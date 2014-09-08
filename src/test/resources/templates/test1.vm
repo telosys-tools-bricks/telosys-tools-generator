@@ -1,0 +1,20 @@
+/*
+ * test1.vm
+ * Created on $today.date ( Time $today.time )
+ */
+
+    //----------------------------------------------------------------------
+    // toString METHOD
+    //----------------------------------------------------------------------
+    public String toString()
+    {
+    
+$myclass.toStringMethodCodeLines(8)
+
+${myclass.toStringMethodCodeLinesWithKey(8,"key")}
+
+
+    }
+
+
+}

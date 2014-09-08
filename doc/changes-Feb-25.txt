@@ -1,0 +1,22 @@
+
+Templates : objects attributes changes 
+
+$field/$attribute "formatted"
+
+$field.formatedType(10)  --> $field.formattedType(10) 
+$field.formatedName(12)  --> $field.formattedName(12) 
+
+
+$link 
+
+$link.formatedType(10)  --> $link.formattedFieldType(10)
+$link.formatedName(12)  --> $link.formattedFieldName(12)
+
+${link.linkType}  --> ${link.fieldType}
+${link.javaName}  --> ${link.fieldName}
+
+$link.targetEntityType --> $link.targetEntitySimpleType
+
+$env usage :
+#set ( $env.entityClassNamePrefix = "Bbbb" )
+#set ( $env.entityClassNameSuffix = "Entity" )

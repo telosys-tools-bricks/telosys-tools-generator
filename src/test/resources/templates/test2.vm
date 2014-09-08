@@ -1,0 +1,33 @@
+/*
+ * test2.vm
+ * Created on $today.date ( Time $today.time )
+ */
+
+    //----------------------------------------------------------------------
+    public String toString()
+    {
+    
+$beanClass.toStringMethodCodeLines(8)
+
+${beanClass.toStringMethodCodeLinesWithKey(8,"key")}
+
+
+    }
+
+    //----------------------------------------------------------------------
+    public String toStringBis()
+    {
+#if ( $beanClass.hasCompositePrimaryKey() )    
+// Composite Key 
+$beanClass.toStringMethodCodeLines(8)
+// beanClass.name : ${beanClass.name}
+// beanClass.sqlTable : ${beanClass.sqlTable}
+${beanClass.toStringMethodCodeLinesWithKey(8,"key")}
+$beanClass.toStringMethodCodeLines(8)
+#else 
+$beanClass.toStringMethodCodeLines(8)
+${beanClass.toStringMethodCodeLinesWithKey(8,"key")}
+$beanClass.toStringMethodCodeLines(8)
+#end
+	}
+}

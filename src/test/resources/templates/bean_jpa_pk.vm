@@ -1,0 +1,82 @@
+/*
+ * Dto key class 
+ * Created on $today.date ( Time $today.time )
+ */
+
+package ${target.javaPackageFromFolder($project.srcFolder)};
+
+import java.io.Serializable;
+
+
+import javax.persistence.*;
+
+//import javax.validation.constraints.* ;
+//import org.hibernate.validator.constraints.* ;
+
+#foreach( $import in $beanClass.imports )
+import $import;
+#end
+
+#foreach( $import in $beanClass.importsJpa )
+import $import;
+#end
+
+@Embeddable
+public class ${beanClass.name}Key implements Serializable
+{
+    private static final long serialVersionUID = 1L;
+
+    //----------------------------------------------------------------------
+    // ENTITY KEY ATTRIBUTES 
+    //----------------------------------------------------------------------
+#foreach( $field in $beanClass.keyAttributes )
+$field.jpaAnnotationsEmbeddedID(4)
+    private $field.formatedType(10) $field.formatedName(12) #if($field.hasInitialValue())= ${field.initialValue} #end;
+    
+#end
+
+    //----------------------------------------------------------------------
+    // CONSTRUCTOR(S)
+    //----------------------------------------------------------------------
+    public ${beanClass.name}Key()
+    {
+        super();
+    }
+    
+    //----------------------------------------------------------------------
+    // GETTERS & SETTERS FOR KEY FIELDS
+    //----------------------------------------------------------------------
+#foreach( $field in $beanClass.keyAttributes )
+#if ( $field.databaseName ) 
+#end
+#if ( $field.setter )    public void ${field.setter}( $field.type value )
+    {
+        this.$field.name = value;
+    }
+#end
+#if ( $field.getter )    public $field.type ${field.getter}()
+    {
+        return this.$field.name;
+    }
+#end
+
+#end  
+
+    //----------------------------------------------------------------------
+    // toString METHOD
+    //----------------------------------------------------------------------
+    public String toString()
+    {
+		StringBuffer sb = new StringBuffer(); 
+#set( $count = 0 )
+#foreach( $field in $beanClass.keyAttributes )
+#if( $count > 0 )
+		sb.append("|"); 
+#end
+		sb.append($field.name); 
+#set( $count = $count + 1 )
+#end  
+        return sb.toString();
+    }
+
+}

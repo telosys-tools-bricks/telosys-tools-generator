@@ -1,0 +1,202 @@
+/*
+ * Dto class 
+ * Created on $today.date ( Time $today.time )
+ * Target entity name : $target.entityName
+ * Target folder  : $target.folder
+ * beanClass.name : ${beanClass.name}
+ */
+// Constants :
+// KEY      : $const.KEY 
+// NOT_KEY  : $const.NOT_KEY 
+// TEXT     : $const.TEXT
+// NOT_TEXT : $const.NOT_TEXT
+// IN_JOIN_COL     : $const.IN_LINKS
+// NOT_IN_JOIN_COL : $const.NOT_IN_LINKS
+
+
+## IF COMPOSITE PRIMARY KEY : GENERATE A JAVA CLASS FOR THIS COMPOSITE KEY
+#if ( $beanClass.hasCompositePrimaryKey() )
+// This Bean has a composite Primary Key  
+$generator.generate($target.entityName , "${beanClass.name}Key.java", $target.folder, "bean_jpa_pk.vm"  )
+#else 
+// This Bean has a basic Primary Key (not composite) 
+#end
+
+package ${target.javaPackageFromFolder($project.srcFolder)};
+
+import java.io.Serializable;
+
+import javax.persistence.*;
+
+//import javax.validation.constraints.* ;
+//import org.hibernate.validator.constraints.* ;
+
+#foreach( $import in $beanClass.imports )
+import $import;
+#end
+
+#foreach( $import in $beanClass.importsJpa )
+import $import;
+#end
+
+## #set ( $foo = $const.NULL )
+
+//--- Attributes KEY  
+#set( $attributes = $beanClass.getAttributesByCriteria( $const.KEY ) )
+#foreach ( $a in $beanClass.getAttributesByCriteria( $const.KEY ) )
+// Attribute : $a.name
+#end
+//--- Attributes NOT_KEY  
+#set( $attributes = $beanClass.getAttributesByCriteria( $const.NOT_KEY ) )
+#foreach ( $a in $attributes )
+// Attribute : $a.name
+#end
+//--- Attributes NOT_KEY + NOT_TEXT
+#set ( $criteria = $const.NOT_KEY + $const.NOT_TEXT )
+#set( $attributes = $beanClass.getAttributesByCriteria( $const.NOT_KEY, $const.NOT_TEXT ) )
+#foreach ( $a in $attributes )
+// Attribute : $a.name
+#end
+//--- Attributes NOT_KEY + NOT_IN_SELECTED_LINKS
+// $const.NOT_IN_SELECTED_LINKS
+#set ( $criteria = $const.NOT_KEY + $const.NOT_IN_SELECTED_LINKS )
+#set( $attributes = $beanClass.getAttributesByCriteria( $const.NOT_KEY, $const.NOT_IN_SELECTED_LINKS ) )
+#foreach ( $a in $attributes )
+// Attribute : $a.name
+#end
+ 
+$beanClass.jpaAnnotations
+public class $beanClass.name implements Serializable
+{
+    private static final long serialVersionUID = 1L;
+
+#if ( $beanClass.hasCompositePrimaryKey() )
+    //----------------------------------------------------------------------
+    // ENTITY PRIMARY KEY ( EMBEDDED IN AN EXTERNAL CLASS )  
+    //----------------------------------------------------------------------
+	@EmbeddedId
+    private ${beanClass.name}Key key;
+
+#else 
+    //----------------------------------------------------------------------
+    // ENTITY PRIMARY KEY ( BASED ON A SINGLE FIELD )
+    //----------------------------------------------------------------------
+#foreach( $field in $beanClass.keyAttributes )
+$field.jpaAnnotations(4)
+    private $field.formatedType(10) $field.formatedName(12) #if($field.hasInitialValue())= ${field.initialValue} #end;
+#end
+
+#end
+
+    //----------------------------------------------------------------------
+    // ENTITY FIELDS 
+    //----------------------------------------------------------------------    
+#foreach( $field in $beanClass.nonKeyAttributes )
+#if ( $field.isUsedInLinkJoinColumn( $beanClass.selectedLinks ) != true )
+$field.jpaAnnotations(4)
+    private $field.formatedType(10) $field.formatedName(12) #if($field.hasInitialValue())= ${field.initialValue} #end;
+    
+#else
+    // "$field.name" (column "$field.databaseName") is not mapped as an attribute because it is used in a link   
+    
+#end
+#end
+
+    //----------------------------------------------------------------------
+    // ENTITY LINKS ( RELATIONSHIP )
+    //----------------------------------------------------------------------
+#foreach( $link in $beanClass.selectedLinks )
+$link.jpaAnnotations(4)
+    private $link.formatedType(10) $link.formatedName(12);
+
+#end
+
+    //----------------------------------------------------------------------
+    // CONSTRUCTOR(S)
+    //----------------------------------------------------------------------
+    public ${beanClass.name}()
+    {
+        super();
+    }
+    
+#if ( $beanClass.hasCompositePrimaryKey() )
+    //----------------------------------------------------------------------
+    // GETTER & SETTER FOR THE COMPOSITE KEY 
+    //----------------------------------------------------------------------
+    
+	public ${beanClass.name}Key getKey() {
+        return key;
+    }
+ 
+    public void setKey(${beanClass.name}Key keyIn) {
+        this.key = keyIn;
+    }
+    
+#else 
+    //----------------------------------------------------------------------
+    // GETTER & SETTER FOR THE KEY FIELD
+    //----------------------------------------------------------------------
+#foreach( $field in $beanClass.keyAttributes )
+#if ( $field.setter )    public void ${field.setter}( $field.type value )
+    {
+        this.$field.name = value;
+    }
+#end
+#if ( $field.getter )    public $field.type ${field.getter}()
+    {
+        return this.$field.name;
+    }
+#end
+#end
+#end
+
+    //----------------------------------------------------------------------
+    // GETTERS & SETTERS FOR FIELDS
+    //----------------------------------------------------------------------
+#foreach( $field in $beanClass.nonKeyAttributes )
+#if ( $field.isUsedInLinkJoinColumn( $beanClass.selectedLinks ) != true )
+#if ( $field.databaseName )    //--- DATABSE MAPPING : $field.databaseName ( $field.databaseType ) 
+#end
+#if ( $field.setter )    public void ${field.setter}( $field.type value )
+    {
+        this.$field.name = value;
+    }
+#end
+#if ( $field.getter )    public $field.type ${field.getter}()
+    {
+        return this.$field.name;
+    }
+#end
+
+#end  
+#end  
+
+    
+    //----------------------------------------------------------------------
+    // GETTERS & SETTERS FOR LINKS
+    //----------------------------------------------------------------------
+#foreach( $link in $beanClass.selectedLinks )
+#if ( $link.setter )    public void ${link.setter}( ${link.linkType} value )
+    {
+        this.${link.javaName} = value;
+    }
+#end
+#if ( $link.getter )    public ${link.linkType} ${link.getter}()
+    {
+        return this.${link.javaName};
+    }
+#end
+
+#end  
+
+    //----------------------------------------------------------------------
+    // toString METHOD
+    //----------------------------------------------------------------------
+    public String toString()
+    {
+#set( $attributes = $beanClass.getAttributesByCriteria( $const.NOT_KEY, $const.NOT_TEXT, $const.NOT_IN_SELECTED_LINKS ) )    
+$beanClass.toStringMethodCodeLinesWithKey(8, $attributes, "key") 
+## The "key" is used only if composite key
+    }
+
+}
