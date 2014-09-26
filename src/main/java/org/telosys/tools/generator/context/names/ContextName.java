@@ -59,6 +59,7 @@ public class ContextName {
 	public final static String  JPA              = "jpa" ; // ver 2.0.7
 	public final static String  BEAN_VALIDATION  = "beanValidation" ; // ver 2.0.7
 	public final static String  ENV              = "env" ; // ver 2.1.0
+	public final static String  JDBC             = "jdbc" ; // ver 2.1.1
 	//---  
 	public final static String  ENTITY            = "entity" ;    // New name 
 	//public final static String  BEAN_CLASS        = "beanClass" ; // Other name for "entity" removed in ver 2.1.0

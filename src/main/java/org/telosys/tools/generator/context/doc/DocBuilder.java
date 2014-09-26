@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.context.BeanValidation;
 import org.telosys.tools.generator.context.Const;
 import org.telosys.tools.generator.context.DatabaseInContext;
@@ -31,11 +32,11 @@ import org.telosys.tools.generator.context.EmbeddedGenerator;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generator.context.Fn;
+import org.telosys.tools.generator.context.ForeignKeyColumnInContext;
+import org.telosys.tools.generator.context.ForeignKeyInContext;
 import org.telosys.tools.generator.context.GenerationInContext;
 import org.telosys.tools.generator.context.Java;
-import org.telosys.tools.generator.context.AttributeInContext;
-import org.telosys.tools.generator.context.ForeignKeyInContext;
-import org.telosys.tools.generator.context.ForeignKeyColumnInContext;
+import org.telosys.tools.generator.context.JdbcInContext;
 import org.telosys.tools.generator.context.JoinColumnInContext;
 import org.telosys.tools.generator.context.Jpa;
 import org.telosys.tools.generator.context.LinkAttributeInContext;
@@ -242,6 +243,7 @@ public class DocBuilder {
 		Target.class,
 		Today.class,
 		EnvInContext.class, // ver 2.1.0
+		JdbcInContext.class, // ver 2.1.1
 	};
 	
 	public Map<String,ClassInfo> getVelocityClassesInfo() {

@@ -84,6 +84,7 @@ public class AttributeInContext
 //	private final String  _sSetter ; // Dynamic since v 2.0.7
 	
 	private final String  _sDefaultValue ; // can be null 
+	private final boolean _bSelected ; // v 2.1.1 #LGU
 	
 	//--- Database info -------------------------------------------------
     private final boolean _bKeyElement      ;  // True if primary key
@@ -190,7 +191,8 @@ public class AttributeInContext
 		// v 2.0.7
 //		_sGetter = Util.buildGetter(_sName, _sType);
 //		_sSetter = Util.buildSetter(_sName);
-
+		_bSelected        = column.getSelected(); // v 2.1.1 #LGU
+		
 		_sInitialValue    = null ; //  column.getJavaInitialValue()  ???
 		_sDefaultValue    = column.getJavaDefaultValue();
 		
@@ -1320,6 +1322,16 @@ public class AttributeInContext
 		return s != null ? s : "" ;
 	}
 	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns TRUE if the attribute is selected (ckeckbox ckecked in the GUI)"
+			}
+	)
+	public boolean isSelected() {
+		return _bSelected;
+	}
+
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
