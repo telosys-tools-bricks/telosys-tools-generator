@@ -178,8 +178,23 @@ public class JdbcInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
-			"Returns the list of all the attributes required for the SQL SELECT",
+			"Returns the list of all the attributes of the Primary Key",
 			""
+		},
+		example={	
+				"$jdbc.attributesForPrimaryKey"
+			},
+		since = "2.1.1"
+	)
+	public List<AttributeInContext> getAttributesForPrimaryKey()
+    {
+		return this.sqlCRUDRequests.getAttributesForPrimaryKey();
+    }
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns the list of all the attributes required for the SQL SELECT",
+			"All the attributes required to populate the bean instance from the result set"
 		},
 		example={	
 				"$jdbc.attributesForSelect"
@@ -194,7 +209,7 @@ public class JdbcInContext {
 	@VelocityMethod ( 
 			text= { 
 				"Returns the list of all the attributes required for the SQL INSERT",
-				""
+				"All the attributes required to populate the PreparedStatement from a bean instance "
 			},
 			example={	
 					"$jdbc.attributesForInsert"
@@ -206,12 +221,26 @@ public class JdbcInContext {
 			return this.sqlCRUDRequests.getAttributesForInsert();
 	    }
 	//-------------------------------------------------------------------------------------
-	
+	@VelocityMethod ( 
+			text= { 
+				"Returns the list of all the attributes required for the SQL UPDATE",
+				""
+			},
+			example={	
+					"$jdbc.attributesForUpdate"
+				},
+			since = "2.1.1"
+		)
+		public List<AttributeInContext> getAttributesForUpdate()
+	    {
+			return this.sqlCRUDRequests.getAttributesForUpdate();
+	    }
+	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
 			"Returns PreparedStatement setter according to the attribute type",
-			"e.g. : 'setInt', setString', 'setBoolean', etc",
+			"e.g. : 'setInt', 'setString', 'setBoolean', etc",
 			""
 		},
 		parameters = {
@@ -245,6 +274,25 @@ public class JdbcInContext {
 	public String valueForPreparedStatement(AttributeInContext attribute, String name)
     {
 		return JdbcTypesMapper.getValueForPreparedStatement(attribute, name);
+    }
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns ResultSet getter according to the attribute type",
+			"e.g. : 'getInt', 'getString', 'getBoolean', etc",
+			""
+		},
+		parameters = {
+			"attribute : the attribute"
+		},
+		example={	
+			"$jdbc.resultSetGetter($attribute)"
+		},
+		since = "2.1.1"
+	)
+	public String resultSetGetter(AttributeInContext attribute)
+    {
+		return JdbcTypesMapper.getResultSetGetter( attribute) ;
     }
 	//-------------------------------------------------------------------------------------
 }

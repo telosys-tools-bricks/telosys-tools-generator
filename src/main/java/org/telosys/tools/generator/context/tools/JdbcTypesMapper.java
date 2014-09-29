@@ -67,6 +67,45 @@ public class JdbcTypesMapper {
 		
 	}
 	
+	private final static Hashtable<String,String> resultSetGetters = new Hashtable<String,String>() ;
+	static {
+		resultSetGetters.put(String.class.getCanonicalName(),  "getString" );
+		
+		resultSetGetters.put(Byte.class.getCanonicalName(),    "getByte"  );
+		resultSetGetters.put(byte.class.getCanonicalName(),    "getByte"  );
+		
+		resultSetGetters.put(Short.class.getCanonicalName(),   "getShort" );
+		resultSetGetters.put(short.class.getCanonicalName(),   "getShort" );
+		
+		resultSetGetters.put(Integer.class.getCanonicalName(), "getInt"   );
+		resultSetGetters.put(int.class.getCanonicalName(),     "getInt"   );
+		
+		resultSetGetters.put(Long.class.getCanonicalName(),    "getLong"  );
+		resultSetGetters.put(long.class.getCanonicalName(),    "getLong"  );
+
+		resultSetGetters.put(Float.class.getCanonicalName(),   "getFloat"  );
+		resultSetGetters.put(float.class.getCanonicalName(),   "getFloat"  );
+		
+		resultSetGetters.put(Double.class.getCanonicalName(),  "getDouble"  );
+		resultSetGetters.put(double.class.getCanonicalName(),  "getDouble"  );
+
+		// BigInteger.class.getCanonicalName() : not supported in JDBC
+		resultSetGetters.put(BigDecimal.class.getCanonicalName(), "getBigDecimal"  );
+
+		// NB : java.util.Date value is supposed to be converted in java.sql.Date
+		resultSetGetters.put(java.util.Date.class.getCanonicalName(),     "getDate"  );
+		
+		resultSetGetters.put(java.sql.Date.class.getCanonicalName(),      "getDate"  );
+		resultSetGetters.put(java.sql.Time.class.getCanonicalName(),      "getTime"  );
+		resultSetGetters.put(java.sql.Timestamp.class.getCanonicalName(), "getTimestamp"  );
+		
+		resultSetGetters.put(Boolean.class.getCanonicalName(),  "getBoolean"  );
+		resultSetGetters.put(boolean.class.getCanonicalName(),  "getBoolean"  );
+		
+		resultSetGetters.put(byte[].class.getCanonicalName(),   "getBytes"  );
+		
+	}
+	
 	/**
 	 * No Constructor
 	 */
@@ -96,6 +135,15 @@ public class JdbcTypesMapper {
 			// Just return the simple getter 
 			return getter;
 		}
+	}
+
+	public static String getResultSetGetter(AttributeInContext attribute) {
+		
+		String getter = resultSetGetters.get( attribute.getFullType() );
+		if ( getter == null ) {
+			return "getUnknown" ;
+		}
+		return getter ;
 	}
 
 }
