@@ -17,10 +17,11 @@ package org.telosys.tools.generator.context;
 
 import java.util.List;
 
-import org.telosys.tools.commons.jdbc.SqlCRUDRequests;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generator.context.tools.JdbcRequests;
+import org.telosys.tools.generator.context.tools.JdbcTypesMapper;
 
 //-------------------------------------------------------------------------------------
 @VelocityObject(
@@ -34,96 +35,46 @@ import org.telosys.tools.generator.context.names.ContextName;
 //-------------------------------------------------------------------------------------
 public class JdbcInContext {
 
-	//private final static List<String> VOID_STRINGS_LIST = new LinkedList<String>();
-	private boolean useSchema = false ;
-
+	//private final SqlCRUDRequests sqlCRUDRequests ;
+	private final JdbcRequests sqlCRUDRequests ;
+	
 	//-------------------------------------------------------------------------------------
 	// CONSTRUCTOR
 	//-------------------------------------------------------------------------------------
-	public JdbcInContext() {
+	public JdbcInContext(EntityInContext entity, boolean useSchema) {
 		super();
+		//this.sqlCRUDRequests = buildJdbc(entity, useSchema );
+		this.sqlCRUDRequests = new JdbcRequests(entity, useSchema );
 	}
 	
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod ( 
-		text= { 
-			"Defines if the 'schema' must be used in the table name",
-			"Default value is FALSE"
-		},
-		parameters = {
-			"value : true = use schema, false = do not use schema "
-		},		
-		example={	
-			"$jdbc.useSchema()"
-		},
-		since = "2.1.1"
-	)
-	public void useSchema(boolean value)
-    {
-		this.useSchema = value ;
-    }
-	
-//	//-------------------------------------------------------------------------------------
-//	// JPA IMPORTS
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod ( 
-//		text= { 
-//			"Returns a list of all the Java classes required by the current entity for JPA",
-//			"( this version always returns 'javax.persistence.*' )"
-//		},
-//		parameters = {
-//			"entity : the entity "
-//		},
-//		example={	
-//			"#foreach( $import in $jpa.imports($entity) )",
-//			"import $import;",
-//			"#end" 
-//		},
-//		since = "2.0.7"
-//	)
-//	@VelocityReturnType("List of 'String'")
-//	//public List<String> imports(JavaBeanClass entity) 
-//	public List<String> imports(EntityInContext entity) 
-//	{
-//		ImportsList _importsJpa = buildJpaImportsList(entity) ;
-//		if ( _importsJpa != null )
-//		{
-//			return _importsJpa.getList() ;
-//		}
-//		return VOID_STRINGS_LIST ;
-//	}
 
-	private String[] getColumnNames(List<AttributeInContext> attributes) {
-		String[] columnNames = new String[attributes.size()] ;
-		int i = 0 ;
-		for ( AttributeInContext attr : attributes ) {
-			columnNames[i] = attr.getDatabaseName() ; 
-			i++;
-		}
-		return columnNames;
-	}
+//	private String[] getColumnNames(List<AttributeInContext> attributes) {
+//		String[] columnNames = new String[attributes.size()] ;
+//		int i = 0 ;
+//		for ( AttributeInContext attr : attributes ) {
+//			columnNames[i] = attr.getDatabaseName() ; 
+//			i++;
+//		}
+//		return columnNames;
+//	}
 	
-	private SqlCRUDRequests buildJdbc(EntityInContext entity) {
-		String table = entity.getDatabaseTable();
-		if ( this.useSchema ) {
-			table = entity.getDatabaseSchema() + "." + entity.getDatabaseTable();
-		}
-		String[] keyColumns    = getColumnNames(entity.getKeyAttributes());
-		String[] nonKeyColumns = getColumnNames(entity.getNonKeyAttributes());
-		if ( entity.hasAutoIncrementedKey() ) {
-			// This entity has an auto-incremented column
-			String autoincrColumn = entity.getAutoincrementedKeyAttribute().getDatabaseName() ;
-			return new SqlCRUDRequests(table, keyColumns, nonKeyColumns, autoincrColumn ) ;
-		}
-		else {
-			// No auto-incremented column
-			return new SqlCRUDRequests(table, keyColumns, nonKeyColumns ) ;
-		}
-	}
-	
-	private SqlCRUDRequests getSqlCRUDRequests(EntityInContext entity) {
-		return buildJdbc(entity);
-	}
+//	private SqlCRUDRequests buildJdbc(EntityInContext entity, boolean useSchema) {
+//		String table = entity.getDatabaseTable();
+//		if ( useSchema ) {
+//			table = entity.getDatabaseSchema() + "." + entity.getDatabaseTable();
+//		}
+//		String[] keyColumns    = getColumnNames(entity.getKeyAttributes());
+//		String[] nonKeyColumns = getColumnNames(entity.getNonKeyAttributes());
+//		if ( entity.hasAutoIncrementedKey() ) {
+//			// This entity has an auto-incremented column
+//			String autoincrColumn = entity.getAutoincrementedKeyAttribute().getDatabaseName() ;
+//			return new SqlCRUDRequests(table, keyColumns, nonKeyColumns, autoincrColumn ) ;
+//		}
+//		else {
+//			// No auto-incremented column
+//			return new SqlCRUDRequests(table, keyColumns, nonKeyColumns ) ;
+//		}
+//	}
 	
 	//-------------------------------------------------------------------------------------
 	// SQL REQUESTS
@@ -133,17 +84,22 @@ public class JdbcInContext {
 			"Returns the JDBC SQL SELECT request",
 			""
 		},
-		parameters = {
-			"entity : the entity"
-		},
+//		parameters = {
+//			"entity : the entity"
+//		},
+//		example={	
+//			"$jdbc.sqlSelect( $entity )"
+//		},
 		example={	
-			"$jdbc.sqlSelect( $entity )"
-		},
+				"$jdbc.sqlSelect"
+			},
 		since = "2.1.1"
 	)
-	public String sqlSelect(EntityInContext entity)
+//	public String sqlSelect(EntityInContext entity)
+	public String getSqlSelect()
     {
-		return getSqlCRUDRequests(entity).getSqlSelect() ;
+		//return getSqlCRUDRequests(entity).getSqlSelect() ;
+		return this.sqlCRUDRequests.getSqlSelect();
     }
 	
 	//-------------------------------------------------------------------------------------
@@ -152,17 +108,22 @@ public class JdbcInContext {
 			"Returns the JDBC SQL INSERT request",
 			""
 		},
-		parameters = {
-			"entity : the entity"
-		},
+//		parameters = {
+//			"entity : the entity"
+//		},
+//		example={	
+//			"$jdbc.sqlInsert( $entity )"
+//		},
 		example={	
-			"$jdbc.sqlInsert( $entity )"
-		},
+				"$jdbc.sqlInsert"
+			},
 		since = "2.1.1"
 	)
-	public String sqlInsert(EntityInContext entity)
+//	public String sqlInsert(EntityInContext entity)
+	public String getSqlInsert()
     {
-		return getSqlCRUDRequests(entity).getSqlInsert() ;
+		//return getSqlCRUDRequests(entity).getSqlInsert() ;
+		return this.sqlCRUDRequests.getSqlInsert();
     }
 	
 	//-------------------------------------------------------------------------------------
@@ -174,14 +135,19 @@ public class JdbcInContext {
 		parameters = {
 			"entity : the entity"
 		},
+//		example={	
+//			"$jdbc.sqlUpdate( $entity )"
+//		},
 		example={	
-			"$jdbc.sqlUpdate( $entity )"
-		},
+				"$jdbc.sqlUpdate"
+			},
 		since = "2.1.1"
 	)
-	public String sqlUpdate(EntityInContext entity)
+//	public String sqlUpdate(EntityInContext entity)
+	public String getSqlUpdate()
     {
-		return getSqlCRUDRequests(entity).getSqlUpdate() ;
+		//return getSqlCRUDRequests(entity).getSqlUpdate() ;
+		return this.sqlCRUDRequests.getSqlUpdate();
     }
 
 	//-------------------------------------------------------------------------------------
@@ -190,20 +156,95 @@ public class JdbcInContext {
 			"Returns the JDBC SQL DELETE request",
 			""
 		},
-		parameters = {
-			"entity : the entity"
-		},
+//		parameters = {
+//			"entity : the entity"
+//		},
+//		example={	
+//			"$jdbc.sqlDelete( $entity )"
+//		},
 		example={	
-			"$jdbc.sqlDelete( $entity )"
-		},
+				"$jdbc.sqlDelete"
+			},
 		since = "2.1.1"
 	)
-	public String sqlDelete(EntityInContext entity)
+	//public String sqlDelete(EntityInContext entity)
+	public String getSqlDelete()
     {
-		return getSqlCRUDRequests(entity).getSqlDelete();
+		//return getSqlCRUDRequests(entity).getSqlDelete();
+		return this.sqlCRUDRequests.getSqlDelete();
     }
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns the list of all the attributes required for the SQL SELECT",
+			""
+		},
+		example={	
+				"$jdbc.attributesForSelect"
+			},
+		since = "2.1.1"
+	)
+	public List<AttributeInContext> getAttributesForSelect()
+    {
+		return this.sqlCRUDRequests.getAttributesForSelect();
+    }
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+			text= { 
+				"Returns the list of all the attributes required for the SQL INSERT",
+				""
+			},
+			example={	
+					"$jdbc.attributesForInsert"
+				},
+			since = "2.1.1"
+		)
+		public List<AttributeInContext> getAttributesForInsert()
+	    {
+			return this.sqlCRUDRequests.getAttributesForInsert();
+	    }
+	//-------------------------------------------------------------------------------------
 	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns PreparedStatement setter according to the attribute type",
+			"e.g. : 'setInt', setString', 'setBoolean', etc",
+			""
+		},
+		parameters = {
+			"attribute : the attribute"
+		},
+		example={	
+			"$jdbc.preparedStatementSetter($attribute)"
+		},
+		since = "2.1.1"
+	)
+	public String preparedStatementSetter(AttributeInContext attribute)
+    {
+		return JdbcTypesMapper.getPreparedStatementSetter( attribute) ;
+    }
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns the attribute's value to be set in the PreparedStatement ",
+			"e.g. : 'getFirstName', 'getCode', etc",
+			""
+		},
+		parameters = {
+				"attribute : the attribute",
+				"name : the variable name to be used to identify the attribute ( eg : 'country', 'book', 'employee', etc )"
+			},
+		example={	
+			"$jdbc.valueForPreparedStatement($attribute, 'book')"
+		},
+		since = "2.1.1"
+	)
+	public String valueForPreparedStatement(AttributeInContext attribute, String name)
+    {
+		return JdbcTypesMapper.getValueForPreparedStatement(attribute, name);
+    }
+	//-------------------------------------------------------------------------------------
 }
