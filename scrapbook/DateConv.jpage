@@ -1,0 +1,5 @@
+java.util.Date now = new java.util.Date();
+System.out.println( now.getTime() );
+java.util.Date nowSql = new java.sql.Date( now.getTime() );
+System.out.println( nowSql.getTime() );
+
