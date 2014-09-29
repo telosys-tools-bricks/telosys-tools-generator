@@ -84,21 +84,13 @@ public class JdbcInContext {
 			"Returns the JDBC SQL SELECT request",
 			""
 		},
-//		parameters = {
-//			"entity : the entity"
-//		},
-//		example={	
-//			"$jdbc.sqlSelect( $entity )"
-//		},
 		example={	
 				"$jdbc.sqlSelect"
 			},
 		since = "2.1.1"
 	)
-//	public String sqlSelect(EntityInContext entity)
 	public String getSqlSelect()
     {
-		//return getSqlCRUDRequests(entity).getSqlSelect() ;
 		return this.sqlCRUDRequests.getSqlSelect();
     }
 	
@@ -108,21 +100,13 @@ public class JdbcInContext {
 			"Returns the JDBC SQL INSERT request",
 			""
 		},
-//		parameters = {
-//			"entity : the entity"
-//		},
-//		example={	
-//			"$jdbc.sqlInsert( $entity )"
-//		},
 		example={	
 				"$jdbc.sqlInsert"
 			},
 		since = "2.1.1"
 	)
-//	public String sqlInsert(EntityInContext entity)
 	public String getSqlInsert()
     {
-		//return getSqlCRUDRequests(entity).getSqlInsert() ;
 		return this.sqlCRUDRequests.getSqlInsert();
     }
 	
@@ -135,18 +119,13 @@ public class JdbcInContext {
 		parameters = {
 			"entity : the entity"
 		},
-//		example={	
-//			"$jdbc.sqlUpdate( $entity )"
-//		},
 		example={	
 				"$jdbc.sqlUpdate"
 			},
 		since = "2.1.1"
 	)
-//	public String sqlUpdate(EntityInContext entity)
 	public String getSqlUpdate()
     {
-		//return getSqlCRUDRequests(entity).getSqlUpdate() ;
 		return this.sqlCRUDRequests.getSqlUpdate();
     }
 
@@ -156,22 +135,29 @@ public class JdbcInContext {
 			"Returns the JDBC SQL DELETE request",
 			""
 		},
-//		parameters = {
-//			"entity : the entity"
-//		},
-//		example={	
-//			"$jdbc.sqlDelete( $entity )"
-//		},
 		example={	
 				"$jdbc.sqlDelete"
 			},
 		since = "2.1.1"
 	)
-	//public String sqlDelete(EntityInContext entity)
 	public String getSqlDelete()
     {
-		//return getSqlCRUDRequests(entity).getSqlDelete();
 		return this.sqlCRUDRequests.getSqlDelete();
+    }
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns the JDBC SQL COUNT request to check existence",
+			""
+		},
+		example={	
+				"$jdbc.sqlExists"
+			},
+		since = "2.1.1"
+	)
+	public String getSqlExists()
+    {
+		return this.sqlCRUDRequests.getSqlExists();
     }
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
