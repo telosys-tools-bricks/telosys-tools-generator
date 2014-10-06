@@ -376,6 +376,9 @@ public class Fn {
 		return "";
 	}
 
+	//==============================================================================================
+	// Version 2.1.0
+	//==============================================================================================
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(text={	
 			"Returns TRUE if the given object name is defined in the Velocity Context"
@@ -451,5 +454,25 @@ public class Fn {
 			return str.toLowerCase();
 		}
 		return str.substring(0, 1).toLowerCase() + str.substring(1);
+	}	
+
+	//==============================================================================================
+	// Version 2.1.1
+	//==============================================================================================
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Builds a list of values (one value for each attribute)",
+			"Those values are usable in test cases"
+			},
+			parameters = { 
+				"attributes : list of attributes requiring values",
+				"step : a step (from 1 to N) used to change the values builded "
+			},
+			example = {
+				"$fn.buildValues($entity.attributes, 1) " },
+			since = "2.1.1"
+			)
+	public ValuesInContext buildValues(final List<AttributeInContext> attributes, final int step) {
+		return new ValuesInContext( attributes, step ) ;
 	}	
 }
