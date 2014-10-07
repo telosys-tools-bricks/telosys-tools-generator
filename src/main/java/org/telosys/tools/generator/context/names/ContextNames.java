@@ -78,6 +78,8 @@ public class ContextNames {
 		GENERATOR_OBJECTS_LIST.add( ContextName.DATABASES ); // ver 2.1.0
 		GENERATOR_OBJECTS_LIST.add( ContextName.TODAY );
 		GENERATOR_OBJECTS_LIST.add( ContextName.ENV ); // ver 2.1.0
+		GENERATOR_OBJECTS_LIST.add( ContextName.JDBC_FACTORY ); // ver 2.1.1
+		GENERATOR_OBJECTS_LIST.add( ContextName.H2 ); // ver 2.1.1
 
 		//--- Current Entity/Target objects
 		GENERATOR_OBJECTS_LIST.add( ContextName.TARGET      );
@@ -102,6 +104,8 @@ public class ContextNames {
 		PREDEFINED_NAMES_LIST.add( ContextName.DATABASE ); // v 2.1.0
 		PREDEFINED_NAMES_LIST.add( ContextName.LINK_ATTRIBUTE ); // v 2.1.0
 		PREDEFINED_NAMES_LIST.add( ContextName.JOIN_COLUMN ); // v 2.1.0
+
+		PREDEFINED_NAMES_LIST.add( ContextName.JDBC ); // v 2.1.1
 	}
 
 //	private static List<String> WIZARDS_OBJECTS_LIST = new LinkedList<String>();

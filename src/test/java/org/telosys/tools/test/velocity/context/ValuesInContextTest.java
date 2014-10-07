@@ -41,6 +41,7 @@ public class ValuesInContextTest {
 		System.out.println("b2 = " + b2);
 		
 		short sh = (short)12;
+		System.out.println("sh = " + sh);
 		
 		float  f = 12345.60F ;
 		System.out.println("f = " + f);

@@ -44,6 +44,7 @@ import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generator.context.Fn;
 import org.telosys.tools.generator.context.GenerationInContext;
+import org.telosys.tools.generator.context.H2InContext;
 import org.telosys.tools.generator.context.Java;
 import org.telosys.tools.generator.context.JdbcFactoryInContext;
 import org.telosys.tools.generator.context.Jpa;
@@ -294,6 +295,7 @@ public class Generator {
 //		_velocityContext.put(ContextName.JDBC,            new JdbcInContext());  // JDBC utility functions ( ver 2.1.1 )
 		_velocityContext.put(ContextName.JDBC_FACTORY,    new JdbcFactoryInContext());  // JDBC factory ( ver 2.1.1 )
 		_velocityContext.put(ContextName.BEAN_VALIDATION, new BeanValidation()); // Bean Validation utility functions
+		_velocityContext.put(ContextName.H2,              new H2InContext());  // JDBC factory ( ver 2.1.1 )
 
 		_velocityContext.put(ContextName.DATABASES,
 							new DatabasesInContext( generatorConfig.getDatabasesConfigurations() ) ); // ver 2.1.0
