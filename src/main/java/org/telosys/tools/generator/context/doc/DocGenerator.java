@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.telosys.tools.commons.FileUtil;
+
 
 public class DocGenerator {
 
@@ -29,12 +31,20 @@ public class DocGenerator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
 		String userDir =  System.getProperty("user.dir") ;
-		System.out.println( "USER DIR : " + userDir );
-		// USER DIR is "X:\xxx\xxx\workspace\project"
-		String destDir = userDir + "/target/doc/html/objects/" ;
-		System.out.println( "DEST DIR : " + destDir );
+		System.out.println( "USER DIR : " + userDir ); // "X:\xxx\xxx\workspace\project"
+
+		String destDir = userDir + "/target/doc/html/objects" ;
+		System.out.println( "DEST DIR : " + destDir );	
+		
+		int n = generateHtmlDoc(destDir);
+		System.out.println("Normal end of generation. " + n + " files generated.");
+	}
+	
+	public static int generateHtmlDoc(String destDir) {
+
+		System.out.println( "HTML documentation generation" );
+		System.out.println( "Destination directory : " + destDir );
 		File fileDir = new File(destDir);
 		if ( ! fileDir.exists() )
 		{
@@ -44,8 +54,9 @@ public class DocGenerator {
 		    }
 		    else {
 		    	System.out.println("ERROR : Cannot create directory !");
+		    	return -1 ;
 		    }
-		}		
+		}
 		
 		DocBuilder docBuilder = new DocBuilder();
 		
@@ -60,15 +71,18 @@ public class DocGenerator {
 		List<String>sortedNames = sortList(names);
 		
 		DocGeneratorHTML htmlGenerator = new DocGeneratorHTML();
-		
+
 		System.out.println("Sorted context names (size=" + sortedNames.size() + ") : " );
+		int c = 0 ;
 		for ( String name : sortedNames ) {
 			ClassInfo classInfo = classesInfo.get(name);
-					//+ classInfo.getJavaClassName() + " " + classInfo.getMethodsCount() + " methods");
-			String fileName = destDir + classInfo.getContextName() + ".html" ;
-			System.out.println(" . " + name + " (" + classInfo.getContextName() + ") --> " + fileName );
-			htmlGenerator.generateDocFile(classInfo, fileName);
+			String shortFileName = classInfo.getContextName() + ".html" ;
+			String fullFileName = FileUtil.buildFilePath(destDir, shortFileName);
+			System.out.println(" . " + name + " (" + classInfo.getContextName() + ") --> " + fullFileName );
+			htmlGenerator.generateDocFile(classInfo, fullFileName);
+			c++;
 		}
+		return c;
 	}
 	
 	public static <T extends Comparable<? super T>> List<T> sortList(Collection<T> c) {

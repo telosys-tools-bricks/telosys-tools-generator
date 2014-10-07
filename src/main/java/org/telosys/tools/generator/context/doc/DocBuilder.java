@@ -35,7 +35,9 @@ import org.telosys.tools.generator.context.Fn;
 import org.telosys.tools.generator.context.ForeignKeyColumnInContext;
 import org.telosys.tools.generator.context.ForeignKeyInContext;
 import org.telosys.tools.generator.context.GenerationInContext;
+import org.telosys.tools.generator.context.H2InContext;
 import org.telosys.tools.generator.context.Java;
+import org.telosys.tools.generator.context.JdbcFactoryInContext;
 import org.telosys.tools.generator.context.JdbcInContext;
 import org.telosys.tools.generator.context.JoinColumnInContext;
 import org.telosys.tools.generator.context.Jpa;
@@ -244,6 +246,8 @@ public class DocBuilder {
 		Today.class,
 		EnvInContext.class, // ver 2.1.0
 		JdbcInContext.class, // ver 2.1.1
+		JdbcFactoryInContext.class, // ver 2.1.1
+		H2InContext.class // ver 2.1.1
 	};
 	
 	public Map<String,ClassInfo> getVelocityClassesInfo() {
