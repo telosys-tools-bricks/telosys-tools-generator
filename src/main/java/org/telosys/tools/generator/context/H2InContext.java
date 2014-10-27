@@ -120,6 +120,9 @@ public class H2InContext {
 		sb.append( " ") ;
 		sb.append( getColumnType(attribute) ) ;
 		sb.append( " ") ;
+		if ( attribute.isAutoIncremented() ) {
+			sb.append( "AUTO_INCREMENT ") ;
+		}
 		if ( attribute.isNotNull() ) {
 			sb.append( "NOT NULL") ;
 		}

@@ -115,23 +115,40 @@ public class ValuesInContextTest {
 		
 		List<AttributeInContext> attributes = new LinkedList<AttributeInContext>() ;
 		
-		attributes.add( new AttributeInContext(null, buildColumn("id",        "int")) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("firstName", "java.lang.String", 10)) ) ;
+		AttributeInContext attribId = new AttributeInContext(null, buildColumn("id",        "int")) ;
+		attributes.add(attribId);
+		
+		AttributeInContext attribFirstName =  new AttributeInContext(null, buildColumn("firstName", "java.lang.String", 10)) ;
+		attributes.add(attribFirstName);
+		
 		attributes.add( new AttributeInContext(null, buildColumn("age",       "java.lang.Short")) ) ;
+		attributes.add( new AttributeInContext(null, buildColumn("num1",      "long")) ) ;
+		attributes.add( new AttributeInContext(null, buildColumn("num2",      "java.lang.Double")) ) ;
 		attributes.add( new AttributeInContext(null, buildColumn("date1",     "java.util.Date")) ) ;
 		attributes.add( new AttributeInContext(null, buildColumn("date2",     "java.sql.Date")) ) ;
+		attributes.add( new AttributeInContext(null, buildColumn("flag",      "boolean")) ) ;
+		attributes.add( new AttributeInContext(null, buildColumn("flag2",     "boolean")) ) ;
+		attributes.add( new AttributeInContext(null, buildColumn("time",     "java.sql.Time")) ) ;
 		
 		ValuesInContext values = new ValuesInContext( attributes, 1 );
 		
 		checkValue(values, "id",        "100") ;
 		checkValue(values, "firstName", buildString('A', 10)) ;
 		checkValue(values, "age",       "(short)10") ;
+		checkValue(values, "flag",      "true") ;
+		checkValue(values, "flag2",      "true") ;
 //		checkValue(values, "date1",     "Calendar.getInstance().getTime()") ;
 //		checkValue(values, "date2",     "(new java.sql.Date(Calendar.getInstance().getTime().getTime()))") ;
-		checkValue(values, "date1",     "null") ;
-		checkValue(values, "date2",     "null") ;
+		checkValue(values, "date1",     "java.sql.Date.valueOf(\"2001-06-22\")") ;
+		checkValue(values, "date2",     "java.sql.Date.valueOf(\"2001-05-21\")") ;
+		checkValue(values, "time",      "java.sql.Time.valueOf(\"01:46:52\")") ;
+		checkValue(values, "num1",      "1000L") ;
+		checkValue(values, "num2",      "1000.66D") ;
 		
 		checkValue(values, "inex",      "null") ;
+		
+		checkCompareValue(values, "book", attribId, "book.getId() == 100");
+		checkCompareValue(values, "book", attribFirstName, "book.getFirstName().equals(" + buildString('A', 10) + ")");
 		
 		String listOfValues = values.getJavaValues();
 		System.out.println("list of values :");
@@ -154,8 +171,6 @@ public class ValuesInContextTest {
 		checkValue(values, "id",        "200") ;
 		checkValue(values, "firstName", buildString('B', 3)) ;
 		checkValue(values, "age",       "(short)20") ;
-//		checkValue(values, "date1",     "Calendar.getInstance().getTime()") ;
-//		checkValue(values, "date2",     "(new java.sql.Date(Calendar.getInstance().getTime().getTime()))") ;
 	}
 	
 	@Test
@@ -180,8 +195,15 @@ public class ValuesInContextTest {
 	
 	private void checkValue(ValuesInContext values, String attributeName, String expectedValue) {
 		String v = values.javaValue(attributeName);
-		System.out.println(". value for '" + attributeName + "' = " + v + " (expected : '" + expectedValue + "')");
+		System.out.println(". value for '" + attributeName + "' = '" + v + "' (expected : '" + expectedValue + "')");
 		Assert.assertTrue(v.equals(expectedValue));
+	}
+	
+	private void checkCompareValue(ValuesInContext values, String entityVariableName, AttributeInContext attribute, String expectedValue) {
+		String v = values.javaValueComparedTo(entityVariableName, attribute);
+		String v2 = v.trim();
+		System.out.println(". comparison : '" + v + "' (expected : '" + expectedValue + "')");
+		Assert.assertTrue(v2.equals(expectedValue.trim()));
 	}
 	
 	private Column buildColumn(String attributeName, String javaType) {
