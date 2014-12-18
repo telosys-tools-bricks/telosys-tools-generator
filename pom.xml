@@ -10,6 +10,13 @@
 	<version>2.1.1</version>
 	<packaging>jar</packaging>
 
+    <parent>
+        <groupId>org.telosys.tools</groupId>
+        <artifactId>telosys-tools-parent</artifactId>
+        <version>2.1.1</version>
+        <relativePath>../telosys-tools-parent/pom.xml</relativePath>
+    </parent>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
