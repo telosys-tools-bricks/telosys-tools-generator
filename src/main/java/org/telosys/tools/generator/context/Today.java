@@ -37,8 +37,10 @@ import org.telosys.tools.generator.context.names.ContextName;
 //-------------------------------------------------------------------------------------
 public class Today
 {
-    private static final SimpleDateFormat defaultDateFormat = new SimpleDateFormat("d MMM yyyy");
-    private static final SimpleDateFormat defaultTimeFormat = new SimpleDateFormat("HH:mm:ss");
+//    private static final SimpleDateFormat defaultDateFormat = new SimpleDateFormat("d MMM yyyy");
+//    private static final SimpleDateFormat defaultTimeFormat = new SimpleDateFormat("HH:mm:ss");
+    private static final String DEFAULT_DATE_FORMAT = "d MMM yyyy" ;
+    private static final String DEFAULT_TIME_FORMAT = "HH:mm:ss"   ;
     
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -48,7 +50,10 @@ public class Today
 	)
     public String getDate()
     {
-        return defaultDateFormat.format( new Date() );
+        //return defaultDateFormat.format( new Date() );
+		// Fix SimpleDateFormat potential bug
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+        return dateFormat.format( new Date() );
     }
 
 	//-------------------------------------------------------------------------------------
@@ -74,7 +79,10 @@ public class Today
 	)
     public String getTime()
     {
-        return defaultTimeFormat.format( new Date() );
+        //return defaultTimeFormat.format( new Date() );
+		// Fix SimpleDateFormat potential bug
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DEFAULT_TIME_FORMAT);
+        return dateFormat.format( new Date() );
     }
     
 	//-------------------------------------------------------------------------------------
