@@ -98,9 +98,12 @@ public class Target
 		if ( variables != null ) {
 			variablesManager = new VariablesManager( variables );
 		}
+		//--- Replace variables on File Name
 		this.file   = replaceVariables( targetDefinition.getFile(),   entityJavaClassName, variablesManager );
-		
-		variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
+		//--- Replace variables on Folder Name
+		if (variablesManager != null) {
+			variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
+		}
 		this.folder = replaceVariables( targetDefinition.getFolder(), entityJavaClassName, variablesManager );
 	}
 
