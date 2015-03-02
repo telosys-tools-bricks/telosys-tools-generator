@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2008-2014  Telosys project org. ( http://www.telosys.org/ )
+ *  Copyright (C) 2008-2015  Telosys project org. ( http://www.telosys.org/ )
  *
  *  Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 3.0 (the "License");
  *  you may not use this file except in compliance with the License.
