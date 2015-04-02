@@ -71,7 +71,8 @@ public class BundleResourcesManager {
 		LinkedList<Target> targets = new LinkedList<Target>();
 		if ( targetsDefinitions != null ) {
 			for ( TargetDefinition targetDefinition : targetsDefinitions ) {
-				Target target = new Target ( targetDefinition, "", "", projectVariables );
+				//Target target = new Target ( targetDefinition, "", "", projectVariables );
+				Target target = new Target ( targetDefinition, projectVariables ); // v 3.0.0
 				targets.add(target);
 			}
 		}

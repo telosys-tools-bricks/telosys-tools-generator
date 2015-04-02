@@ -20,6 +20,24 @@ import java.util.LinkedList;
 import org.telosys.tools.commons.JavaClassUtil;
 
 public class Util {
+
+	public static String numberToString(Number value, String defaultValue) {
+		if ( value != null ) {
+			return value.toString();
+		}
+		else {
+			return defaultValue ;
+		}
+	}
+	
+	public static int intValue(Integer value, int defaultValue) {
+		if ( value != null ) {
+			return value.intValue();
+		}
+		else {
+			return defaultValue ;
+		}
+	}
 	
     /**
      * Returns 'getFoo' for 'foo'(or 'isFoo' if foo is boolean )
@@ -101,4 +119,16 @@ public class Util {
 		return JavaClassUtil.shortName(sLongType);
 	}
 
+    /**
+     * Trim the given string, returns the default value is the string is null
+     * @param s
+     * @param defaultValue
+     * @return
+     */
+    public static String trim(String s, String defaultValue) {
+    	if ( s != null ) {
+    		return s.trim();
+    	}
+    	return defaultValue ;
+    }
 }

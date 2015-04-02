@@ -60,7 +60,7 @@ import org.telosys.tools.generator.directive.DirectiveException;
 import org.telosys.tools.generator.directive.ErrorDirective;
 import org.telosys.tools.generator.directive.UsingDirective;
 import org.telosys.tools.generator.events.GeneratorEvents;
-import org.telosys.tools.repository.model.RepositoryModel;
+import org.telosys.tools.generic.model.Model;
 
 /**
  * This class is a Velocity generator ready to use. <br>
@@ -100,14 +100,14 @@ public class Generator {
 
 	/**
 	 * Constructor
-	 * @param target the target to be generated
-	 * @param generatorConfig the generator configuration
-	 * @param repositoryModel the current repository model
+	 * @param target
+	 * @param generatorConfig
+	 * @param model
 	 * @param logger
 	 * @throws GeneratorException
 	 */
 	public Generator( Target target, GeneratorConfig generatorConfig, 
-						RepositoryModel repositoryModel, TelosysToolsLogger logger) throws GeneratorException 
+						Model model, TelosysToolsLogger logger) throws GeneratorException 
 	{
 		_logger = logger;
 		
@@ -126,16 +126,6 @@ public class Generator {
 		}
 		
 		_generatorConfig = generatorConfig ;
-		
-//		//_repositoryModel = repositoryModel ;
-//		// Build the list of all the entities defined in the repository  
-//		if ( repositoryModel != null ) {
-//			//_allEntities = RepositoryModelUtil.buildAllJavaBeanClasses(repositoryModel,	_generatorConfig.getProjectConfiguration() );
-//			_allEntities = RepositoryModelUtil.buildAllJavaBeanClasses(repositoryModel,	_generatorConfig ); // v 2.1.0
-//		}
-//		else {
-//			_allEntities = new LinkedList<JavaBeanClass>();
-//		}
 		
 		//------------------------------------------------------------------
 		// Workaround for Velocity error in OSGi environment
@@ -160,7 +150,8 @@ public class Generator {
 			log("Generator constructor : VelocityContext events attached.");
 	
 			log("Generator constructor : VelocityContext initialization ...");
-			initContext(generatorConfig, repositoryModel, logger); 
+			//initContext(generatorConfig, model, logger); 
+			initContext(generatorConfig, logger); // v 3.0.0
 			log("Generator constructor : VelocityContext initialized.");
 			
 			//------------------------------------------------------------------
@@ -270,7 +261,7 @@ public class Generator {
 	//========================================================================
 	// CONTEXT MANAGEMENT
 	//========================================================================
-	private void initContext( GeneratorConfig generatorConfig, RepositoryModel repositoryModel, TelosysToolsLogger logger)
+	private void initContext( GeneratorConfig generatorConfig, TelosysToolsLogger logger)
 		throws GeneratorException
 	{
 		log("initContext()..." );
@@ -462,7 +453,7 @@ public class Generator {
 	 * @throws GeneratorException
 	 */
 	public void generateTarget(Target target, 
-			RepositoryModel repositoryModel, 
+			Model model, 
 			List<String> selectedEntitiesNames,
 			List<Target> generatedTargets) throws GeneratorException
 	{
@@ -472,11 +463,11 @@ public class Generator {
 		EnvInContext env = new EnvInContext() ;
 		_velocityContext.put(ContextName.ENV, env);   // ver 2.1.0
 		
-		EntitiesManager entitiesManager = new EntitiesManager(repositoryModel, _generatorConfig, env);
+		EntitiesManager entitiesManager = new EntitiesManager(model, _generatorConfig, env);
 		
 		//--- "$model" object : it provides all the entities (v 2.0.7)
-		ModelInContext model = new ModelInContext(repositoryModel, entitiesManager );
-		_velocityContext.put(ContextName.MODEL, model); 
+		ModelInContext modelInContext = new ModelInContext(model, entitiesManager );
+		_velocityContext.put(ContextName.MODEL, modelInContext); 
 		
 		//--- Set the "$target"  in the context 
 		_velocityContext.put(ContextName.TARGET, target);
@@ -519,7 +510,7 @@ public class Generator {
 		
 		//--- Set the "$generator"  in the context ( "real" embedded generator )
 		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator(
-				repositoryModel, _generatorConfig, _logger, selectedEntitiesNames, generatedTargets );
+				model, _generatorConfig, _logger, selectedEntitiesNames, generatedTargets );
 		_velocityContext.put(ContextName.GENERATOR, embeddedGenerator );
 		
 		//---------- ((( GENERATION ))) 

@@ -19,7 +19,7 @@ import org.telosys.tools.generator.GeneratorContextException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.repository.model.JoinColumn;
+import org.telosys.tools.generic.model.JoinColumn;
 
 /**
  * Link exposed in the Velocity Context 

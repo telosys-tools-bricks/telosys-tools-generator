@@ -28,8 +28,8 @@ import org.telosys.tools.generator.GeneratorUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.repository.model.Column;
-import org.telosys.tools.repository.persistence.util.RepositoryConst;
+import org.telosys.tools.generic.model.Attribute;
+import org.telosys.tools.generic.model.DateType;
 
 
 /**
@@ -58,12 +58,10 @@ import org.telosys.tools.repository.persistence.util.RepositoryConst;
 //-------------------------------------------------------------------------------------
 public class AttributeInContext 
 {
-//	public final static int NO_MAXLENGTH   = -1 ;
-
-    public final static int NO_DATE_TYPE   = 0 ;
-    public final static int DATE_ONLY      = 1 ;
-    public final static int TIME_ONLY      = 2 ;
-    public final static int DATE_AND_TIME  = 3 ;
+//    public final static int NO_DATE_TYPE   = 0 ;
+//    public final static int DATE_ONLY      = 1 ;
+//    public final static int TIME_ONLY      = 2 ;
+//    public final static int DATE_AND_TIME  = 3 ;
     
     private final static String TYPE_INT  = "int" ;
     private final static String TYPE_NUM  = "num" ;
@@ -80,8 +78,6 @@ public class AttributeInContext
 	private boolean       _bUseFullType = false ;
 	
 	private final String  _sInitialValue ; // can be null 
-//	private final String  _sGetter ; // Dynamic since v 2.0.7
-//	private final String  _sSetter ; // Dynamic since v 2.0.7
 	
 	private final String  _sDefaultValue ; // can be null 
 	private final boolean _bSelected ; // v 2.1.1 #LGU
@@ -109,13 +105,13 @@ public class AttributeInContext
     private final String  _sBooleanFalseValue ; // eg "0", ""No"",  ""false""
     
     //--- Further info for DATE/TIME ---------------------------------
-    private final int     _iDateType       ;  // By default only DATE
-    private final boolean _bDatePast        ;
-    private final boolean _bDateFuture     ;
-    private final boolean _bDateBefore      ;
-    private final String  _sDateBeforeValue  ;
-    private final boolean _bDateAfter       ;
-    private final String  _sDateAfterValue   ;
+    private final DateType _dateType       ;  // By default only DATE
+    private final boolean  _bDatePast        ;
+    private final boolean  _bDateFuture     ;
+    private final boolean  _bDateBefore      ;
+    private final String   _sDateBeforeValue  ;
+    private final boolean  _bDateAfter       ;
+    private final String   _sDateAfterValue   ;
 
     //--- Further info for NUMBER ------------------------------------
     private final String  _sMinValue ; 
@@ -128,7 +124,6 @@ public class AttributeInContext
     private final String  _sMinLength  ; 
     private final String  _sMaxLength  ; 
     private final String  _sPattern    ; 
-    
     
 	//--- JPA KEY Generation infos -------------------------------------------------
     private final boolean _bGeneratedValue ;  // True if GeneratedValue ( annotation "@GeneratedValue" )
@@ -147,99 +142,89 @@ public class AttributeInContext
 	private final String  _sTableGeneratorValueColumnName  ;
 	private final String  _sTableGeneratorPkColumnValue   ;
 
-//	//-----------------------------------------------------------------------------------------------
-//	/**
-//	 * Constructor to create a Java Class Attribute without model <br>
-//	 * This constructor is designed to be used by the WIZARDS GENERATOR<br>
-//	 * 
-//	 * @param name internal (private) java attribute name
-//	 * @param simpleType the shortest type to use ( "String", "int", "BigDecimal", "Date", "java.util.Date", ... ), <br>
-//	 *              can be a full type ( eg : if "java.util.Date" and "java.sql.Date" are used in the same class ) 
-//	 * @param fullType standard full type with package ( "java.lang.String", "int", "java.math.BigDecimal", ... )
-//	 * @param initialValue
-//	 */
-//	//public JavaBeanClassAttribute(String sName, String sType, String sFullType, String sInitialValue, String sGetter, String sSetter) 
-//	public JavaBeanClassAttribute(String name, String simpleType, String fullType, String initialValue ) // v 2.0.7
-//	{
-//		_sName = name ; 
-////		_sType = StrUtil.removeAllBlanks(sType);    
-//		_sSimpleType   = StrUtil.removeAllBlanks(simpleType);    // v 2.0.7
-//		_sFullType     = StrUtil.removeAllBlanks(fullType);  
-//		_sInitialValue = initialValue; // can be null 
-//		_sDefaultValue = null ; // keep null ( for hasDefaultValue )
-//		
-//		// v 2.0.7
-////		_sGetter = sGetter ;
-////		_sSetter = sSetter ;		
-//	}
-	
 	//-----------------------------------------------------------------------------------------------
 	/**
 	 * Constructor to create a Java Class Attribute from the given model-column definition  
 	 * @param column the column of the repository model
 	 */
-	public AttributeInContext(final EntityInContext entity, final Column column) 
+	//public AttributeInContext(final EntityInContext entity, final Column column) 
+	public AttributeInContext(final EntityInContext entity, final Attribute column) // v 3.0.0
 	{
 		_entity = entity ;
 		
-		_sName   = column.getJavaName();
+		//_sName   = column.getJavaName();
+		_sName   = column.getName(); // v 3.0.0
 		
-//		_sType     = StrUtil.removeAllBlanks(Util.shortestType(column.getJavaType(), new LinkedList<String>()));
-		_sFullType   = StrUtil.removeAllBlanks( column.getJavaType() );
+		//_sFullType   = StrUtil.removeAllBlanks( column.getJavaType() );
+		_sFullType   = StrUtil.removeAllBlanks( column.getFullType() ); // v 3.0.0
 		_sSimpleType = JavaClassUtil.shortName( _sFullType );    // v 2.0.7
 				
-		// v 2.0.7
-//		_sGetter = Util.buildGetter(_sName, _sType);
-//		_sSetter = Util.buildSetter(_sName);
-		_bSelected        = column.getSelected(); // v 2.1.1 #LGU
+		//_bSelected        = column.getSelected(); // v 2.1.1 #LGU
+		_bSelected        = column.isSelected(); // v 3.0.0
 		
-		_sInitialValue    = null ; //  column.getJavaInitialValue()  ???
-		_sDefaultValue    = column.getJavaDefaultValue();
+		//_sInitialValue    = null ; //  column.getJavaInitialValue()  ???
+		_sInitialValue    = column.getInitialValue() ; // v 3.0.0
+		//_sDefaultValue    = column.getJavaDefaultValue();
+		_sDefaultValue    = column.getDefaultValue(); // v 3.0.0
 		
 		_sDataBaseName     = column.getDatabaseName() ;
-        _sDataBaseType     = column.getDatabaseTypeName() ;
-        _iJdbcTypeCode     = column.getJdbcTypeCode() ;
-        _sJdbcTypeName     = column.getJdbcTypeName(); // Added in ver 2.0.7
-        _bKeyElement       = column.isPrimaryKey() ;
-        _bUsedInForeignKey = column.isForeignKey();
+        //_sDataBaseType     = column.getDatabaseTypeName() ;
+        _sDataBaseType     = column.getDatabaseType() ; // v 3.0.0
+        _iJdbcTypeCode     = column.getJdbcTypeCode() != null ? column.getJdbcTypeCode() : 0 ; // v 3.0.0
+        _sJdbcTypeName     = column.getJdbcTypeName(); 
+        //_bKeyElement       = column.isPrimaryKey() ;
+        _bKeyElement       = column.isKeyElement(); // v 3.0.0
+        //_bUsedInForeignKey = column.isForeignKey(); 
+        _bUsedInForeignKey = column.isUsedInForeignKey() ; // v 3.0.0
         _bAutoIncremented  = column.isAutoIncremented();
-        _iDatabaseSize     = column.getDatabaseSize() ;
+        _iDatabaseSize     = column.getDatabaseSize() != null ? column.getDatabaseSize() : 0 ;
         _sDatabaseComment  = column.getDatabaseComment() ; // Added in v 2.1.1 - #LCH
         _sDatabaseDefaultValue = column.getDatabaseDefaultValue(); 
         _bDatabaseNotNull  = column.isDatabaseNotNull();
         
 		//--- Further info for ALL
-        _bNotNull   = column.getJavaNotNull();
+        //_bNotNull   = column.getJavaNotNull();
+        _bNotNull   = column.isNotNull();  // v 3.0.0
         _sLabel     = column.getLabel();
         _sInputType = column.getInputType();
         
 		//--- Further info for BOOLEAN 
-        _sBooleanTrueValue   = column.getBooleanTrueValue().trim() ;
-		_sBooleanFalseValue  = column.getBooleanFalseValue().trim() ;
+//        _sBooleanTrueValue   = column.getBooleanTrueValue().trim() ;
+//		_sBooleanFalseValue  = column.getBooleanFalseValue().trim() ;
+        _sBooleanTrueValue   = Util.trim(column.getBooleanTrueValue(), "") ; 
+		_sBooleanFalseValue  = Util.trim(column.getBooleanFalseValue(), "") ;
 		
 		//--- Further info for NUMBER 
-	    _sMinValue = column.getMinValue() ; 
-	    _sMaxValue = column.getMaxValue() ; 
+//	    _sMinValue = column.getMinValue() ; 
+	    _sMinValue = Util.numberToString(column.getMinValue(), "" ) ; // v 3.0.0
+//	    _sMaxValue = column.getMaxValue() ; 
+	    _sMaxValue = Util.numberToString(column.getMaxValue(), "" ) ; // v 3.0.0 
 
 		//--- Further info for STRING 
-        _bLongText  = column.getLongText() ;
-        _bNotEmpty  = column.getNotEmpty();
-        _bNotBlank  = column.getNotBlank();
-        _sMaxLength = column.getMaxLength();
-        _sMinLength = column.getMinLength();
+        //_bLongText  = column.getLongText() ;
+        _bLongText  = column.isLongText() ; // v 3.0.0
+        //_bNotEmpty  = column.getNotEmpty();
+        _bNotEmpty  = column.isNotEmpty(); // v 3.0.0
+        //_bNotBlank  = column.getNotBlank();
+        _bNotBlank  = column.isNotBlank(); // v 3.0.0
+        //_sMaxLength = column.getMaxLength();
+        _sMaxLength = Util.numberToString(column.getMaxLength(), ""); // v 3.0.0
+        //_sMinLength = column.getMinLength();
+        _sMinLength = Util.numberToString(column.getMinLength(), ""); // v 3.0.0
         _sPattern   = column.getPattern();
         
-    
 		//--- Further info for DATE/TIME 
-		if ( RepositoryConst.SPECIAL_DATE_ONLY.equalsIgnoreCase(column.getDateType()) ) {
-			_iDateType = DATE_ONLY;
-		} else if ( RepositoryConst.SPECIAL_TIME_ONLY.equalsIgnoreCase(column.getDateType()) )  {
-			_iDateType = TIME_ONLY;
-		} else if ( RepositoryConst.SPECIAL_DATE_AND_TIME.equalsIgnoreCase(column.getDateType()) )  {
-			_iDateType = DATE_AND_TIME;
-		} else {
-			_iDateType =  -1  ; // Default : UNKNOWN
-		}
+//		if ( RepositoryConst.SPECIAL_DATE_ONLY.equalsIgnoreCase(column.getDateType()) ) {
+//			_iDateType = DATE_ONLY;
+//		} else if ( RepositoryConst.SPECIAL_TIME_ONLY.equalsIgnoreCase(column.getDateType()) )  {
+//			_iDateType = TIME_ONLY;
+//		} else if ( RepositoryConst.SPECIAL_DATE_AND_TIME.equalsIgnoreCase(column.getDateType()) )  {
+//			_iDateType = DATE_AND_TIME;
+//		} else {
+//			_iDateType =  -1  ; // Default : UNKNOWN
+//		}
+		_dateType = column.getDateType(); // v 3.0.0
+		
         _bDatePast   = column.isDatePast();
         _bDateFuture = column.isDateFuture();
         _bDateBefore = column.isDateBefore();
@@ -254,10 +239,13 @@ public class AttributeInContext
 			_sGeneratedValueGenerator = null ;
         } 
         else {
-			if (column.getGeneratedValue() != null) {
+			//if (column.getGeneratedValue() != null) {
+        	if (column.isGeneratedValue() ) { // v 3.0.0
 			    _bGeneratedValue = true ;
-				_sGeneratedValueStrategy  = column.getGeneratedValue().getStrategy();
-				_sGeneratedValueGenerator = column.getGeneratedValue().getGenerator();
+				//_sGeneratedValueStrategy  = column.getGeneratedValue().getStrategy();
+				_sGeneratedValueStrategy  = column.getGeneratedValueStrategy(); // v 3.0.0
+				//_sGeneratedValueGenerator = column.getGeneratedValue().getGenerator();
+				_sGeneratedValueGenerator = column.getGeneratedValueGenerator(); // v 3.0.0
 			}
 			else {
 				_bGeneratedValue = false;
@@ -266,13 +254,19 @@ public class AttributeInContext
 			}
         }
 			        
-		if ( column.getTableGenerator() != null ) {
+		//if ( column.getTableGenerator() != null ) {
+		if ( column.hasTableGenerator() ) { // v 3.0.0
 		    _bTableGenerator = true ;
-			_sTableGeneratorName = column.getTableGenerator().getName();
-			_sTableGeneratorTable = column.getTableGenerator().getTable();
-			_sTableGeneratorPkColumnName = column.getTableGenerator().getPkColumnName();
-			_sTableGeneratorValueColumnName = column.getTableGenerator().getValueColumnName();
-			_sTableGeneratorPkColumnValue = column.getTableGenerator().getPkColumnValue();
+			//_sTableGeneratorName = column.getTableGenerator().getName();
+			_sTableGeneratorName = column.getTableGeneratorName(); // v 3.0.0
+			//_sTableGeneratorTable = column.getTableGenerator().getTable();
+			_sTableGeneratorTable = column.getTableGeneratorTable(); // v 3.0.0
+			//_sTableGeneratorPkColumnName = column.getTableGenerator().getPkColumnName();
+			_sTableGeneratorPkColumnName = column.getTableGeneratorPkColumnName(); // v 3.0.0
+			//_sTableGeneratorValueColumnName = column.getTableGenerator().getValueColumnName();
+			_sTableGeneratorValueColumnName = column.getTableGeneratorValueColumnName(); // v 3.0.0
+			//_sTableGeneratorPkColumnValue = column.getTableGenerator().getPkColumnValue();
+			_sTableGeneratorPkColumnValue = column.getTableGeneratorPkColumnValue(); // v 3.0.0
 		}
 		else {
 		    _bTableGenerator = false ;
@@ -283,11 +277,15 @@ public class AttributeInContext
 			_sTableGeneratorPkColumnValue = null;
 		}
 
-		if (column.getSequenceGenerator() != null) {
+		//if (column.getSequenceGenerator() != null) {
+		if (column.hasSequenceGenerator() ) {
 		    _bSequenceGenerator = true;
-			_sSequenceGeneratorName = column.getSequenceGenerator().getName();
-			_sSequenceGeneratorSequenceName = column.getSequenceGenerator().getSequenceName();
-			_iSequenceGeneratorAllocationSize = column.getSequenceGenerator().getAllocationSize();
+			//_sSequenceGeneratorName = column.getSequenceGenerator().getName();
+			_sSequenceGeneratorName = column.getSequenceGeneratorName();
+			//_sSequenceGeneratorSequenceName = column.getSequenceGenerator().getSequenceName();
+			_sSequenceGeneratorSequenceName = column.getSequenceGeneratorSequenceName();
+			//_iSequenceGeneratorAllocationSize = column.getSequenceGenerator().getAllocationSize();
+			_iSequenceGeneratorAllocationSize = Util.intValue(column.getSequenceGeneratorAllocationSize(), 0);
 		}
 		else {
 		    _bSequenceGenerator = false;
@@ -299,13 +297,6 @@ public class AttributeInContext
 	}
     
 	//-----------------------------------------------------------------------------------------------
-//	protected void forceType ( String sTypeToUse )
-//	{
-//		if ( sTypeToUse != null )
-//		{
-//			_sType = sTypeToUse ;
-//		}
-//	}
 	/* package */ void useFullType ()
 	{
 		_bUseFullType = true ;
@@ -458,7 +449,8 @@ public class AttributeInContext
 	)
 	public int getDateType()
 	{
-		return _iDateType ;
+		//return _iDateType ;
+		return _dateType.getValue(); // returns the enum value
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -491,7 +483,6 @@ public class AttributeInContext
 	)
 	public String getGetter()
 	{
-		// return _sGetter;
 		return Util.buildGetter(_sName, this.getType() ); // v 2.0.7
 	}
 
@@ -504,7 +495,6 @@ public class AttributeInContext
 	)
 	public String getGetterWithGetPrefix()
 	{
-		// return _sGetter;
 		return Util.buildGetter(_sName); // v 2.0.7
 	}
 	
@@ -517,7 +507,6 @@ public class AttributeInContext
 	)
 	public String getSetter()
 	{
-		//return _sSetter;
 		return Util.buildSetter(_sName);
 	}
 
@@ -580,12 +569,6 @@ public class AttributeInContext
 	)
     public String getDatabaseTypeWithSize()
     {
-//        if ( _iJdbcTypeCode == Types.VARCHAR || _iJdbcTypeCode == Types.CHAR ) {
-//        	return _sDataBaseType + "(" + _iDatabaseSize + ")" ;
-//        }
-//        else {
-//        	return _sDataBaseType ;
-//        }
         return DatabaseUtil.getNativeTypeWithSize(_sDataBaseType, _iDatabaseSize, _iJdbcTypeCode);
     }
 
@@ -650,14 +633,6 @@ public class AttributeInContext
     {
         return _bDatabaseNotNull;
     }
-//    /**
-//     * Synonym for usage without "()"
-//     * @return
-//     */
-//    public boolean getIsDatabaseNotNull()
-//    {
-//        return isDatabaseNotNull();
-//    }
     
 	//----------------------------------------------------------------------
 	@VelocityMethod(
@@ -712,14 +687,6 @@ public class AttributeInContext
     {
         return _bKeyElement;
     }
-//    /**
-//     * Synonym for usage without "()"
-//     * @return
-//     */
-//    public boolean getIsKeyElement()
-//    {
-//        return isKeyElement();
-//    }
 
 	//----------------------------------------------------------------------
     /**
@@ -735,14 +702,6 @@ public class AttributeInContext
     {
         return _bUsedInForeignKey ;
     }
-//    /**
-//     * Synonym for usage without "()"
-//     * @return
-//     */
-//    public boolean getIsUsedInForeignKey()
-//    {
-//        return isKeyElement();
-//    }
 
     /**
      * Returns TRUE if the attribute is involved in a link Foreign Key <br>
@@ -764,24 +723,11 @@ public class AttributeInContext
     	}
     	
 		for ( LinkInContext link : links ) {
-//			if ( link.isOwningSide() && link.hasJoinColumns() ) {
-//				String[] joinColumns = link.getJoinColumns() ;
-//				if ( joinColumns != null ) {
-//					for ( int i = 0 ; i < joinColumns.length ; i++ ) {
-//						String colName = joinColumns[i];
-//						if ( _sDataBaseName.equalsIgnoreCase( colName ) ) {
-//							//--- Yes : this attribute's mapping column is a 'Join Column' 
-//							return true ;
-//						}
-//					}
-//				}
-//			}
 			if( link.isOwningSide() ) {
 				if ( link.usesAttribute(this) ) {
 					return true ;
 				}					
 			}
-			
 		}
 		return false ;
     }
@@ -801,15 +747,6 @@ public class AttributeInContext
     {
         return _bAutoIncremented;
     }
-    
-//    /**
-//     * Synonym for usage without "()"
-//     * @return
-//     */
-//    public boolean getIsAutoIncremented()
-//    {
-//        return isAutoIncremented();
-//    }
 
 	//----------------------------------------------------------------------
     /**
@@ -825,14 +762,6 @@ public class AttributeInContext
     {
         return _bNotNull;
     }
-//    /**
-//     * Synonym for usage without "()"
-//     * @return
-//     */
-//    public boolean getIsNotNull()
-//    {
-//        return isNotNull();
-//    }
 
 	//----------------------------------------------------------------------
     /**
@@ -1781,13 +1710,6 @@ public class AttributeInContext
 	)
 	public String getReferencedEntityType() throws GeneratorException {
 		for( LinkInContext link : _entity.getLinks()  ) {
-//			if( link.isOwningSide() && link.hasJoinColumns() ) {
-//				String[] joinColumns = link.getJoinColumns() ;
-//				if ( joinColumns != null && joinColumns.length == 1 ) {
-//					if( joinColumns[0].equals(this.getDatabaseName() ) ) {
-//						return link.getTargetEntitySimpleType() ;
-//					}
-//				}
 			if( link.isOwningSide() && link.getAttributesCount() == 1 ) {
 				if ( link.usesAttribute(this) ) {
 					return link.getTargetEntitySimpleType() ;

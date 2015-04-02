@@ -299,10 +299,6 @@ public class Jpa {
 	 */
 	private String getInverseSideCardinalityAnnotation( LinkInContext entityLink, String cardinality ) 
 					throws GeneratorException  {
-		//Link   _link         = entityLink.getLink();
-		
-		//Entity _targetEntity = entityLink.getTargetEntity() ;
-		//String targetEntityClassName = entityLink.getTargetEntitySimpleType() ; // refactoring v 2.1.0
 		String targetEntityClassName = entityLink.getTargetEntity().getName();
 		
 		StringBuilder annotation = new StringBuilder();

@@ -18,6 +18,7 @@ package org.telosys.tools.generator.context;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generic.model.ForeignKeyColumn;
 
 /**
  * Database Foreign Key Column exposed in the generator context
@@ -50,21 +51,17 @@ public class ForeignKeyColumnInContext
 	private final String _referencedColumnName ;
 	
 	//-------------------------------------------------------------------------------------
-//	public JavaBeanClassForeignKeyColumn(int sequence, String columnName, String columnRef, 
-//			String updateRule, String deleteRule, String deferrable) {
+//	public ForeignKeyColumnInContext( int sequence, String columnName, String referencedColumnName ) {
 //		super();
-//		this._sequence = sequence;
+//		this._sequence   = sequence;
 //		this._columnName = columnName;
-//		this._columnRef = columnRef;
-//		this._updateRule = updateRule;
-//		this._deleteRule = deleteRule;
-//		this._deferrable = deferrable;
+//		this._referencedColumnName  = referencedColumnName;
 //	}
-	public ForeignKeyColumnInContext( int sequence, String columnName, String referencedColumnName ) {
+	public ForeignKeyColumnInContext( ForeignKeyColumn metadataFKColumn ) { //  v 3.0.0
 		super();
-		this._sequence   = sequence;
-		this._columnName = columnName;
-		this._referencedColumnName  = referencedColumnName;
+		this._sequence   = metadataFKColumn.getSequence();
+		this._columnName = metadataFKColumn.getColumnName();
+		this._referencedColumnName  = metadataFKColumn.getReferencedColumnName();
 	}
 	 
 	//-------------------------------------------------------------------------------------

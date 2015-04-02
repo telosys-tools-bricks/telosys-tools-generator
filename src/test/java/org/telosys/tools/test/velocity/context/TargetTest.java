@@ -5,6 +5,8 @@ import junit.framework.TestCase;
 import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generator.target.TargetDefinition;
+import org.telosys.tools.generic.model.Entity;
+import org.telosys.tools.tests.fakemodel.EntityInFakeModel;
 
 public class TargetTest extends TestCase {
 
@@ -28,7 +30,8 @@ public class TargetTest extends TestCase {
 				"bean.vm", 
 				"*");
 		
-		Target target = new Target( targetDef, "AUTHOR", "Author", getVariables() ); 
+		//Target target = new Target( targetDef, "AUTHOR", "Author", getVariables() ); 
+		Target target = new Target( targetDef, buildEntity("AUTHOR", "Author"), getVariables() );  // v 3.0.0
 		
 		String file   = target.getFile();
 		String folder = target.getFolder();
@@ -49,7 +52,8 @@ public class TargetTest extends TestCase {
 				"bean.vm", 
 				"*");
 		
-		Target target = new Target( targetDef, "AUTHOR", "Author", getVariables() ); 
+		//Target target = new Target( targetDef, "AUTHOR", "Author", getVariables() ); 
+		Target target = new Target( targetDef, buildEntity("AUTHOR", "Author"), getVariables() ); // v 3.0.0
 		
 		String file   = target.getFile();
 		String folder = target.getFolder();
@@ -60,5 +64,11 @@ public class TargetTest extends TestCase {
 		assertEquals("/src/org/demo/foo/bar/bean", folder);
 		
 	}
-	
+
+	private Entity buildEntity(String tableName, String className) { // v 3.0.0
+		EntityInFakeModel entity = new EntityInFakeModel();
+		entity.setDatabaseTable(tableName);
+		entity.setClassName(className);
+		return entity ;
+	}
 }

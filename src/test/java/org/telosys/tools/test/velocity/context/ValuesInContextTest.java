@@ -9,7 +9,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.context.ValuesInContext;
-import org.telosys.tools.repository.model.Column;
+import org.telosys.tools.generic.model.Attribute;
+import org.telosys.tools.tests.fakemodel.AttributeInFakeModel;
 
 public class ValuesInContextTest {
 	
@@ -115,20 +116,20 @@ public class ValuesInContextTest {
 		
 		List<AttributeInContext> attributes = new LinkedList<AttributeInContext>() ;
 		
-		AttributeInContext attribId = new AttributeInContext(null, buildColumn("id",        "int")) ;
+		AttributeInContext attribId = new AttributeInContext(null, buildAttribute("id",        "int")) ;
 		attributes.add(attribId);
 		
-		AttributeInContext attribFirstName =  new AttributeInContext(null, buildColumn("firstName", "java.lang.String", 10)) ;
+		AttributeInContext attribFirstName =  new AttributeInContext(null, buildAttribute("firstName", "java.lang.String", 10)) ;
 		attributes.add(attribFirstName);
 		
-		attributes.add( new AttributeInContext(null, buildColumn("age",       "java.lang.Short")) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("num1",      "long")) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("num2",      "java.lang.Double")) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("date1",     "java.util.Date")) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("date2",     "java.sql.Date")) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("flag",      "boolean")) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("flag2",     "boolean")) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("time",     "java.sql.Time")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("age",       "java.lang.Short")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("num1",      "long")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("num2",      "java.lang.Double")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("date1",     "java.util.Date")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("date2",     "java.sql.Date")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("flag",      "boolean")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("flag2",     "boolean")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("time",     "java.sql.Time")) ) ;
 		
 		ValuesInContext values = new ValuesInContext( attributes, 1 );
 		
@@ -160,11 +161,11 @@ public class ValuesInContextTest {
 		
 		List<AttributeInContext> attributes = new LinkedList<AttributeInContext>() ;
 		
-		attributes.add( new AttributeInContext(null, buildColumn("id",        "int")) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("firstName", "java.lang.String", 3)) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("age",       "java.lang.Short")) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("date1",     "java.util.Date")) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("date2",     "java.sql.Date")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("id",        "int")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("firstName", "java.lang.String", 3)) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("age",       "java.lang.Short")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("date1",     "java.util.Date")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("date2",     "java.sql.Date")) ) ;
 		
 		ValuesInContext values = new ValuesInContext( attributes, 2 );
 		
@@ -178,11 +179,11 @@ public class ValuesInContextTest {
 		
 		List<AttributeInContext> attributes = new LinkedList<AttributeInContext>() ;
 		
-		attributes.add( new AttributeInContext(null, buildColumn("id",        "short")) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("firstName", "java.lang.String", 3)) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("flag1",     "java.lang.Boolean")) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("flag2",     "boolean")) ) ;
-		attributes.add( new AttributeInContext(null, buildColumn("byteVal",   "byte")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("id",        "short")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("firstName", "java.lang.String", 3)) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("flag1",     "java.lang.Boolean")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("flag2",     "boolean")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("byteVal",   "byte")) ) ;
 		
 		ValuesInContext values = new ValuesInContext( attributes, 3 );
 		
@@ -206,15 +207,19 @@ public class ValuesInContextTest {
 		Assert.assertTrue(v2.equals(expectedValue.trim()));
 	}
 	
-	private Column buildColumn(String attributeName, String javaType) {
-		return buildColumn( attributeName, javaType, 0);
+	private Attribute buildAttribute(String attributeName, String javaType) {
+		return buildAttribute( attributeName, javaType, 0);
 	}
-	private Column buildColumn(String attributeName, String javaType, int maxLength) {
-		Column column = new Column();
-		column.setJavaName(attributeName);
-		column.setJavaType(javaType);
-		column.setMaxLength(""+maxLength);
-		return column ;
+	private Attribute buildAttribute(String attributeName, String javaType, int maxLength) {
+//		AttributeInDbModel column = new AttributeInDbModel();
+//		column.setJavaName(attributeName);
+//		column.setJavaType(javaType);
+//		column.setMaxLength(""+maxLength);
+		AttributeInFakeModel attribute = new AttributeInFakeModel();
+		attribute.setName(attributeName);
+		attribute.setFullType(javaType);
+		attribute.setMaxLength(maxLength);
+		return attribute ;
 	}
 	
 	private String buildString(char c, int n) {

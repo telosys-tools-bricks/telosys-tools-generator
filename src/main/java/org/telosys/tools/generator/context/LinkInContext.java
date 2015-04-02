@@ -26,8 +26,12 @@ import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.repository.model.JoinColumn;
-import org.telosys.tools.repository.model.Link;
+import org.telosys.tools.generic.model.Cardinality;
+import org.telosys.tools.generic.model.CascadeOptions;
+import org.telosys.tools.generic.model.FetchType;
+import org.telosys.tools.generic.model.JoinColumn;
+import org.telosys.tools.generic.model.Link;
+import org.telosys.tools.generic.model.Optional;
 
 /**
  * Link exposed in the Velocity Context 
@@ -56,12 +60,25 @@ public class LinkInContext {
 	
     private final EntityInContext  _entity ; // The entity the link belongs to
 
-	private final Link             _link;
+	//private final Link             _link; // removed in ver 3.0.0
 	private final EntitiesManager  _entitiesManager;
 
 	private final List<JoinColumnInContext> _joinColumns ; 
 	private final JoinTableInContext        _joinTable ; 
+
+	//--- Added in ver 3.0.0 (to replace reference / Link )
+	private final String       _id ;
+	private final String       _fieldName ;
+	private final String       _fieldType ;
+	private final String       _targetTableName ;
+	private final String       _mappedBy ;
+	private final boolean      _selected ;
+	private final boolean      _owningSide ;
 	
+	private final Cardinality    _cardinality ;
+	private final FetchType      _fetchType ;
+	private final Optional       _optional ;
+	private final CascadeOptions _cascadeOptions ;
 	
 	//-------------------------------------------------------------------------------------
 	/**
@@ -69,26 +86,22 @@ public class LinkInContext {
 	 * @param link link in the repository 
 	 * @param targetEntity targeted entity in the repository 
 	 */
-	//public LinkInContext(final Link link, final Entity targetEntity ) 
-	//public LinkInContext(final Link link, final EntityInContext targetEntity ) 
 	public LinkInContext(final EntityInContext entity, final Link link, final EntitiesManager entitiesManager ) 
 	{
 		this._entity = entity ;
-		this._link = link;
-//		this._targetEntity  = targetEntity;
+		//this._link = link; // removed in ver 3.0.0
 		this._entitiesManager  = entitiesManager;
-		
-////		_sGetter = Util.buildGetter(this.getJavaName(), this.getLinkType());
-////		_sSetter = Util.buildSetter(this.getJavaName());		
-//		_sGetter = Util.buildGetter(this.getFieldName(), this.getFieldType());
-//		_sSetter = Util.buildSetter(this.getFieldName());
 		
 		//--- Build the list of "join columns"
 		_joinColumns = new LinkedList<JoinColumnInContext>();
-		if ( _link.getJoinColumns() != null ) {
-			JoinColumn[] joinColumns = _link.getJoinColumns().getAll();
-			for ( JoinColumn col : joinColumns ) {
-				_joinColumns.add( new JoinColumnInContext(col) ) ;
+		if ( link.getJoinColumns() != null ) {
+//			JoinColumn[] joinColumns = _link.getJoinColumns().getAll();
+//			for ( JoinColumn col : joinColumns ) {
+//				_joinColumns.add( new JoinColumnInContext(col) ) ;
+//			}
+			// ver 3.0.0
+			for ( JoinColumn joinColumn : link.getJoinColumns() ) {
+				_joinColumns.add( new JoinColumnInContext(joinColumn) ) ;
 			}
 		}
 		
@@ -99,8 +112,22 @@ public class LinkInContext {
 		else {
 			_joinTable = null ;
 		}
+		
+		//--- Init link information (ver 3.0.0)
+		_id = link.getId() ;
+		_fieldName = link.getFieldName() ;
+		_fieldType = link.getFieldType();
+		_targetTableName = link.getTargetTableName();
+		_selected = link.isSelected();
+		_mappedBy = link.getMappedBy();
+		_owningSide = link.isOwningSide();
+		
+		_cardinality = link.getCardinality();
+		_fetchType = link.getFetchType();
+		_optional = link.getOptional();
+		_cascadeOptions = link.getCascadeOptions();
 	}
-
+	
 //	//-------------------------------------------------------------------------------------
 //	protected Link getLink() {
 //		return this._link ;
@@ -352,17 +379,19 @@ public class LinkInContext {
 			}
 	)
 	public String getId() {
-		return _link.getId();
+		//return _link.getId();
+		return _id ;
 	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns TRUE if the link is selected (ckeckbox ckecked in the GUI)"
+			"Returns TRUE if the link is selected (checkbox checked in the GUI)"
 			}
 	)
 	public boolean isSelected() {
-		return _link.isUsed();
+		//return _link.isUsed();
+		return _selected ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -372,7 +401,8 @@ public class LinkInContext {
 			}
 	)
 	public String getTargetTableName() {
-		return _link.getTargetTableName();
+		//return _link.getTargetTableName();
+		return _targetTableName ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -382,7 +412,8 @@ public class LinkInContext {
 			}
 	)
 	public String getFieldName() {
-		return _link.getJavaFieldName();
+		//return _link.getJavaFieldName();
+		return _fieldName ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -396,11 +427,12 @@ public class LinkInContext {
 	public String getFieldFullType() throws GeneratorException {
 		//return _link.getJavaFieldType();
 		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
-			// List, Set, ...
-			return _link.getJavaFieldType();
+			// Link referencing a collection : the link provides the full type ( java.util.List, java.util.Set, ... )
+			//return _link.getJavaFieldType();
+			return _fieldType ; // use the type as is 
 		} else {
-			// Person, Customer, Book, ...
-			return this.getTargetEntityFullType() ; // v 2.1.0
+			// Link referencing an entity : the link provides the simple type ( Person, Customer, Book, ... )
+			return this.getTargetEntityFullType() ; // get the 'full type' from the referenced entity // v 2.1.0
 		}		
 	}
 
@@ -415,11 +447,12 @@ public class LinkInContext {
 	public String getFieldSimpleType() throws GeneratorException {
 		//return JavaClassUtil.shortName(_link.getJavaFieldType());
 		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
-			// List, Set, ...
-			return JavaClassUtil.shortName( _link.getJavaFieldType() );
+			// Link referencing a collection : the link provides the full type ( java.util.List, java.util.Set, ... )
+			//return JavaClassUtil.shortName( _link.getJavaFieldType() );
+			return JavaClassUtil.shortName( _fieldType ); // return only the 'simple name' ( 'List', 'Set', ... )
 		} else {
-			// Person, Customer, Book, ...
-			return this.getTargetEntitySimpleType() ; // v 2.1.0
+			// Link referencing an entity : the link provides the simple type ( Person, Customer, Book, ... )
+			return this.getTargetEntitySimpleType() ; // get the 'simple type' from the referenced entity // v 2.1.0
 		}		
 	}
 	
@@ -452,7 +485,8 @@ public class LinkInContext {
 			}
 	)
 	public boolean isOwningSide() {
-		return _link.isOwningSide();
+		//return _link.isOwningSide();
+		return _owningSide ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -463,7 +497,8 @@ public class LinkInContext {
 			}
 	)
 	public String getMappedBy() {
-		return _link.getMappedBy();
+		//return _link.getMappedBy();
+		return _mappedBy;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -517,7 +552,8 @@ public class LinkInContext {
 			}
 	)
 	public String getCardinality() { // v 2.0.5
-		return _link.getCardinality();
+		//return _link.getCardinality();
+		return _cardinality.getText();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -527,7 +563,8 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCardinalityOneToOne() {
-		return _link.isTypeOneToOne();
+		//return _link.isTypeOneToOne();
+		return _cardinality == Cardinality.ONE_TO_ONE ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -537,7 +574,8 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCardinalityOneToMany() {
-		return _link.isTypeOneToMany();
+		//return _link.isTypeOneToMany();
+		return _cardinality == Cardinality.ONE_TO_MANY ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -547,7 +585,8 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCardinalityManyToOne() {
-		return _link.isTypeManyToOne();
+		//return _link.isTypeManyToOne();
+		return _cardinality == Cardinality.MANY_TO_ONE ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -557,67 +596,98 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCardinalityManyToMany() {
-		return _link.isTypeManyToMany();
+		//return _link.isTypeManyToMany();
+		return _cardinality == Cardinality.MANY_TO_MANY ;
 	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the 'cascade type' ( 'ALL', 'MERGE', 'PERSIST', 'REFRESH', 'REMOVE' )"
+			"Returns the 'cascade type' ( 'ALL', 'MERGE', 'MERGE PERSIST', 'PERSIST REFRESH', 'REMOVE' )",
+			"A string containing all the selected cascade options"
 			}
 	)
 	public String getCascade() {
-		return _link.getCascade();
+//		//return _link.getCascade();
+//		if ( this.cascadeALL ) {
+//			return RepositoryConst.CASCADE_ALL ;
+//		}
+//		else {
+//			StringBuffer sb = new StringBuffer();
+//			if ( this.cascadeMERGE ) {
+//				sb.append(" ");
+//				sb.append(RepositoryConst.CASCADE_MERGE);
+//			}
+//			if ( this.cascadePERSIST ) {
+//				sb.append(" ");
+//				sb.append(RepositoryConst.CASCADE_PERSIST);
+//			}
+//			if ( this.cascadeREFRESH ) {
+//				sb.append(" ");
+//				sb.append(RepositoryConst.CASCADE_REFRESH);
+//			}
+//			if ( this.cascadeREMOVE ) {
+//				sb.append(" ");
+//				sb.append(RepositoryConst.CASCADE_REMOVE);
+//			}
+//			return sb.toString();
+//		}
+		return _cascadeOptions.toString();
 	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns true if the 'cascade type' is 'ALL' "
+			"Returns true if the 'cascade options' is 'ALL' "
 			}
 	)
 	public boolean isCascadeALL() {
-		return _link.isCascadeALL();
+		//return _link.isCascadeALL();
+		return _cascadeOptions.isCascadeAll();
 	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns true if the 'cascade type' is 'MERGE' "
+			"Returns true if the 'cascade options' contains 'MERGE' "
 			}
 	)
 	public boolean isCascadeMERGE() {
-		return _link.isCascadeMERGE();
+		//return _link.isCascadeMERGE();
+		return _cascadeOptions.isCascadeMerge();
 	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns true if the 'cascade type' is 'PERSIST' "
+			"Returns true if the 'cascade options' contains 'PERSIST' "
 			}
 	)
 	public boolean isCascadePERSIST() {
-		return _link.isCascadePERSIST();
+		//return _link.isCascadePERSIST();
+		return _cascadeOptions.isCascadePersist();
 	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns true if the 'cascade type' is 'REFRESH' "
+			"Returns true if the 'cascade options' contains 'REFRESH' "
 			}
 	)
 	public boolean isCascadeREFRESH() {
-		return _link.isCascadeREFRESH();
+		//return _link.isCascadeREFRESH();
+		return _cascadeOptions.isCascadeRefresh();
 	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns true if the 'cascade type' is 'REMOVE' "
+			"Returns true if the 'cascade options' contains 'REMOVE' "
 			}
 	)
 	public boolean isCascadeREMOVE() {
-		return _link.isCascadeREMOVE();
+		//return _link.isCascadeREMOVE();
+		return _cascadeOptions.isCascadeRemove();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -628,7 +698,8 @@ public class LinkInContext {
 			}
 	)
 	public String getFetch() {
-		return _link.getFetch();
+		//return _link.getFetch();
+		return _fetchType.getText();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -638,7 +709,8 @@ public class LinkInContext {
 			}
 	)
 	public boolean isFetchDEFAULT() {
-		return _link.isFetchDEFAULT();
+		//return _link.isFetchDEFAULT();
+		return _fetchType == FetchType.DEFAULT ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -648,7 +720,8 @@ public class LinkInContext {
 			}
 	)
 	public boolean isFetchEAGER() {
-		return _link.isFetchEAGER();
+		//return _link.isFetchEAGER();
+		return _fetchType == FetchType.EAGER ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -658,7 +731,8 @@ public class LinkInContext {
 			}
 	)
 	public boolean isFetchLAZY() {
-		return _link.isFetchLAZY();
+		//return _link.isFetchLAZY();
+		return _fetchType == FetchType.LAZY ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -670,7 +744,8 @@ public class LinkInContext {
 			}
 	)
 	public String getOptional() {
-		return _link.getOptional();
+		//return _link.getOptional();
+		return _optional.getText();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -680,7 +755,8 @@ public class LinkInContext {
 			}
 	)
 	public boolean isOptionalUndefined() {
-		return _link.isOptionalUndefined();
+		//return _link.isOptionalUndefined();
+		return _optional == Optional.UNDEFINED ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -690,7 +766,8 @@ public class LinkInContext {
 			}
 	)
 	public boolean isOptionalFalse() {
-		return _link.isOptionalFalse();
+		//return _link.isOptionalFalse();
+		return _optional == Optional.FALSE ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -700,7 +777,8 @@ public class LinkInContext {
 			}
 	)
 	public boolean isOptionalTrue() {
-		return _link.isOptionalTrue();
+		//return _link.isOptionalTrue();
+		return _optional == Optional.TRUE ;
 	}
 
 }

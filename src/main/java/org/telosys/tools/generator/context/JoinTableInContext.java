@@ -17,10 +17,8 @@ package org.telosys.tools.generator.context;
 
 import java.util.LinkedList;
 
-import org.telosys.tools.repository.model.InverseJoinColumns;
-import org.telosys.tools.repository.model.JoinColumn;
-import org.telosys.tools.repository.model.JoinColumns;
-import org.telosys.tools.repository.model.JoinTable;
+import org.telosys.tools.generic.model.JoinColumn;
+import org.telosys.tools.generic.model.JoinTable;
 
 
 /**
@@ -50,15 +48,22 @@ public class JoinTableInContext
 		
 		//--- Build the list of "join columns"
 		_joinColumns = new LinkedList<JoinColumnInContext>();
-		JoinColumns joinColumns = joinTable.getJoinColumns() ;
-		for ( JoinColumn jc : joinColumns ) {
+//		JoinColumns joinColumns = joinTable.getJoinColumns() ;
+//		for ( JoinColumn jc : joinColumns ) {
+//			_joinColumns.add( new JoinColumnInContext(jc) ) ;
+//		}
+		// ver 3.0.0
+		for ( JoinColumn jc : joinTable.getJoinColumns() ) {
 			_joinColumns.add( new JoinColumnInContext(jc) ) ;
 		}
 
 		//--- Build the list of "inverse join columns"
 		_inverseJoinColumns = new LinkedList<JoinColumnInContext>();
-		InverseJoinColumns inverseJoinColumns = joinTable.getInverseJoinColumns() ;
-		for ( JoinColumn jc : inverseJoinColumns ) {
+//		InverseJoinColumns inverseJoinColumns = joinTable.getInverseJoinColumns() ;
+//		for ( JoinColumn jc : inverseJoinColumns ) {
+//			_inverseJoinColumns.add( new JoinColumnInContext(jc) ) ;
+//		}
+		for ( JoinColumn jc : joinTable.getInverseJoinColumns() ) {
 			_inverseJoinColumns.add( new JoinColumnInContext(jc) ) ;
 		}
 	}

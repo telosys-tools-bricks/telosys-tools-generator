@@ -15,7 +15,6 @@
  */
 package org.telosys.tools.generator.context;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,10 +27,10 @@ import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.context.tools.AmbiguousTypesDetector;
-import org.telosys.tools.repository.model.Column;
-import org.telosys.tools.repository.model.Entity;
-import org.telosys.tools.repository.model.ForeignKey;
-import org.telosys.tools.repository.model.Link;
+import org.telosys.tools.generic.model.Attribute;
+import org.telosys.tools.generic.model.Entity;
+import org.telosys.tools.generic.model.ForeignKey;
+import org.telosys.tools.generic.model.Link;
 
 /**
  * Specific Java Class for an Entity Java Bean with Object-Relational Mapping (ORM) <br>
@@ -64,14 +63,10 @@ public class EntityInContext
 	//--- Static void lists
 	private final static List<AttributeInContext>  VOID_ATTRIBUTES_LIST    = new LinkedList<AttributeInContext>();
 	private final static List<ForeignKeyInContext> VOID_FOREIGN_KEYS_LIST  = new LinkedList<ForeignKeyInContext>();
-	private final static List<LinkInContext>           VOID_LINKS_LIST         = new LinkedList<LinkInContext>();
+	private final static List<LinkInContext>       VOID_LINKS_LIST         = new LinkedList<LinkInContext>();
 	
-	//private final static String   NONE = "" ;
-	
-	private final String     _sName ;
+	private final String     _sClassName ;
 	private final String     _sPackage ;
-	//private String     _sFullName    = NONE ;
-	//private String     _sSuperClass  = NONE ;	
 	
     private final String     _sDatabaseTable    ; // Table name this class is mapped with
     private final String     _sDatabaseCatalog  ; // The table's catalog 
@@ -82,15 +77,8 @@ public class EntityInContext
 	private LinkedList<AttributeInContext>  _keyAttributes     = null ; // The KEY attributes for this class
 	private LinkedList<AttributeInContext>  _nonKeyAttributes  = null ; // The NON KEY attributes for this class
 
-//	private String     _sSqlKeyColumns = null ;
-//	private String     _sSqlNonKeyColumns = null ;
-	
 	private final LinkedList<ForeignKeyInContext>  _foreignKeys ; // The database FOREIGN KEYS attributes for this entity ( v 2.0.7)
 	
-//	//--- XML mapper infos
-//	private LinkedList<JavaBeanClassAttribute> _nonTextAttributes  = null ; // Standard attributes for this class ( not "long text" )
-//	private LinkedList<JavaBeanClassAttribute> _textAttributes     = null ; // Special "long text" attributes for this class
-
 	//--- JPA specific
 	private final LinkedList<LinkInContext> _links ; // The links for this class ( ALL ATTRIBUTES )
 	
@@ -109,54 +97,59 @@ public class EntityInContext
 	public EntityInContext( final Entity entity, final String entityPackage, 
 							final EntitiesManager entitiesManager, final EnvInContext env ) throws GeneratorException
 	{
-		_sName = entity.getBeanJavaClass() ;
+		//_sName = entity.getBeanJavaClass() ;
+		_sClassName = entity.getClassName();  // v 3.0.0
+		
 		_sPackage = entityPackage;
 		
 		_entitiesManager = entitiesManager ;
 		_env = env ;
 		
-		_sDatabaseTable   = entity.getName();
-		_sDatabaseCatalog = entity.getCatalog();
-		_sDatabaseSchema  = entity.getSchema();
+		_sDatabaseTable   = entity.getDatabaseTable();
+		//_sDatabaseCatalog = entity.getCatalog();
+		_sDatabaseCatalog = entity.getDatabaseCatalog(); // v 3.0.0
+		
+		//_sDatabaseSchema  = entity.getSchema();
+		_sDatabaseSchema  = entity.getDatabaseSchema(); // v 3.0.0
+		
 		_sDatabaseType    = entity.getDatabaseType(); // ver 2.0.7
 		
 		//--- Initialize all the ATTRIBUTES for the current entity
 		_attributes = new LinkedList<AttributeInContext>();
-		Collection<Column> entityColumns = entity.getColumnsCollection() ;
-		for ( Column column : entityColumns ) {
-			AttributeInContext attribute = new AttributeInContext(this, column);
-			_attributes.add(attribute);
+//		Collection<Column> entityColumns = entity.getColumnsCollection() ;
+//		for ( Column column : entityColumns ) {
+//			AttributeInContext attribute = new AttributeInContext(this, column);
+//			_attributes.add(attribute);
+//		}
+		for ( Attribute attribute : entity.getAttributes() ) { // v 3.0.0
+			AttributeInContext attributeInContext = new AttributeInContext(this, attribute);
+			_attributes.add(attributeInContext);
 		}
 
 		//--- Initialize all the LINKS for the current entity
 		_links = new LinkedList<LinkInContext>();
-		Collection<Link> entityLinks = entity.getLinksCollection() ;
-		for ( Link link : entityLinks ) {
-			// On va trouver le bean correspondant a ce lien dans le model
-//			Entity referencedEntity = repositoryModel.getEntityByName(link.getTargetTableName());
-////			JavaBeanClassLink jcl = new JavaBeanClassLink(link, this._entite , entityCible );
-//			LinkInContext jcl = new LinkInContext(link, referencedEntity );
-
-			//String entityName = link.getTargetTableName() ;
-//			EntityInContext referencedEntity = _entitiesBuilder.getEntity( entityName ) ;
-//			LinkInContext jcl = new LinkInContext(link, referencedEntity );
-			LinkInContext linkInCtx = new LinkInContext(this, link, _entitiesManager );
-			
-			//this.addLink(jcl);
-			_links.add(linkInCtx);
+//		Collection<Link> entityLinks = entity.getLinksCollection() ;
+//		for ( Link link : entityLinks ) {
+//			LinkInContext linkInCtx = new LinkInContext(this, link, _entitiesManager );
+//			_links.add(linkInCtx);
+//		}
+		for ( Link link : entity.getLinks() ) { // v 3.0.0
+			LinkInContext linkInContext = new LinkInContext(this, link, _entitiesManager );
+			_links.add(linkInContext);
 		}
 		
 		//--- Init all the DATABASE FOREIGN KEYS  ( v 2.0.7 )
 		_foreignKeys = new LinkedList<ForeignKeyInContext>();
-		Collection<ForeignKey> foreignKeys = entity.getForeignKeysCollection();
-		for ( ForeignKey fk : foreignKeys ) {
+//		Collection<ForeignKey> foreignKeys = entity.getForeignKeysCollection();
+//		for ( ForeignKey fk : foreignKeys ) {
+//			_foreignKeys.add( new ForeignKeyInContext(fk ) );
+//		}
+		for ( ForeignKey fk : entity.getDatabaseForeignKeys() ) {
 			_foreignKeys.add( new ForeignKeyInContext(fk ) );
 		}
 		
-		// import resolution
-		//this.endOfDefinition();
+		//--- Post processing : import resolution
 		endOfAttributesDefinition();
-		
 	}
 	
 	//-----------------------------------------------------------------------------------------------	
@@ -174,12 +167,12 @@ public class EntityInContext
 		if ( _env != null ) {
 			StringBuilder sb = new StringBuilder();
 			sb.append( _env.getEntityClassNamePrefix() ) ; // Never null ( "" if not set )
-			sb.append( _sName ) ; // Never null ( "" if not set )
+			sb.append( _sClassName ) ; // Never null ( "" if not set )
 			sb.append( _env.getEntityClassNameSuffix() ) ; // Never null ( "" if not set )
 			return sb.toString();
 		}
 		else {
-			return _sName ;
+			return _sClassName ;
 		}
 	}
 	
@@ -222,8 +215,6 @@ public class EntityInContext
 	)
 	public String getFullName()
     {
-		//return _sFullName ;
-		
 		return _sPackage + "." + getName();
     }
 	

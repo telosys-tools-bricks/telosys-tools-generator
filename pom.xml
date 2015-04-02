@@ -21,9 +21,16 @@
 			<artifactId>telosys-tools-commons</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		<!-- 
 	 	<dependency>
 			<groupId>org.telosys.tools</groupId>
 		  	<artifactId>telosys-tools-repository</artifactId>
+			<version>${project.parent.version}</version>
+	 	</dependency>
+		 -->
+	 	<dependency>
+			<groupId>org.telosys.tools</groupId>
+		  	<artifactId>telosys-tools-generic-model</artifactId>
 			<version>${project.parent.version}</version>
 	 	</dependency>
 		

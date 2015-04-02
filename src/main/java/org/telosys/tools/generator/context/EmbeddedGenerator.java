@@ -27,8 +27,8 @@ import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.target.TargetDefinition;
-import org.telosys.tools.repository.model.Entity;
-import org.telosys.tools.repository.model.RepositoryModel;
+import org.telosys.tools.generic.model.Entity;
+import org.telosys.tools.generic.model.Model;
 
 /**
  * Embedded generator stored in the Velocity Context and usable in the template.
@@ -45,7 +45,7 @@ import org.telosys.tools.repository.model.RepositoryModel;
 //-------------------------------------------------------------------------------------
 public class EmbeddedGenerator {
 
-	private final RepositoryModel    repositoryModel ;
+	private final Model              model ;
 	private final GeneratorConfig    generatorConfig ;
 	private final TelosysToolsLogger logger ;
 	private final List<String>       selectedEntitiesNames;	
@@ -57,7 +57,7 @@ public class EmbeddedGenerator {
 	 */
 	public EmbeddedGenerator() {
 		super();
-		this.repositoryModel = null ;
+		this.model = null ;
 		this.generatorConfig = null ;
 		this.logger = null ;
 		this.selectedEntitiesNames = null ;
@@ -67,22 +67,22 @@ public class EmbeddedGenerator {
 
 	/**
 	 * Constructor for real generator that can generate sub-targets from a template
-	 * @param repositoryModel
+	 * @param model
 	 * @param generatorConfig
 	 * @param logger
 	 * @param selectedEntitiesNames
 	 * @param generatedTargets
 	 */
-	public EmbeddedGenerator(	RepositoryModel repositoryModel,
+	public EmbeddedGenerator(	Model model,
 								GeneratorConfig generatorConfig, 
 								TelosysToolsLogger logger, 
 								List<String> selectedEntitiesNames,
 								List<Target> generatedTargets) {
 		super();
-		this.repositoryModel = repositoryModel;
+		this.model = model;
 		this.generatorConfig = generatorConfig;
 		this.logger = logger;
-		if ( repositoryModel != null && generatorConfig != null && logger != null ) {
+		if ( model != null && generatorConfig != null && logger != null ) {
 			this.canGenerate = true ;
 		}
 		else {
@@ -120,13 +120,70 @@ public class EmbeddedGenerator {
         return GeneratorVersion.GENERATOR_VERSION ;
     }
 	
+//	//-------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Generates an other target with the given template file "
+//			},
+//		parameters = { 
+//			"entityId : the id of the entity",
+//			"outputFile : the file name to be generated ",
+//			"outputFolder : the folder where to generate the file",			
+//			"templateFile : the template file to be used "			
+//			},
+//		example = {
+//			"#if ( $entity.hasCompositePrimaryKey() )",
+//			"$generator.generate($target.entityName , \"${entity.name}Key.java\", $target.folder, \"jpa_bean_pk.vm\" ) ",
+//			"#end"
+//		}
+//	)
+//	public void generate(String entityId, String outputFile, String outputFolder, String templateFile) throws GeneratorException
+//	{
+//		String err = "Cannot generate with embedded generator ";
+//		
+//		if ( canGenerate != true ) {
+//			throw new GeneratorException( err + "(environment not available)");
+//		}
+//		
+//		if ( null == entityId ) {
+//			throw new GeneratorException( err + "(entity name is null)");
+//		}
+//		if ( null == outputFile ) {
+//			throw new GeneratorException( err + "(output file is null)");
+//		}
+//		if ( null == outputFolder ) {
+//			throw new GeneratorException( err + "(output folder is null)");
+//		}
+//		if ( null == templateFile ) {
+//			throw new GeneratorException( err + "(template file is null)");
+//		}
+//		
+//		Variable[] allVariables = generatorConfig.getTelosysToolsCfg().getAllVariables(); // v 2.1.0
+//		
+//		//Entity entity = model.getEntityByName(entityName.trim());
+//		Entity entity = model.getEntityById(entityId.trim());
+//		if ( null == entity ) {
+//			throw new GeneratorException( err + "(entity '" + entityId + "' not found in repository)");
+//		}
+//		
+//		TargetDefinition genericTarget = new TargetDefinition("Dynamic target", outputFile, outputFolder, templateFile, "");
+//		
+//		//Target target = new Target( genericTarget, entity.getName(), entity.getBeanJavaClass(), allVariables ); // v 2.1.0
+//		Target target = new Target( genericTarget, entity, allVariables ); // v 3.0.0
+//		
+//		Generator generator = new Generator(target, generatorConfig, model, logger); // v 2.0.7
+//		
+//		generator.generateTarget(target, model, selectedEntitiesNames, this.generatedTargets);
+//		
+//	}
+	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Generates an other target with the given template file "
 			},
 		parameters = { 
-			"entityName : the name of the entity",
+			"entity : the entity ",
 			"outputFile : the file name to be generated ",
 			"outputFolder : the folder where to generate the file",			
 			"templateFile : the template file to be used "			
@@ -137,16 +194,15 @@ public class EmbeddedGenerator {
 			"#end"
 		}
 	)
-	public void generate(String entityName, String outputFile, String outputFolder, String templateFile) throws GeneratorException
+	public void generate(Entity entity, String outputFile, String outputFolder, String templateFile) throws GeneratorException
 	{
 		String err = "Cannot generate with embedded generator ";
 		
 		if ( canGenerate != true ) {
 			throw new GeneratorException( err + "(environment not available)");
 		}
-		
-		if ( null == entityName ) {
-			throw new GeneratorException( err + "(entity name is null)");
+		if ( null == entity ) {
+			throw new GeneratorException( err + "(entity is null)");
 		}
 		if ( null == outputFile ) {
 			throw new GeneratorException( err + "(output file is null)");
@@ -158,24 +214,22 @@ public class EmbeddedGenerator {
 			throw new GeneratorException( err + "(template file is null)");
 		}
 		
-		//ProjectConfiguration projectConfiguration = generatorConfig.getProjectConfiguration();
 		Variable[] allVariables = generatorConfig.getTelosysToolsCfg().getAllVariables(); // v 2.1.0
 		
-		Entity entity = repositoryModel.getEntityByName(entityName.trim());
-		if ( null == entity ) {
-			throw new GeneratorException( err + "(entity '" + entityName + "' not found in repository)");
-		}
+//		//Entity entity = model.getEntityByName(entityName.trim());
+//		Entity entity = model.getEntityById(entityId.trim());
+//		if ( null == entity ) {
+//			throw new GeneratorException( err + "(entity '" + entityId + "' not found in repository)");
+//		}
 		
 		TargetDefinition genericTarget = new TargetDefinition("Dynamic target", outputFile, outputFolder, templateFile, "");
 		
-		//Target target = new Target( genericTarget, entity.getName(), entity.getBeanJavaClass(), projectConfiguration.getAllVariables() );
-		Target target = new Target( genericTarget, entity.getName(), entity.getBeanJavaClass(), allVariables ); // v 2.1.0
+		//Target target = new Target( genericTarget, entity.getName(), entity.getBeanJavaClass(), allVariables ); // v 2.1.0
+		Target target = new Target( genericTarget, entity, allVariables ); // v 3.0.0
 		
-		//Generator generator = new Generator(target, generatorConfig, logger);
-		Generator generator = new Generator(target, generatorConfig, repositoryModel, logger); // v 2.0.7
+		Generator generator = new Generator(target, generatorConfig, model, logger); // v 2.0.7
 		
-		generator.generateTarget(target, repositoryModel, selectedEntitiesNames, this.generatedTargets);
-		
+		generator.generateTarget(target, model, selectedEntitiesNames, this.generatedTargets);
 	}
 	
 }

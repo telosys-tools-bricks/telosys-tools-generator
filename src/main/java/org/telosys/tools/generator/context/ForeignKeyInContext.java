@@ -23,8 +23,8 @@ import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.repository.model.ForeignKey;
-import org.telosys.tools.repository.model.ForeignKeyColumn;
+import org.telosys.tools.generic.model.ForeignKey;
+import org.telosys.tools.generic.model.ForeignKeyColumn;
 
 /**
  * Database Foreign Key exposed in the generator context
@@ -82,27 +82,38 @@ public class ForeignKeyInContext {
 //	}
 
 	//-------------------------------------------------------------------------------------
-	public ForeignKeyInContext(final ForeignKey metadataFK ) 
+	public ForeignKeyInContext(final ForeignKey foreignKey ) 
 	{
-		this.fkName = metadataFK.getName() ;
-		this.tableName = metadataFK.getTableName() ;
-		this.targetTableName = metadataFK.getTableRef() ;
+		this.fkName = foreignKey.getName() ;
+		this.tableName = foreignKey.getTableName() ;
+		//this.targetTableName = metadataFK.getTableRef() ;
+		this.targetTableName = foreignKey.getReferencedTableName();
 		
 		this._updateRuleCode = 0 ;
 		this._deleteRuleCode = 0 ;
 		this._deferrableCode = 0 ;
 		this.fkColumns = new LinkedList<ForeignKeyColumnInContext>() ;
-		if ( metadataFK.getForeignKeyColumnsCollection().size() > 0 ) {
-			for ( ForeignKeyColumn metadataFKColumn : metadataFK.getForeignKeyColumnsCollection() ) {
-				int    sequence = metadataFKColumn.getSequence();
-				String columnName = metadataFKColumn.getColumnName();
-				String referencedColumnName = metadataFKColumn.getColumnRef();
-				fkColumns.add( new ForeignKeyColumnInContext(sequence, columnName, referencedColumnName ) ) ;
-				//--- ON UPDATE, ON DELETE and DEFERRABLE (stored in each column in meta-data, keep the last one)
-				this._updateRuleCode = metadataFKColumn.getUpdateRuleCode() ;
-				this._deleteRuleCode = metadataFKColumn.getDeleteRuleCode() ;
-				this._deferrableCode = metadataFKColumn.getDeferrableCode() ;
-			}
+//		if ( metadataFK.getForeignKeyColumnsCollection().size() > 0 ) {
+//			for ( ForeignKeyColumn metadataFKColumn : metadataFK.getForeignKeyColumnsCollection() ) {
+//				int    sequence = metadataFKColumn.getSequence();
+//				String columnName = metadataFKColumn.getColumnName();
+//				String referencedColumnName = metadataFKColumn.getColumnRef();
+//				fkColumns.add( new ForeignKeyColumnInContext(sequence, columnName, referencedColumnName ) ) ;
+//				//--- ON UPDATE, ON DELETE and DEFERRABLE (stored in each column in meta-data, keep the last one)
+//				this._updateRuleCode = metadataFKColumn.getUpdateRuleCode() ;
+//				this._deleteRuleCode = metadataFKColumn.getDeleteRuleCode() ;
+//				this._deferrableCode = metadataFKColumn.getDeferrableCode() ;
+//			}
+//		}
+
+		//--- V 3.0.0 
+		//--- ON UPDATE, ON DELETE and DEFERRABLE (stored in each column in meta-data, keep the last one)
+		this._updateRuleCode = foreignKey.getUpdateRuleCode() ;
+		this._deleteRuleCode = foreignKey.getDeleteRuleCode() ;
+		this._deferrableCode = foreignKey.getDeferrableCode() ;
+		
+		for ( ForeignKeyColumn metadataFKColumn : foreignKey.getColumns() ) {
+			fkColumns.add( new ForeignKeyColumnInContext(metadataFKColumn) );
 		}
 	}
 

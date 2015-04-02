@@ -19,6 +19,7 @@ import java.sql.Types;
 
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.AttributeInContext;
+import org.telosys.tools.generic.model.DateType;
 
 /**
  * This class manages the JPA annotations for a given Java attribute ( a field mapped on a column )
@@ -108,17 +109,28 @@ public class AnnotationsForJPA
 		// @Temporal
 		if ( "java.util.Date".equals(sAttributeFullType) || "java.util.Calendar".equals(sAttributeFullType) ) 
 		{
-			switch ( _attribute.getDateType()  ) 
-			{
-			case AttributeInContext.DATE_ONLY :
+//			switch ( _attribute.getDateType()  ) 
+//			{
+//			case AttributeInContext.DATE_ONLY :
+//				annotationTemporal(annotations, "DATE");
+//				break;
+//			case AttributeInContext.TIME_ONLY :
+//				annotationTemporal(annotations, "TIME");
+//				break;
+//			case AttributeInContext.DATE_AND_TIME :
+//				annotationTemporal(annotations, "TIMESTAMP");
+//				break;
+//			}
+			// ver 3.0.0
+			int dateTypeValue = _attribute.getDateType() ; // same 'int' value as in Velocity template
+			if ( dateTypeValue == DateType.DATE_ONLY.getValue() ) {
 				annotationTemporal(annotations, "DATE");
-				break;
-			case AttributeInContext.TIME_ONLY :
+			}
+			else if ( dateTypeValue == DateType.TIME_ONLY.getValue() ) {
 				annotationTemporal(annotations, "TIME");
-				break;
-			case AttributeInContext.DATE_AND_TIME :
+			}
+			else if ( dateTypeValue == DateType.DATE_AND_TIME.getValue() ) {
 				annotationTemporal(annotations, "TIMESTAMP");
-				break;
 			}
 		}
 

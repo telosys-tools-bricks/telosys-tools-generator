@@ -24,7 +24,7 @@ import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.repository.model.RepositoryModel;
+import org.telosys.tools.generic.model.Model;
 
 /**
  * This class give access to the entire repository model
@@ -41,9 +41,6 @@ import org.telosys.tools.repository.model.RepositoryModel;
 //-------------------------------------------------------------------------------------
 public class ModelInContext
 {
-//	private final List<JavaBeanClass>       _allEntities ;
-//	private final Map<String,JavaBeanClass> _entitiesByTableName ;
-//	private final Map<String,JavaBeanClass> _entitiesByClassName ;
 	private final List<EntityInContext>       _allEntities ;
 	private final Map<String,EntityInContext> _entitiesByTableName ;
 	private final Map<String,EntityInContext> _entitiesByClassName ;
@@ -53,26 +50,19 @@ public class ModelInContext
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Constructor
-	 * @param repositoryModel
-	 * @param generatorConfig
-	 * @param env
+	 * @param model
+	 * @param entitiesManager
 	 * @throws GeneratorException
 	 */
-	public ModelInContext( RepositoryModel repositoryModel, EntitiesManager entitiesManager ) throws GeneratorException  {
+	public ModelInContext( Model model, EntitiesManager entitiesManager ) throws GeneratorException  {
 		super();
-		if ( repositoryModel == null ) throw new GeneratorException("RepositoryModel is null");
-//		if ( generatorConfig == null ) throw new GeneratorException("GeneratorConfig is null");
-//		if ( env == null ) throw new GeneratorException("EnvInContext is null");
+		if ( model == null ) throw new GeneratorException("Model is null");
 		if ( entitiesManager == null ) throw new GeneratorException("EntitiesBuilder is null");
 		
 		//--- All the entities
-		//_allEntities = RepositoryModelUtil.buildAllJavaBeanClasses(repositoryModel, generatorConfig );
-//		EntitiesBuilder entitiesBuilder = new EntitiesBuilder(repositoryModel, generatorConfig, env);
 		_allEntities = entitiesManager.getAllEntities();
 		
 		//--- Entities by TABLE NAME
-		//_entitiesByTableName = new HashMap<String,JavaBeanClass>();
-		//for ( JavaBeanClass entity : _allEntities ) {
 		_entitiesByTableName = new HashMap<String,EntityInContext>();
 		for ( EntityInContext entity : _allEntities ) {
 			// The table name is unique 
@@ -80,16 +70,24 @@ public class ModelInContext
 		}
 		
 		//--- Entities by CLASS NAME
-//		_entitiesByClassName = new HashMap<String,JavaBeanClass>();
-//		for ( JavaBeanClass entity : _allEntities ) {
 		_entitiesByClassName = new HashMap<String,EntityInContext>();
 		for ( EntityInContext entity : _allEntities ) {
 			// The class name is supposed to be unique 
 			_entitiesByClassName.put(entity.getName(), entity);
 		}
 		
-		_databaseId          = repositoryModel.getDatabaseId();
-		_databaseProductName = repositoryModel.getDatabaseProductName();
+		if ( model.getDatabaseId() != null ) {
+			_databaseId          = model.getDatabaseId();
+		}
+		else {
+			_databaseId = -1;
+		}
+		if ( model.getDatabaseProductName() != null ) {
+			_databaseProductName = model.getDatabaseProductName();
+		}
+		else {
+			_databaseProductName = "";
+		}
 	}
 
 	//-------------------------------------------------------------------------------------

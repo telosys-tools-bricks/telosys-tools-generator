@@ -24,6 +24,7 @@ import org.telosys.tools.generator.context.doc.VelocityNoDoc;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.target.TargetDefinition;
+import org.telosys.tools.generic.model.Entity;
 
 /**
  * The generation target file <br>  
@@ -52,73 +53,88 @@ public class Target
 	
 	private final String    template ;
 
-	private final String    entityName ;
+	private final String    entityClassName ;
 
-//	private final boolean   templateOnly ; // v 2.1.1
-
-	// Removed in v 2.1.1
 //	/**
-//	 * Constructor for special target containing only the template <br>
-//	 * Used by Wizards generators
-//	 * 
-//	 * @param template
+//	 * Constructor
+//	 * @param targetDefinition  the initial target as defined in the targets configuration file
+//	 * @param entityName  the name of the entity (as defined in the repository model)
+//	 * @param entityJavaClassName 
+//	 * @param variables  the project's specific variables to be applied 
 //	 */
-//	public Target( String template ) {
+//	public Target( TargetDefinition targetDefinition, String entityName, String entityJavaClassName, Variable[] variables ) 
+//	{
 //		super();
-//		this.targetName = null;
-//		this.file = null ;
-//		this.folder = null;
-//		this.template = template.trim();
-//		this.entityName = null ;
-////		this.templateOnly = true ; // v 2.1.1
+//		
+//		//--- Generic target informations
+//		this.targetName = targetDefinition.getName();
+//		this.template = targetDefinition.getTemplate();
+//		
+//		//--- Specialization for the given entity
+//		this.entityName = entityName ;
+//
+//		//--- Replace the "$" variables in _sFile and _sFolder
+//		VariablesManager variablesManager = null ;
+//		if ( variables != null ) {
+//			variablesManager = new VariablesManager( variables );
+//		}
+//		this.file   = replaceVariables( targetDefinition.getFile(),   entityJavaClassName, variablesManager );
+//		
+//		variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
+//		this.folder = replaceVariables( targetDefinition.getFolder(), entityJavaClassName, variablesManager );
 //	}
-	
+
 	/**
-	 * Constructor
-	 * @param targetDefinition  the initial target as defined in the targets configuration file
-	 * @param entityName  the name of the entity (as defined in the repository model)
-	 * @param entityJavaClassName 
-	 * @param variables  the project's specific variables to be applied 
+	 * Constructor for a generation with an entity and a template
+	 * @param targetDefinition
+	 * @param entity
+	 * @param variables
 	 */
-	public Target( TargetDefinition targetDefinition, String entityName, String entityJavaClassName, Variable[] variables ) 
-	{
+	public Target( TargetDefinition targetDefinition, Entity entity, Variable[] variables ) {
 		super();
-		
 		//--- Generic target informations
 		this.targetName = targetDefinition.getName();
 		this.template = targetDefinition.getTemplate();
 		
 		//--- Specialization for the given entity
-		this.entityName = entityName ;
+		this.entityClassName = entity.getClassName() ;
 
-//		this.templateOnly = false ; // v 2.1.1
-		
 		//--- Replace the "$" variables in _sFile and _sFolder
 		VariablesManager variablesManager = null ;
 		if ( variables != null ) {
 			variablesManager = new VariablesManager( variables );
 		}
-		//--- Replace variables on File Name
-		this.file   = replaceVariables( targetDefinition.getFile(),   entityJavaClassName, variablesManager );
-		//--- Replace variables on Folder Name
-		if (variablesManager != null) {
-			variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
-		}
-		this.folder = replaceVariables( targetDefinition.getFolder(), entityJavaClassName, variablesManager );
+		this.file   = replaceVariables( targetDefinition.getFile(),   this.entityClassName, variablesManager );
+		
+		variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
+		this.folder = replaceVariables( targetDefinition.getFolder(), this.entityClassName, variablesManager );
 	}
 
-	// removed in v 2.1.1	
-//	/**
-//	 * Returns true if this target contains only the template file <br>
-//	 * ( not a "real target", true for Wizards generation ) 
-//	 * 
-//	 * @return
-//	 */
-//	@VelocityNoDoc
-//	public boolean isTemplateOnly() {
-//		return this.templateOnly ;
-//	}
-	
+	/**
+	 * Constructor for a resource copy
+	 * @param targetDefinition
+	 * @param variables
+	 */
+	public Target( TargetDefinition targetDefinition, Variable[] variables ) {
+		super();
+		//--- Generic target informations
+		this.targetName = targetDefinition.getName();
+		this.template = targetDefinition.getTemplate();
+		
+		//--- Specialization for the given entity
+		this.entityClassName = null ;
+
+		//--- Replace the "$" variables in _sFile and _sFolder
+		VariablesManager variablesManager = null ;
+		if ( variables != null ) {
+			variablesManager = new VariablesManager( variables );
+		}
+		this.file   = replaceVariables( targetDefinition.getFile(),   "", variablesManager );
+		
+		variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
+		this.folder = replaceVariables( targetDefinition.getFolder(), "", variablesManager );
+	}
+
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -167,7 +183,7 @@ public class Target
 	)
 	public String getEntityName()
 	{
-		return entityName ;
+		return entityClassName ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -240,8 +256,7 @@ public class Target
 	}
 	
 	//-----------------------------------------------------------------------
-	private String replaceVariables( String originalString, String sBeanClass, VariablesManager varmanager )
-	{
+	private String replaceVariables( String originalString, String sBeanClass, VariablesManager varmanager ) {
 		//--- Replace the generic name "${BEANNAME}" if any
 		String s1 = replace(originalString, ConfigDefaults.BEANNAME, sBeanClass);
 
@@ -364,8 +379,7 @@ public class Target
 	public String toString() {
 		return "Target [targetName=" + targetName + ", file=" + file
 				+ ", folder=" + folder + ", template=" + template
-				+ ", entityName=" + entityName + "]";
-//				+ ", templateOnly=" + templateOnly + "]"; // v 2.1.1
+				+ ", entityName=" + entityClassName + "]";
 	}
 	
 	
