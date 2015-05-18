@@ -18,13 +18,13 @@ package org.telosys.tools.generator.context;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.velocity.VelocityContext;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.XmlUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generator.engine.GeneratorContext;
 
 /**
  * Set of functions usable in Velocity template with $fn.functionName(...) 
@@ -44,21 +44,18 @@ import org.telosys.tools.generator.context.names.ContextName;
 //-------------------------------------------------------------------------------------
 public class Fn {
 
-// USELESS 
-//	public boolean isNull (Object o) {
-//		return null == o ;
+//	private final VelocityContext _velocityContext ;
+	private final GeneratorContext _generatorContext ;
+	
+	
+//	public Fn(VelocityContext velocityContext) {
+//		super();
+//		this._velocityContext = velocityContext;
 //	}
-//	
-//	public boolean isNotNull (Object o) {
-//		return ! isNull(o);
-//	}
 	
-	private final VelocityContext _velocityContext ;
-	
-	
-	public Fn(VelocityContext velocityContext) {
+	public Fn(GeneratorContext generatorContext) {
 		super();
-		this._velocityContext = velocityContext;
+		this._generatorContext = generatorContext;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -390,7 +387,8 @@ public class Fn {
 			since = "2.1.0"
 			)
 	public boolean isDefined(String objectName) {
-		Object o = _velocityContext.get(objectName);
+//		Object o = _velocityContext.get(objectName);
+		Object o = _generatorContext.get(objectName);
 		return ( o != null );
 	}
 
@@ -408,7 +406,8 @@ public class Fn {
 			)
 	@VelocityReturnType("Any kind of object ")
 	public Object get(String objectName, Object defaultValue) {
-		Object o = _velocityContext.get(objectName);
+//		Object o = _velocityContext.get(objectName);
+		Object o = _generatorContext.get(objectName);
 		return ( o != null ? o : defaultValue );
 	}
 

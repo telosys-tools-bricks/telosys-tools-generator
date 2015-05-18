@@ -143,7 +143,8 @@ public class GeneratorRunner {
 
 			List<Target> generatedTargets = new LinkedList<Target>();
 			//Generator generator = new Generator(target, generatorConfig, logger);
-			Generator generator = new Generator(target, generatorConfig, model, logger); // v 2.0.7
+//			Generator generator = new Generator(target, generatorConfig, model, logger); // v 2.0.7
+			Generator generator = new Generator(generatorConfig, logger); // v 3.0
 			generator.generateTarget(target, model, null, generatedTargets);
 			
 //		} catch (GeneratorException e) {

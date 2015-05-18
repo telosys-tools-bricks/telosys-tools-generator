@@ -227,7 +227,8 @@ public class EmbeddedGenerator {
 		//Target target = new Target( genericTarget, entity.getName(), entity.getBeanJavaClass(), allVariables ); // v 2.1.0
 		Target target = new Target( genericTarget, entity, allVariables ); // v 3.0.0
 		
-		Generator generator = new Generator(target, generatorConfig, model, logger); // v 2.0.7
+		//Generator generator = new Generator(target, generatorConfig, model, logger); // v 2.0.7
+		Generator generator = new Generator(generatorConfig, logger); // v 3.0
 		
 		generator.generateTarget(target, model, selectedEntitiesNames, this.generatedTargets);
 	}
