@@ -100,10 +100,11 @@ public class Target
 		this.entityClassName = entity.getClassName() ;
 
 		//--- Replace the "$" variables in _sFile and _sFolder
-		VariablesManager variablesManager = null ;
-		if ( variables != null ) {
-			variablesManager = new VariablesManager( variables );
-		}
+//		VariablesManager variablesManager = null ;
+//		if ( variables != null ) {
+//			variablesManager = new VariablesManager( variables );
+//		}
+		VariablesManager variablesManager = new VariablesManager( variables ); 
 		this.file   = replaceVariables( targetDefinition.getFile(),   this.entityClassName, variablesManager );
 		
 		variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
@@ -125,10 +126,11 @@ public class Target
 		this.entityClassName = null ;
 
 		//--- Replace the "$" variables in _sFile and _sFolder
-		VariablesManager variablesManager = null ;
-		if ( variables != null ) {
-			variablesManager = new VariablesManager( variables );
-		}
+//		VariablesManager variablesManager = null ;
+//		if ( variables != null ) {
+//			variablesManager = new VariablesManager( variables );
+//		}
+		VariablesManager variablesManager = new VariablesManager( variables ); 		
 		this.file   = replaceVariables( targetDefinition.getFile(),   "", variablesManager );
 		
 		variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
