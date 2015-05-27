@@ -22,8 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.List;
 
 import org.telosys.tools.commons.TelosysToolsLogger;
@@ -48,10 +46,8 @@ import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generator.context.Today;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.engine.GeneratorContext;
-import org.telosys.tools.generator.engine.GeneratorContextException;
 import org.telosys.tools.generator.engine.GeneratorEngine;
 import org.telosys.tools.generator.engine.GeneratorTemplate;
-import org.telosys.tools.generator.engine.directive.DirectiveException;
 import org.telosys.tools.generic.model.Model;
 
 /**

@@ -33,6 +33,11 @@
 		  	<artifactId>telosys-tools-generic-model</artifactId>
 			<version>${project.parent.version}</version>
 	 	</dependency>
+ 	 	<dependency>
+			<groupId>org.telosys.tools</groupId>
+		  	<artifactId>telosys-tools-generator-engine</artifactId>
+			<version>${project.parent.version}</version>
+	 	</dependency>
 		
 		<!-- VELOCITY DEPENDENCIES -->
 		
