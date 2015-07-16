@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.TelosysToolsLogger;
 import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generator.config.GeneratorConfig;
@@ -507,7 +508,8 @@ public class Generator {
 		
 		//--- Set "$entity" object in the context ( the current entity for this target )
 		EntityInContext entity = null ;
-		if ( target.getEntityName().trim().length() > 0 ) {
+		//if ( target.getEntityName().trim().length() > 0 ) {
+		if ( ! StrUtil.nullOrVoid( target.getEntityName() ) ) { // v 3.0.0
 			//--- Target with entity ( classical target )
 			entity = entitiesManager.getEntity(target.getEntityName() );
 		}
@@ -527,7 +529,11 @@ public class Generator {
 		try {
 			is = generateInMemory(target, generatorContext);
 		} catch (Exception e) {
-			throw new GeneratorException(e.getMessage());
+			//_logger.error( ExceptionUtil.getStackTraceAsString(e) ); // Useless : "ASTMethod.handleInvocationException"
+			String msg = "Entity '" + target.getEntityName() + "' - Template '" + target.getTemplate() + "'" ;
+			_logger.error(msg);
+			_logger.error(e.getMessage());
+			throw new GeneratorException(msg + " : " + e.getMessage(), e);
 		} // Generate the target in memory
 		_logger.info("Generation done.");
 

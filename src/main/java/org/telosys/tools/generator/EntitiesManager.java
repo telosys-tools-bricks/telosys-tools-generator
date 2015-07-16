@@ -28,11 +28,12 @@ import org.telosys.tools.generic.model.Model;
 
 public class EntitiesManager {
 
-	private final Model           _model ;
+	private final Model           _model ; // TODO : remove ?
 	private final GeneratorConfig _generatorConfig ;
 	private final EnvInContext    _env ;
 	
-	private final Map<String,EntityInContext> _entities = new Hashtable<String,EntityInContext>();
+	private final Map<String,EntityInContext> _entitiesByName = new Hashtable<String,EntityInContext>();
+	private final Map<String,EntityInContext> _entitiesByTableName = new Hashtable<String,EntityInContext>(); // v 3.0.0
 
 	/**
 	 * Constructor
@@ -76,8 +77,12 @@ public class EntitiesManager {
 	    	String entityPackage = _generatorConfig.getTelosysToolsCfg().getEntityPackage(); 
 	    	//--- New instance of EntityInContext
 	    	EntityInContext entityInContext = new EntityInContext(entity, entityPackage, this, _env);    	
-			//--- Store the EntityInContext
-			_entities.put(entityInContext.getName(), entityInContext) ;
+			//--- Store the EntityInContext by name
+			_entitiesByName.put(entityInContext.getName(), entityInContext) ;
+			//--- Store the EntityInContext by TABLE name
+			if ( entityInContext.getDatabaseTable() != null ) { // v 3.0.0
+				_entitiesByTableName.put(entityInContext.getDatabaseTable(), entityInContext) ; // v 3.0.0
+			}
 		}
 	}
 	
@@ -120,9 +125,24 @@ public class EntitiesManager {
 	 */
 	public EntityInContext getEntity( String entityName ) throws GeneratorException
 	{
-		EntityInContext entity =_entities.get(entityName) ;
+		EntityInContext entity =_entitiesByName.get(entityName) ;
 		if ( entity == null ) {
-			throw new GeneratorException("Unknown entity '" + entityName + "'");
+			throw new GeneratorException("Unknown entity for name '" + entityName + "'");
+		}
+		return entity ;
+	}
+
+	/**
+	 * Returns the entity identified by the given table name
+	 * @param entityTableName
+	 * @return
+	 * @throws GeneratorException
+	 * @since 3.0.0
+	 */
+	public EntityInContext getEntityByTableName( String entityTableName ) throws GeneratorException {
+		EntityInContext entity =_entitiesByTableName.get(entityTableName) ;
+		if ( entity == null ) {
+			throw new GeneratorException("Unknown entity for table name '" + entityTableName + "'");
 		}
 		return entity ;
 	}
@@ -138,7 +158,7 @@ public class EntitiesManager {
 		List<EntityInContext> allEntities = new LinkedList<EntityInContext>();
 		
 		//--- For each entity 
-		for ( Map.Entry<String, EntityInContext> entry : _entities.entrySet() )
+		for ( Map.Entry<String, EntityInContext> entry : _entitiesByName.entrySet() )
 		{
 		    //String name = entry.getKey() ;
 		    EntityInContext entity = entry.getValue() ;
@@ -159,7 +179,7 @@ public class EntitiesManager {
 		List<EntityInContext> selectedEntities = new LinkedList<EntityInContext>();
 		if ( entitiesNames != null ) {
 			for ( String entityName : entitiesNames ) {
-				EntityInContext entity = _entities.get(entityName);
+				EntityInContext entity = _entitiesByName.get(entityName);
 				if ( entity != null ) {
 					selectedEntities.add(entity);
 				}

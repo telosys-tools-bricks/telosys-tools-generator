@@ -65,6 +65,13 @@
 			<scope>provided</scope>
 		</dependency>
  -->
+		<!-- TELOSYS-TOOLS DEPENDENCIES FOR TESTS -->
+	 	<dependency>
+			<groupId>org.telosys.tools</groupId>
+		  	<artifactId>telosys-tools-repository</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>test</scope>
+	 	</dependency>
 
 	</dependencies>
 

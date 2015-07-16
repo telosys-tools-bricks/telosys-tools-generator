@@ -112,7 +112,7 @@ public class Target
 	}
 
 	/**
-	 * Constructor for a resource copy
+	 * Constructor for a 'ONCE' target or a 'RESOURCE' target ( resource copy )
 	 * @param targetDefinition
 	 * @param variables
 	 */
@@ -180,7 +180,7 @@ public class Target
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the entity name for the generation in progress "
+			"Returns the entity name for the generation in progress (entity class name : Book, Author, ...)"
 			}
 	)
 	public String getEntityName()

@@ -510,7 +510,8 @@ public class LinkInContext {
 		since = "2.1.0"
 	)
 	public EntityInContext getTargetEntity() throws GeneratorException {
-		return _entitiesManager.getEntity( getTargetTableName() );
+		// return _entitiesManager.getEntity( getTargetTableName() );
+		return _entitiesManager.getEntityByTableName( getTargetTableName() ); // v 3.0.0
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -522,10 +523,6 @@ public class LinkInContext {
 			}
 	)
 	public String getTargetEntitySimpleType() throws GeneratorException {
-//		//return _link.getTargetEntityJavaType();
-//		//return _targetEntity.getName(); // v 2.1.0
-//		EntityInContext entity = _entitiesBuilder.getEntity( getTargetTableName() );
-//		return entity.getName();
 		return this.getTargetEntity().getName();
 	}
 	
@@ -538,8 +535,6 @@ public class LinkInContext {
 			}
 	)
 	public String getTargetEntityFullType() throws GeneratorException {
-////		return _targetEntity.getFullName(); // v 2.1.0
-//		EntityInContext entity = _entitiesBuilder.getEntity( getTargetTableName() );
 		return this.getTargetEntity().getFullName();	
 	}
 
