@@ -55,35 +55,6 @@ public class Target
 
 	private final String    entityClassName ;
 
-//	/**
-//	 * Constructor
-//	 * @param targetDefinition  the initial target as defined in the targets configuration file
-//	 * @param entityName  the name of the entity (as defined in the repository model)
-//	 * @param entityJavaClassName 
-//	 * @param variables  the project's specific variables to be applied 
-//	 */
-//	public Target( TargetDefinition targetDefinition, String entityName, String entityJavaClassName, Variable[] variables ) 
-//	{
-//		super();
-//		
-//		//--- Generic target informations
-//		this.targetName = targetDefinition.getName();
-//		this.template = targetDefinition.getTemplate();
-//		
-//		//--- Specialization for the given entity
-//		this.entityName = entityName ;
-//
-//		//--- Replace the "$" variables in _sFile and _sFolder
-//		VariablesManager variablesManager = null ;
-//		if ( variables != null ) {
-//			variablesManager = new VariablesManager( variables );
-//		}
-//		this.file   = replaceVariables( targetDefinition.getFile(),   entityJavaClassName, variablesManager );
-//		
-//		variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
-//		this.folder = replaceVariables( targetDefinition.getFolder(), entityJavaClassName, variablesManager );
-//	}
-
 	/**
 	 * Constructor for a generation with an entity and a template
 	 * @param targetDefinition
@@ -100,10 +71,6 @@ public class Target
 		this.entityClassName = entity.getClassName() ;
 
 		//--- Replace the "$" variables in _sFile and _sFolder
-//		VariablesManager variablesManager = null ;
-//		if ( variables != null ) {
-//			variablesManager = new VariablesManager( variables );
-//		}
 		VariablesManager variablesManager = new VariablesManager( variables ); 
 		this.file   = replaceVariables( targetDefinition.getFile(),   this.entityClassName, variablesManager );
 		
@@ -122,14 +89,10 @@ public class Target
 		this.targetName = targetDefinition.getName();
 		this.template = targetDefinition.getTemplate();
 		
-		//--- Specialization for the given entity
-		this.entityClassName = null ;
+		//--- No current entity 
+		this.entityClassName = "" ;
 
 		//--- Replace the "$" variables in _sFile and _sFolder
-//		VariablesManager variablesManager = null ;
-//		if ( variables != null ) {
-//			variablesManager = new VariablesManager( variables );
-//		}
 		VariablesManager variablesManager = new VariablesManager( variables ); 		
 		this.file   = replaceVariables( targetDefinition.getFile(),   "", variablesManager );
 		
@@ -328,19 +291,6 @@ public class Target
 	@VelocityNoDoc
 	public String getOutputFileNameInFileSystem(String projectLocation)
 	{
-//		String s = getOutputFileNameInProject();
-//		if ( projectLocation != null )
-//		{
-//			if ( projectLocation.endsWith("/") || projectLocation.endsWith("\\") )
-//			{
-//				return projectLocation + s ;
-//			}
-//			else
-//			{
-//				return projectLocation + "/" + s ;
-//			}
-//		}
-//		return "/" + s ;
 		String fileInProject = getOutputFileNameInProject() ;
 		return buildFullPath(projectLocation, fileInProject ) ;
 	}
