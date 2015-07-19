@@ -84,6 +84,13 @@ public abstract class AbstractGenerationTask
 	{
 		super();
 		
+		if ( model  == null ) throw new TelosysToolsException("_repositoryModel is null ");
+		if ( selectedEntities == null ) throw new TelosysToolsException("_selectedEntities is null ");
+		if ( selectedTargets  == null ) throw new TelosysToolsException("_selectedTargets is null ");
+		// resourcesTargets : can be null
+		if ( generatorConfig  == null ) throw new TelosysToolsException("_generatorConfig is null ");
+		if ( logger  == null )  throw new TelosysToolsException("_logger is null ");
+
 		_model            = model;
 		_selectedEntities = selectedEntities ;
 		_selectedTargets  = selectedTargets ;
@@ -91,12 +98,6 @@ public abstract class AbstractGenerationTask
 		_generatorConfig  = generatorConfig ;
 		_bundleName       = generatorConfig.getBundleName() ; 
 		_logger           = logger ;
-		
-		if ( _selectedEntities == null ) throw new TelosysToolsException("_selectedEntities is null ");
-		if ( _selectedTargets  == null ) throw new TelosysToolsException("_selectedTargets is null ");
-		if ( _model  == null ) throw new TelosysToolsException("_repositoryModel is null ");
-		if ( _generatorConfig  == null ) throw new TelosysToolsException("_generatorConfig is null ");
-		if ( _logger  == null )  throw new TelosysToolsException("_logger is null ");
 		
 		_logger.log(this, "Task created");
 		
