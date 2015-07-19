@@ -59,7 +59,8 @@ public class DatabasesInContext {
 		List<DatabaseConfiguration> list = databasesConfigurations.getDatabaseConfigurationsList();
 		for ( DatabaseConfiguration dbcfg : list ) {
 			DatabaseInContext db = new DatabaseInContext(dbcfg) ;
-			Integer databaseId = new Integer(db.getId());
+			//Integer databaseId = new Integer(db.getId());
+			Integer databaseId = Integer.valueOf(db.getId()); // v 3.0.0 : Sonar Perf Issue Fixed
 			_databasesMap.put(databaseId, db);
 		}
 	}
@@ -74,7 +75,8 @@ public class DatabasesInContext {
 		parameters={"id : the database id"}
 		)
 	public DatabaseInContext getDatabase(int id) {
-		return _databasesMap.get(new Integer(id)) ;
+		//return _databasesMap.get(new Integer(id)) ;
+		return _databasesMap.get(Integer.valueOf(id)) ; // v 3.0.0 : Sonar Perf Issue Fixed
 	}
 	
 	//----------------------------------------------------------------------------------
@@ -83,7 +85,8 @@ public class DatabasesInContext {
 		parameters={"id : the database id"}
 		)
 	public boolean hasDatabase(int id) {
-		return _databasesMap.get(new Integer(id)) != null ;
+		// return _databasesMap.get(new Integer(id)) != null ;
+		return _databasesMap.get(Integer.valueOf(id)) != null ; // v 3.0.0 : Sonar Perf Issue Fixed
 	}
 	
 	//----------------------------------------------------------------------------------
