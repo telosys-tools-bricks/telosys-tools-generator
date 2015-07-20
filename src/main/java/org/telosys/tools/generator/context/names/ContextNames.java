@@ -203,30 +203,52 @@ public class ContextNames {
 		return false ;
 	}
 	
+//	/**
+//	 * Returns an array containing the invalid variable names, <br>
+//	 * or null if all the names are valid.
+//	 * @param variables
+//	 * @return
+//	 */
+//	public final static String[] getInvalidVariableNames(Variable[] variables)
+//	{
+//		LinkedList<String> invalidVariables = null ; 
+//		if ( null == variables ) return null ;
+//		for ( int i = 0 ; i < variables.length ; i++ )
+//		{
+//			Variable v = variables[i];
+//			String sVarName = v.getName();
+//			if ( isReservedName(sVarName) )
+//			{
+//				if ( null == invalidVariables )
+//				{
+//					invalidVariables = new LinkedList<String>();
+//				}
+//				invalidVariables.add(sVarName);
+//			}
+//		}
+//		if ( invalidVariables != null ) return (String[]) invalidVariables.toArray(new String[0]);
+//		else return null ;
+//	}
 	/**
-	 * Returns an array containing the invalid variable names, <br>
+	 * Returns a list of invalid variable names, <br>
 	 * or null if all the names are valid.
 	 * @param variables
 	 * @return
 	 */
-	public final static String[] getInvalidVariableNames(Variable[] variables)
+	public final static List<String> getInvalidVariableNames(List<Variable> variables) // v 3.0.0  (use List)
 	{
-		LinkedList<String> invalidVariables = null ; 
-		if ( null == variables ) return null ;
-		for ( int i = 0 ; i < variables.length ; i++ )
-		{
-			Variable v = variables[i];
-			String sVarName = v.getName();
-			if ( isReservedName(sVarName) )
-			{
-				if ( null == invalidVariables )
-				{
-					invalidVariables = new LinkedList<String>();
+		if ( variables == null ) return null ;
+		LinkedList<String> invalidVariableNames = null ; 
+		for ( Variable v : variables ) {
+			String variableName = v.getName();
+			if ( isReservedName(variableName) ) { // invalid
+				// add the variable name in the list
+				if ( invalidVariableNames == null ) {
+					invalidVariableNames = new LinkedList<String>();
 				}
-				invalidVariables.add(sVarName);
+				invalidVariableNames.add(variableName);
 			}
 		}
-		if ( invalidVariables != null ) return (String[]) invalidVariables.toArray(new String[0]);
-		else return null ;
+		return invalidVariableNames ;
 	}
 }

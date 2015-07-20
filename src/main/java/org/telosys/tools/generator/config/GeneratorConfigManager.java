@@ -81,7 +81,8 @@ public class GeneratorConfigManager
 		TelosysToolsCfgManager cfgManager = new TelosysToolsCfgManager(sProjectLocation);
 		TelosysToolsCfg telosysToolsCfg = null ;
 		try {
-			telosysToolsCfg = cfgManager.loadProjectConfig(); // Never null
+			// telosysToolsCfg = cfgManager.loadProjectConfig(); // Never null
+			telosysToolsCfg = cfgManager.loadTelosysToolsCfg(); // v 3.0.0
 		} catch (TelosysToolsException e) {
 			throw new GeneratorException("Cannot load configuration from "+cfgManager.getCfgFileAbsolutePath()) ;
 		}
