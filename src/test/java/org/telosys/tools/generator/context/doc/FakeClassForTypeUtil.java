@@ -1,10 +1,10 @@
-package org.telosys.tools.test.velocity.context.doc;
+package org.telosys.tools.generator.context.doc;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public class ClassForTypeTest {
+class FakeClassForTypeUtil {
 
 	public void v() {
 	}

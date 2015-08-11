@@ -1,4 +1,4 @@
-package org.telosys.tools.test.velocity.context.doc;
+package org.telosys.tools.generator.context.doc;
 
 import java.util.List;
 

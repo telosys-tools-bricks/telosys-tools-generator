@@ -1,16 +1,17 @@
-package org.telosys.tools.test.velocity.context;
+package org.telosys.tools.generator.context;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
+import junit.env.telosys.tools.generator.fakemodel.AttributeInFakeModel;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.context.ValuesInContext;
 import org.telosys.tools.generic.model.Attribute;
-import org.telosys.tools.tests.fakemodel.AttributeInFakeModel;
 
 public class ValuesInContextTest {
 	

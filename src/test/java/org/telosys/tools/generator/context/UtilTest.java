@@ -1,4 +1,4 @@
-package org.telosys.tools.test.generator.context;
+package org.telosys.tools.generator.context;
 
 import junit.framework.TestCase;
 

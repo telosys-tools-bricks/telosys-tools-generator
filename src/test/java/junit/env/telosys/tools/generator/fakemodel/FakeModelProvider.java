@@ -1,4 +1,4 @@
-package org.telosys.tools.tests.fakemodel;
+package junit.env.telosys.tools.generator.fakemodel;
 
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.Model;

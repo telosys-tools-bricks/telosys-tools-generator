@@ -1,12 +1,13 @@
-package org.telosys.tools.test.velocity.context;
+package org.telosys.tools.generator.context;
 
+import junit.env.telosys.tools.generator.fakemodel.EntityInFakeModel;
 import junit.framework.TestCase;
 
 import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generator.target.TargetDefinition;
 import org.telosys.tools.generic.model.Entity;
-import org.telosys.tools.tests.fakemodel.EntityInFakeModel;
+
 
 public class TargetTest extends TestCase {
 

@@ -1,4 +1,4 @@
-package org.telosys.tools.test.velocity;
+package junit.env.telosys.tools.generator;
 
 import org.telosys.tools.commons.ConsoleLogger;
 import org.telosys.tools.commons.TelosysToolsLogger;

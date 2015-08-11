@@ -3,6 +3,8 @@ package org.telosys.tools.generator;
 import java.io.File;
 import java.util.List;
 
+import junit.env.telosys.tools.generator.AbstractTest;
+
 import org.junit.Test;
 import org.telosys.tools.commons.ConsoleLogger;
 import org.telosys.tools.commons.TelosysToolsException;
@@ -10,7 +12,6 @@ import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.repository.model.RepositoryModel;
 import org.telosys.tools.repository.persistence.PersistenceManager;
 import org.telosys.tools.repository.persistence.PersistenceManagerFactory;
-import org.telosys.tools.tests.AbstractTest;
 
 public class EntitiesManagerTest extends AbstractTest {
 	

@@ -1,4 +1,9 @@
-package org.telosys.tools.test.generatorrunner;
+package org.telosys.tools.generator.api;
+
+
+import junit.env.telosys.tools.generator.LoggerProvider;
+import junit.env.telosys.tools.generator.TestsEnv;
+import junit.env.telosys.tools.generator.fakemodel.FakeModelProvider;
 
 import org.junit.Test;
 import org.telosys.tools.commons.TelosysToolsLogger;
@@ -7,9 +12,6 @@ import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.api.GeneratorRunner;
 import org.telosys.tools.generator.config.GeneratorConfig;
 import org.telosys.tools.generic.model.Model;
-import org.telosys.tools.test.velocity.LoggerProvider;
-import org.telosys.tools.tests.TestsEnv;
-import org.telosys.tools.tests.fakemodel.FakeModelProvider;
 
 public class GeneratorRunnerTest {
 

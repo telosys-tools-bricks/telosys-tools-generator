@@ -1,4 +1,4 @@
-package org.telosys.tools.test.velocity.context.doc;
+package org.telosys.tools.generator.context.doc;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -34,7 +34,7 @@ public class TypeUtilTest  extends TestCase {
 	
 	public void testWithMethods() {
 		//ClassForTypeTest o = new ClassForTypeTest();
-		Class<?> clazz = ClassForTypeTest.class ;
+		Class<?> clazz = FakeClassForTypeUtil.class ;
 //		for ( Method m : ClassForTypeTest.class.getDeclaredMethods() ) {
 //			Type type = m.getGenericReturnType() ;
 //			convert(type);

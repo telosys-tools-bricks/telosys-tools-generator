@@ -1,4 +1,4 @@
-package org.telosys.tools.tests;
+package junit.env.telosys.tools.generator;
 
 import java.io.File;
 
