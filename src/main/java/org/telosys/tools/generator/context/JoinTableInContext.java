@@ -53,8 +53,10 @@ public class JoinTableInContext
 //			_joinColumns.add( new JoinColumnInContext(jc) ) ;
 //		}
 		// ver 3.0.0
-		for ( JoinColumn jc : joinTable.getJoinColumns() ) {
-			_joinColumns.add( new JoinColumnInContext(jc) ) ;
+		if ( joinTable.getJoinColumns() != null ) {
+			for ( JoinColumn jc : joinTable.getJoinColumns() ) {
+				_joinColumns.add( new JoinColumnInContext(jc) ) ;
+			}
 		}
 
 		//--- Build the list of "inverse join columns"
@@ -63,8 +65,10 @@ public class JoinTableInContext
 //		for ( JoinColumn jc : inverseJoinColumns ) {
 //			_inverseJoinColumns.add( new JoinColumnInContext(jc) ) ;
 //		}
-		for ( JoinColumn jc : joinTable.getInverseJoinColumns() ) {
-			_inverseJoinColumns.add( new JoinColumnInContext(jc) ) ;
+		if ( joinTable.getInverseJoinColumns() != null ) {
+			for ( JoinColumn jc : joinTable.getInverseJoinColumns() ) {
+				_inverseJoinColumns.add( new JoinColumnInContext(jc) ) ;
+			}
 		}
 	}
 

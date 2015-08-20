@@ -23,7 +23,7 @@ public class EntitiesManagerTest extends AbstractTest {
 		PersistenceManager pm = PersistenceManagerFactory.createPersistenceManager(file, new ConsoleLogger());
 		RepositoryModel repositoryModel = pm.load();
 		
-		EntitiesManager entitiesManager = new EntitiesManager(repositoryModel, getGeneratorConfig(), getEnvInContext() );
+		EntitiesManager entitiesManager = new EntitiesManager(repositoryModel, getGeneratorConfig("fake-bundle"), getEnvInContext() );
 		
 		List<EntityInContext> allEntities = entitiesManager.getAllEntities();
 		System.out.println("All entities : "  );

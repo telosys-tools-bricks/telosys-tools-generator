@@ -75,7 +75,7 @@ public class GeneratorConfig //implements IGeneratorConfig
 //				_projectProperties ); // v 2.0.7
 //	}
 
-	public GeneratorConfig(String sProjectLocation, TelosysToolsCfg telosysToolsCfg, String bundleName) 
+	protected GeneratorConfig(String sProjectLocation, TelosysToolsCfg telosysToolsCfg, String bundleName) 
 	{
 		_sProjectLocation = sProjectLocation;
 		_telosysToolsCfg = telosysToolsCfg ;
