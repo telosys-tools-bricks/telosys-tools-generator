@@ -45,14 +45,12 @@ public class GeneratorRunnerTest extends AbstractTest {
 	@Test
 	public void generateAuthor() throws GeneratorException {
 		GeneratorRunner generatorRunner = getGeneratorRunner() ;
-		//generatorRunner.generateEntity("AUTHOR",    "Author.java",    OUTPUT_FOLDER, "jpa_bean_with_links.vm" );
-		generatorRunner.generateEntity("Author",    "Author.java",    OUTPUT_FOLDER, "jpa_bean_with_links.vm" );
+		//generatorRunner.generateEntity("Author",    "Author.java",    OUTPUT_FOLDER, "jpa_bean_with_links.vm" );
 	}
 
 	@Test
 	public void generateEmployee() throws GeneratorException {
 		GeneratorRunner generatorRunner = getGeneratorRunner() ;
-		//generatorRunner.generateEntity("EMPLOYEE",  "Employee.java",  OUTPUT_FOLDER, "jpa_bean_with_links.vm" );
 		//generatorRunner.generateEntity("Employee",  "Employee.java",  OUTPUT_FOLDER, "jpa_bean_with_links.vm" );
 	}
 
