@@ -23,7 +23,8 @@ public class EntitiesManagerTest extends AbstractTest {
 		PersistenceManager pm = PersistenceManagerFactory.createPersistenceManager(file, new ConsoleLogger());
 		RepositoryModel repositoryModel = pm.load();
 		
-		EntitiesManager entitiesManager = new EntitiesManager(repositoryModel, getGeneratorConfig("fake-bundle"), getEnvInContext() );
+//		EntitiesManager entitiesManager = new EntitiesManager(repositoryModel, getGeneratorConfig("fake-bundle"), getEnvInContext() );
+		EntitiesManager entitiesManager = new EntitiesManager(repositoryModel, "org.demo.bean", getEnvInContext() ); // v 3.0.0
 		
 		List<EntityInContext> allEntities = entitiesManager.getAllEntities();
 		System.out.println("All entities : "  );
@@ -37,6 +38,8 @@ public class EntitiesManagerTest extends AbstractTest {
 		EntityInContext e = entitiesManager.getEntity("Author"); 
 		System.out.println(" . " + e );
 		
+		System.out.println("Entity package : " + e.getPackage() );
+		assertEquals("org.demo.bean", e.getPackage());
 	}
 
 }

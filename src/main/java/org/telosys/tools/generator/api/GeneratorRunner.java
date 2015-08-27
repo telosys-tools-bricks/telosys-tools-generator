@@ -19,10 +19,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.telosys.tools.commons.TelosysToolsLogger;
+import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generator.Generator;
 import org.telosys.tools.generator.GeneratorException;
-import org.telosys.tools.generator.config.GeneratorConfig;
 import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generator.target.TargetDefinition;
 import org.telosys.tools.generic.model.Entity;
@@ -38,7 +38,9 @@ public class GeneratorRunner {
 
 	private final Model              model  ;
 
-	private final GeneratorConfig    generatorConfig ; 
+	//private final GeneratorConfig    generatorConfig ; 
+	private final TelosysToolsCfg    telosysToolsCfg; // v 3.0.0
+	private final String             bundleName; // v 3.0.0
 	
 	private final TelosysToolsLogger logger ;
 	
@@ -49,50 +51,25 @@ public class GeneratorRunner {
 	 * @param generatorConfig
 	 * @param logger
 	 */
-	public GeneratorRunner(Model model, GeneratorConfig generatorConfig, TelosysToolsLogger logger) throws GeneratorException
+//	public GeneratorRunner(Model model, GeneratorConfig generatorConfig, TelosysToolsLogger logger) throws GeneratorException
+	public GeneratorRunner(Model model, TelosysToolsCfg telosysToolsCfg, String bundleName, TelosysToolsLogger logger) throws GeneratorException
 	{
 		super();
 		if ( null == model ) {
 			throw new GeneratorException("Illegal argument : Repository model is null" );
 		}
-		if ( null == generatorConfig ) {
-			throw new GeneratorException("Illegal argument : Generator configuration is null" );
+//		if ( null == generatorConfig ) {
+//			throw new GeneratorException("Illegal argument : Generator configuration is null" );
+//		}
+		if ( null == telosysToolsCfg ) {
+			throw new GeneratorException("Illegal argument : TelosysToolsCfg is null" );
 		}
 		this.model = model;
-		this.generatorConfig = generatorConfig;
+//		this.generatorConfig = generatorConfig;
+		this.telosysToolsCfg = telosysToolsCfg ;
+		this.bundleName = bundleName ;
 		this.logger = logger;
 	}
-
-//	/**
-//	 * Constructor
-//	 * 
-//	 * @param repositoryFileName
-//	 * @param projectLocation
-//	 * @param logger
-//	 * @throws GeneratorException
-//	 */
-//	public GeneratorRunner(String repositoryFileName, String projectLocation, TelosysToolsLogger logger) throws GeneratorException
-//	{
-//		super();
-//		this.logger = logger;
-//		
-//		//--- Load the repository 
-//		StandardFilePersistenceManager pm = new StandardFilePersistenceManager( repositoryFileName, logger );		
-//		RepositoryModel repositoryModel = null ;
-//		try {
-//			repositoryModel = pm.load();
-//		} catch (TelosysToolsException e) {
-//			throw new GeneratorException("Cannot load the repository from file '" + repositoryFileName + "'", e);
-//		}
-//		this.repositoryModel = repositoryModel;
-//		
-//		//--- Load the configuration
-//		GeneratorConfigManager configManager = new GeneratorConfigManager(logger);
-//		GeneratorConfig config = configManager.initFromDirectory(projectLocation, null);
-//		this.generatorConfig = config ;
-// 
-//	}
-
 
 	/**
 	 * Generates a file from the given entity and using the given target
@@ -109,7 +86,6 @@ public class GeneratorRunner {
 			) throws GeneratorException
 	{
 
-//		try {
 			//----------------------------------------------------------------
 			// 1) Build the target
 			//----------------------------------------------------------------
@@ -133,7 +109,8 @@ public class GeneratorRunner {
 			TargetDefinition genericTarget = new TargetDefinition("Dynamic target", outputFile, outputFolder, templateFileName, "");
 			//Target target = new Target( genericTarget, entity.getName(), entity.getBeanJavaClass(), projectConfiguration.getAllVariables() );
 			
-			Variable[] allVariables = this.generatorConfig.getTelosysToolsCfg().getAllVariables(); // ver 2.1.0
+//			Variable[] allVariables = this.generatorConfig.getTelosysToolsCfg().getAllVariables(); // ver 2.1.0
+			Variable[] allVariables = telosysToolsCfg.getAllVariables(); // ver 3.0.0
 			//Target target = new Target( genericTarget, entity.getName(), entity.getBeanJavaClass(), allVariables );
 			Target target = new Target( genericTarget, entity, allVariables ); // v 3.0.0
 			
@@ -141,16 +118,12 @@ public class GeneratorRunner {
 			// 2) Launch the generation 
 			//----------------------------------------------------------------
 
-			List<Target> generatedTargets = new LinkedList<Target>();
-			//Generator generator = new Generator(target, generatorConfig, logger);
 //			Generator generator = new Generator(target, generatorConfig, model, logger); // v 2.0.7
-			Generator generator = new Generator(generatorConfig, logger); // v 3.0
+//			Generator generator = new Generator(generatorConfig, logger); // v 3.0.0
+			Generator generator = new Generator(telosysToolsCfg, bundleName, logger); // v 3.0.0
+
+			List<Target> generatedTargets = new LinkedList<Target>();
 			generator.generateTarget(target, model, null, generatedTargets);
 			
-//		} catch (GeneratorException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
 	}	
 }

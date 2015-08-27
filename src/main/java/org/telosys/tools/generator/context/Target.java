@@ -15,6 +15,7 @@
  */
 package org.telosys.tools.generator.context;
 
+import org.telosys.tools.commons.FileUtil;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.config.ConfigDefaults;
 import org.telosys.tools.commons.variables.Variable;
@@ -291,8 +292,9 @@ public class Target
 	@VelocityNoDoc
 	public String getOutputFileNameInFileSystem(String projectLocation)
 	{
-		String fileInProject = getOutputFileNameInProject() ;
-		return buildFullPath(projectLocation, fileInProject ) ;
+		String fileNameInProject = getOutputFileNameInProject() ;
+//		return buildFullPath(projectLocation, fileNameInProject ) ;
+		return FileUtil.buildFilePath(projectLocation, fileNameInProject) ; // v 3.0.0
 	}
 	
 	/**
@@ -307,24 +309,25 @@ public class Target
 	public String getOutputFolderInFileSystem(String projectLocation)
 	{
 		String folderInProject = getFolder() ;
-		return buildFullPath(projectLocation, folderInProject ) ;
+//		return buildFullPath(projectLocation, folderInProject ) ;
+		return FileUtil.buildFilePath(projectLocation, folderInProject) ; // v 3.0.0
 	}
 
-	private String buildFullPath(String projectLocation, String fileOrFolder)
-	{
-		if ( projectLocation != null )
-		{
-			if ( projectLocation.endsWith("/") || projectLocation.endsWith("\\") )
-			{
-				return projectLocation + fileOrFolder ;
-			}
-			else
-			{
-				return projectLocation + "/" + fileOrFolder ;
-			}
-		}
-		return "/" + fileOrFolder ;
-	}
+//	private String buildFullPath(String projectLocation, String fileOrFolder)
+//	{
+//		if ( projectLocation != null )
+//		{
+//			if ( projectLocation.endsWith("/") || projectLocation.endsWith("\\") )
+//			{
+//				return projectLocation + fileOrFolder ;
+//			}
+//			else
+//			{
+//				return projectLocation + "/" + fileOrFolder ;
+//			}
+//		}
+//		return "/" + fileOrFolder ;
+//	}
 	
 	@VelocityNoDoc
 	@Override

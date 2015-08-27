@@ -34,7 +34,6 @@ import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generator.context.Fn;
 import org.telosys.tools.generator.context.ForeignKeyColumnInContext;
 import org.telosys.tools.generator.context.ForeignKeyInContext;
-import org.telosys.tools.generator.context.GenerationInContext;
 import org.telosys.tools.generator.context.H2InContext;
 import org.telosys.tools.generator.context.Java;
 import org.telosys.tools.generator.context.JdbcFactoryInContext;
@@ -223,7 +222,7 @@ public class DocBuilder {
 		Const.class,
 		EmbeddedGenerator.class,
 		Fn.class,
-		GenerationInContext.class, // ver 2.1.0
+		// GenerationInContext.class, // ver 2.1.0 // removed in v 3.0.0
 		Java.class, // ver 2.0.7
 		Jpa.class, // ver 2.0.7
 		BeanValidation.class, // ver 2.0.7

@@ -60,7 +60,7 @@ public class BundleResourcesManager {
 	}
 	//----------------------------------------------------------------------------------------------------
 	/**
-	 * Copy the resources for each target definition
+	 * Returns a list of 'Targets' for the given list of 'Targets Definitions'
 	 * @param targetsDefinitions list of target definitions 
 	 * @return
 	 */
@@ -84,7 +84,10 @@ public class BundleResourcesManager {
 	//----------------------------------------------------------------------------------------------------
 	/**
 	 * Copy all the given resources targets definitions
-	 * @param targetsDefinitions list of the resources targets definition
+	 * @param targetsDefinitions
+	 * @param overwriteChooser - OverwriteChooser implementation (or null if none)
+	 * @param copyHandler - handler for action 'before' and 'after' copy (can be null)
+	 * @return
 	 * @throws Exception
 	 */
 	public int copyTargetsResourcesInProject( List<TargetDefinition> targetsDefinitions, OverwriteChooser overwriteChooser, CopyHandler copyHandler ) throws Exception {
@@ -107,6 +110,13 @@ public class BundleResourcesManager {
 	}
 
 	//----------------------------------------------------------------------------------------------------
+	/**
+	 * @param target
+	 * @param overwriteChooser
+	 * @param copyHandler - handler for action 'before' and 'after' copy (can be null)
+	 * @return
+	 * @throws Exception
+	 */
 	private int copyTargetResourcesInProject( Target target, OverwriteChooser overwriteChooser, CopyHandler copyHandler ) throws Exception {
 		log("copyTargetResourcesInProject() : target = " + target );
 

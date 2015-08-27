@@ -24,10 +24,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import org.telosys.tools.commons.DirUtil;
+import org.telosys.tools.commons.FileUtil;
 import org.telosys.tools.commons.StrUtil;
+import org.telosys.tools.commons.TelosysToolsException;
 import org.telosys.tools.commons.TelosysToolsLogger;
+import org.telosys.tools.commons.cfg.TelosysToolsCfg;
+import org.telosys.tools.commons.dbcfg.DatabasesConfigurations;
+import org.telosys.tools.commons.dbcfg.DbConfigManager;
 import org.telosys.tools.commons.variables.Variable;
-import org.telosys.tools.generator.config.GeneratorConfig;
 import org.telosys.tools.generator.context.BeanValidation;
 import org.telosys.tools.generator.context.Const;
 import org.telosys.tools.generator.context.DatabasesInContext;
@@ -35,7 +40,6 @@ import org.telosys.tools.generator.context.EmbeddedGenerator;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generator.context.Fn;
-import org.telosys.tools.generator.context.GenerationInContext;
 import org.telosys.tools.generator.context.H2InContext;
 import org.telosys.tools.generator.context.Java;
 import org.telosys.tools.generator.context.JdbcFactoryInContext;
@@ -82,111 +86,165 @@ public class Generator {
 //	private final VelocityContext    _velocityContext ;
 //	private final GeneratorContext _generatorContext ; // renamed in v 3.0
 
-	private final GeneratorConfig    _generatorConfig ;
+//	private final GeneratorConfig          _generatorConfig ; // removed in v 3.0.0
+
+	private final TelosysToolsCfg          _telosysToolsCfg ; // v 3.0.0
+	private final String                   _bundleName ; // v 3.0.0
+
+	private final DatabasesConfigurations  _databasesConfigurations ; // v 3.0.0
 	
-	private final TelosysToolsLogger _logger ;
+	private final TelosysToolsLogger       _logger ;
 
 //	private final String             _sTemplateFileName ; // removed in v 3.0
 
 	/**
-	 * Constructor
-	 * @param target
-	 * @param generatorConfig
-	 * @param model
+	 * Constructor 
+	 * @param telosysToolsCfg
 	 * @param logger
-	 * @throws GeneratorException
 	 */
-//	public Generator( Target target, GeneratorConfig generatorConfig, 
-//						Model model, TelosysToolsLogger logger) throws GeneratorException 
-	public Generator( GeneratorConfig generatorConfig, 
-			TelosysToolsLogger logger) //throws GeneratorException 
-	{
-		_logger = logger;
+	public Generator( TelosysToolsCfg telosysToolsCfg, String bundleName, TelosysToolsLogger logger)  { // v 3.0.0
+		_logger = logger; 
 		
-//		if ( null == target) {
-//			throw new GeneratorException("Target is null (Generator constructor argument)");
-//		}
-//		String sTemplateFileName = target.getTemplate(); 
-//		
-//		log("Generator constructor (" + sTemplateFileName + ")");
-//
-//		if ( null == sTemplateFileName) {
-//			throw new GeneratorException("Template file name is null (Generator constructor argument)");
-//		}
-		if ( null == generatorConfig) {
-			throw new IllegalArgumentException("Generator configuration is null (Generator constructor)");
+		if ( telosysToolsCfg == null ) {
+			throw new IllegalArgumentException("TelosysToolsCfg parameter is null");
 		}
+		_telosysToolsCfg = telosysToolsCfg;
+
+		if ( bundleName == null ) {
+			throw new IllegalArgumentException("Bundle name parameter is null");
+		}
+		_bundleName = bundleName ; // v 3.0.0
 		
-		_generatorConfig = generatorConfig ;
-		
-		//------------------------------------------------------------------
-		// Workaround for Velocity error in OSGi environment
-		// "The specified class for ResourceManager (ResourceManagerImpl) does not implement ResourceManager"
-		// ( see https://github.com/whitesource/whitesource-bamboo-agent/issues/9 )
-		//------------------------------------------------------------------
-		Thread currentThread = Thread.currentThread();
-		ClassLoader originalClassLoader = currentThread.getContextClassLoader();
-		currentThread.setContextClassLoader(this.getClass().getClassLoader()); // Set the context ClassLoader for this Thread
-		try {
-			
-//			//------------------------------------------------------------------
-//			// 1) Init Velocity context
-//			//------------------------------------------------------------------
-//			//--- Create a context
-//			log("Generator constructor : VelocityContext creation ...");
-//			//_velocityContext = new VelocityContext();
-//			_generatorContext = new GeneratorContext(); // v 3.0 			
-//			log("Generator constructor : VelocityContext created.");
-//			
-//			//log("Generator constructor : VelocityContext events attachment ...");
-//			//GeneratorEvents.attachEvents(_velocityContext);
-//			//log("Generator constructor : VelocityContext events attached.");
-//	
-//			log("Generator constructor : VelocityContext initialization ...");
-//			//initContext(generatorConfig, model, logger); 
-//			initContext(generatorConfig, logger); // v 3.0.0
-//			log("Generator constructor : VelocityContext initialized.");
-			
-			//------------------------------------------------------------------
-			// 2) Init Velocity engine
-			//------------------------------------------------------------------
-			//--- Get the templates directory and use it to initialize the engine		
-			String sTemplateDirectory = generatorConfig.getTemplatesFolderFullPath();		
-			log("Templates Directory : '" + sTemplateDirectory + "'");
-	
-//			//--- Check template file existence		
-//			checkTemplate(sTemplateDirectory, sTemplateFileName);
-//			_sTemplateFileName  = sTemplateFileName;
-	
-//			log("Generator constructor : VelocityEngine initialization ...");
-//			_velocityEngine = new VelocityEngine();
-//			_velocityEngine.setProperty(VelocityEngine.FILE_RESOURCE_LOADER_PATH, sTemplateDirectory);
-//			try {
-//				// init() : 
-//				//   initialize the Velocity runtime engine, using the default properties of the Velocity distribution
-//				// _velocityEngine.init();
-//
-//				// init(Properties p) : 
-//				//    initialize the Velocity runtime engine, using default properties 
-//				//    plus the properties in the passed in java.util.Properties object
-//				_velocityEngine.init( getSpecificVelocityProperties() ); // ver 2.0.7
-//				
-//			} catch (Exception e) {
-//				throw new GeneratorException("Cannot init VelocityEngine", e );
-//			}
-//			log("Generator constructor : VelocityEngine initialized.");
-		}
-		finally {
-			currentThread.setContextClassLoader(originalClassLoader); // Restore the original classLoader
-		}
-		//------------------------------------------------------------------
-		// End of Workaround for Velocity error in OSGi environment
-		//------------------------------------------------------------------
+		_databasesConfigurations = loadDatabasesConfigurations(_telosysToolsCfg); // v 3.0.0
 	}
+	
+//	/**
+//	 * Constructor
+//	 * @param target
+//	 * @param generatorConfig
+//	 * @param model
+//	 * @param logger
+//	 * @throws GeneratorException
+//	 */
+////	public Generator( Target target, GeneratorConfig generatorConfig, 
+////						Model model, TelosysToolsLogger logger) throws GeneratorException 
+//	public Generator( GeneratorConfig generatorConfig, 
+//			TelosysToolsLogger logger) //throws GeneratorException 
+//	{
+//		_logger = logger;
+//		
+////		if ( null == target) {
+////			throw new GeneratorException("Target is null (Generator constructor argument)");
+////		}
+////		String sTemplateFileName = target.getTemplate(); 
+////		
+////		log("Generator constructor (" + sTemplateFileName + ")");
+////
+////		if ( null == sTemplateFileName) {
+////			throw new GeneratorException("Template file name is null (Generator constructor argument)");
+////		}
+//		if ( null == generatorConfig) {
+//			throw new IllegalArgumentException("Generator configuration is null (Generator constructor)");
+//		}
+//		
+////		_generatorConfig = generatorConfig ; // removed in v 3.0.0
+//		_telosysToolsCfg = generatorConfig.getTelosysToolsCfg();
+//		
+//		_databasesConfigurations = loadDatabasesConfigurations(_telosysToolsCfg); // v 3.0.0
+//		
+///****  v 3.0.0
+//		//------------------------------------------------------------------
+//		// Workaround for Velocity error in OSGi environment
+//		// "The specified class for ResourceManager (ResourceManagerImpl) does not implement ResourceManager"
+//		// ( see https://github.com/whitesource/whitesource-bamboo-agent/issues/9 )
+//		//------------------------------------------------------------------
+//		Thread currentThread = Thread.currentThread();
+//		ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+//		currentThread.setContextClassLoader(this.getClass().getClassLoader()); // Set the context ClassLoader for this Thread
+//		try {
+//			
+////			//------------------------------------------------------------------
+////			// 1) Init Velocity context
+////			//------------------------------------------------------------------
+////			//--- Create a context
+////			log("Generator constructor : VelocityContext creation ...");
+////			//_velocityContext = new VelocityContext();
+////			_generatorContext = new GeneratorContext(); // v 3.0 			
+////			log("Generator constructor : VelocityContext created.");
+////			
+////			//log("Generator constructor : VelocityContext events attachment ...");
+////			//GeneratorEvents.attachEvents(_velocityContext);
+////			//log("Generator constructor : VelocityContext events attached.");
+////	
+////			log("Generator constructor : VelocityContext initialization ...");
+////			//initContext(generatorConfig, model, logger); 
+////			initContext(generatorConfig, logger); // v 3.0.0
+////			log("Generator constructor : VelocityContext initialized.");
+//			
+//			//------------------------------------------------------------------
+//			// 2) Init Velocity engine
+//			//------------------------------------------------------------------
+//			//--- Get the templates directory and use it to initialize the engine		
+//			String sTemplateDirectory = generatorConfig.getTemplatesFolderFullPath();		
+//			log("Templates Directory : '" + sTemplateDirectory + "'");
+//	
+////			//--- Check template file existence		
+////			checkTemplate(sTemplateDirectory, sTemplateFileName);
+////			_sTemplateFileName  = sTemplateFileName;
+//	
+////			log("Generator constructor : VelocityEngine initialization ...");
+////			_velocityEngine = new VelocityEngine();
+////			_velocityEngine.setProperty(VelocityEngine.FILE_RESOURCE_LOADER_PATH, sTemplateDirectory);
+////			try {
+////				// init() : 
+////				//   initialize the Velocity runtime engine, using the default properties of the Velocity distribution
+////				// _velocityEngine.init();
+////
+////				// init(Properties p) : 
+////				//    initialize the Velocity runtime engine, using default properties 
+////				//    plus the properties in the passed in java.util.Properties object
+////				_velocityEngine.init( getSpecificVelocityProperties() ); // ver 2.0.7
+////				
+////			} catch (Exception e) {
+////				throw new GeneratorException("Cannot init VelocityEngine", e );
+////			}
+////			log("Generator constructor : VelocityEngine initialized.");
+//		}
+//		finally {
+//			currentThread.setContextClassLoader(originalClassLoader); // Restore the original classLoader
+//		}
+//		//------------------------------------------------------------------
+//		// End of Workaround for Velocity error in OSGi environment
+//		//------------------------------------------------------------------
+//*****/
+//	}
 
 	private void log(String s) {
 		if (_logger != null) {
 			_logger.log(s);
+		}
+	}
+	
+	/**
+	 * Loads the databases configurations if any
+	 * @return
+	 */
+	private DatabasesConfigurations loadDatabasesConfigurations( TelosysToolsCfg telosysToolsCfg )  // v 3.0.0
+	{
+		DatabasesConfigurations databasesConfigurations = null ;
+		String dbcfgFileName = telosysToolsCfg.getDatabasesDbCfgFileAbsolutePath();
+		File dbcfgFile = new File(dbcfgFileName);
+		if ( dbcfgFile.exists() ) {
+			try {
+				DbConfigManager dbConfigManager = new DbConfigManager( dbcfgFile );
+				databasesConfigurations = dbConfigManager.load() ;
+			} catch (TelosysToolsException e) {
+				databasesConfigurations = new DatabasesConfigurations() ; // Void
+			}
+			return databasesConfigurations ;
+		}
+		else {
+			return new DatabasesConfigurations() ; // Void
 		}
 	}
 
@@ -196,7 +254,8 @@ public class Generator {
 	private GeneratorTemplate loadTemplate(Target target) throws GeneratorException {
 		
 		String templateFileName  = target.getTemplate();
-		String templateDirectory = this._generatorConfig.getTemplatesFolderFullPath();		
+		//String templateDirectory = this._generatorConfig.getTemplatesFolderFullPath();	
+		String templateDirectory = _telosysToolsCfg.getTemplatesFolderAbsolutePath(); // v 3.0.0
 
 		File file = checkTemplate( templateDirectory, templateFileName);
 		
@@ -205,8 +264,7 @@ public class Generator {
 		return generatorTemplate ;
 	}
 	
-	private File checkTemplate(String sTemplateDirectory,
-			String sTemplateFileName) throws GeneratorException {
+	private File checkTemplate(String sTemplateDirectory, String sTemplateFileName) throws GeneratorException {
 		if (sTemplateDirectory == null) {
 			throw new GeneratorException("Template directory is null !");
 		}
@@ -223,20 +281,28 @@ public class Generator {
 					+ sTemplateDirectory + "' is not a directory !");
 		}
 
-		String sTemplateFullPath = null;
-		if (sTemplateDirectory.endsWith("/")) {
-			sTemplateFullPath = sTemplateDirectory + sTemplateFileName;
-		} else {
-			sTemplateFullPath = sTemplateDirectory + "/" + sTemplateFileName;
+		//--- Templates directory full path ( with bundle name if any )
+		String templatesFolderFullPath = sTemplateDirectory ;
+		if ( ! StrUtil.nullOrVoid(_bundleName)) {
+			templatesFolderFullPath = FileUtil.buildFilePath(sTemplateDirectory, _bundleName);
 		}
+		//--- Template file full path 
+		String sTemplateFullPath = FileUtil.buildFilePath(templatesFolderFullPath, sTemplateFileName);
+		
+//		String sTemplateFullPath = null;
+//		if (sTemplateDirectory.endsWith("/")) {
+//			sTemplateFullPath = sTemplateDirectory + sTemplateFileName;
+//		} else {
+//			sTemplateFullPath = sTemplateDirectory + "/" + sTemplateFileName;
+//		}
+		
+		//--- Check template file existence 
 		File file = new File(sTemplateFullPath);
 		if (!file.exists()) {
-			throw new GeneratorException("Template file '" + sTemplateFullPath
-					+ "' doesn't exist !");
+			throw new GeneratorException("Template file '" + sTemplateFullPath + "' doesn't exist !");
 		}
 		if (!file.isFile()) {
-			throw new GeneratorException("Template file '" + sTemplateFullPath
-					+ "' is not a file !");
+			throw new GeneratorException("Template file '" + sTemplateFullPath + "' is not a file !");
 		}
 		return file ;
 	}
@@ -270,17 +336,21 @@ public class Generator {
 	//========================================================================
 	// CONTEXT MANAGEMENT
 	//========================================================================
-	private GeneratorContext createContext( GeneratorConfig generatorConfig, TelosysToolsLogger logger)
-			//throws GeneratorException
+//	private GeneratorContext createContext( GeneratorConfig generatorConfig, TelosysToolsLogger logger)
+//			//throws GeneratorException
+	private GeneratorContext createContext( TelosysToolsLogger logger) // v 3.0.0
 	{
 		//--- Create a context
 		log("Generator : createContext() ...");
 		GeneratorContext generatorContext = new GeneratorContext(); // v 3.0 			
 		
-		initContext(generatorContext, generatorConfig, logger); // v 3.0.0
+//		initContext(generatorContext, generatorConfig, logger); // v 3.0.0
+		initContext(generatorContext, logger); // v 3.0.0
 		return generatorContext ;
 	}
-	private void initContext( GeneratorContext generatorContext, GeneratorConfig generatorConfig, TelosysToolsLogger logger)
+	
+//	private void initContext( GeneratorContext generatorContext, GeneratorConfig generatorConfig, TelosysToolsLogger logger)
+	private void initContext( GeneratorContext generatorContext, TelosysToolsLogger logger)
 		//throws GeneratorException
 	{
 		log("Generator : initContext() ...");
@@ -308,27 +378,32 @@ public class Generator {
 		generatorContext.put(ContextName.BEAN_VALIDATION, new BeanValidation()); // Bean Validation utility functions
 		generatorContext.put(ContextName.H2,              new H2InContext());  // JDBC factory ( ver 2.1.1 )
 
-		generatorContext.put(ContextName.DATABASES,
-							new DatabasesInContext( generatorConfig.getDatabasesConfigurations() ) ); // ver 2.1.0
+//		generatorContext.put(ContextName.DATABASES,
+//							new DatabasesInContext( generatorConfig.getDatabasesConfigurations() ) ); // ver 2.1.0
+		generatorContext.put(ContextName.DATABASES,	new DatabasesInContext(_databasesConfigurations) ); // ver 3.0.0
 				
 		//_velocityContext.put(ContextName.CLASS, null);
 		
 		//--- Set the dynamic class loader 
 		//Loader loader = new Loader(projectConfiguration, _velocityContext);
-		Loader loader = new Loader( generatorConfig.getTemplatesFolderFullPath() ); // ver 2.1.0
+//		Loader loader = new Loader( generatorConfig.getTemplatesFolderFullPath() ); // ver 2.1.0
+		Loader loader = new Loader( _telosysToolsCfg.getTemplatesFolderAbsolutePath() ); // ver 3.0.0
 		generatorContext.put(ContextName.LOADER, loader);
 		
 		//--- Set the "$project" variable in the context
 //		ProjectConfiguration projectConfiguration = generatorConfig.getProjectConfiguration();
 //		_velocityContext.put(ContextName.PROJECT, projectConfiguration);
-		generatorContext.put(ContextName.PROJECT, new ProjectInContext(generatorConfig)); // ver 2.1.0
+//		generatorContext.put(ContextName.PROJECT, new ProjectInContext(generatorConfig)); // ver 2.1.0
+		generatorContext.put(ContextName.PROJECT, new ProjectInContext(_telosysToolsCfg)); // ver 3.0.0
 
-		//--- Set the "$generation" variable in the context
-		generatorContext.put(ContextName.GENERATION, new GenerationInContext(generatorConfig)); // ver 2.1.0
+// removed in v 3.0.0
+//		//--- Set the "$generation" variable in the context
+//		generatorContext.put(ContextName.GENERATION, new GenerationInContext(generatorConfig)); // ver 2.1.0
 		
 		//--- Get all the project variables and put them in the context	
 		//Variable[] projectVariables = projectConfiguration.getAllVariables();
-		Variable[] projectVariables = generatorConfig.getTelosysToolsCfg().getAllVariables();
+//		Variable[] projectVariables = generatorConfig.getTelosysToolsCfg().getAllVariables();
+		Variable[] projectVariables = _telosysToolsCfg.getAllVariables(); // v 3.0.0
 		log("initContext() : Project variables count = " + ( projectVariables != null ? projectVariables.length : 0 ) );
 
 		//--- Set the project variables in the context ( if any )
@@ -487,13 +562,15 @@ public class Generator {
 	{
 		_logger.info("Generation in progress : target = " + target.getTargetName() + " / entity = " + target.getEntityName() );
 		
-		GeneratorContext generatorContext = createContext(this._generatorConfig, this._logger);
+//		GeneratorContext generatorContext = createContext(this._generatorConfig, this._logger);
+		GeneratorContext generatorContext = createContext(this._logger); // v 3.0.0
 		
 		//--- Set "$env" object ( environment configuration )
 		EnvInContext env = new EnvInContext() ;
 		generatorContext.put(ContextName.ENV, env);  
 		
-		EntitiesManager entitiesManager = new EntitiesManager(model, _generatorConfig, env);
+//		EntitiesManager entitiesManager = new EntitiesManager(model, _generatorConfig, env); 
+		EntitiesManager entitiesManager = new EntitiesManager(model, _telosysToolsCfg.getEntityPackage(), env); // v 3.0.0
 		
 		//--- Set "$model" object : full model with  all the entities (v 2.0.7)
 		ModelInContext modelInContext = new ModelInContext(model, entitiesManager );
@@ -520,8 +597,12 @@ public class Generator {
 		generatorContext.put(ContextName.ENTITY, entity ); 
 		
 		//--- Set the "$generator"  in the context ( "real" embedded generator )
-		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator(
-				model, _generatorConfig, _logger, selectedEntitiesNames, generatedTargets );
+//		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator(
+//				model, _generatorConfig, _logger, selectedEntitiesNames, generatedTargets );
+//		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator(
+//				model, _telosysToolsCfg, _logger, selectedEntitiesNames, generatedTargets ); // v 3.0.0
+		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator( _telosysToolsCfg, _bundleName, _logger,
+				model, selectedEntitiesNames, generatedTargets ); // v 3.0.0
 		generatorContext.put(ContextName.GENERATOR, embeddedGenerator );
 		
 		//---------- ((( GENERATION ))) 
@@ -538,7 +619,9 @@ public class Generator {
 		_logger.info("Generation done.");
 
 		//---------- Save the result in the file
-		String outputFileName = target.getOutputFileNameInFileSystem( _generatorConfig.getProjectLocation() );
+//		String outputFileName = target.getOutputFileNameInFileSystem( _generatorConfig.getProjectLocation() );
+//		String outputFileName = target.getOutputFileNameInFileSystem( _generatorConfig.getTelosysToolsCfg().getProjectAbsolutePath() ); // v 3.0.0
+		String outputFileName = target.getOutputFileNameInFileSystem( _telosysToolsCfg.getProjectAbsolutePath() ); // v 3.0.0
 		_logger.info("Saving target file : " + outputFileName );
 		saveStreamInFile(is, outputFileName, true );
 		_logger.info("Target file saved." );
@@ -551,36 +634,31 @@ public class Generator {
 	
 	private void saveStreamInFile(InputStream is, String fileName, boolean bCreateDir) throws GeneratorException
 	{
-		File f = new File(fileName);
+		File file = new File(fileName);
 		
 		//--- Check if it's possible to write the file
-		if ( f.exists() )
-		{
-			if ( ! f.canWrite() )				
-			{
-				throw new GeneratorException("Cannot write on existing target file '"+ f.toString() + "' !");
+		if ( file.exists() ) {
+			if ( ! file.canWrite() ) {
+				throw new GeneratorException("Cannot write on existing target file '"+ file.toString() + "' !");
 			}
 		}
-		else
-		{
-			File parent = f.getParentFile();
-			if ( ! parent.exists() )
-			{
-				if ( bCreateDir == false )
-				{
-					throw new GeneratorException("Target directory '"+ parent.toString() + "' not found !");
+		else {
+			File parentFile = file.getParentFile();
+			if ( ! parentFile.exists() ) {
+				if ( bCreateDir == false ) {
+					throw new GeneratorException("Target directory '"+ parentFile.toString() + "' not found !");
 				}
-				else
-				{
+				else {
 					// Create the target file directory(ies)
-					parent.mkdirs();				
+					//parentFile.mkdirs();
+					DirUtil.createDirectory(parentFile); // v 3.0.0
 				}
 			}
 		}
 		
 		//--- Write the file
 		try {
-			OutputStream out = new FileOutputStream(f);
+			OutputStream out = new FileOutputStream(file);
 			byte buf[] = new byte[1024];
 			int len;
 			while ((len = is.read(buf)) > 0) {

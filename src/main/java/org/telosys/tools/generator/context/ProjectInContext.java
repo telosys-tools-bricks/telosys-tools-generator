@@ -15,8 +15,8 @@
  */
 package org.telosys.tools.generator.context;
 
+import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.variables.Variable;
-import org.telosys.tools.generator.config.GeneratorConfig;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
@@ -37,13 +37,20 @@ import org.telosys.tools.generator.context.names.ContextName;
 //-------------------------------------------------------------------------------------
 public class ProjectInContext
 {
-	private final GeneratorConfig _generatorConfig ;
+//	private final GeneratorConfig _generatorConfig ;
+	private final TelosysToolsCfg _telosysToolsCfg ; // v 3.0.0
 	
+//    //---------------------------------------------------------------------------
+//	public ProjectInContext(GeneratorConfig generatorConfig)
+//	{
+//		super();
+//		_generatorConfig = generatorConfig ;
+//	}
+//
     //---------------------------------------------------------------------------
-	public ProjectInContext(GeneratorConfig generatorConfig)
-	{
+	public ProjectInContext(TelosysToolsCfg telosysToolsCfg) { // v 3.0.0
 		super();
-		_generatorConfig = generatorConfig ;
+		_telosysToolsCfg = telosysToolsCfg ;
 	}
 
 	//--------------------------------------------------------------------------------------------------------------
@@ -58,7 +65,24 @@ public class ProjectInContext
 	)
     public String getLocationFullPath()
     {
-        return _generatorConfig.getProjectLocation() ;
+//        return _generatorConfig.getProjectLocation() ;
+//        return _generatorConfig.getTelosysToolsCfg().getProjectAbsolutePath() ;
+        return _telosysToolsCfg.getProjectAbsolutePath() ; // v 3.0.0
+    }
+	
+	//--------------------------------------------------------------------------------------------------------------
+	@VelocityMethod (
+		text = { 
+				"Returns the full path of current templates folder ",
+				"(just for information, not supposed to be used in generation)" },
+		example = {
+				"$project.templatesFolderFullPath"
+			},
+		since = "3.0.0"
+	)
+    public String getTemplatesFolderFullPath()
+    {
+        return _telosysToolsCfg.getTemplatesFolderAbsolutePath() ; 
     }
 
 	//--------------------------------------------------------------------------------------------------------------
@@ -75,7 +99,8 @@ public class ProjectInContext
 	)
     public Variable[] getSpecificVariables()
     {
-		return _generatorConfig.getTelosysToolsCfg().getSpecificVariables();
+//		return _generatorConfig.getTelosysToolsCfg().getSpecificVariables();
+		return _telosysToolsCfg.getSpecificVariables(); // v 3.0.0
     }
 	//--------------------------------------------------------------------------------------------------------------
 	@VelocityMethod (
@@ -91,6 +116,7 @@ public class ProjectInContext
 	)
     public Variable[] getAllVariables()
     {
-		return _generatorConfig.getTelosysToolsCfg().getAllVariables();
+//		return _generatorConfig.getTelosysToolsCfg().getAllVariables();
+		return _telosysToolsCfg.getAllVariables(); // v 3.0.0
     }
 }

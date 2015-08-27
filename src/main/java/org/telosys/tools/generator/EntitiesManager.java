@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.telosys.tools.generator.config.GeneratorConfig;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generic.model.Entity;
@@ -29,28 +28,44 @@ import org.telosys.tools.generic.model.Model;
 public class EntitiesManager {
 
 	private final Model           _model ; // TODO : remove ?
-	private final GeneratorConfig _generatorConfig ;
+//	private final GeneratorConfig _generatorConfig ; // replaced by _entitiesPackage in v 3.0.0
+	private final String          _entitiesPackage ; // v 3.0.0
 	private final EnvInContext    _env ;
 	
 	private final Map<String,EntityInContext> _entitiesByName = new Hashtable<String,EntityInContext>();
 	private final Map<String,EntityInContext> _entitiesByTableName = new Hashtable<String,EntityInContext>(); // v 3.0.0
 
+//	/**
+//	 * Constructor
+//	 * @param model
+//	 * @param generatorConfig
+//	 * @param env
+//	 * @throws GeneratorException
+//	 */
+//	public EntitiesManager( Model model, GeneratorConfig generatorConfig, EnvInContext env) 
+//			throws GeneratorException {
+//		_model           = model ;
+//		_generatorConfig = generatorConfig ;
+//		_env             = env ; // Specific environment instance
+//		
+//		buildAllEntities();
+//	}
+	
 	/**
 	 * Constructor
 	 * @param model
-	 * @param generatorConfig
+	 * @param entitiesPackage
 	 * @param env
 	 * @throws GeneratorException
 	 */
-	public EntitiesManager( Model model, GeneratorConfig generatorConfig, EnvInContext env) 
+	public EntitiesManager( Model model, String entitiesPackage, EnvInContext env) 
 			throws GeneratorException {
 		_model           = model ;
-		_generatorConfig = generatorConfig ;
+		_entitiesPackage = entitiesPackage ; // v 3.0.0
 		_env             = env ; // Specific environment instance
 		
 		buildAllEntities();
 	}
-	
 	
 	/**
 	 * Builds a list of context Entities for all the entities defined in the model 
@@ -73,10 +88,11 @@ public class EntitiesManager {
 	private void buildAllEntities() throws GeneratorException 
 	{
 		for ( Entity entity : _model.getEntities() ) {
-			//--- The package name is determined from the target folder
-	    	String entityPackage = _generatorConfig.getTelosysToolsCfg().getEntityPackage(); 
+//			//--- The package name is determined from the target folder
+//	    	String entityPackage = _generatorConfig.getTelosysToolsCfg().getEntityPackage(); 
 	    	//--- New instance of EntityInContext
-	    	EntityInContext entityInContext = new EntityInContext(entity, entityPackage, this, _env);    	
+//	    	EntityInContext entityInContext = new EntityInContext(entity, entityPackage, this, _env);
+	    	EntityInContext entityInContext = new EntityInContext(entity, _entitiesPackage, this, _env);
 			//--- Store the EntityInContext by name
 			_entitiesByName.put(entityInContext.getName(), entityInContext) ;
 			//--- Store the EntityInContext by TABLE name

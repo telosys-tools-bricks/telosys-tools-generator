@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Telosys Database Repository -->
+<root>
+<tableList databaseId="0" databaseName="H2 embedded" databaseProductName="H2" generation="2015-07-17 15:50:25">
+<table catalog="TEST" databaseType="TABLE" javaBean="Student" name="STUDENT" schema="TEST1">
+<column dbComment="" dbDefaultValue="" dbName="ID" dbNotNull="true" dbPosition="1" dbPrimaryKey="true" dbSize="10" dbTypeName="INTEGER" inputType="number" javaName="id" javaType="java.lang.Integer" jdbcTypeCode="4" label="Id" notNull="true" selected="true"/>
+<column dbComment="" dbDefaultValue="" dbName="FIRST_NAME" dbNotNull="false" dbPosition="2" dbSize="40" dbTypeName="VARCHAR" inputType="text" javaName="firstName" javaType="java.lang.String" jdbcTypeCode="12" label="First name" maxLength="40" notNull="false" selected="true"/>
+<column dbComment="" dbDefaultValue="" dbName="LAST_NAME" dbNotNull="false" dbPosition="3" dbSize="40" dbTypeName="VARCHAR" inputType="text" javaName="lastName" javaType="java.lang.String" jdbcTypeCode="12" label="Last name" maxLength="40" notNull="false" selected="true"/>
+<column dbComment="" dbDefaultValue="" dbForeignKey="true" dbName="TEACHER_CODE1" dbNotNull="false" dbPosition="4" dbSize="10" dbTypeName="INTEGER" inputType="number" javaName="teacherCode1" javaType="java.lang.Integer" jdbcTypeCode="4" label="Teacher code1" notNull="false" selected="true"/>
+<column dbComment="" dbDefaultValue="" dbForeignKey="true" dbName="TEACHER_CODE2" dbNotNull="false" dbPosition="5" dbSize="10" dbTypeName="INTEGER" inputType="number" javaName="teacherCode2" javaType="java.lang.Integer" jdbcTypeCode="4" label="Teacher code2" notNull="false" selected="true"/>
+<fk name="CONSTRAINT_BA">
+<fkcol colname="TEACHER_CODE1" colref="CODE" deferrable="7" deleterule="1" sequence="1" tablename="STUDENT" tableref="TEACHER" updaterule="1"/>
+</fk>
+<fk name="CONSTRAINT_BAC">
+<fkcol colname="TEACHER_CODE2" colref="CODE" deferrable="7" deleterule="1" sequence="1" tablename="STUDENT" tableref="TEACHER" updaterule="1"/>
+</fk>
+<link cardinality="ManyToOne" cascade="" fetch="DEFAULT" foreignKeyName="CONSTRAINT_BAC" id="LINK_FK_CONSTRAINT_BAC_O" inverseSideOf="" javaName="teacher2" javaType="Teacher" joinTableName="" mappedBy="" optional="" owningSide="true" sourceTableName="STUDENT" targetEntity="Teacher" targetTableName="TEACHER" used="true">
+<joinColumns>
+<joinColumn insertable="false" name="TEACHER_CODE2" nullable="true" referencedColumnName="CODE" unique="false" updatable="false"/>
+</joinColumns>
+</link>
+<link cardinality="ManyToOne" cascade="" fetch="DEFAULT" foreignKeyName="CONSTRAINT_BA" id="LINK_FK_CONSTRAINT_BA_O" inverseSideOf="" javaName="teacher" javaType="Teacher" joinTableName="" mappedBy="" optional="" owningSide="true" sourceTableName="STUDENT" targetEntity="Teacher" targetTableName="TEACHER" used="true">
+<joinColumns>
+<joinColumn insertable="false" name="TEACHER_CODE1" nullable="true" referencedColumnName="CODE" unique="false" updatable="false"/>
+</joinColumns>
+</link>
+</table>
+<table catalog="TEST" databaseType="TABLE" javaBean="Teacher" name="TEACHER" schema="TEST1">
+<column dbComment="" dbDefaultValue="" dbName="CODE" dbNotNull="true" dbPosition="1" dbPrimaryKey="true" dbSize="10" dbTypeName="INTEGER" inputType="number" javaName="code" javaType="java.lang.Integer" jdbcTypeCode="4" label="Code" notNull="true" selected="true"/>
+<column dbComment="" dbDefaultValue="" dbName="NAME" dbNotNull="false" dbPosition="2" dbSize="40" dbTypeName="VARCHAR" inputType="text" javaName="name" javaType="java.lang.String" jdbcTypeCode="12" label="Name" maxLength="40" notNull="false" selected="true"/>
+<link cardinality="OneToMany" cascade="" fetch="DEFAULT" foreignKeyName="CONSTRAINT_BAC" id="LINK_FK_CONSTRAINT_BAC_I" inverseSideOf="LINK_FK_CONSTRAINT_BAC_O" javaName="listOfStudent2" javaType="java.util.List" joinTableName="" mappedBy="teacher2" optional="" owningSide="false" sourceTableName="TEACHER" targetEntity="Student" targetTableName="STUDENT" used="true"/>
+<link cardinality="OneToMany" cascade="" fetch="DEFAULT" foreignKeyName="CONSTRAINT_BA" id="LINK_FK_CONSTRAINT_BA_I" inverseSideOf="LINK_FK_CONSTRAINT_BA_O" javaName="listOfStudent" javaType="java.util.List" joinTableName="" mappedBy="teacher" optional="" owningSide="false" sourceTableName="TEACHER" targetEntity="Student" targetTableName="STUDENT" used="true"/>
+</table>
+</tableList>
+</root>

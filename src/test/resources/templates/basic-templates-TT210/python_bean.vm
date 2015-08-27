@@ -1,0 +1,19 @@
+${SHARP} Python class for table ${entity.databaseTable} 
+${SHARP} Created on $today.date ( Time $today.time )
+
+
+${SHARP}
+${SHARP} This class defines the ${entity.name} object 
+${SHARP}
+ 
+class ${entity.name}:
+	
+	${SHARP} Default constructor.
+	def __init__(self):
+		pass
+     
+	def __init__(self #foreach( $field in $entity.attributes ),$field.name #end):
+		${SHARP} super(${entity.name}Data,self).__init__();
+		#foreach( $field in $entity.attributes )
+self.$field.name = $field.name;
+		#end

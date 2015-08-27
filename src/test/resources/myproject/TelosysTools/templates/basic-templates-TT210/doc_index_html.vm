@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!--
+ * Index for all HTML pages
+ * Created on $today.date ( Time $today.time )
+ * Target Name     : "$target.targetName"
+ * Target Template : "$target.template"
+ * Target Entity   : "$target.entityName"  ( entityName is void because this template is "multi-targets" )
+-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Author documentation</title>
+<STYLE TYPE="text/css"> 
+table {
+	 border: thin solid Gray;
+}
+th,td{
+	 border: thin solid Gray;
+	 	margin-left: 10px;
+ 	margin-right: 10px;
+ 		padding-left: 10px;
+ padding-right: 10px;
+ 	
+}
+th {
+	 background-color: #B3AFDE;
+	}
+td.label{
+	 background-color: #B3AFDE;
+}
+
+</STYLE> 
+
+</head>
+<body>
+<h1>Entities documentation </h1>
+<ul>
+#foreach ( $entity in $selectedEntities )
+<li><a href="./${entity.name}.html">${entity.name}</a> $entity.name ( package $entity.package) : Table = $entity.databaseTable </li>
+#end 
+</ul>
+</body>
+</html>

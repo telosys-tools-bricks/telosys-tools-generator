@@ -24,13 +24,13 @@ import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.telosys.tools.commons.TelosysToolsException;
 import org.telosys.tools.commons.TelosysToolsLogger;
+import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.io.CopyHandler;
 import org.telosys.tools.commons.io.OverwriteChooser;
 import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generator.BundleResourcesManager;
 import org.telosys.tools.generator.Generator;
 import org.telosys.tools.generator.GeneratorException;
-import org.telosys.tools.generator.config.GeneratorConfig;
 import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generator.engine.GeneratorContextException;
 import org.telosys.tools.generator.engine.directive.DirectiveException;
@@ -40,7 +40,8 @@ import org.telosys.tools.generic.model.Model;
 
 
 /**
- * Generator runnable task (design to be used with a GUI progress bar) 
+ * Generator runnable task (design to be used with a GUI progress bar) <br>
+ * This task is used to generated a set of target in the current bundle
  *  
  * @author Laurent Guerin
  *
@@ -54,7 +55,8 @@ public abstract class AbstractGenerationTask
 	private final List<TargetDefinition>  _selectedTargets ;
 	private final List<TargetDefinition>  _resourcesTargets ;
 	private final Model                   _model ;
-	private final GeneratorConfig         _generatorConfig ;
+	//private final GeneratorConfig         _generatorConfig ; // removed in v 3.0.0
+	private final TelosysToolsCfg         _telosysToolsCfg ; // v 3.0.0
 	private final String                  _bundleName ;
 	private final TelosysToolsLogger      _logger ;
 	
@@ -67,36 +69,43 @@ public abstract class AbstractGenerationTask
 	 * Constructor
 	 * @param model
 	 * @param selectedEntities
+	 * @param bundleName
 	 * @param selectedTargets
 	 * @param resourcesTargets
-	 * @param generatorConfig
+	 * @param telosysToolsCfg
 	 * @param logger
 	 * @throws TelosysToolsException
 	 */
 	public AbstractGenerationTask(
 			Model                     model,
 			List<String>              selectedEntities, 
+			String                    bundleName, // v 3.0.0
 			List<TargetDefinition>    selectedTargets,
 			List<TargetDefinition>    resourcesTargets,
-			GeneratorConfig           generatorConfig, 
+			// GeneratorConfig           generatorConfig,  // removed in v 3.0.0
+			TelosysToolsCfg           telosysToolsCfg, // v 3.0.0
 			TelosysToolsLogger        logger
 			) throws TelosysToolsException
 	{
 		super();
 		
-		if ( model  == null ) throw new TelosysToolsException("_repositoryModel is null ");
-		if ( selectedEntities == null ) throw new TelosysToolsException("_selectedEntities is null ");
-		if ( selectedTargets  == null ) throw new TelosysToolsException("_selectedTargets is null ");
+		if ( model  == null ) throw new TelosysToolsException("model param is null ");
+		if ( selectedEntities == null ) throw new TelosysToolsException("selectedEntities param is null ");
+		if ( bundleName  == null ) throw new TelosysToolsException("bundle name param is null ");
+		if ( selectedTargets  == null ) throw new TelosysToolsException("selectedTargets param is null ");
 		// resourcesTargets : can be null
-		if ( generatorConfig  == null ) throw new TelosysToolsException("_generatorConfig is null ");
-		if ( logger  == null )  throw new TelosysToolsException("_logger is null ");
+		//if ( generatorConfig  == null ) throw new TelosysToolsException("generatorConfig param is null ");
+		if ( telosysToolsCfg  == null ) throw new TelosysToolsException("TelosysToolsCfg param is null ");
+		if ( logger  == null )  throw new TelosysToolsException("logger param is null ");
 
 		_model            = model;
 		_selectedEntities = selectedEntities ;
 		_selectedTargets  = selectedTargets ;
 		_resourcesTargets = resourcesTargets ; // can be null
-		_generatorConfig  = generatorConfig ;
-		_bundleName       = generatorConfig.getBundleName() ; 
+		//_generatorConfig  = generatorConfig ;
+		_telosysToolsCfg  = telosysToolsCfg ; // v 3.0.0
+		//_bundleName       = generatorConfig.getBundleName() ; 
+		_bundleName       = bundleName ;  // v 3.0.0
 		_logger           = logger ;
 		
 		_logger.log(this, "Task created");
@@ -110,7 +119,7 @@ public abstract class AbstractGenerationTask
 	 * Method used to run the task
 	 * @return
 	 */
-	public abstract GenerationTaskResult run() ; // throws InvocationTargetException, InterruptedException ;
+	public abstract GenerationTaskResult run() ;
 	
 	/**
 	 * Method called after each file generation <br>
@@ -141,17 +150,18 @@ public abstract class AbstractGenerationTask
 	}
 	
 	protected Variable[] getAllProjectVariables() {
-		return _generatorConfig.getTelosysToolsCfg().getAllVariables() ;
+//		return _generatorConfig.getTelosysToolsCfg().getAllVariables() ;
+		return _telosysToolsCfg.getAllVariables() ;
 	}
 	
 	//--------------------------------------------------------------------------------------------------
 	/**
 	 * Copy the static resources if any 
-	 * @param resourcesTargetsDefinitions
+	 * @param overwriteChooser
+	 * @param copyHandler
 	 * @return
 	 * @throws InvocationTargetException
 	 */
-	//private int copyResourcesIfAny( List<TargetDefinition> resourcesTargetsDefinitions ) throws InvocationTargetException {
 	protected int copyResourcesIfAny(OverwriteChooser overwriteChooser, CopyHandler copyHandler) throws InvocationTargetException {
 
 		List<TargetDefinition> resourcesTargetsDefinitions = this._resourcesTargets ;
@@ -159,11 +169,8 @@ public abstract class AbstractGenerationTask
 		if ( resourcesTargetsDefinitions != null ) {
 			_logger.log(this, "run : copy resources " );
 			
-			//OverwriteChooser overwriteChooser = new OverwriteChooserDialogBox() ; 
-			//CopyHandler copyHandler = new CopyHandlerForRefresh() ;
-			
-			//BundleResourcesManager resourcesManager = new BundleResourcesManager( _projectConfig.getTelosysToolsCfg(), 
-			BundleResourcesManager resourcesManager = new BundleResourcesManager( _generatorConfig.getTelosysToolsCfg(), _bundleName, _logger);
+//			BundleResourcesManager resourcesManager = new BundleResourcesManager( _generatorConfig.getTelosysToolsCfg(), _bundleName, _logger);
+			BundleResourcesManager resourcesManager = new BundleResourcesManager( _telosysToolsCfg, _bundleName, _logger);
 			try {
 				count = resourcesManager.copyTargetsResourcesInProject(resourcesTargetsDefinitions, overwriteChooser, copyHandler);
 			} catch (Exception e) {
@@ -278,7 +285,8 @@ public abstract class AbstractGenerationTask
 		LinkedList<Target> generatedTargets = new LinkedList<Target>();
 		try {
 			//Generator generator = new Generator(target, _generatorConfig, _repositoryModel, _logger); // v 2.0.7
-			Generator generator = new Generator( _generatorConfig, _logger); // v 3.0.0
+//			Generator generator = new Generator( _generatorConfig, _logger); // v 3.0.0
+			Generator generator = new Generator( _telosysToolsCfg, _bundleName, _logger); // v 3.0.0
 			generator.generateTarget(target, _model, selectedEntitiesNames, generatedTargets);						
 			
 		} catch (GeneratorException e) {
@@ -292,7 +300,8 @@ public abstract class AbstractGenerationTask
 			_logger.log(this, "Refresh generated target : " + generatedTarget.getFile() );
 
 			//String outputFileNameInProject = generatedTarget.getOutputFileNameInProject() ;
-			String projectLocation = _generatorConfig.getProjectLocation();
+//			String projectLocation = _generatorConfig.getTelosysToolsCfg().getProjectAbsolutePath();
+			String projectLocation = _telosysToolsCfg.getProjectAbsolutePath();
 			String outputFileNameInFileSystem = generatedTarget.getOutputFileNameInFileSystem(projectLocation);
 			_logger.log(this, "Call afterFileGeneration(" + outputFileNameInFileSystem + ")...");
 			
