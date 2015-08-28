@@ -387,7 +387,7 @@ public class Generator {
 		//--- Set the dynamic class loader 
 		//Loader loader = new Loader(projectConfiguration, _velocityContext);
 //		Loader loader = new Loader( generatorConfig.getTemplatesFolderFullPath() ); // ver 2.1.0
-		Loader loader = new Loader( _telosysToolsCfg.getTemplatesFolderAbsolutePath() ); // ver 3.0.0
+		Loader loader = new Loader( _telosysToolsCfg.getTemplatesFolderAbsolutePath(this._bundleName) ); // ver 3.0.0
 		generatorContext.put(ContextName.LOADER, loader);
 		
 		//--- Set the "$project" variable in the context

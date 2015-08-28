@@ -12,7 +12,7 @@ import org.telosys.tools.generic.model.Model;
 
 
 /**
- * Eclipse runnable task with a progress bar 
+ * Runnable task with a progress bar (Eclipse like)
  * for code generation 
  *  
  * @author Laurent Guerin
@@ -48,12 +48,81 @@ public class GenerationTaskWithProgress extends AbstractGenerationTask // implem
 	}
 	
 	//--------------------------------------------------------------------------------------
+	// Methods implementation for super class 'AbstractGenerationTask'
+	//--------------------------------------------------------------------------------------
+	@Override  // Implementation for AbstractGenerationTask
+	protected void showErrorMessage(String message, Throwable exception) {
+		//MsgBox.error( message, exception );
+		System.out.println("ERROR");
+		System.out.println(" msg : " + message);
+		System.out.println(" exc : " + exception.getMessage() );
+	}
+
+	@Override  // Implementation for AbstractGenerationTask
+	protected void showErrorMessage(String message1, String message2) {
+		//MsgBox.error( message1, message2 );
+		System.out.println("ERROR");
+		System.out.println(" msg1 : " + message1);
+		System.out.println(" msg2 : " + message2 );
+	}
+	
+	@Override  // Implementation for AbstractGenerationTask
+	protected void afterFileGeneration(String fullFileName) {
+		log("afterFileGeneration(" + fullFileName + ")");
+		// Refresh the Eclipse Workspace 
+		//EclipseWksUtil.refresh( new File(fullFileName) );	
+	}
+
+	@Override  // Implementation for AbstractGenerationTask
+	public GenerationTaskResult launch() { 
+		log("launch");
+		
+		//-----------------------------------------------------------------------------------
+		// BULK GENERATION ENTRY POINT 
+		// Creates a 'ProgressMonitor (Eclipse object)' and use it to run this task instance
+		//-----------------------------------------------------------------------------------
+
+//		GenerationTaskResult generationTaskResult = null ;
+		//GenerationTaskWithProgress generationTaskWithProgress = this ;
+		
+		//--- Run the generation task via the progress monitor 
+		//ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog( Util.getActiveWindowShell() ) ;
+		try {
+			log("Run generation task ..."  );
+			//--- RUN THE ECLIPSE TASK ( 'this' task ) ....
+			//progressMonitorDialog.run(false, false, this);  
+			
+			run(); // 
+			log("End of generation task."  );
+			
+			GenerationTaskResult generationTaskResult = super.getResult() ;
+//			MsgBox.info("Normal end of generation." 
+//					+ "\n\n" + generationTaskResult.getNumberOfResourcesCopied() + " resources(s) copied."
+//					+ "\n\n" + generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated.");
+			System.out.println(
+					"Normal end of generation." 
+					+ "\n\n" + generationTaskResult.getNumberOfResourcesCopied() + " resources(s) copied."
+					+ "\n\n" + generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated.");
+			
+		} catch (InvocationTargetException invocationTargetException) {
+//			showGenerationError(invocationTargetException, 
+//					generationTaskWithProgress.getCurrentTemplateName(), generationTaskWithProgress.getCurrentEntityName() ); // v 2.0.7
+			super.showGenerationError(invocationTargetException);
+		} catch (InterruptedException e) {
+//			MsgBox.info("Generation interrupted");
+		}
+		
+//    	return generationTaskResult;		
+    	return super.getResult();		
+	}
+	
+	//--------------------------------------------------------------------------------------
 	// Methods implementation for Eclipse interface 'IRunnableWithProgress'
 	//--------------------------------------------------------------------------------------
 //	@Override
 //	public void run(IProgressMonitor progressMonitor) throws InvocationTargetException,
 //			InterruptedException {
-	public void launch() throws InvocationTargetException, InterruptedException {
+	private void run() throws InvocationTargetException, InterruptedException {
 		log("run");
 
 		//---------------------------------------------------------------------------
@@ -78,67 +147,4 @@ public class GenerationTaskWithProgress extends AbstractGenerationTask // implem
 		//--- Task result
 		super.setResult(numberOfResourcesCopied, numberOfFilesGenerated); // call SUPER CLASS
 	}
-
-	
-	//--------------------------------------------------------------------------------------
-	// Methods implementation for super class 'AbstractGenerationTask'
-	//--------------------------------------------------------------------------------------
-	@Override  // Implementation for AbstractGenerationTask
-	protected void showErrorMessage(String message, Throwable exception) {
-		//MsgBox.error( message, exception );
-	}
-
-	@Override  // Implementation for AbstractGenerationTask
-	protected void showErrorMessage(String message1, String message2) {
-		//MsgBox.error( message1, message2 );
-	}
-	
-	@Override  // Implementation for AbstractGenerationTask
-	protected void afterFileGeneration(String fullFileName) {
-		log("afterFileGeneration(" + fullFileName + ")");
-		// Refresh the Eclipse Workspace 
-		//EclipseWksUtil.refresh( new File(fullFileName) );	
-	}
-
-	@Override  // Implementation for AbstractGenerationTask
-	public GenerationTaskResult run() { 
-		
-		//-----------------------------------------------------------------------------------
-		// BULK GENERATION ENTRY POINT 
-		// Creates a 'ProgressMonitor (Eclipse object)' and use it to run this task instance
-		//-----------------------------------------------------------------------------------
-
-		GenerationTaskResult generationTaskResult = null ;
-		//GenerationTaskWithProgress generationTaskWithProgress = this ;
-		
-		//--- Run the generation task via the progress monitor 
-		//ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog( Util.getActiveWindowShell() ) ;
-		try {
-			log("Run generation task ..."  );
-			//--- RUN THE ECLIPSE TASK ( 'this' task ) ....
-			//progressMonitorDialog.run(false, false, this);  
-			
-			launch();
-			log("End of generation task."  );
-			
-			generationTaskResult = super.getResult() ;
-//			MsgBox.info("Normal end of generation." 
-//					+ "\n\n" + generationTaskResult.getNumberOfResourcesCopied() + " resources(s) copied."
-//					+ "\n\n" + generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated.");
-			System.out.println(
-					"Normal end of generation." 
-					+ "\n\n" + generationTaskResult.getNumberOfResourcesCopied() + " resources(s) copied."
-					+ "\n\n" + generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated.");
-			
-		} catch (InvocationTargetException invocationTargetException) {
-//			showGenerationError(invocationTargetException, 
-//					generationTaskWithProgress.getCurrentTemplateName(), generationTaskWithProgress.getCurrentEntityName() ); // v 2.0.7
-			super.showGenerationError(invocationTargetException);
-		} catch (InterruptedException e) {
-//			MsgBox.info("Generation interrupted");
-		}
-		
-    	return generationTaskResult;		
-	}
-
 }

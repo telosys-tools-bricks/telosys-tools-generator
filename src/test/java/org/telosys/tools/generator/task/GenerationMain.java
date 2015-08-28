@@ -16,7 +16,7 @@ public class GenerationMain {
 	
 	public static void main(String[] args) throws TelosysToolsException, Exception {
 
-		TelosysProject telosysProject = TestsProject.initProjectEnv("myproject") ;
+		TelosysProject telosysProject = TestsProject.initProjectEnv("myproject", TestsProject.BUNDLE_NAME) ;
 		
 		//---------- Required files loading
 		System.out.println("loading TelosysToolsCfg...");
@@ -41,7 +41,7 @@ public class GenerationMain {
 				TestsProject.BUNDLE_NAME, selectedTargets, resourcesTargets, 
 				telosysToolsCfg, logger);
 		
-		GenerationTaskResult generationTaskResult = generationTask.run();
+		GenerationTaskResult generationTaskResult = generationTask.launch();
 		System.out.println("Nb file(s) generated : " + generationTaskResult.getNumberOfFilesGenerated() );
 	}
 }

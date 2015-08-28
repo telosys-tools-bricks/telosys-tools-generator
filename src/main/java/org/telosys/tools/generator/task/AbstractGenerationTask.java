@@ -119,7 +119,7 @@ public abstract class AbstractGenerationTask
 	 * Method used to run the task
 	 * @return
 	 */
-	public abstract GenerationTaskResult run() ;
+	public abstract GenerationTaskResult launch() ;
 	
 	/**
 	 * Method called after each file generation <br>

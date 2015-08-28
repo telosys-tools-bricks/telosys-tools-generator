@@ -13,7 +13,7 @@ public class TestsProject {
 	public final static String BUNDLE_NAME   = "basic-templates-TT210" ; 
 
 
-	public static TelosysProject initProjectEnv(String projectName) throws TelosysToolsException, Exception {
+	public static TelosysProject initProjectEnv(String projectName, String bundleName) throws TelosysToolsException, Exception {
 		
 		System.out.println("Getting TelosysProject, project name = '" + projectName + "'");
 		TelosysProject telosysProject = getTelosysProject(projectName) ;
@@ -28,8 +28,8 @@ public class TestsProject {
 		initDbRepFile(telosysProject, REPO_FILENAME);
 		
 		//--- Initialize project with templates copied from "src/test/resources" 
-		System.out.println("initializing templates for bundle : " + BUNDLE_NAME );
-		initBundle(telosysProject, BUNDLE_NAME);
+		System.out.println("initializing templates for bundle : " + bundleName );
+		initBundle(telosysProject, bundleName);
 		
 		return telosysProject ;
 	}
@@ -61,7 +61,7 @@ public class TestsProject {
 		File sourceFolder = new File( originalFolderAbsolutePath ) ;
 		// destination folder
 		TelosysToolsCfg telosysToolsCfg = telosysProject.loadTelosysToolsCfg();
-		File destFolder = new File(telosysToolsCfg.getTemplatesBundleFolderAbsolutePath(bundleName));
+		File destFolder = new File(telosysToolsCfg.getTemplatesFolderAbsolutePath(bundleName));
 		
 		
 		//--- Copy 

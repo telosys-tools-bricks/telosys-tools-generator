@@ -1,6 +1,6 @@
 package org.telosys.tools.generator.task;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -18,9 +18,9 @@ import org.telosys.tools.generic.model.Model;
 public class GenerationTaskTest {
 
 	private GenerationTaskResult launchGenerationTask(List<String> selectedEntities, 
-			List<TargetDefinition> selectedTargets ) throws TelosysToolsException, Exception {
+			String bundleName, List<TargetDefinition> selectedTargets ) throws TelosysToolsException, Exception {
 		
-		TelosysProject telosysProject = TestsProject.initProjectEnv("myproject") ;
+		TelosysProject telosysProject = TestsProject.initProjectEnv("myproject", bundleName) ;
 		
 		//---------- Required files loading
 		System.out.println("loading TelosysToolsCfg...");
@@ -35,10 +35,10 @@ public class GenerationTaskTest {
 		
 		GenerationTaskWithProgress generationTask = new GenerationTaskWithProgress(
 				model, selectedEntities, 
-				TestsProject.BUNDLE_NAME, selectedTargets, resourcesTargets, 
+				bundleName, selectedTargets, resourcesTargets, 
 				telosysToolsCfg, logger);
 		
-		GenerationTaskResult generationTaskResult = generationTask.run();
+		GenerationTaskResult generationTaskResult = generationTask.launch();
 		System.out.println("Nb file(s) generated : " + generationTaskResult.getNumberOfFilesGenerated() );
 		
 		return generationTaskResult ;
@@ -55,7 +55,7 @@ public class GenerationTaskTest {
 		List<TargetDefinition> selectedTargets = new LinkedList<TargetDefinition>();
 		selectedTargets.add(new TargetDefinition("Entity Java Bean", "${BEANNAME}.java", "${SRC}/${ENTITY_PKG}", "java_bean.vm", ""));
 		
-		GenerationTaskResult generationTaskResult = launchGenerationTask(selectedEntities, selectedTargets);
+		GenerationTaskResult generationTaskResult = launchGenerationTask(selectedEntities, TestsProject.BUNDLE_NAME, selectedTargets);
 
 		assertEquals(1, generationTaskResult.getNumberOfFilesGenerated());
 		assertEquals(0, generationTaskResult.getNumberOfResourcesCopied());
@@ -73,9 +73,28 @@ public class GenerationTaskTest {
 		List<TargetDefinition> selectedTargets = new LinkedList<TargetDefinition>();
 		selectedTargets.add(new TargetDefinition("Entity Java Bean", "${BEANNAME}.java", "${SRC}/${ENTITY_PKG}", "java_bean.vm", ""));
 		
-		GenerationTaskResult generationTaskResult = launchGenerationTask(selectedEntities, selectedTargets);
+		GenerationTaskResult generationTaskResult = launchGenerationTask(selectedEntities, TestsProject.BUNDLE_NAME, selectedTargets);
 
 		assertEquals(2, generationTaskResult.getNumberOfFilesGenerated());
+		assertEquals(0, generationTaskResult.getNumberOfResourcesCopied());
+	}
+
+	@Test
+	public void test3() throws TelosysToolsException, Exception {
+		
+		//--- List of entities to be generated
+		List<String> selectedEntities = new LinkedList<String>() ;
+		selectedEntities.add("Author"); 
+		selectedEntities.add("Badge");
+		selectedEntities.add("BookOrderItem"); // 2 files : entity + PK
+		
+		//--- List of targets
+		List<TargetDefinition> selectedTargets = new LinkedList<TargetDefinition>();
+		selectedTargets.add(new TargetDefinition("Entity Java Bean", "${BEANNAME}.java", "${SRC}/${ENTITY_PKG}", "jpa_bean_with_links.vm", ""));
+		
+		GenerationTaskResult generationTaskResult = launchGenerationTask(selectedEntities, "unit-tests", selectedTargets);
+
+		assertEquals(4, generationTaskResult.getNumberOfFilesGenerated());
 		assertEquals(0, generationTaskResult.getNumberOfResourcesCopied());
 	}
 

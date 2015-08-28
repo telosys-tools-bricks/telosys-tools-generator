@@ -45,29 +45,29 @@ import org.telosys.tools.generic.model.Model;
 //-------------------------------------------------------------------------------------
 public class EmbeddedGenerator {
 
-	private final Model              model ;
+	private final Model              _model ;
 //	private final GeneratorConfig    generatorConfig ; // replaced by TelosysToolsCfg in v 3.0.0
-	private final TelosysToolsCfg    telosysToolsCfg ; // v 3.0.0
+	private final TelosysToolsCfg    _telosysToolsCfg ; // v 3.0.0
 	private final String             _bundleName ; // v 3.0.0
 	
-	private final TelosysToolsLogger logger ;
-	private final List<String>       selectedEntitiesNames;	
-	private final boolean            canGenerate ;
-	private final List<Target>       generatedTargets ;
+	private final TelosysToolsLogger _logger ;
+	private final List<String>       _selectedEntitiesNames;	
+	private final boolean            _canGenerate ;
+	private final List<Target>       _generatedTargets ;
 	
 	/**
 	 * Constructor for limited embedded generator without generation capabilities
 	 */
 	public EmbeddedGenerator() {
 		super();
-		this.model = null ;
+		this._model = null ;
 		//this.generatorConfig = null ;// v 3.0.0
-		this.telosysToolsCfg = null ; // v 3.0.0
+		this._telosysToolsCfg = null ; // v 3.0.0
 		this._bundleName = null ; // v 3.0.0
-		this.logger = null ;
-		this.selectedEntitiesNames = null ;
-		this.canGenerate = false ;
-		this.generatedTargets = null ;
+		this._logger = null ;
+		this._selectedEntitiesNames = null ;
+		this._canGenerate = false ;
+		this._generatedTargets = null ;
 	}
 
 //	public EmbeddedGenerator(	Model model,
@@ -97,20 +97,20 @@ public class EmbeddedGenerator {
 			List<Target> generatedTargets) {
 		super();
 		// this.generatorConfig = generatorConfig; // v 3.0.0
-		this.telosysToolsCfg = telosysToolsCfg ; // v 3.0.0
+		this._telosysToolsCfg = telosysToolsCfg ; // v 3.0.0
 		this._bundleName = bundleName ; // v 3.0.0
-		this.logger = logger;
+		this._logger = logger;
 		
 //		if ( model != null && generatorConfig != null && logger != null ) {
-		this.model = model;
-		this.selectedEntitiesNames = selectedEntitiesNames ;
-		this.generatedTargets = generatedTargets ;
+		this._model = model;
+		this._selectedEntitiesNames = selectedEntitiesNames ;
+		this._generatedTargets = generatedTargets ;
 
 		if ( model != null && telosysToolsCfg != null && _bundleName != null && logger != null ) {
-			this.canGenerate = true ;
+			this._canGenerate = true ;
 		}
 		else {
-			this.canGenerate = false ;
+			this._canGenerate = false ;
 		}
 	}
 
@@ -205,7 +205,7 @@ public class EmbeddedGenerator {
 			"Generates an other target with the given template file "
 			},
 		parameters = { 
-			"entity : the entity ",
+			"entityClassName : the entity class name",
 			"outputFile : the file name to be generated ",
 			"outputFolder : the folder where to generate the file",			
 			"templateFile : the template file to be used "			
@@ -216,15 +216,15 @@ public class EmbeddedGenerator {
 			"#end"
 		}
 	)
-	public void generate(Entity entity, String outputFile, String outputFolder, String templateFile) throws GeneratorException
+	public void generate(String entityClassName, String outputFile, String outputFolder, String templateFile) throws GeneratorException
 	{
-		String err = "Cannot generate with embedded generator ";
+		String err = "Error in embedded generator ";
 		
-		if ( canGenerate != true ) {
-			throw new GeneratorException( err + "(environment not available)");
+		if ( _canGenerate != true ) {
+			throw new GeneratorException( err + "(embedded generator is not able to generate, environment is not available)");
 		}
-		if ( null == entity ) {
-			throw new GeneratorException( err + "(entity is null)");
+		if ( null == entityClassName ) {
+			throw new GeneratorException( err + "(entity class name is null)");
 		}
 		if ( null == outputFile ) {
 			throw new GeneratorException( err + "(output file is null)");
@@ -236,8 +236,14 @@ public class EmbeddedGenerator {
 			throw new GeneratorException( err + "(template file is null)");
 		}
 		
+		//--- Search the entity in the model
+		Entity entity = _model.getEntityByClassName(entityClassName.trim());
+		if ( null == entity ) {
+			throw new GeneratorException( err + "(entity '" + entityClassName + "' not found in repository)");
+		}
+		
 //		Variable[] allVariables = generatorConfig.getTelosysToolsCfg().getAllVariables(); // v 2.1.0
-		Variable[] allVariables = this.telosysToolsCfg.getAllVariables(); // v 2.1.0
+		Variable[] allVariables = this._telosysToolsCfg.getAllVariables(); // v 2.1.0
 		
 		TargetDefinition genericTarget = new TargetDefinition("Dynamic target", outputFile, outputFolder, templateFile, "");
 		
@@ -246,9 +252,9 @@ public class EmbeddedGenerator {
 		
 		//Generator generator = new Generator(target, generatorConfig, model, logger); // v 2.0.7
 //		Generator generator = new Generator(generatorConfig, logger); // v 3.0.0
-		Generator generator = new Generator(this.telosysToolsCfg, _bundleName, logger); // v 3.0.0
+		Generator generator = new Generator(this._telosysToolsCfg, _bundleName, _logger); // v 3.0.0
 		
-		generator.generateTarget(target, model, selectedEntitiesNames, this.generatedTargets);
+		generator.generateTarget(target, _model, _selectedEntitiesNames, this._generatedTargets);
 	}
 	
 }

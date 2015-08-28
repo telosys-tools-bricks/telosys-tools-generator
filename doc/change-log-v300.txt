@@ -5,5 +5,4 @@ Templates :
    ( class GenerationInContext.java removed )
    getTemplatesFolderFullPath() moved in "$project"
    
-   
-   
+

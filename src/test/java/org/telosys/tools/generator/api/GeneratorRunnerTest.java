@@ -22,7 +22,7 @@ public class GeneratorRunnerTest extends AbstractTest {
 	private GeneratorRunner getGeneratorRunner() throws TelosysToolsException,  Exception {
 		System.out.println("Creating GeneratorRunner...");
 		
-		TelosysProject telosysProject = TestsProject.initProjectEnv("myproject") ;
+		TelosysProject telosysProject = TestsProject.initProjectEnv("myproject", TestsProject.BUNDLE_NAME) ;
 
 		TelosysToolsLogger logger = LoggerProvider.getLogger();
 		
