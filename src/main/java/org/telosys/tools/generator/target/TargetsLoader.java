@@ -28,11 +28,11 @@ public class TargetsLoader {
 	
 	public final static String TEMPLATES_CFG = "templates.cfg" ;
 
-	private final String templatesFolder ;
+	private final String templatesFolderAbsolutePath ;
 	
-	public TargetsLoader(String templatesFolder) {
+	public TargetsLoader(String templatesFolderAbsolutePath) {
 		super();
-		this.templatesFolder = templatesFolder;
+		this.templatesFolderAbsolutePath = templatesFolderAbsolutePath;
 	}
 
 	public TargetsDefinitions loadTargetsDefinitions(String bundleName) throws GeneratorException
@@ -41,7 +41,7 @@ public class TargetsLoader {
 			throw new GeneratorException("Invalid bundle name (null or void) : '" + bundleName + "'  ");
 		}
 
-		String bundleFolder = FileUtil.buildFilePath(templatesFolder, bundleName.trim() );
+		String bundleFolder = FileUtil.buildFilePath(templatesFolderAbsolutePath, bundleName.trim() );
 		// templates.cfg full path  
 		String sFile = FileUtil.buildFilePath(bundleFolder, TEMPLATES_CFG );
 		

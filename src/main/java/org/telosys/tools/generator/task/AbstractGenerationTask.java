@@ -68,10 +68,10 @@ public abstract class AbstractGenerationTask
 	/**
 	 * Constructor
 	 * @param model
-	 * @param selectedEntities
+	 * @param selectedEntities list of entities names to be used for code generation
 	 * @param bundleName
-	 * @param selectedTargets
-	 * @param resourcesTargets
+	 * @param selectedTargets templates targets to be used for code generation
+	 * @param resourcesTargets resources targets to be copied (or null if none)
 	 * @param telosysToolsCfg
 	 * @param logger
 	 * @throws TelosysToolsException
