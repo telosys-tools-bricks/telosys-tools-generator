@@ -63,6 +63,8 @@ public class AttributeInContext
 //    public final static int TIME_ONLY      = 2 ;
 //    public final static int DATE_AND_TIME  = 3 ;
     
+    private final static String VOID_STRING  = "" ;
+    
     private final static String TYPE_INT  = "int" ;
     private final static String TYPE_NUM  = "num" ;
     private final static String TYPE_DATE = "date" ;
@@ -143,75 +145,76 @@ public class AttributeInContext
 	private final String  _sTableGeneratorPkColumnValue   ;
 
 	//-----------------------------------------------------------------------------------------------
-	/**
-	 * Constructor to create a Java Class Attribute from the given model-column definition  
-	 * @param column the column of the repository model
-	 */
 	//public AttributeInContext(final EntityInContext entity, final Column column) 
-	public AttributeInContext(final EntityInContext entity, final Attribute column) // v 3.0.0
+	/**
+	 * Constructor to create an ATTRIBUTE in the generator context
+	 * @param entity
+	 * @param attribute
+	 */
+	public AttributeInContext(final EntityInContext entity, final Attribute attribute) // v 3.0.0
 	{
 		_entity = entity ;
 		
 		//_sName   = column.getJavaName();
-		_sName   = column.getName(); // v 3.0.0
+		_sName   = attribute.getName(); // v 3.0.0
 		
 		//_sFullType   = StrUtil.removeAllBlanks( column.getJavaType() );
-		_sFullType   = StrUtil.removeAllBlanks( column.getFullType() ); // v 3.0.0
+		_sFullType   = StrUtil.removeAllBlanks( attribute.getFullType() ); // v 3.0.0
 		_sSimpleType = JavaClassUtil.shortName( _sFullType );    // v 2.0.7
 				
 		//_bSelected        = column.getSelected(); // v 2.1.1 #LGU
-		_bSelected        = column.isSelected(); // v 3.0.0
+		_bSelected        = attribute.isSelected(); // v 3.0.0
 		
 		//_sInitialValue    = null ; //  column.getJavaInitialValue()  ???
-		_sInitialValue    = column.getInitialValue() ; // v 3.0.0
+		_sInitialValue    = StrUtil.notNull( attribute.getInitialValue() ); // v 3.0.0
 		//_sDefaultValue    = column.getJavaDefaultValue();
-		_sDefaultValue    = column.getDefaultValue(); // v 3.0.0
+		_sDefaultValue    = StrUtil.notNull( attribute.getDefaultValue() ); // v 3.0.0
 		
-		_sDataBaseName     = column.getDatabaseName() ;
+		_sDataBaseName     = StrUtil.notNull( attribute.getDatabaseName() ) ;
         //_sDataBaseType     = column.getDatabaseTypeName() ;
-        _sDataBaseType     = column.getDatabaseType() ; // v 3.0.0
-        _iJdbcTypeCode     = column.getJdbcTypeCode() != null ? column.getJdbcTypeCode() : 0 ; // v 3.0.0
-        _sJdbcTypeName     = column.getJdbcTypeName(); 
+        _sDataBaseType     = StrUtil.notNull( attribute.getDatabaseType() ) ; // v 3.0.0
+        _iJdbcTypeCode     = attribute.getJdbcTypeCode() != null ? attribute.getJdbcTypeCode() : 0 ; // v 3.0.0
+        _sJdbcTypeName     = StrUtil.notNull( attribute.getJdbcTypeName() );
         //_bKeyElement       = column.isPrimaryKey() ;
-        _bKeyElement       = column.isKeyElement(); // v 3.0.0
+        _bKeyElement       = attribute.isKeyElement(); // v 3.0.0
         //_bUsedInForeignKey = column.isForeignKey(); 
-        _bUsedInForeignKey = column.isUsedInForeignKey() ; // v 3.0.0
-        _bAutoIncremented  = column.isAutoIncremented();
-        _iDatabaseSize     = column.getDatabaseSize() != null ? column.getDatabaseSize() : 0 ;
-        _sDatabaseComment  = column.getDatabaseComment() ; // Added in v 2.1.1 - #LCH
-        _sDatabaseDefaultValue = column.getDatabaseDefaultValue(); 
-        _bDatabaseNotNull  = column.isDatabaseNotNull();
+        _bUsedInForeignKey = attribute.isUsedInForeignKey() ; // v 3.0.0
+        _bAutoIncremented  = attribute.isAutoIncremented();
+        _iDatabaseSize     = attribute.getDatabaseSize() != null ? attribute.getDatabaseSize() : 0 ;
+        _sDatabaseComment  = StrUtil.notNull( attribute.getDatabaseComment() ) ; // Added in v 2.1.1 - #LCH
+        _sDatabaseDefaultValue = StrUtil.notNull( attribute.getDatabaseDefaultValue() ) ; 
+        _bDatabaseNotNull  = attribute.isDatabaseNotNull();
         
 		//--- Further info for ALL
         //_bNotNull   = column.getJavaNotNull();
-        _bNotNull   = column.isNotNull();  // v 3.0.0
-        _sLabel     = column.getLabel();
-        _sInputType = column.getInputType();
+        _bNotNull   = attribute.isNotNull();  // v 3.0.0
+        _sLabel     = StrUtil.notNull( attribute.getLabel() ) ;
+        _sInputType = StrUtil.notNull( attribute.getInputType() );
         
 		//--- Further info for BOOLEAN 
 //        _sBooleanTrueValue   = column.getBooleanTrueValue().trim() ;
 //		_sBooleanFalseValue  = column.getBooleanFalseValue().trim() ;
-        _sBooleanTrueValue   = Util.trim(column.getBooleanTrueValue(), "") ; 
-		_sBooleanFalseValue  = Util.trim(column.getBooleanFalseValue(), "") ;
+        _sBooleanTrueValue   = Util.trim(attribute.getBooleanTrueValue(), VOID_STRING) ; 
+		_sBooleanFalseValue  = Util.trim(attribute.getBooleanFalseValue(), VOID_STRING) ;
 		
 		//--- Further info for NUMBER 
 //	    _sMinValue = column.getMinValue() ; 
-	    _sMinValue = Util.numberToString(column.getMinValue(), "" ) ; // v 3.0.0
+	    _sMinValue = Util.numberToString(attribute.getMinValue(), VOID_STRING ) ; // v 3.0.0
 //	    _sMaxValue = column.getMaxValue() ; 
-	    _sMaxValue = Util.numberToString(column.getMaxValue(), "" ) ; // v 3.0.0 
+	    _sMaxValue = Util.numberToString(attribute.getMaxValue(), VOID_STRING ) ; // v 3.0.0 
 
 		//--- Further info for STRING 
         //_bLongText  = column.getLongText() ;
-        _bLongText  = column.isLongText() ; // v 3.0.0
+        _bLongText  = attribute.isLongText() ; // v 3.0.0
         //_bNotEmpty  = column.getNotEmpty();
-        _bNotEmpty  = column.isNotEmpty(); // v 3.0.0
+        _bNotEmpty  = attribute.isNotEmpty(); // v 3.0.0
         //_bNotBlank  = column.getNotBlank();
-        _bNotBlank  = column.isNotBlank(); // v 3.0.0
+        _bNotBlank  = attribute.isNotBlank(); // v 3.0.0
         //_sMaxLength = column.getMaxLength();
-        _sMaxLength = Util.numberToString(column.getMaxLength(), ""); // v 3.0.0
+        _sMaxLength = Util.numberToString(attribute.getMaxLength(), VOID_STRING); // v 3.0.0
         //_sMinLength = column.getMinLength();
-        _sMinLength = Util.numberToString(column.getMinLength(), ""); // v 3.0.0
-        _sPattern   = column.getPattern();
+        _sMinLength = Util.numberToString(attribute.getMinLength(), VOID_STRING); // v 3.0.0
+        _sPattern   = StrUtil.notNull( attribute.getPattern() );
         
 		//--- Further info for DATE/TIME 
 //		if ( RepositoryConst.SPECIAL_DATE_ONLY.equalsIgnoreCase(column.getDateType()) ) {
@@ -223,74 +226,74 @@ public class AttributeInContext
 //		} else {
 //			_iDateType =  -1  ; // Default : UNKNOWN
 //		}
-		_dateType = column.getDateType(); // v 3.0.0
+		_dateType = ( attribute.getDateType() != null ?  attribute.getDateType() : DateType.UNDEFINED ); // v 3.0.0
 		
-        _bDatePast   = column.isDatePast();
-        _bDateFuture = column.isDateFuture();
-        _bDateBefore = column.isDateBefore();
-        _sDateBeforeValue = column.getDateBeforeValue();
-        _bDateAfter  = column.isDateAfter();
-        _sDateAfterValue  = column.getDateAfterValue();
+        _bDatePast   = attribute.isDatePast();
+        _bDateFuture = attribute.isDateFuture();
+        _bDateBefore = attribute.isDateBefore();
+        _sDateBeforeValue = StrUtil.notNull( attribute.getDateBeforeValue() );
+        _bDateAfter  = attribute.isDateAfter();
+        _sDateAfterValue  = StrUtil.notNull( attribute.getDateAfterValue() );
         
 		//--- Further info for JPA         
-        if ( column.isAutoIncremented() ) {
+        if ( attribute.isAutoIncremented() ) {
 		    _bGeneratedValue = true ;
-			_sGeneratedValueStrategy  = null ; // "AUTO" is the default strategy 
-			_sGeneratedValueGenerator = null ;
+			_sGeneratedValueStrategy  = VOID_STRING ; // "AUTO" is the default strategy 
+			_sGeneratedValueGenerator = VOID_STRING ;
         } 
         else {
 			//if (column.getGeneratedValue() != null) {
-        	if (column.isGeneratedValue() ) { // v 3.0.0
+        	if (attribute.isGeneratedValue() ) { // v 3.0.0
 			    _bGeneratedValue = true ;
 				//_sGeneratedValueStrategy  = column.getGeneratedValue().getStrategy();
-				_sGeneratedValueStrategy  = column.getGeneratedValueStrategy(); // v 3.0.0
+				_sGeneratedValueStrategy  = StrUtil.notNull( attribute.getGeneratedValueStrategy() ); // v 3.0.0
 				//_sGeneratedValueGenerator = column.getGeneratedValue().getGenerator();
-				_sGeneratedValueGenerator = column.getGeneratedValueGenerator(); // v 3.0.0
+				_sGeneratedValueGenerator = StrUtil.notNull( attribute.getGeneratedValueGenerator() ); // v 3.0.0
 			}
 			else {
 				_bGeneratedValue = false;
-				_sGeneratedValueStrategy  = null;
-				_sGeneratedValueGenerator = null;
+				_sGeneratedValueStrategy  = VOID_STRING;
+				_sGeneratedValueGenerator = VOID_STRING;
 			}
         }
 			        
 		//if ( column.getTableGenerator() != null ) {
-		if ( column.hasTableGenerator() ) { // v 3.0.0
+		if ( attribute.hasTableGenerator() ) { // v 3.0.0
 		    _bTableGenerator = true ;
 			//_sTableGeneratorName = column.getTableGenerator().getName();
-			_sTableGeneratorName = column.getTableGeneratorName(); // v 3.0.0
+			_sTableGeneratorName = StrUtil.notNull(attribute.getTableGeneratorName()); // v 3.0.0
 			//_sTableGeneratorTable = column.getTableGenerator().getTable();
-			_sTableGeneratorTable = column.getTableGeneratorTable(); // v 3.0.0
+			_sTableGeneratorTable = StrUtil.notNull(attribute.getTableGeneratorTable()); // v 3.0.0
 			//_sTableGeneratorPkColumnName = column.getTableGenerator().getPkColumnName();
-			_sTableGeneratorPkColumnName = column.getTableGeneratorPkColumnName(); // v 3.0.0
+			_sTableGeneratorPkColumnName = StrUtil.notNull(attribute.getTableGeneratorPkColumnName()); // v 3.0.0
 			//_sTableGeneratorValueColumnName = column.getTableGenerator().getValueColumnName();
-			_sTableGeneratorValueColumnName = column.getTableGeneratorValueColumnName(); // v 3.0.0
+			_sTableGeneratorValueColumnName = StrUtil.notNull(attribute.getTableGeneratorValueColumnName()); // v 3.0.0
 			//_sTableGeneratorPkColumnValue = column.getTableGenerator().getPkColumnValue();
-			_sTableGeneratorPkColumnValue = column.getTableGeneratorPkColumnValue(); // v 3.0.0
+			_sTableGeneratorPkColumnValue = StrUtil.notNull(attribute.getTableGeneratorPkColumnValue()); // v 3.0.0
 		}
 		else {
 		    _bTableGenerator = false ;
-			_sTableGeneratorName = null ;
-			_sTableGeneratorTable = null ;
-			_sTableGeneratorPkColumnName = null ;
-			_sTableGeneratorValueColumnName = null;
-			_sTableGeneratorPkColumnValue = null;
+			_sTableGeneratorName = VOID_STRING ;
+			_sTableGeneratorTable = VOID_STRING ;
+			_sTableGeneratorPkColumnName = VOID_STRING ;
+			_sTableGeneratorValueColumnName = VOID_STRING;
+			_sTableGeneratorPkColumnValue = VOID_STRING;
 		}
 
 		//if (column.getSequenceGenerator() != null) {
-		if (column.hasSequenceGenerator() ) {
+		if (attribute.hasSequenceGenerator() ) {
 		    _bSequenceGenerator = true;
 			//_sSequenceGeneratorName = column.getSequenceGenerator().getName();
-			_sSequenceGeneratorName = column.getSequenceGeneratorName();
+			_sSequenceGeneratorName = attribute.getSequenceGeneratorName();
 			//_sSequenceGeneratorSequenceName = column.getSequenceGenerator().getSequenceName();
-			_sSequenceGeneratorSequenceName = column.getSequenceGeneratorSequenceName();
+			_sSequenceGeneratorSequenceName = attribute.getSequenceGeneratorSequenceName();
 			//_iSequenceGeneratorAllocationSize = column.getSequenceGenerator().getAllocationSize();
-			_iSequenceGeneratorAllocationSize = Util.intValue(column.getSequenceGeneratorAllocationSize(), 0);
+			_iSequenceGeneratorAllocationSize = Util.intValue(attribute.getSequenceGeneratorAllocationSize(), 0);
 		}
 		else {
 		    _bSequenceGenerator = false;
-			_sSequenceGeneratorName = null;
-			_sSequenceGeneratorSequenceName = null;
+			_sSequenceGeneratorName = VOID_STRING;
+			_sSequenceGeneratorSequenceName = VOID_STRING;
 			_iSequenceGeneratorAllocationSize = -1;
 		}
 		

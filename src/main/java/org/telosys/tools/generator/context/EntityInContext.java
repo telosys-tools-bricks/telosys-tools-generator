@@ -18,6 +18,7 @@ package org.telosys.tools.generator.context;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.EntitiesManager;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
@@ -100,19 +101,19 @@ public class EntityInContext
 		//_sName = entity.getBeanJavaClass() ;
 		_sClassName = entity.getClassName();  // v 3.0.0
 		
-		_sPackage = entityPackage;
+		_sPackage = StrUtil.notNull(entityPackage);
 		
 		_entitiesManager = entitiesManager ;
 		_env = env ;
 		
-		_sDatabaseTable   = entity.getDatabaseTable();
+		_sDatabaseTable   = StrUtil.notNull(entity.getDatabaseTable());
 		//_sDatabaseCatalog = entity.getCatalog();
-		_sDatabaseCatalog = entity.getDatabaseCatalog(); // v 3.0.0
+		_sDatabaseCatalog = StrUtil.notNull(entity.getDatabaseCatalog()); // v 3.0.0
 		
 		//_sDatabaseSchema  = entity.getSchema();
-		_sDatabaseSchema  = entity.getDatabaseSchema(); // v 3.0.0
+		_sDatabaseSchema  = StrUtil.notNull(entity.getDatabaseSchema()); // v 3.0.0
 		
-		_sDatabaseType    = entity.getDatabaseType(); // ver 2.0.7
+		_sDatabaseType    = StrUtil.notNull(entity.getDatabaseType()); // ver 2.0.7
 		
 		//--- Initialize all the ATTRIBUTES for the current entity
 		_attributes = new LinkedList<AttributeInContext>();
