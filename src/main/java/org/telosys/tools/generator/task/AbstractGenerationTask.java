@@ -115,11 +115,11 @@ public abstract class AbstractGenerationTask
 	//--------------------------------------------------------------------------------------------------
 	// ABSTRACT METHODS
 	//--------------------------------------------------------------------------------------------------
-	/**
-	 * Method used to run the task
-	 * @return
-	 */
-	public abstract GenerationTaskResult launch() ;
+//	/**
+//	 * Method used to run the task
+//	 * @return
+//	 */
+//	public abstract GenerationTaskResult launch() ;
 	
 	/**
 	 * Method called after each file generation <br>
@@ -324,7 +324,7 @@ public abstract class AbstractGenerationTask
 	 * Returns the name of the entity currently under generation 
 	 * @return
 	 */
-	public String getCurrentEntityName() {
+	private String getCurrentEntityName() {
 		if ( _currentTarget == null ) return ENTITY_NONE ;
 		String entityName = _currentTarget.getEntityName() ;
 		if ( entityName == null ) {
@@ -343,7 +343,7 @@ public abstract class AbstractGenerationTask
 	 * Returns the name of the template currently in use for generation 
 	 * @return
 	 */
-	public String getCurrentTemplateName() {
+	private String getCurrentTemplateName() {
 		if ( _currentTarget == null ) return NO_TEMPLATE ;
 		return _currentTarget.getTemplate() ;
 	}
@@ -353,7 +353,7 @@ public abstract class AbstractGenerationTask
 	 * Returns the result (number of files generated, ... )
 	 * @return
 	 */
-	public GenerationTaskResult getResult() {
+	protected GenerationTaskResult getResult() {
 		return _result != null ? _result : new GenerationTaskResult() ;
 	}
 	

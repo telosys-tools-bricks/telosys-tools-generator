@@ -33,7 +33,7 @@ public class GenerationTaskTest {
 		
 		TelosysToolsLogger logger = new ConsoleLogger() ;
 		
-		GenerationTaskWithProgress generationTask = new GenerationTaskWithProgress(
+		StandardGenerationTask generationTask = new StandardGenerationTask(
 				model, selectedEntities, 
 				bundleName, selectedTargets, resourcesTargets, 
 				telosysToolsCfg, logger);
