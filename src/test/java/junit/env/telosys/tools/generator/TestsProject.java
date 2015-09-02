@@ -47,7 +47,7 @@ public class TestsProject {
 		File dbrepInputFile = new File( originalFileAbsolutePath ) ;
 		// destination folder
 		TelosysToolsCfg telosysToolsCfg = telosysProject.loadTelosysToolsCfg();
-		File destDir = new File(telosysToolsCfg.getRepositoriesFolderAbsolutePath());
+		File destDir = new File(telosysToolsCfg.getModelsFolderAbsolutePath());
 		
 		System.out.println(" copy " + dbrepInputFile ); 
 		System.out.println("   to " + destDir ); 

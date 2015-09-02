@@ -57,7 +57,7 @@ public class TelosysProject {
 	//-----------------------------------------------------------------------------------------------------
 	public Model loadModelFromDbRep(final String dbrepFileName) throws TelosysToolsException {
 		TelosysToolsCfg telosysToolsCfg = loadTelosysToolsCfg();
-		String dbrepAbsolutePath = FileUtil.buildFilePath( telosysToolsCfg.getRepositoriesFolderAbsolutePath(), dbrepFileName);
+		String dbrepAbsolutePath = FileUtil.buildFilePath( telosysToolsCfg.getModelsFolderAbsolutePath(), dbrepFileName);
 		return loadRepository( dbrepAbsolutePath );
 	}
 	
