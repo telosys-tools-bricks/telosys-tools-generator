@@ -4,12 +4,7 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
-import org.telosys.tools.commons.FileUtil;
-import org.telosys.tools.commons.TelosysToolsException;
-import org.telosys.tools.commons.cfg.TelosysToolsCfg;
-import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.EnvInContext;
-import org.telosys.tools.generator.task.TelosysProject;
 
 public abstract class AbstractTest  extends TestCase  {
 
