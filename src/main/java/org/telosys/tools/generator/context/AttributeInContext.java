@@ -464,7 +464,9 @@ public class AttributeInContext
 	)
 	public boolean hasInitialValue()
 	{
-		return _sInitialValue != null ;
+//		return _sInitialValue != null ;
+//		return _sInitialValue != null && ( "".equals(_sInitialValue) == false ) ;
+		return ! StrUtil.nullOrVoid(_sInitialValue); // v 3.0.0
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
