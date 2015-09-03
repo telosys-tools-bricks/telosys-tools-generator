@@ -148,8 +148,8 @@ public class BundleResourcesManager {
 	//----------------------------------------------------------------------------------------------------
 	private File getDestination(Target target) {
 		// "resources destination" = "project folder where to generate" in .cfg file 
-		String projectLocation = _telosysToolsCfg.getProjectAbsolutePath() ;
-		String destinationFullPath = target.getOutputFileNameInFileSystem(projectLocation) ;
+		//String destinationLocation = _telosysToolsCfg.getProjectAbsolutePath() ;
+		String destinationFullPath = target.getOutputFileNameInFileSystem(_telosysToolsCfg.getDestinationFolderAbsolutePath()) ; // v 3.0.0
 		File destinationFile = new File(destinationFullPath);
 		return destinationFile ;
 	}

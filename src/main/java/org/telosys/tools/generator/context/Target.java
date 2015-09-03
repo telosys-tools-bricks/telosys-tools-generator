@@ -284,34 +284,35 @@ public class Target
 
 	/**
 	 * Returns the absolute full path of the generated file in the file system <br>
-	 * using the given project location
-	 * ie : "C:/tmp/project/src/org/demo/screen/employee/EmployeeData.java"
-	 * @param projectLocation the project location ( ie "C:/tmp/project" )
+	 * using the given project location <br>
+	 * Return example : "C:/tmp/project/src/org/demo/screen/employee/EmployeeData.java"
+	 * @param destinationFolderFullPath the destination folder ( ie "C:/tmp/project" )
 	 * @return
 	 */
 	@VelocityNoDoc
-	public String getOutputFileNameInFileSystem(String projectLocation)
+	public String getOutputFileNameInFileSystem(String destinationFolderFullPath)
 	{
 		String fileNameInProject = getOutputFileNameInProject() ;
 //		return buildFullPath(projectLocation, fileNameInProject ) ;
-		return FileUtil.buildFilePath(projectLocation, fileNameInProject) ; // v 3.0.0
+		return FileUtil.buildFilePath(destinationFolderFullPath, fileNameInProject) ; // v 3.0.0
 	}
 	
-	/**
-	 * Returns the absolute full path of the folder in the file system <br>
-	 * where to generate the target (using the given project location)
-	 * ie : "C:/tmp/project/src/org/demo"
-	 * @param projectLocation the project location ( ie "C:/tmp/project" )
-	 * @return
-	 * @since 2.0.7
-	 */
-	@VelocityNoDoc
-	public String getOutputFolderInFileSystem(String projectLocation)
-	{
-		String folderInProject = getFolder() ;
-//		return buildFullPath(projectLocation, folderInProject ) ;
-		return FileUtil.buildFilePath(projectLocation, folderInProject) ; // v 3.0.0
-	}
+// removed in v 3.0.0	
+//	/**
+//	 * Returns the absolute full path of the folder in the file system <br>
+//	 * where to generate the target (using the given project location)
+//	 * ie : "C:/tmp/project/src/org/demo"
+//	 * @param projectLocation the project location ( ie "C:/tmp/project" )
+//	 * @return
+//	 * @since 2.0.7
+//	 */
+//	@VelocityNoDoc
+//	public String getOutputFolderInFileSystem(String projectLocation)
+//	{
+//		String folderInProject = getFolder() ;
+////		return buildFullPath(projectLocation, folderInProject ) ;
+//		return FileUtil.buildFilePath(projectLocation, folderInProject) ; // v 3.0.0
+//	}
 
 //	private String buildFullPath(String projectLocation, String fileOrFolder)
 //	{

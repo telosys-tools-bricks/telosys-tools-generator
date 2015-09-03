@@ -301,8 +301,10 @@ public abstract class AbstractGenerationTask
 
 			//String outputFileNameInProject = generatedTarget.getOutputFileNameInProject() ;
 //			String projectLocation = _generatorConfig.getTelosysToolsCfg().getProjectAbsolutePath();
-			String projectLocation = _telosysToolsCfg.getProjectAbsolutePath();
-			String outputFileNameInFileSystem = generatedTarget.getOutputFileNameInFileSystem(projectLocation);
+//			String projectLocation = _telosysToolsCfg.getProjectAbsolutePath();
+//			String outputFileNameInFileSystem = generatedTarget.getOutputFileNameInFileSystem(projectLocation);
+			// v 3.0.0
+			String outputFileNameInFileSystem = generatedTarget.getOutputFileNameInFileSystem(_telosysToolsCfg.getDestinationFolderAbsolutePath());
 			_logger.log(this, "Call afterFileGeneration(" + outputFileNameInFileSystem + ")...");
 			
 			afterFileGeneration(outputFileNameInFileSystem);

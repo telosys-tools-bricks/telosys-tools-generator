@@ -621,7 +621,8 @@ public class Generator {
 		//---------- Save the result in the file
 //		String outputFileName = target.getOutputFileNameInFileSystem( _generatorConfig.getProjectLocation() );
 //		String outputFileName = target.getOutputFileNameInFileSystem( _generatorConfig.getTelosysToolsCfg().getProjectAbsolutePath() ); // v 3.0.0
-		String outputFileName = target.getOutputFileNameInFileSystem( _telosysToolsCfg.getProjectAbsolutePath() ); // v 3.0.0
+//		String outputFileName = target.getOutputFileNameInFileSystem( _telosysToolsCfg.getProjectAbsolutePath() ); // v 3.0.0
+		String outputFileName = target.getOutputFileNameInFileSystem( _telosysToolsCfg.getDestinationFolderAbsolutePath() ); // v 3.0.0
 		_logger.info("Saving target file : " + outputFileName );
 		saveStreamInFile(is, outputFileName, true );
 		_logger.info("Target file saved." );
