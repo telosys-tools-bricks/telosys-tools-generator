@@ -21,7 +21,6 @@ import java.util.List;
 import org.telosys.tools.commons.TelosysToolsException;
 import org.telosys.tools.commons.TelosysToolsLogger;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
-import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generator.target.TargetDefinition;
 import org.telosys.tools.generic.model.Model;
 
@@ -70,6 +69,7 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 		//MsgBox.error( message, exception );
 		System.out.println("ERROR");
 		System.out.println(" msg : " + message);
+		System.out.println(" exc : " + exception.getClass().getSimpleName() );
 		System.out.println(" exc : " + exception.getMessage() );
 	}
 
@@ -77,8 +77,8 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 	protected void showErrorMessage(String message1, String message2) {
 		//MsgBox.error( message1, message2 );
 		System.out.println("ERROR");
-		System.out.println(" msg1 : " + message1);
-		System.out.println(" msg2 : " + message2 );
+		System.out.println(" title   : " + message1);
+		System.out.println(" message : " + message2 );
 	}
 	
 	@Override  // Implementation for AbstractGenerationTask
@@ -108,6 +108,7 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 			//progressMonitorDialog.run(false, false, this);  
 			
 			run(); // 
+			
 			log("End of generation task."  );
 			
 			GenerationTaskResult generationTaskResult = super.getResult() ;
@@ -146,20 +147,23 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 		// by calling the super class standard methods
 		//---------------------------------------------------------------------------
 		
-		Variable[] projectVariables = super.getAllProjectVariables(); // call SUPER CLASS
-		
-		//--- 1) Copy the given resources (or do nothing if null)
-//		OverwriteChooser overwriteChooser = new OverwriteChooserDialogBox() ; 
-//		CopyHandler copyHandler = new CopyHandlerForRefresh() ;
+//		Variable[] projectVariables = super.getAllProjectVariables(); // call SUPER CLASS
+//		
+//		//--- 1) Copy the given resources (or do nothing if null)
+////		OverwriteChooser overwriteChooser = new OverwriteChooserDialogBox() ; 
+////		CopyHandler copyHandler = new CopyHandlerForRefresh() ;
+////
+////		int numberOfResourcesCopied = super.copyResourcesIfAny(overwriteChooser, copyHandler); // call SUPER CLASS
+//		int numberOfResourcesCopied = super.copyResourcesIfAny(null, null); // call SUPER CLASS
 //
-//		int numberOfResourcesCopied = super.copyResourcesIfAny(overwriteChooser, copyHandler); // call SUPER CLASS
-		int numberOfResourcesCopied = super.copyResourcesIfAny(null, null); // call SUPER CLASS
+//		//--- 2) Launch the generation
+//		ITaskMonitor defaultTaskMonitor = new DefaultTaskMonitor();
+//		int numberOfFilesGenerated = super.generateSelectedTargets(defaultTaskMonitor, projectVariables); // call SUPER CLASS
+//		
+//		//--- Task result
+//		super.setResult(numberOfResourcesCopied, numberOfFilesGenerated); // call SUPER CLASS
 
-		//--- 2) Launch the generation
 		ITaskMonitor defaultTaskMonitor = new DefaultTaskMonitor();
-		int numberOfFilesGenerated = super.generateSelectedTargets(defaultTaskMonitor, projectVariables); // call SUPER CLASS
-		
-		//--- Task result
-		super.setResult(numberOfResourcesCopied, numberOfFilesGenerated); // call SUPER CLASS
+		super.runTask(defaultTaskMonitor, null, null);
 	}
 }

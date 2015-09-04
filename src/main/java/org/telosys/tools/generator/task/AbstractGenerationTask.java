@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
+import org.apache.velocity.exception.VelocityException;
 import org.telosys.tools.commons.TelosysToolsException;
 import org.telosys.tools.commons.TelosysToolsLogger;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
@@ -137,10 +138,10 @@ public abstract class AbstractGenerationTask
 
 	/**
 	 * Method used to show an error message
-	 * @param message1
-	 * @param message2
+	 * @param title
+	 * @param message
 	 */
-	protected abstract void showErrorMessage(String message1, String message2) ;
+	protected abstract void showErrorMessage(String title, String message) ;
 
 	//--------------------------------------------------------------------------------------------------
 	protected void log(String msg) {
@@ -149,9 +150,39 @@ public abstract class AbstractGenerationTask
 		}
 	}
 	
-	protected Variable[] getAllProjectVariables() {
+	private Variable[] getAllProjectVariables() {
 //		return _generatorConfig.getTelosysToolsCfg().getAllVariables() ;
 		return _telosysToolsCfg.getAllVariables() ;
+	}
+	
+	protected void runTask(ITaskMonitor taskMonitor, OverwriteChooser overwriteChooser, CopyHandler copyHandler) 
+			throws InvocationTargetException {
+
+		Variable[] projectVariables = getAllProjectVariables(); 
+		
+		//--- 1) Copy the given resources (or do nothing if null)
+		int numberOfResourcesCopied;
+		try {
+			numberOfResourcesCopied = copyResourcesIfAny(overwriteChooser, copyHandler);
+			
+		} catch (Exception e) {
+			// if the "run" method must propagate a checked exception, 
+			// it should wrap it inside an InvocationTargetException; 
+			throw new InvocationTargetException(e);
+		}
+		
+		//--- 2) Launch the generation
+		int numberOfFilesGenerated;
+		try {
+			numberOfFilesGenerated = generateSelectedTargets(taskMonitor, projectVariables);
+		} catch (Exception e) {
+			// if the "run" method must propagate a checked exception, 
+			// it should wrap it inside an InvocationTargetException; 
+			throw new InvocationTargetException(e);
+		}
+
+		//--- Task result
+		setResult(numberOfResourcesCopied, numberOfFilesGenerated); // call SUPER CLASS
 	}
 	
 	//--------------------------------------------------------------------------------------------------
@@ -162,20 +193,23 @@ public abstract class AbstractGenerationTask
 	 * @return
 	 * @throws InvocationTargetException
 	 */
-	protected int copyResourcesIfAny(OverwriteChooser overwriteChooser, CopyHandler copyHandler) throws InvocationTargetException {
+	private int copyResourcesIfAny(OverwriteChooser overwriteChooser, CopyHandler copyHandler) 
+		throws Exception { 
+		//throws InvocationTargetException {
 
 		List<TargetDefinition> resourcesTargetsDefinitions = this._resourcesTargets ;
 		int count = 0 ;
 		if ( resourcesTargetsDefinitions != null ) {
 			_logger.log(this, "run : copy resources " );
 			
-//			BundleResourcesManager resourcesManager = new BundleResourcesManager( _generatorConfig.getTelosysToolsCfg(), _bundleName, _logger);
+////			BundleResourcesManager resourcesManager = new BundleResourcesManager( _generatorConfig.getTelosysToolsCfg(), _bundleName, _logger);
 			BundleResourcesManager resourcesManager = new BundleResourcesManager( _telosysToolsCfg, _bundleName, _logger);
-			try {
-				count = resourcesManager.copyTargetsResourcesInProject(resourcesTargetsDefinitions, overwriteChooser, copyHandler);
-			} catch (Exception e) {
-				throw new InvocationTargetException(e);
-			}
+//			try {
+//				count = resourcesManager.copyTargetsResourcesInProject(resourcesTargetsDefinitions, overwriteChooser, copyHandler);
+//			} catch (Exception e) {
+//				throw new InvocationTargetException(e);
+//			}
+			count = resourcesManager.copyTargetsResourcesInProject(resourcesTargetsDefinitions, overwriteChooser, copyHandler);
 		}
 		else {
 			_logger.log(this, "run : no resources to be copied" );
@@ -192,8 +226,10 @@ public abstract class AbstractGenerationTask
 	 * @throws InvocationTargetException
 	 * @throws InterruptedException
 	 */
-	protected int generateSelectedTargets( ITaskMonitor progressMonitor, Variable[] variables ) 
-				throws InvocationTargetException, InterruptedException 
+	private int generateSelectedTargets( ITaskMonitor progressMonitor, Variable[] variables ) 
+				throws //InvocationTargetException, 
+				InterruptedException ,
+				GeneratorException
 	{
 		//--- Separate targets in 2 list : "ONCE" and "ENTITY"
 		List<TargetDefinition> onceTargets   = new LinkedList<TargetDefinition>() ; 
@@ -271,7 +307,8 @@ public abstract class AbstractGenerationTask
 	 */
 	private int generateTarget(ITaskMonitor progressMonitor, // IProgressMonitor progressMonitor, 
 			Target target, List<String> selectedEntitiesNames) 
-					throws InvocationTargetException, InterruptedException 
+					throws //InvocationTargetException, InterruptedException 
+					GeneratorException
 	{
 
 		int count = 0 ;
@@ -283,17 +320,19 @@ public abstract class AbstractGenerationTask
 		
 		//--- Possible multiple generated targets for one main target (with embedded generator)
 		LinkedList<Target> generatedTargets = new LinkedList<Target>();
-		try {
-			//Generator generator = new Generator(target, _generatorConfig, _repositoryModel, _logger); // v 2.0.7
-//			Generator generator = new Generator( _generatorConfig, _logger); // v 3.0.0
-			Generator generator = new Generator( _telosysToolsCfg, _bundleName, _logger); // v 3.0.0
-			generator.generateTarget(target, _model, selectedEntitiesNames, generatedTargets);						
-			
-		} catch (GeneratorException e) {
-			// if the "run" method must propagate a checked exception, 
-			// it should wrap it inside an InvocationTargetException; 
-			throw new InvocationTargetException(e);
-		}
+//		try {
+//			//Generator generator = new Generator(target, _generatorConfig, _repositoryModel, _logger); // v 2.0.7
+////			Generator generator = new Generator( _generatorConfig, _logger); // v 3.0.0
+//			Generator generator = new Generator( _telosysToolsCfg, _bundleName, _logger); // v 3.0.0
+//			generator.generateTarget(target, _model, selectedEntitiesNames, generatedTargets);						
+//			
+//		} catch (GeneratorException e) {
+//			// if the "run" method must propagate a checked exception, 
+//			// it should wrap it inside an InvocationTargetException; 
+//			throw new InvocationTargetException(e);
+//		}
+		Generator generator = new Generator( _telosysToolsCfg, _bundleName, _logger); // v 3.0.0
+		generator.generateTarget(target, _model, selectedEntitiesNames, generatedTargets);						
 
 		//--- Refresh the generated files
 		for ( Target generatedTarget : generatedTargets ) {
@@ -364,7 +403,7 @@ public abstract class AbstractGenerationTask
 	 * @param numberOfResourcesCopied
 	 * @param numberOfFilesGenerated
 	 */
-	protected void setResult(int numberOfResourcesCopied, int numberOfFilesGenerated) {
+	private void setResult(int numberOfResourcesCopied, int numberOfFilesGenerated) {
 		this._result = new GenerationTaskResult(numberOfResourcesCopied, numberOfFilesGenerated);
 	}
 	
@@ -379,84 +418,102 @@ public abstract class AbstractGenerationTask
 		String templateName = this.getCurrentTemplateName() ;
 		String entityName = this.getCurrentEntityName() ;
 		
-		Throwable cause = invocationTargetException.getCause();
-		if ( cause instanceof GeneratorException ) {
-			GeneratorException generatorException = (GeneratorException) cause ;
+		Throwable originalException = invocationTargetException.getCause();
+		if ( originalException instanceof GeneratorException ) {
+			GeneratorException generatorException = (GeneratorException) originalException ;
 			Throwable generatorExceptionCause = generatorException.getCause() ;
-			
-			if ( generatorExceptionCause instanceof DirectiveException ) {
-				//--- DIRECTIVE ERROR ( Telosys Tools exception )
-				// eg : #using ( "varNotDefined" )
-				DirectiveException directiveException = (DirectiveException) generatorExceptionCause ;
-				String msg1 = buildErrorMessageHeader( directiveException.getTemplateName(), 
-						directiveException.getLineNumber(), entityName);
-				
-				String msg2 = "Directive  #" + directiveException.getDirectiveName() + " \n\n" 
-					+ directiveException.getMessage() ;
-
-				//MsgBox.error( "Directive error", msg1 + msg2 );
-				showErrorMessage( "Directive error", msg1 + msg2 );
-			}
-			else if ( generatorExceptionCause instanceof ParseErrorException ) {
-				//--- TEMPLATE PARSING ERROR ( Velocity exception )
-				// eg : #set(zzz)
-				ParseErrorException parseErrorException = (ParseErrorException) generatorExceptionCause ;
-				String msg1 = buildErrorMessageHeader( parseErrorException.getTemplateName(), 
-						parseErrorException.getLineNumber(), entityName);
-				String msg2 = parseErrorException.getMessage() ;
-				//MsgBox.error( "Template parsing error", msg1 + msg2 );
-				showErrorMessage( "Template parsing error", msg1 + msg2 );
-			}
-			else if ( generatorExceptionCause instanceof MethodInvocationException ) {
-				//--- METHOD INVOCATION ( Velocity exception )
-				// eg : $fn.isNotVoid("") : collection argument expected 
-				MethodInvocationException methodInvocationException = (MethodInvocationException) generatorExceptionCause ;
-				String msg1 = buildErrorMessageHeader( methodInvocationException.getTemplateName(), 
-						methodInvocationException.getLineNumber(), entityName);
-				String msg2 =  methodInvocationException.getMessage() 
-					+ "\n\n" 
-					+ "Reference name : '" + methodInvocationException.getReferenceName() + "'"
-					+ "\n" 
-					+ "Method name : '" + methodInvocationException.getMethodName() + "'"
-					+ "\n\n" 
-					+ getCauseMessage(generatorExceptionCause) 
-					;
-				//MsgBox.error( "Method invocation error", msg1 + msg2 );
-				showErrorMessage( "Method invocation error", msg1 + msg2 );
-			}			
-			else if ( generatorExceptionCause instanceof ResourceNotFoundException ) {
-				//--- RESOURCE NOT FOUND ( Velocity exception )
-				ResourceNotFoundException resourceNotFoundException = (ResourceNotFoundException) generatorExceptionCause ;
-				String msg1 = buildErrorMessageHeader( templateName, 0, entityName);
-				String msg2 = resourceNotFoundException.getMessage(); 
-				//MsgBox.error( "Resource not found", msg1 + msg2 );
-				showErrorMessage( "Resource not found", msg1 + msg2 );
-			}			
-			else if ( generatorExceptionCause instanceof GeneratorContextException ) {
-				//--- CONTEXT ERROR ( Telosys Tools exception )
-				// Reflection error encapsulation
-				// eg : $entity.tototo / $entity.getTTTTTTTTT() / $entity.name.toAAAAA()
-				// or errors due to invalid model 
-				GeneratorContextException generatorContextException = (GeneratorContextException) generatorExceptionCause ;
-				// generatorContextException.getTemplateName() not always know the template => use templateName arg
-				String msg1 = buildErrorMessageHeader( templateName,  // keep templateName here
-						generatorContextException.getLineNumber(), entityName); 
-				String msg2 = generatorContextException.getMessage() ;
-				//MsgBox.error( "Context error", msg1 + msg2 );
-				showErrorMessage( "Context error", msg1 + msg2 );
-				
+			if ( generatorExceptionCause != null ) {
+				showGenerationExceptionCause(generatorExceptionCause, entityName, templateName);
 			}
 			else {
-				//MsgBox.error("Error during generation", cause );
-				showErrorMessage("Error during generation", cause );
+				showErrorMessage("Error during generation (GeneratorException without cause)", generatorException );
 			}
+		}
+		else if ( originalException instanceof TelosysToolsException ) {
+			showErrorMessage("Error during generation (TelosysToolsException)", originalException );
 		}
 		else {
 			
 			//MsgBox.error("Error during generation", cause );
-			showErrorMessage("Error during generation", cause );
+			showErrorMessage("Error during generation (" + originalException.getClass().getSimpleName() + ")", 
+					getCauseMessage(originalException) );
 		}
 		
+	}
+	
+	private void showGenerationExceptionCause(Throwable generatorExceptionCause, String entityName, String templateName ) {
+		
+		if ( generatorExceptionCause instanceof DirectiveException ) {
+			//--- DIRECTIVE ERROR ( Telosys Tools exception )
+			// eg : #using ( "varNotDefined" )
+			DirectiveException directiveException = (DirectiveException) generatorExceptionCause ;
+			String msg = 
+				  buildErrorMessageHeader( directiveException.getTemplateName(), directiveException.getLineNumber(), entityName)
+				+ buildExceptionMessage(directiveException)
+				+ "Directive  #" + directiveException.getDirectiveName() + " \n\n" 
+				+ directiveException.getMessage() ;
+
+			showErrorMessage( "Directive error", msg);
+		}
+		else if ( generatorExceptionCause instanceof ParseErrorException ) {
+			//--- TEMPLATE PARSING ERROR ( Velocity exception )
+			// eg : #set(zzz)
+			ParseErrorException parseErrorException = (ParseErrorException) generatorExceptionCause ;
+			String msg = 
+				  buildErrorMessageHeader( parseErrorException.getTemplateName(), parseErrorException.getLineNumber(), entityName)
+				+ buildExceptionMessage(parseErrorException);
+			showErrorMessage( "Template parsing error", msg );
+		}
+		else if ( generatorExceptionCause instanceof MethodInvocationException ) {
+			//--- METHOD INVOCATION ( Velocity exception )
+			// eg : $fn.isNotVoid("") : collection argument expected 
+			MethodInvocationException methodInvocationException = (MethodInvocationException) generatorExceptionCause ;
+			String msg = 
+				  buildErrorMessageHeader( methodInvocationException.getTemplateName(), methodInvocationException.getLineNumber(), entityName)
+				+ buildExceptionMessage(methodInvocationException)
+				+ "Reference name : '" + methodInvocationException.getReferenceName() + "'"
+				+ "\n" 
+				+ "Method name : '" + methodInvocationException.getMethodName() + "'"
+				+ "\n\n" 
+				+ getCauseMessage(generatorExceptionCause) 
+				;
+			showErrorMessage( "Method invocation error", msg );
+		}			
+		else if ( generatorExceptionCause instanceof ResourceNotFoundException ) {
+			//--- RESOURCE NOT FOUND ( Velocity exception )
+			ResourceNotFoundException resourceNotFoundException = (ResourceNotFoundException) generatorExceptionCause ;
+			String msg = 
+				  buildErrorMessageHeader( templateName, 0, entityName )
+				+ buildExceptionMessage(resourceNotFoundException); 
+			showErrorMessage( "Resource not found", msg );
+		}			
+		else if ( generatorExceptionCause instanceof GeneratorContextException ) {
+			//--- CONTEXT ERROR ( Telosys Tools exception )
+			// Reflection error encapsulation
+			// eg : $entity.tototo / $entity.getTTTTTTTTT() / $entity.name.toAAAAA()
+			// or errors due to invalid model 
+			GeneratorContextException generatorContextException = (GeneratorContextException) generatorExceptionCause ;
+			// generatorContextException.getTemplateName() not always know the template => use templateName arg
+			String msg = 
+				  buildErrorMessageHeader( templateName, generatorContextException.getLineNumber(), entityName)
+				+ buildExceptionMessage(generatorContextException) ;
+			showErrorMessage( "Context error", msg );
+		}
+		else if ( generatorExceptionCause instanceof VelocityException ) {
+			//--- Generic Velocity exception (eg "OutOfBoud" )
+			VelocityException velocityException = (VelocityException) generatorExceptionCause ;
+			String msg = 
+				  buildErrorMessageHeader( templateName, 0, entityName)
+				+ buildExceptionMessage(velocityException) 
+				+ getCauseMessage(velocityException);
+			showErrorMessage( "Velocity error (VelocityException)", msg);
+		}
+		else {
+			String msg = 
+				  buildErrorMessageHeader( templateName, 0, entityName)
+				+ buildExceptionMessage(generatorExceptionCause) ;
+			showErrorMessage("GeneratorException : unknown cause)", msg );
+		}
 	}
 	
 	//-------------------------------------------------------------------------------------------------------------
@@ -467,6 +524,13 @@ public abstract class AbstractGenerationTask
 		}
 		return "Template \"" + template + "\"" + lineMsg + "  -  Entity : \"" 
 				+ entity + "\" \n\n" ;
+	}
+	//-------------------------------------------------------------------------------------------------------------
+	private String buildExceptionMessage( Throwable exception ) {
+		String s = exception.getClass().getSimpleName() + " : \n" 
+					+ exception.getMessage() + "\n"
+					+ "\n" ;
+		return s ;
 	}
 	//-------------------------------------------------------------------------------------------------------------
 	private String getCauseMessage(Throwable exception) {
