@@ -16,14 +16,15 @@
 package org.telosys.tools.generator.context;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.telosys.tools.generator.EntitiesManager;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.Model;
 
 /**
@@ -54,13 +55,18 @@ public class ModelInContext
 	 * @param entitiesManager
 	 * @throws GeneratorException
 	 */
-	public ModelInContext( Model model, EntitiesManager entitiesManager ) throws GeneratorException  {
+//	public ModelInContext( Model model, EntitiesManager entitiesManager ) throws GeneratorException  {
+	public ModelInContext( Model model, String entitiesPackage, EnvInContext env ) throws GeneratorException  {
 		super();
 		if ( model == null ) throw new GeneratorException("Model is null");
-		if ( entitiesManager == null ) throw new GeneratorException("EntitiesBuilder is null");
+//		if ( entitiesManager == null ) throw new GeneratorException("EntitiesBuilder is null");
 		
-		//--- All the entities
-		_allEntities = entitiesManager.getAllEntities();
+		//--- All the entities (the original model order is kept)
+//		_allEntities = entitiesManager.getAllEntities();
+		_allEntities = new LinkedList<EntityInContext>(); // v 3.0.0
+		for ( Entity entity : model.getEntities() ) { // v 3.0.0
+			_allEntities.add( new EntityInContext(entity, entitiesPackage, this, env) );// v 3.0.0
+		}
 		
 		//--- Entities by TABLE NAME
 		_entitiesByTableName = new HashMap<String,EntityInContext>();
@@ -89,7 +95,7 @@ public class ModelInContext
 			_databaseProductName = "";
 		}
 	}
-
+	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -112,6 +118,30 @@ public class ModelInContext
     {
 		return _allEntities ;
     }
+	
+	//---------------------------------------------------------------------------------------------------
+	/**
+	 * Returns a list of entities for the given entities names
+	 * @param entitiesNames list entities names (can be null)
+	 * @return
+	 * @throws GeneratorException
+	 */
+	public List<EntityInContext> getEntities( List<String> entitiesNames ) throws GeneratorException
+	{
+		List<EntityInContext> selectedEntities = new LinkedList<EntityInContext>();
+		if ( entitiesNames != null ) {
+			for ( String entityName : entitiesNames ) {
+				EntityInContext entity = _entitiesByClassName.get(entityName);
+				if ( entity != null ) {
+					selectedEntities.add(entity);
+				}
+				else {
+					throw new GeneratorException("Unknown entity '" + entityName + "'");
+				}
+			}
+		}
+		return selectedEntities ;
+	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -140,9 +170,9 @@ public class ModelInContext
 		}
 	)
     //public JavaBeanClass getEntityByClassName( String name )
-    public EntityInContext getEntityByClassName( String name )
+    public EntityInContext getEntityByClassName( String entityClassName )
     {
-		return _entitiesByClassName.get(name);
+		return _entitiesByClassName.get(entityClassName);
     }
 
 	//-------------------------------------------------------------------------------------

@@ -570,17 +570,19 @@ public class Generator {
 		generatorContext.put(ContextName.ENV, env);  
 		
 //		EntitiesManager entitiesManager = new EntitiesManager(model, _generatorConfig, env); 
-		EntitiesManager entitiesManager = new EntitiesManager(model, _telosysToolsCfg.getEntityPackage(), env); // v 3.0.0
+//		EntitiesManager entitiesManager = new EntitiesManager(model, _telosysToolsCfg.getEntityPackage(), env); // v 3.0.0
 		
 		//--- Set "$model" object : full model with  all the entities (v 2.0.7)
-		ModelInContext modelInContext = new ModelInContext(model, entitiesManager );
+//		ModelInContext modelInContext = new ModelInContext(model, entitiesManager );
+		ModelInContext modelInContext = new ModelInContext(model, _telosysToolsCfg.getEntityPackage(), env ); // v 3.0.0
 		generatorContext.put(ContextName.MODEL, modelInContext); 
 		
 		//--- Set "$target" object in the context 
 		generatorContext.put(ContextName.TARGET, target);
 
 		//--- List of selected entities ( $selectedEntities )
-		List<EntityInContext> selectedEntities = entitiesManager.getEntities( selectedEntitiesNames );
+//		List<EntityInContext> selectedEntities = entitiesManager.getEntities( selectedEntitiesNames );
+		List<EntityInContext> selectedEntities = modelInContext.getEntities(selectedEntitiesNames); // v 3.0.0
 		generatorContext.put(ContextName.SELECTED_ENTITIES, selectedEntities);
 		
 		//--- Set "$entity" object in the context ( the current entity for this target )
@@ -588,7 +590,8 @@ public class Generator {
 		//if ( target.getEntityName().trim().length() > 0 ) {
 		if ( ! StrUtil.nullOrVoid( target.getEntityName() ) ) { // v 3.0.0
 			//--- Target with entity ( classical target )
-			entity = entitiesManager.getEntity(target.getEntityName() );
+			//entity = entitiesManager.getEntity(target.getEntityName() );
+			entity = modelInContext.getEntityByClassName( target.getEntityName() ); // v 3.0.0
 		}
 		else {
 			//--- Target without entity ( e.g. "once" target )

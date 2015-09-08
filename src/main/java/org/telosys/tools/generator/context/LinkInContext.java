@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.telosys.tools.commons.JavaClassUtil;
-import org.telosys.tools.generator.EntitiesManager;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.GeneratorUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
@@ -61,7 +60,8 @@ public class LinkInContext {
     private final EntityInContext  _entity ; // The entity the link belongs to
 
 	//private final Link             _link; // removed in ver 3.0.0
-	private final EntitiesManager  _entitiesManager;
+	//private final EntitiesManager  _entitiesManager; // removed in ver 3.0.0
+	private final ModelInContext   _modelInContext ;  // v 3.0.0 (replaces EntitiesManager)
 
 	private final List<JoinColumnInContext> _joinColumns ; 
 	private final JoinTableInContext        _joinTable ; 
@@ -86,11 +86,13 @@ public class LinkInContext {
 	 * @param link link in the repository 
 	 * @param targetEntity targeted entity in the repository 
 	 */
-	public LinkInContext(final EntityInContext entity, final Link link, final EntitiesManager entitiesManager ) 
+//	public LinkInContext(final EntityInContext entity, final Link link, final EntitiesManager entitiesManager ) 
+	public LinkInContext(final EntityInContext entity, final Link link, final ModelInContext modelInContext ) 
 	{
 		this._entity = entity ;
 		//this._link = link; // removed in ver 3.0.0
-		this._entitiesManager  = entitiesManager;
+		//this._entitiesManager  = entitiesManager; // removed in ver 3.0.0
+		this._modelInContext = modelInContext ; // v 3.0.0
 		
 		//--- Build the list of "join columns"
 		_joinColumns = new LinkedList<JoinColumnInContext>();
@@ -511,7 +513,8 @@ public class LinkInContext {
 	)
 	public EntityInContext getTargetEntity() throws GeneratorException {
 		// return _entitiesManager.getEntity( getTargetTableName() );
-		return _entitiesManager.getEntityByTableName( getTargetTableName() ); // v 3.0.0
+		// return _entitiesManager.getEntityByTableName( getTargetTableName() ); // v 3.0.0
+		return _modelInContext.getEntityByTableName( getTargetTableName() ); // v 3.0.0
 	}
 	
 	//-------------------------------------------------------------------------------------

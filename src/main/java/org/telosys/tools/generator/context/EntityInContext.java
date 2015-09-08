@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.telosys.tools.commons.StrUtil;
-import org.telosys.tools.generator.EntitiesManager;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityNoDoc;
@@ -83,7 +82,9 @@ public class EntityInContext
 	//--- JPA specific
 	private final LinkedList<LinkInContext> _links ; // The links for this class ( ALL ATTRIBUTES )
 	
-	private final EntitiesManager _entitiesManager ; // ver 2.1.0
+	// private final EntitiesManager _entitiesManager ; // removed in v 3.0.0
+	private final ModelInContext _modelInContext ;  // v 3.0.0
+	
 	private final EnvInContext    _env ; // ver 2.1.0
 	
 	//-----------------------------------------------------------------------------------------------
@@ -96,14 +97,17 @@ public class EntityInContext
 	 * @throws GeneratorException
 	 */
 	public EntityInContext( final Entity entity, final String entityPackage, 
-							final EntitiesManager entitiesManager, final EnvInContext env ) throws GeneratorException
+//							final EntitiesManager entitiesManager,  // removed in v 3.0.0
+							final ModelInContext modelInContext, // v 3.0.0
+							final EnvInContext env ) throws GeneratorException
 	{
 		//_sName = entity.getBeanJavaClass() ;
 		_sClassName = entity.getClassName();  // v 3.0.0
 		
 		_sPackage = StrUtil.notNull(entityPackage);
 		
-		_entitiesManager = entitiesManager ;
+		// _entitiesManager = entitiesManager ; // removed in v 3.0.0
+		_modelInContext = modelInContext ; // v 3.0.0
 		_env = env ;
 		
 		_sDatabaseTable   = StrUtil.notNull(entity.getDatabaseTable());
@@ -135,7 +139,8 @@ public class EntityInContext
 //			_links.add(linkInCtx);
 //		}
 		for ( Link link : entity.getLinks() ) { // v 3.0.0
-			LinkInContext linkInContext = new LinkInContext(this, link, _entitiesManager );
+//			LinkInContext linkInContext = new LinkInContext(this, link, _entitiesManager );
+			LinkInContext linkInContext = new LinkInContext(this, link, _modelInContext ); // v 3.0.0
 			_links.add(linkInContext);
 		}
 		
