@@ -21,6 +21,7 @@ import java.util.List;
 import org.telosys.tools.commons.TelosysToolsException;
 import org.telosys.tools.commons.TelosysToolsLogger;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
+import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generator.target.TargetDefinition;
 import org.telosys.tools.generic.model.Model;
 
@@ -64,31 +65,45 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 	//--------------------------------------------------------------------------------------
 	// Methods implementation for super class 'AbstractGenerationTask'
 	//--------------------------------------------------------------------------------------
-	@Override  // Implementation for AbstractGenerationTask
-	protected void showErrorMessage(String message, Throwable exception) {
-		//MsgBox.error( message, exception );
+	/**
+	 * Eclipse like 'MsgBox.error' 
+	 * @param messageTitle
+	 * @param messageBody
+	 * @param exception
+	 */
+	private void msgBoxError(String messageTitle, String messageBody, Throwable exception) {
 		System.out.println("ERROR");
-		System.out.println(" msg : " + message);
-		System.out.println(" exc : " + exception.getClass().getSimpleName() );
-		System.out.println(" exc : " + exception.getMessage() );
+		System.out.println(" title   : " + messageTitle );
+		System.out.println(" message : " + messageBody );
+		if ( exception != null ) {
+			System.out.println(" exception : " + exception.getMessage() );
+		}
 	}
 
+	/**
+	 * Eclipse like 'MsgBox.info' 
+	 * @param message
+	 */
+	private void msgBoxInfo(String message) {
+		System.out.println("INFORMATION");
+		System.out.println(" message : " + message );
+	}
+	
+
 	@Override  // Implementation for AbstractGenerationTask
-	protected void showErrorMessage(String message1, String message2) {
-		//MsgBox.error( message1, message2 );
-		System.out.println("ERROR");
-		System.out.println(" title   : " + message1);
-		System.out.println(" message : " + message2 );
+	protected boolean onError(ErrorReport errorReport) {
+		msgBoxError(errorReport.getMessageTitle(), errorReport.getMessageBody(), errorReport.getException() );
+		return true ; // continue the task
 	}
 	
 	@Override  // Implementation for AbstractGenerationTask
-	protected void afterFileGeneration(String fullFileName) {
-		log("afterFileGeneration(" + fullFileName + ")");
+	protected void afterFileGeneration(Target target, String fullFileName) {
+		log("afterFileGeneration : " + target.getTemplate() + " --> " + fullFileName + "");
 		// Refresh the Eclipse Workspace 
 		//EclipseWksUtil.refresh( new File(fullFileName) );	
 	}
-
-	@Override  // Implementation for AbstractGenerationTask
+	
+	@Override  // Implementation for GenerationTask
 	public GenerationTaskResult launch() { 
 		log("launch");
 		
@@ -96,39 +111,33 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 		// BULK GENERATION ENTRY POINT 
 		// Creates a 'ProgressMonitor (Eclipse object)' and use it to run this task instance
 		//-----------------------------------------------------------------------------------
-
-//		GenerationTaskResult generationTaskResult = null ;
-		//GenerationTaskWithProgress generationTaskWithProgress = this ;
 		
 		//--- Run the generation task via the progress monitor 
 		//ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog( Util.getActiveWindowShell() ) ;
 		try {
 			log("Run generation task ..."  );
-			//--- RUN THE ECLIPSE TASK ( 'this' task ) ....
-			//progressMonitorDialog.run(false, false, this);  
 			
+			//--- RUN THE TASK ( 'this' task ) 
+			// the 'run' method must be conformed to Eclipse 'IRunnableWithProgress' implementation			
 			run(); // 
+			// NB :
+			// All the exceptions are wrapped in a 'InvocationTargetException'
 			
 			log("End of generation task."  );
 			
 			GenerationTaskResult generationTaskResult = super.getResult() ;
-//			MsgBox.info("Normal end of generation." 
-//					+ "\n\n" + generationTaskResult.getNumberOfResourcesCopied() + " resources(s) copied."
-//					+ "\n\n" + generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated.");
-			System.out.println(
-					"Normal end of generation." 
+			
+			msgBoxInfo("END OF GENERATION" 
 					+ "\n\n" + generationTaskResult.getNumberOfResourcesCopied() + " resources(s) copied."
-					+ "\n\n" + generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated.");
+					+ "\n\n" + generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated."
+					+ "\n\n" + generationTaskResult.getNumberOfGenerationErrors() + " generation error(s).");
 			
 		} catch (InvocationTargetException invocationTargetException) {
-//			showGenerationError(invocationTargetException, 
-//					generationTaskWithProgress.getCurrentTemplateName(), generationTaskWithProgress.getCurrentEntityName() ); // v 2.0.7
-			super.showGenerationError(invocationTargetException);
-		} catch (InterruptedException e) {
-//			MsgBox.info("Generation interrupted");
+			onError( buildErrorReport(invocationTargetException) ) ;
+		} catch (InterruptedException interruptedException) {
+			msgBoxInfo("Generation interrupted");
 		}
 		
-//    	return generationTaskResult;		
     	return super.getResult();		
 	}
 	
@@ -136,9 +145,8 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 	// Methods implementation for Eclipse interface 'IRunnableWithProgress'
 	//--------------------------------------------------------------------------------------
 //	@Override
-//	public void run(IProgressMonitor progressMonitor) throws InvocationTargetException,
-//			InterruptedException {
-	private void run() throws InvocationTargetException, InterruptedException {
+	private void run() throws InvocationTargetException, // just for Eclipse like behavior
+							InterruptedException {
 		log("run");
 
 		//---------------------------------------------------------------------------
@@ -146,22 +154,6 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 		// It copies the required resources and generates the selected targets 
 		// by calling the super class standard methods
 		//---------------------------------------------------------------------------
-		
-//		Variable[] projectVariables = super.getAllProjectVariables(); // call SUPER CLASS
-//		
-//		//--- 1) Copy the given resources (or do nothing if null)
-////		OverwriteChooser overwriteChooser = new OverwriteChooserDialogBox() ; 
-////		CopyHandler copyHandler = new CopyHandlerForRefresh() ;
-////
-////		int numberOfResourcesCopied = super.copyResourcesIfAny(overwriteChooser, copyHandler); // call SUPER CLASS
-//		int numberOfResourcesCopied = super.copyResourcesIfAny(null, null); // call SUPER CLASS
-//
-//		//--- 2) Launch the generation
-//		ITaskMonitor defaultTaskMonitor = new DefaultTaskMonitor();
-//		int numberOfFilesGenerated = super.generateSelectedTargets(defaultTaskMonitor, projectVariables); // call SUPER CLASS
-//		
-//		//--- Task result
-//		super.setResult(numberOfResourcesCopied, numberOfFilesGenerated); // call SUPER CLASS
 
 		ITaskMonitor defaultTaskMonitor = new DefaultTaskMonitor();
 		super.runTask(defaultTaskMonitor, null, null);

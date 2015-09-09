@@ -15,44 +15,53 @@
  */
 package org.telosys.tools.generator.task;
 
+import org.telosys.tools.generator.context.Target;
+
 /**
- * Generator task result 
+ * Generation task result 
  * 
  * @author L. Guerin
  *
  */
 public class GenerationTaskResult {
 
-	private final int numberOfResourcesCopied ;
-	private final int numberOfFilesGenerated ;
+	private int numberOfResourcesCopied ;
+	private int numberOfFilesGenerated ;
+	private int numberOfGenerationErrors ;
 		
-	/**
-	 * Constructor
-	 * @param numberOfResourcesCopied
-	 * @param numberOfFilesGenerated
-	 */
-	public GenerationTaskResult(int numberOfResourcesCopied,
-			int numberOfFilesGenerated) {
-		super();
-		this.numberOfResourcesCopied = numberOfResourcesCopied;
-		this.numberOfFilesGenerated = numberOfFilesGenerated;
-	}
-
+	//--------------------------------------------------------------------------------------
 	/**
 	 * Default constructor with 0 for all values
 	 */
-	public GenerationTaskResult() {
+	protected GenerationTaskResult() {
 		super();
 		this.numberOfResourcesCopied = 0;
 		this.numberOfFilesGenerated  = 0;
 	}
 
+	//--------------------------------------------------------------------------------------
+	protected void setNumberOfResourcesCopied(int n) {
+		numberOfResourcesCopied = n;
+	}
 	public int getNumberOfResourcesCopied() {
 		return numberOfResourcesCopied;
 	}
 
+	//--------------------------------------------------------------------------------------
+	protected void incrementNumberOfFilesGenerated() {
+		numberOfFilesGenerated++;
+	}
 	public int getNumberOfFilesGenerated() {
 		return numberOfFilesGenerated;
+	}
+	
+	//--------------------------------------------------------------------------------------
+	protected void addGenerationError(Target target) {
+		numberOfGenerationErrors++;
+		//target.
+	}
+	public int getNumberOfGenerationErrors() {
+		return numberOfGenerationErrors;
 	}
 	
 }
