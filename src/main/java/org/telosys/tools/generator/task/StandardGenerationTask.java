@@ -93,7 +93,7 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 	@Override  // Implementation for AbstractGenerationTask
 	protected boolean onError(ErrorReport errorReport) {
 		msgBoxError(errorReport.getMessageTitle(), errorReport.getMessageBody(), errorReport.getException() );
-		return true ; // continue the task
+		return false ; // continue the task
 	}
 	
 	@Override  // Implementation for AbstractGenerationTask
@@ -134,8 +134,13 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 			
 		} catch (InvocationTargetException invocationTargetException) {
 			onError( buildErrorReport(invocationTargetException) ) ;
+			
 		} catch (InterruptedException interruptedException) {
-			msgBoxInfo("Generation interrupted");
+			GenerationTaskResult generationTaskResult = super.getResult() ;
+			msgBoxInfo("GENERATION CANCELED" 
+					+ "\n\n" + generationTaskResult.getNumberOfResourcesCopied() + " resources(s) copied."
+					+ "\n\n" + generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated."
+					+ "\n\n" + generationTaskResult.getNumberOfGenerationErrors() + " generation error(s).");
 		}
 		
     	return super.getResult();		

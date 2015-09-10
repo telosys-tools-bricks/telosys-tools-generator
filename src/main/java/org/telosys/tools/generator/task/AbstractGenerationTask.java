@@ -154,16 +154,11 @@ public abstract class AbstractGenerationTask
 	protected void runTask(ITaskMonitor taskMonitor, OverwriteChooser overwriteChooser, CopyHandler copyHandler) 
 			throws InterruptedException {
 		
-		boolean continueTask = true ; 
+		//--- 1) Copy the static resources of the bundle if any (if cancelled : 'InterruptedException' is thrown )
+		copyResourcesIfAny(overwriteChooser, copyHandler);
 		
-		//--- 1) Copy the given resources (or do nothing if null)
-		continueTask = copyResourcesIfAny(overwriteChooser, copyHandler);
-		
-		//--- 2) Launch the generation
-		if ( continueTask ) {
-			continueTask = generateSelectedTargets(taskMonitor, getAllProjectVariables());
-		}
-
+		//--- 2) Launch the generation (if cancelled : 'InterruptedException' is thrown )
+		generateSelectedTargets(taskMonitor, getAllProjectVariables());
 	}
 	
 	//--------------------------------------------------------------------------------------------------
@@ -171,11 +166,12 @@ public abstract class AbstractGenerationTask
 	 * Copy the static resources if any 
 	 * @param overwriteChooser
 	 * @param copyHandler
-	 * @return true to continue, false to interrupt the task
+	 * @throws InterruptedException
 	 */
-	private boolean copyResourcesIfAny(OverwriteChooser overwriteChooser, CopyHandler copyHandler) { 
+	private void copyResourcesIfAny(OverwriteChooser overwriteChooser, CopyHandler copyHandler) 
+			throws InterruptedException { 
 
-		boolean continueTask = true ; 
+//		boolean continueTask = true ; 
 
 		List<TargetDefinition> resourcesTargetsDefinitions = this._resourcesTargets ;
 		if ( resourcesTargetsDefinitions != null ) {
@@ -189,14 +185,19 @@ public abstract class AbstractGenerationTask
 			} catch (Exception e) {
 				ErrorReport errorReport = new ErrorReport("Resources copy error", 
 						buildMessageForException(e), e);
-				continueTask = onError(errorReport);
+				//continueTask = onError(errorReport);
+				manageError(errorReport); // throws InterruptedException if 'canceled'
 			}
 			_result.setNumberOfResourcesCopied(numberOfResourcesCopied);
 		}
 		else {
 			_logger.log(this, "run : no resources to be copied" );
 		}
-		return continueTask ;
+		
+//		if ( continueTask == false ) // An error has occurred and the user choose "Cancel"
+//		{
+//			throw new InterruptedException("The generation task was cancelled");
+//		}
 	}
 	
 	//--------------------------------------------------------------------------------------------------
@@ -207,7 +208,7 @@ public abstract class AbstractGenerationTask
 	 * @return true to continue, false to interrupt the task
 	 * @throws InterruptedException
 	 */
-	private boolean generateSelectedTargets( ITaskMonitor progressMonitor, Variable[] variables ) throws InterruptedException
+	private void generateSelectedTargets( ITaskMonitor progressMonitor, Variable[] variables ) throws InterruptedException
 	{
 		//--- Separate targets in 2 list : "ONCE" and "ENTITY"
 		List<TargetDefinition> onceTargets   = new LinkedList<TargetDefinition>() ; 
@@ -226,7 +227,7 @@ public abstract class AbstractGenerationTask
 
 		progressMonitor.beginTask("Generation in progress", totalWorkTasks ); 
 				
-		boolean continueTask = true ; 
+		//boolean continueTask = true ; 
 		//--- For each entity
 		for ( String entityName : _selectedEntities ) {
 			
@@ -239,15 +240,17 @@ public abstract class AbstractGenerationTask
 					//--- Get a specialized target for the current entity
 					Target target = new Target( targetDefinition, entity, variables ); // v 3.0.0
 					
-					continueTask = generateTarget(progressMonitor, target, _selectedEntities); 
+					//continueTask = generateTarget(progressMonitor, target, _selectedEntities); 
+					generateTarget(progressMonitor, target, _selectedEntities); // throws InterruptedException if error + 'cancel'
 				}
 				//--- One TARGET done 
 			}
 			else {
 				ErrorReport errorReport = new ErrorReport("Generation error", 
 						"Entity '" + entityName + "' not found in the repository", null);
-				onError(errorReport);
+				//continueTask = onError(errorReport);
 				_logger.error("Entity '" + entityName + "' not found in the repository") ;
+				manageError(errorReport); // throws InterruptedException if 'canceled'
 			}
 			//--- One ENTITY done
 		} // end of "For each entity"
@@ -256,18 +259,22 @@ public abstract class AbstractGenerationTask
 		for ( TargetDefinition targetDefinition : onceTargets ) {
 			//--- Target without current entity
 			Target target = new Target( targetDefinition, variables ); // v 3.0.0
-			continueTask = generateTarget(progressMonitor, target, _selectedEntities); 
+			//continueTask = generateTarget(progressMonitor, target, _selectedEntities); 
+			generateTarget(progressMonitor, target, _selectedEntities);  // throws InterruptedException if error + 'cancel'
 		}
 		
 		//--- Notifies that the work is done; that is, either the main task is completed or the user canceled it.
 		progressMonitor.done();
 		
-		if (progressMonitor.isCanceled()) // Returns whether cancellation of current operation has been requested
-		{
+//		if ( 	progressMonitor.isCanceled() // Cancellation of current operation has been requested
+//			|| 	continueTask == false ) // An error has occurred and the user choose "Cancel"
+//		{
+//			throw new InterruptedException("The generation task was cancelled");
+//		}
+		if ( progressMonitor.isCanceled() ) { // Cancellation of current operation has been requested
 			throw new InterruptedException("The generation task was cancelled");
 		}
 		
-		return continueTask ;
 	}
 	//--------------------------------------------------------------------------------------------------
 	/**
@@ -276,11 +283,12 @@ public abstract class AbstractGenerationTask
 	 * @param progressMonitor
 	 * @param target
 	 * @param selectedEntitiesNames
-	 * @return true to continue, false to interrupt the task
+	 * @throws InterruptedException
 	 */
-	private boolean generateTarget(ITaskMonitor progressMonitor, Target target, List<String> selectedEntitiesNames) 
+	private void generateTarget(ITaskMonitor progressMonitor, Target target, List<String> selectedEntitiesNames) 
+			throws InterruptedException
 	{
-		boolean continueTask = true ;
+		//boolean continueTask = true ;
 		
 		_logger.log(this, "Generate TARGET : entity name '" + target.getEntityName() + "' - target file '" + target.getFile() + "' ");
 		
@@ -291,13 +299,14 @@ public abstract class AbstractGenerationTask
 		//--- Possible multiple generated targets for one main target (with embedded generator)
 		LinkedList<Target> generatedTargets = new LinkedList<Target>();
 		
-		
 		Generator generator = new Generator( _telosysToolsCfg, _bundleName, _logger); // v 3.0.0
 		try {
 			generator.generateTarget(target, _model, selectedEntitiesNames, generatedTargets);
 		} catch (GeneratorException e) {
 			_result.addGenerationError(target);
-			continueTask = onError(buildErrorReportForGeneratorException(e));
+			//continueTask = onError(buildErrorReportForGeneratorException(e));
+			ErrorReport errorReport = buildErrorReportForGeneratorException(e);
+			manageError(errorReport); // throws InterruptedException if 'canceled'
 		}
 
 		//--- After normal end of generation : refresh the generated files and update count
@@ -318,7 +327,7 @@ public abstract class AbstractGenerationTask
 		// Note that this amount represents an installment, as opposed to a cumulative amount of work done to date.
 		progressMonitor.worked(1); // One unit done (not cumulative)
 		
-		return continueTask ;
+		//return continueTask ;
 	}
 	
 	//--------------------------------------------------------------------------------------------------
@@ -359,6 +368,22 @@ public abstract class AbstractGenerationTask
 		return _result != null ? _result : new GenerationTaskResult() ;
 	}
 	
+	//--------------------------------------------------------------------------------------------------
+	/**
+	 * Open a dialog box to show the error <br>
+	 * The user can choose to continue or to cancel <br>
+	 * If 'cancel' : throws InterruptedException
+	 * @param errorReport
+	 * @throws InterruptedException 
+	 */
+	private void manageError( ErrorReport errorReport ) throws InterruptedException {
+		//--- Open the dialog box (the user can choose to continue or to cancel)
+		boolean continueTask = onError(errorReport);
+		//--- If 'cancel' : throw InterruptedException
+		if ( continueTask == false ) {
+			throw new InterruptedException("Generation task cancelled");
+		}
+	}
 	//--------------------------------------------------------------------------------------------------
 	protected ErrorReport buildErrorReport(Throwable exception ) {
 			String msg = buildMessageForException(exception)
