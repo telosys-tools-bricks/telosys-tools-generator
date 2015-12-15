@@ -489,6 +489,12 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 	}
 
 	@Override
+	public List<String> getWarnings() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public String toString() {
 //		return  name 
 //				+ "|"  + catalog 
@@ -509,5 +515,6 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 				+ "|links=" + links.size() 
 				;
 	}
+
 
 }
