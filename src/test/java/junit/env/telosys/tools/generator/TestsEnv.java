@@ -3,8 +3,8 @@ package junit.env.telosys.tools.generator;
 import java.io.File;
 import java.util.Properties;
 
+import org.telosys.tools.commons.PropertiesManager;
 import org.telosys.tools.commons.TelosysToolsException;
-import org.telosys.tools.commons.cfg.PropertiesManager;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.cfg.TelosysToolsCfgManager;
 
@@ -206,7 +206,7 @@ public class TestsEnv {
 		Properties proxyProperties;
 		try {
 			proxyProperties = pm.load();
-		} catch (TelosysToolsException e) {
+		} catch (Exception e) {
 			throw new RuntimeException("ERROR : Cannot load proxy properties", e);
 		}
 		if ( proxyProperties == null ) {
@@ -249,7 +249,7 @@ public class TestsEnv {
 		Properties properties;
 		try {
 			properties = pm.load();
-		} catch (TelosysToolsException e) {
+		} catch (Exception e) {
 			throw new RuntimeException("ERROR : Cannot load 'telosys-tools.cfg' properties", e);
 		}
 		if ( properties == null ) {
