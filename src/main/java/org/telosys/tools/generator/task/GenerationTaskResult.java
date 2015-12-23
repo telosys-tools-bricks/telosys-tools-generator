@@ -15,6 +15,9 @@
  */
 package org.telosys.tools.generator.task;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.telosys.tools.generator.context.Target;
 
 /**
@@ -28,7 +31,9 @@ public class GenerationTaskResult {
 	private int numberOfResourcesCopied ;
 	private int numberOfFilesGenerated ;
 	private int numberOfGenerationErrors ;
-		
+
+	private List<ErrorReport> errors = new ArrayList<ErrorReport>();
+
 	//--------------------------------------------------------------------------------------
 	/**
 	 * Default constructor with 0 for all values
@@ -64,4 +69,14 @@ public class GenerationTaskResult {
 		return numberOfGenerationErrors;
 	}
 	
+	//--------------------------------------------------------------------------------------
+	protected void addError(ErrorReport errorReport) {
+		errors.add(errorReport);
+	}
+	
+	public List<ErrorReport> getErrors() {
+		return this.errors;
+	}
+	
+
 }

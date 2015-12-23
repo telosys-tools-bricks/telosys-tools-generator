@@ -15,6 +15,7 @@
  */
 package org.telosys.tools.generator.task;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -385,11 +386,18 @@ public abstract class AbstractGenerationTask
 		}
 	}
 	//--------------------------------------------------------------------------------------------------
-	protected ErrorReport buildErrorReport(Throwable exception ) {
-			String msg = buildMessageForException(exception)
-						+ buildMessageForExceptionCause(exception);
+	/**
+	 * Build a new ErrorReport from the given exception and add it in the TaskResult
+	 * @param exception
+	 * @return
+	 */
+	protected ErrorReport buildErrorReport(InvocationTargetException exception ) {
+		String msg = buildMessageForException(exception)
+					+ buildMessageForExceptionCause(exception);
 
-			return new ErrorReport( "Error", msg, exception);
+		ErrorReport errorReport = new ErrorReport( "InvocationTargetException", msg, exception);
+		_result.addError(errorReport);
+		return errorReport ;
 	}
 	//--------------------------------------------------------------------------------------------------
 	private ErrorReport buildErrorReportForGeneratorException(GeneratorException generatorException ) {

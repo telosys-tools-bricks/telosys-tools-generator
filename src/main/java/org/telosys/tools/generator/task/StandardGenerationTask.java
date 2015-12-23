@@ -62,19 +62,29 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 		super(model, selectedEntities, bundleName, selectedTargets, resourcesTargets, telosysToolsCfg, logger); // v 3.0.0
 	}
 	
-	//--------------------------------------------------------------------------------------
-	// Methods implementation for super class 'AbstractGenerationTask'
-	//--------------------------------------------------------------------------------------
+//	/**
+//	 * Eclipse like 'MsgBox.error' 
+//	 * @param messageTitle
+//	 * @param messageBody
+//	 * @param exception
+//	 */
+//	private void msgBoxError(String messageTitle, String messageBody, Throwable exception) {
+//		System.out.println("ERROR");
+//		System.out.println(" title   : " + messageTitle );
+//		System.out.println(" message : " + messageBody );
+//		if ( exception != null ) {
+//			System.out.println(" exception : " + exception.getMessage() );
+//		}
+//	}
+
 	/**
 	 * Eclipse like 'MsgBox.error' 
-	 * @param messageTitle
-	 * @param messageBody
+	 * @param message
 	 * @param exception
 	 */
-	private void msgBoxError(String messageTitle, String messageBody, Throwable exception) {
+	private void msgBoxError(String message, Throwable exception) {
 		System.out.println("ERROR");
-		System.out.println(" title   : " + messageTitle );
-		System.out.println(" message : " + messageBody );
+		System.out.println(" message : " + message );
 		if ( exception != null ) {
 			System.out.println(" exception : " + exception.getMessage() );
 		}
@@ -89,10 +99,14 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 		System.out.println(" message : " + message );
 	}
 	
+	//--------------------------------------------------------------------------------------
+	// Methods implementation for super class 'AbstractGenerationTask'
+	//--------------------------------------------------------------------------------------
 
 	@Override  // Implementation for AbstractGenerationTask
 	protected boolean onError(ErrorReport errorReport) {
-		msgBoxError(errorReport.getMessageTitle(), errorReport.getMessageBody(), errorReport.getException() );
+//		msgBoxError(errorReport.getMessageTitle(), errorReport.getMessageBody(), errorReport.getException() );
+		msgBoxError(errorReport.getMessage(), errorReport.getException() );
 		return false ; // continue the task
 	}
 	
@@ -133,7 +147,8 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 					+ "\n\n" + generationTaskResult.getNumberOfGenerationErrors() + " generation error(s).");
 			
 		} catch (InvocationTargetException invocationTargetException) {
-			onError( buildErrorReport(invocationTargetException) ) ;
+			ErrorReport errorReport = buildErrorReport(invocationTargetException);
+			onError( errorReport ) ;
 			
 		} catch (InterruptedException interruptedException) {
 			GenerationTaskResult generationTaskResult = super.getResult() ;

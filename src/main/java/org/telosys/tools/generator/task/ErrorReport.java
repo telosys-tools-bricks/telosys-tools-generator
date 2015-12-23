@@ -24,25 +24,37 @@ package org.telosys.tools.generator.task;
  */
 public class ErrorReport {
 
-	private final String messageTitle ;
-	private final String messageBody ;
+//	private final String messageTitle ;
+	private final String    errorType ;
+	private final String    message ;
 	private final Throwable exception ;
 		
+//	//--------------------------------------------------------------------------------------
+//	public ErrorReport(String messageTitle, String messageBody, Throwable exception) {
+//		super();
+//		this.messageTitle = messageTitle;
+//		this.messageBody = messageBody;
+//		this.exception = exception;
+//	}
 	//--------------------------------------------------------------------------------------
-	public ErrorReport(String messageTitle, String messageBody, Throwable exception) {
+	public ErrorReport( String errorType, String errorMessage, Throwable exception) {
 		super();
-		this.messageTitle = messageTitle;
-		this.messageBody = messageBody;
+		this.errorType = errorType ;
+		this.message   = errorMessage;
 		this.exception = exception;
 	}
 
 	//--------------------------------------------------------------------------------------
-	public String getMessageTitle() {
-		return messageTitle;
+//	public String getMessageTitle() {
+//		return messageTitle;
+//	}
+
+	public String getErrorType() {
+		return errorType;
 	}
 
-	public String getMessageBody() {
-		return messageBody;
+	public String getMessage() {
+		return message;
 	}
 
 	public Throwable getException() {
