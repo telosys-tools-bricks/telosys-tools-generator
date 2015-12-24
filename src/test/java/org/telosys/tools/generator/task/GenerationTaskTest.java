@@ -45,7 +45,7 @@ public class GenerationTaskTest {
 	}
 	
 	@Test
-	public void test1() throws TelosysToolsException, Exception {
+	public void testGenerationOk1() throws TelosysToolsException, Exception {
 		
 		//--- List of entities to be generated
 		List<String> selectedEntities = new LinkedList<String>() ;
@@ -57,12 +57,14 @@ public class GenerationTaskTest {
 		
 		GenerationTaskResult generationTaskResult = launchGenerationTask(selectedEntities, TestsProject.BUNDLE_NAME, selectedTargets);
 
-		assertEquals(1, generationTaskResult.getNumberOfFilesGenerated());
-		assertEquals(0, generationTaskResult.getNumberOfResourcesCopied());
+		assertEquals(1, generationTaskResult.getNumberOfFilesGenerated() );
+		assertEquals(0, generationTaskResult.getNumberOfResourcesCopied() );
+		assertEquals(0, generationTaskResult.getNumberOfGenerationErrors() );
+		assertEquals(0, generationTaskResult.getErrors().size() );
 	}
 
 	@Test
-	public void test2() throws TelosysToolsException, Exception {
+	public void testGenerationOk2() throws TelosysToolsException, Exception {
 		
 		//--- List of entities to be generated
 		List<String> selectedEntities = new LinkedList<String>() ;
@@ -77,10 +79,12 @@ public class GenerationTaskTest {
 
 		assertEquals(2, generationTaskResult.getNumberOfFilesGenerated());
 		assertEquals(0, generationTaskResult.getNumberOfResourcesCopied());
+		assertEquals(0, generationTaskResult.getNumberOfGenerationErrors() );
+		assertEquals(0, generationTaskResult.getErrors().size() );
 	}
 
 	@Test
-	public void test3() throws TelosysToolsException, Exception {
+	public void testGenerationOk3() throws TelosysToolsException, Exception {
 		
 		//--- List of entities to be generated
 		List<String> selectedEntities = new LinkedList<String>() ;
@@ -96,6 +100,64 @@ public class GenerationTaskTest {
 
 		assertEquals(4, generationTaskResult.getNumberOfFilesGenerated());
 		assertEquals(0, generationTaskResult.getNumberOfResourcesCopied());
+		assertEquals(0, generationTaskResult.getNumberOfGenerationErrors() );
+		assertEquals(0, generationTaskResult.getErrors().size() );
 	}
+
+	@Test
+	public void testGenerationWithError1() throws TelosysToolsException, Exception {
+		
+		//--- List of entities to be generated
+		List<String> selectedEntities = new LinkedList<String>() ;
+		selectedEntities.add("Author");
+		
+		String template = "java_bean_with_error.vm" ; // TEMPLATE with ERROR 
+		
+		//--- List of targets
+		List<TargetDefinition> selectedTargets = new LinkedList<TargetDefinition>();
+		selectedTargets.add(new TargetDefinition("Entity Java Bean", "${BEANNAME}.java", "${SRC}/${ENTITY_PKG}", template, ""));
+		
+		GenerationTaskResult generationTaskResult = launchGenerationTask(selectedEntities, TestsProject.BUNDLE_NAME, selectedTargets);
+
+		assertEquals(0, generationTaskResult.getNumberOfFilesGenerated() );
+		assertEquals(0, generationTaskResult.getNumberOfResourcesCopied() );
+		assertEquals(1, generationTaskResult.getNumberOfGenerationErrors() );
+		assertEquals(1, generationTaskResult.getErrors().size() );
+		for ( ErrorReport error : generationTaskResult.getErrors() ) {
+            System.out.println( " . ERROR : \n "
+            		+ "  Error Type    : " + error.getErrorType() + "\n"
+            		+ "  Error Message : " + error.getMessage() );
+		}
+
+	}
+
+	@Test
+	public void testGenerationWithError2() throws TelosysToolsException, Exception {
+		
+		//--- List of entities to be generated
+		List<String> selectedEntities = new LinkedList<String>() ;
+		selectedEntities.add("Author"); 
+		selectedEntities.add("Badge");
+		
+		String template = "java_bean_with_error.vm" ; // TEMPLATE with ERROR 
+		
+		//--- List of targets
+		List<TargetDefinition> selectedTargets = new LinkedList<TargetDefinition>();
+		selectedTargets.add(new TargetDefinition("Entity Java Bean", "${BEANNAME}.java", "${SRC}/${ENTITY_PKG}", template, ""));
+		
+		GenerationTaskResult generationTaskResult = launchGenerationTask(selectedEntities, TestsProject.BUNDLE_NAME, selectedTargets);
+
+		assertEquals(0, generationTaskResult.getNumberOfFilesGenerated() );
+		assertEquals(0, generationTaskResult.getNumberOfResourcesCopied() );
+		assertEquals(2, generationTaskResult.getNumberOfGenerationErrors() );
+		assertEquals(2, generationTaskResult.getErrors().size() );
+		for ( ErrorReport error : generationTaskResult.getErrors() ) {
+            System.out.println( " . ERROR : \n "
+            		+ "  Error Type    : " + error.getErrorType() + "\n"
+            		+ "  Error Message : " + error.getMessage() );
+		}
+
+	}
+
 
 }

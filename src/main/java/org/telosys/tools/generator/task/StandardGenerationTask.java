@@ -35,6 +35,8 @@ import org.telosys.tools.generic.model.Model;
  */
 public class StandardGenerationTask extends AbstractGenerationTask implements GenerationTask // implements IRunnableWithProgress 
 {
+	private boolean _continueIfError = true ;
+	
 	/**
 	 * Constructor
 	 * @param model
@@ -60,6 +62,10 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 		// Just call the super class constructor
 		//super(repositoryModel, selectedEntities, selectedTargets, resourcesTargets,	generatorConfig, logger);
 		super(model, selectedEntities, bundleName, selectedTargets, resourcesTargets, telosysToolsCfg, logger); // v 3.0.0
+	}
+	
+	public void setContinueIfError(boolean continueIfError) {
+		_continueIfError = continueIfError ;
 	}
 	
 //	/**
@@ -107,7 +113,7 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 	protected boolean onError(ErrorReport errorReport) {
 //		msgBoxError(errorReport.getMessageTitle(), errorReport.getMessageBody(), errorReport.getException() );
 		msgBoxError(errorReport.getMessage(), errorReport.getException() );
-		return false ; // continue the task
+		return _continueIfError ; // continue the task or stop ?
 	}
 	
 	@Override  // Implementation for AbstractGenerationTask

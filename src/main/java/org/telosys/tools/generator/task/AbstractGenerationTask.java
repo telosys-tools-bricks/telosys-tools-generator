@@ -378,6 +378,7 @@ public abstract class AbstractGenerationTask
 	 * @throws InterruptedException 
 	 */
 	private void manageError( ErrorReport errorReport ) throws InterruptedException {
+		_result.addError(errorReport);
 		//--- Open the dialog box (the user can choose to continue or to cancel)
 		boolean continueTask = onError(errorReport);
 		//--- If 'cancel' : throw InterruptedException
