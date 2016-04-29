@@ -2,72 +2,40 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<name>telosys-tools-generator</name>
-	<artifactId>telosys-tools-generator</artifactId>
-
-	<packaging>jar</packaging>
 
     <parent>
-        <groupId>org.telosys.tools</groupId>
+        <groupId>org.telosys</groupId>
         <artifactId>telosys-tools-parent</artifactId>
         <version>3.0.0</version>
         <relativePath>../telosys-tools-parent/pom.xml</relativePath>
     </parent>
 
+	<name>telosys-tools-generator</name>
+	<artifactId>telosys-tools-generator</artifactId>
+
+	<packaging>jar</packaging>
+
 	<dependencies>
 		<!-- TELOSYS-TOOLS DEPENDENCIES -->
 		<dependency>
-			<groupId>org.telosys.tools</groupId>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>telosys-tools-commons</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		<!-- 
 	 	<dependency>
-			<groupId>org.telosys.tools</groupId>
-		  	<artifactId>telosys-tools-repository</artifactId>
-			<version>${project.parent.version}</version>
-	 	</dependency>
-		 -->
-	 	<dependency>
-			<groupId>org.telosys.tools</groupId>
+			<groupId>${project.parent.groupId}</groupId>
 		  	<artifactId>telosys-tools-generic-model</artifactId>
 			<version>${project.parent.version}</version>
 	 	</dependency>
  	 	<dependency>
-			<groupId>org.telosys.tools</groupId>
+			<groupId>${project.parent.groupId}</groupId>
 		  	<artifactId>telosys-tools-generator-engine</artifactId>
 			<version>${project.parent.version}</version>
 	 	</dependency>
 		
-		<!-- VELOCITY DEPENDENCIES -->
-		
-<!-- 
-		<dependency>
-			<groupId>org.apache.velocity</groupId>
-			<artifactId>velocity</artifactId>
-			<version>1.7</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>oro</groupId>
-			<artifactId>oro</artifactId>
-			<version>2.0.8</version>
-		</dependency>
-	    <dependency>
-			<groupId>logkit</groupId>
-			<artifactId>logkit</artifactId>
-			<version>2.0</version>
-	    </dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.12</version>
-			<scope>provided</scope>
-		</dependency>
- -->
 		<!-- TELOSYS-TOOLS DEPENDENCIES FOR TESTS -->
 	 	<dependency>
-			<groupId>org.telosys.tools</groupId>
+			<groupId>${project.parent.groupId}</groupId>
 		  	<artifactId>telosys-tools-repository</artifactId>
 			<version>${project.parent.version}</version>
 			<scope>test</scope>
