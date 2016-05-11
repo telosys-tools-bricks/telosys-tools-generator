@@ -17,7 +17,6 @@ package org.telosys.tools.generator.context;
 
 import org.telosys.tools.commons.FileUtil;
 import org.telosys.tools.commons.StrUtil;
-import org.telosys.tools.commons.config.ConfigDefaults;
 import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.commons.variables.VariablesManager;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
@@ -46,6 +45,8 @@ import org.telosys.tools.generic.model.Entity;
 //-------------------------------------------------------------------------------------
 public class Target 
 {
+	private final static String BEANNAME = "BEANNAME" ;
+	
 	private final String    targetName ;
 	
 	private final String    file ;
@@ -224,7 +225,8 @@ public class Target
 	//-----------------------------------------------------------------------
 	private String replaceVariables( String originalString, String sBeanClass, VariablesManager varmanager ) {
 		//--- Replace the generic name "${BEANNAME}" if any
-		String s1 = replace(originalString, ConfigDefaults.BEANNAME, sBeanClass);
+//		String s1 = replace(originalString, ConfigDefaults.BEANNAME, sBeanClass);
+		String s1 = replace(originalString, BEANNAME, sBeanClass);
 
 		//--- Replace the global project variables if any
 		if ( varmanager != null ) {
