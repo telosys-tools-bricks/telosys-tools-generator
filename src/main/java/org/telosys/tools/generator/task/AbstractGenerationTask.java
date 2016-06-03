@@ -519,8 +519,21 @@ public abstract class AbstractGenerationTask
 				n++ ;
 				sb.append( "Cause #" + n + " : " );
 				sb.append( cause.getClass().getSimpleName() );
-				sb.append( "\n" );
+				sb.append( " - " );
 				sb.append( cause.getMessage()  );
+				sb.append( "\n" );
+				StackTraceElement[] stackTrace = cause.getStackTrace() ;
+				if ( stackTrace != null ) {
+					for ( int i = 0 ; ( i < stackTrace.length ) && ( i < 5 ) ; i++ ) {
+						StackTraceElement e = stackTrace[i];
+						sb.append( e.getFileName() ) ;
+						sb.append( " - " ) ;
+						sb.append( e.getMethodName() ) ;
+						sb.append( " - line " ) ;
+						sb.append( e.getLineNumber() ) ;
+						sb.append( "\n" );
+					}
+				}
 				sb.append( "\n" );
 				sb.append( "\n" );
 				cause = cause.getCause() ;

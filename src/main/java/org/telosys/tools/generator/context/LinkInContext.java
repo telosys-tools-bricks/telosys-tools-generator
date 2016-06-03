@@ -514,7 +514,17 @@ public class LinkInContext {
 	public EntityInContext getTargetEntity() throws GeneratorException {
 		// return _entitiesManager.getEntity( getTargetTableName() );
 		// return _entitiesManager.getEntityByTableName( getTargetTableName() ); // v 3.0.0
-		return _modelInContext.getEntityByTableName( getTargetTableName() ); // v 3.0.0
+		
+		String targetTableName = getTargetTableName();
+		if ( targetTableName == null ) {
+			throw new GeneratorException("Cannot get target entity. No target table name for link '" + getId() + "'" );
+		}
+		
+		EntityInContext targetEntity = _modelInContext.getEntityByTableName( targetTableName ); // v 3.0.0
+		if ( targetEntity == null ) {
+			throw new GeneratorException("Cannot get target entity. No entity for table name '" + targetTableName + "'" );
+		}
+		return targetEntity ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -606,30 +616,6 @@ public class LinkInContext {
 			}
 	)
 	public String getCascade() {
-//		//return _link.getCascade();
-//		if ( this.cascadeALL ) {
-//			return RepositoryConst.CASCADE_ALL ;
-//		}
-//		else {
-//			StringBuffer sb = new StringBuffer();
-//			if ( this.cascadeMERGE ) {
-//				sb.append(" ");
-//				sb.append(RepositoryConst.CASCADE_MERGE);
-//			}
-//			if ( this.cascadePERSIST ) {
-//				sb.append(" ");
-//				sb.append(RepositoryConst.CASCADE_PERSIST);
-//			}
-//			if ( this.cascadeREFRESH ) {
-//				sb.append(" ");
-//				sb.append(RepositoryConst.CASCADE_REFRESH);
-//			}
-//			if ( this.cascadeREMOVE ) {
-//				sb.append(" ");
-//				sb.append(RepositoryConst.CASCADE_REMOVE);
-//			}
-//			return sb.toString();
-//		}
 		return _cascadeOptions.toString();
 	}
 
