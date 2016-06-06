@@ -508,16 +508,14 @@ public class Jpa {
 		//String[] jc = getJoinColumnAnnotations( joinColumns.getAll(), linkCardinality, fieldsList );
 		String[] jc = getJoinColumnAnnotations( link, joinColumns, alreadyMappedFields );
 		if ( jc != null ) {
-			if ( jc.length == 1 ) 
-			{
+			if ( jc.length == 1 ) {
 				// Single Join Column
 				// Example :
 				//   @JoinColumn(name="MGR_COUNTRY", referencedColumnName="COUNTRY") 
 				
 				annotations.addLine( jc[0] );
 			}
-			else 
-			{
+			else if ( jc.length > 1 ) {
 				// Multiple Join Columns
 				// Example :
 				// @JoinColumns( {
@@ -530,6 +528,7 @@ public class Jpa {
 					annotations.addLine("    " + jc[i] + end );
 				}
 			}
+			// else ( jc.length == 0 ) : no join columns
 		}
 	}	
 	//-------------------------------------------------------------------------------------
