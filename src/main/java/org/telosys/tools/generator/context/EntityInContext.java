@@ -525,6 +525,40 @@ public class EntityInContext
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
+			"Returns the unique attribute used as the Primary Key for this entity.",
+			"Throws an exception if the entity does not have a Primary Key",
+			"or if it has a composite Primary Key (2 or more attributes)"
+		},
+		example= {
+			"$entity.keyAttribute"
+		},
+		since="3.0.0"
+	)
+	@VelocityReturnType("Instance of 'attribute' ")
+	public AttributeInContext getKeyAttribute() throws GeneratorException 
+	{
+		if ( this.hasPrimaryKey() ) {
+			List<AttributeInContext> keyAttributes = this.getKeyAttributes() ;
+			if ( keyAttributes.size() == 1 ) {
+				// The PK is composed of a single attribute 
+				return keyAttributes.get(0);
+			}
+			else if ( keyAttributes.size() > 1 ){
+				throw new GeneratorException("Cannot get 'keyAttribute' : this entity has a composite Primary Key ("
+							+ keyAttributes.size() + " attributes)");
+			} 
+			else {
+				throw new GeneratorException("Cannot get 'keyAttribute' : "
+						+ keyAttributes.size() + " attributes in Primary Key");
+			}
+		}
+		else {
+			throw new GeneratorException("Cannot get 'keyAttribute' : no Primary Key for this entity");
+		}
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
 			"Returns the key attributes names as a string.",
 			"The attributes names are separated by the given separator",
 			"with a prefix/suffix for each attribute name"
