@@ -198,10 +198,10 @@ public class AttributeInContext
 		_sBooleanFalseValue  = Util.trim(attribute.getBooleanFalseValue(), VOID_STRING) ;
 		
 		//--- Further info for NUMBER 
-//	    _sMinValue = column.getMinValue() ; 
-	    _sMinValue = Util.numberToString(attribute.getMinValue(), VOID_STRING ) ; // v 3.0.0
-//	    _sMaxValue = column.getMaxValue() ; 
-	    _sMaxValue = Util.numberToString(attribute.getMaxValue(), VOID_STRING ) ; // v 3.0.0 
+	    //_sMinValue = Util.numberToString(attribute.getMinValue(), VOID_STRING ) ; // v 3.0.0
+	    _sMinValue = Util.bigDecimalToString(attribute.getMinValue(), VOID_STRING ) ; // v 3.0.0
+	    //_sMaxValue = Util.numberToString(attribute.getMaxValue(), VOID_STRING ) ; // v 3.0.0 
+	    _sMaxValue = Util.bigDecimalToString(attribute.getMaxValue(), VOID_STRING ) ; // v 3.0.0 
 
 		//--- Further info for STRING 
         //_bLongText  = column.getLongText() ;
@@ -211,9 +211,11 @@ public class AttributeInContext
         //_bNotBlank  = column.getNotBlank();
         _bNotBlank  = attribute.isNotBlank(); // v 3.0.0
         //_sMaxLength = column.getMaxLength();
-        _sMaxLength = Util.numberToString(attribute.getMaxLength(), VOID_STRING); // v 3.0.0
+        //_sMaxLength = Util.numberToString(attribute.getMaxLength(), VOID_STRING); // v 3.0.0
+        _sMaxLength = Util.integerToString(attribute.getMaxLength(), VOID_STRING); // v 3.0.0
         //_sMinLength = column.getMinLength();
-        _sMinLength = Util.numberToString(attribute.getMinLength(), VOID_STRING); // v 3.0.0
+        //_sMinLength = Util.numberToString(attribute.getMinLength(), VOID_STRING); // v 3.0.0
+        _sMinLength = Util.integerToString(attribute.getMinLength(), VOID_STRING); // v 3.0.0
         _sPattern   = StrUtil.notNull( attribute.getPattern() );
         
 		//--- Further info for DATE/TIME 

@@ -15,13 +15,31 @@
  */
 package org.telosys.tools.generator.context ;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 
 import org.telosys.tools.commons.JavaClassUtil;
 
 public class Util {
 
-	public static String numberToString(Number value, String defaultValue) {
+//	public static String numberToString(Number value, String defaultValue) {
+//		if ( value != null ) {
+//			return value.toString();
+//		}
+//		else {
+//			return defaultValue ;
+//		}
+//	}
+	public static String bigDecimalToString(BigDecimal value, String defaultValue) {
+		if ( value != null ) {
+			return value.toString();
+		}
+		else {
+			return defaultValue ;
+		}
+	}
+	
+	public static String integerToString(Integer value, String defaultValue) {
 		if ( value != null ) {
 			return value.toString();
 		}
