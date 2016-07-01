@@ -996,5 +996,29 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		return null;
 	}
 
+	@Override
+	public boolean isObjectTypeExpected() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isPrimitiveTypeExpected() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isSqlTypeExpected() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isUnsignedTypeExpected() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	//---------------------------------------------------------------------------------------------------
 }
