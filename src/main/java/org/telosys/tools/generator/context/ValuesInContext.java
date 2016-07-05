@@ -66,7 +66,8 @@ public abstract class ValuesInContext {
 	
 	//----------------------------------------------------------------------------------------
 	/**
-	 * Generates a literal value for the given attribute
+	 * Generates a literal value for the given attribute <br>
+	 * ( this method is not usable in a ".vm" template )
 	 * @param attribute
 	 * @param step
 	 * @return
@@ -93,5 +94,15 @@ public abstract class ValuesInContext {
 	public abstract String getAllValues() ;
 	
 	//----------------------------------------------------------------------------------------
-	protected abstract String valueComparedTo(String entityVariableName, AttributeInContext attribute);
+	/**
+	 * Returns a comparison statement <br>
+	 * Example in Java : <br>
+	 *   book.getId() == 100  <br>
+	 *   book.getFirstName().equals("abcd") <br>
+	 *   
+	 * @param entityVariableName the variable name used in the 'left part' with the 'getter'
+	 * @param attribute the attribute to be used to retrieve the 'right part' (the 'literal value')
+	 * @return
+	 */
+	public abstract String comparisonStatement(String entityVariableName, AttributeInContext attribute);
 }

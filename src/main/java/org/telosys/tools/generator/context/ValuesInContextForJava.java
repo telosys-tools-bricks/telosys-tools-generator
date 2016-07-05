@@ -143,15 +143,20 @@ public class ValuesInContextForJava extends ValuesInContext {
 		return sb.toString();
 	}
 	
+	/* 
+	 * Return something like that : 
+	 *   book.getId() == 100 
+	 *   book.getFirstName().equals("xxx")
+	 */
 	@Override
-	protected String valueComparedTo(String entityVariableName, AttributeInContext attribute) {
+	public String comparisonStatement(String entityVariableName, AttributeInContext attribute) {
 		StringBuilder sb = new StringBuilder();
 		sb.append( entityVariableName ) ;
 		sb.append( "." ) ;
 		sb.append( attribute.getGetter() ) ;
 		sb.append( "()" ) ;
 		
-		String value = _values.get( attribute.getName() ) ;
+		String value = _values.get( attribute.getName() ) ; // Value for the given attribute
 		if ( attribute.isNumberType() ) {
 			//if ( attribute.isBigDecimalType() ) { 
 			if ( attribute.isDecimalType() ) { // v 3.0.0

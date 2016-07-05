@@ -227,7 +227,7 @@ public class ValuesInContextForJavaTest {
 	}
 	
 	private void checkCompareValue(ValuesInContext values, String entityVariableName, AttributeInContext attribute, String expectedValue) {
-		String v = values.valueComparedTo(entityVariableName, attribute);
+		String v = values.comparisonStatement(entityVariableName, attribute);
 		String v2 = v.trim();
 		System.out.println(". comparison : '" + v + "' (expected : '" + expectedValue + "')");
 		Assert.assertTrue(v2.equals(expectedValue.trim()));
