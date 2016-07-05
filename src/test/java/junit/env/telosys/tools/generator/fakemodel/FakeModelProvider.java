@@ -30,11 +30,11 @@ public class FakeModelProvider {
 	}
 
 	public static Attribute buildAttribute_FirstName() {
-		AttributeInFakeModel attribute = new AttributeInFakeModel();
+		AttributeInFakeModel attribute = new AttributeInFakeModel("firstName", "string");
 		attribute.setDatabaseName("FIRST_NAME");
 		attribute.setDatabaseTypeName("VARCHAR");
-		attribute.setName("firstName");
-		attribute.setFullType("java.lang.String");
+//		attribute.setName("firstName");
+//		attribute.setFullType("java.lang.String");
 		return attribute ;
 	}
 }

@@ -1,0 +1,40 @@
+
+Methods removed :
+
+All methods "guiXxxx" and "getGuixxx" : 
+
+   public String getGuiMaxLength() 
+ 
+   public String getGuiMaxLengthAttribute()  --> Moved in $html.maxLength($attribute)
+   returns 'maxlength=12' 
+ 
+   public String getGuiMinMaxAttributes()    --> Moved in $html.min($attribute) and $html.max($attribute)
+   returns 'min=10 max=20'
+ 
+   public String getGuiTypeAttribute()       --> Moved in $html.type($attribute)
+   returns 'type="number"'
+ 
+  Methods used in bundles :
+   - "front-angular" :  ENTITY-form-html 
+   - "front-spingmvc" : ENTITY-form-jspx
+   
+Methods about specific types :
+
+  isArrayType()  : NOT USED IN TEMPLATES
+  isBigDecimalType  : NOT USED IN TEMPLATES
+  isUtilDateType() : NOT USED IN TEMPLATES
+  isSqlDateType() : NOT USED IN TEMPLATES   
+  isSqlTimeType() : NOT USED IN TEMPLATES
+  isSqlTimestampType() : NOT USED IN TEMPLATES
+  isBlobType() : NOT USED IN TEMPLATES
+  isClobType() : NOT USED IN TEMPLATES
+
+NEW METHODES :
+  isDecimal() 
+  isDateType() 
+  isTimeType() 
+  isTimestampType()
+  isBinaryType()
+  
+  
+  

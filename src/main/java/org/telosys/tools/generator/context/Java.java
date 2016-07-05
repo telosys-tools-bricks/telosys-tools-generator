@@ -112,7 +112,8 @@ public class Java {
 						lb.append(indent, "if ( " + attributeName + " != other." + attributeName + " ) return false ; ");
 					}
 				}
-				else if ( attribute.isArrayType() ) {
+				//else if ( attribute.isArrayType() ) {
+				else if ( isArray(attribute) ) { // v 3.0.0
 					// char[], byte[], String[], ...
 					lb.append(indent, "if ( ! Arrays.equals(" + attributeName + ", other." + attributeName + ") ) return false ; ");
 				}
@@ -215,7 +216,8 @@ public class Java {
 							lb.append(indent, "result = prime * result + " + attributeName + ";");
 						}
 					}
-					else if ( attribute.isArrayType() ) {
+					//else if ( attribute.isArrayType() ) {
+					else if ( isArray(attribute) ) { // v 3.0.0
 						// char[], byte[], String[], ...
 						lb.append(indent, "result = prime * result + Arrays.hashCode(" + attributeName + ");");
 					}
@@ -396,13 +398,15 @@ public class Java {
 			"indentSpaces : number of spaces to be used for each indentation level"},
 		since = "2.0.7"
 			)
-	public String toStringMethod( EntityInContext entity, List<AttributeInContext> nonKeyAttributes, String embeddedIdName, int indentSpaces ) {
+	public String toStringMethod( EntityInContext entity, List<AttributeInContext> nonKeyAttributes, 
+			String embeddedIdName, int indentSpaces )  {
 		
 		return toStringMethod( entity , nonKeyAttributes, embeddedIdName, new LinesBuilder(indentSpaces) ); 
 	}
 	
 	//-------------------------------------------------------------------------------------
-	private String toStringMethod( EntityInContext entity, List<AttributeInContext> nonKeyAttributes, String embeddedIdName, LinesBuilder lb ) {
+	private String toStringMethod( EntityInContext entity, List<AttributeInContext> nonKeyAttributes, 
+			String embeddedIdName, LinesBuilder lb )  {
 
 		int indent = 1 ;
 		lb.append(indent, "public String toString() { ");
@@ -444,7 +448,7 @@ public class Java {
      * @param indent
      * @return
      */
-    private int toStringForAttributes( List<AttributeInContext> attributes, LinesBuilder lb, int indent  )
+    private int toStringForAttributes( List<AttributeInContext> attributes, LinesBuilder lb, int indent  ) 
     {    	
     	if ( null == attributes ) return 0 ;
     	int count = 0 ;
@@ -489,9 +493,11 @@ public class Java {
      * @param sType
      * @return
      */
-    private boolean usableInToString( AttributeInContext attribute )
+    private boolean usableInToString( AttributeInContext attribute ) 
     {
-    	if ( attribute.isArrayType() ) return false ;
+    	if ( attribute.isBinaryType() ) return false ;
+    	// if ( attribute.isArrayType() ) return false ;
+    	if ( isArray(attribute) ) return false ;
     	if ( attribute.isLongText() ) return false ;
     	
     	String sType = attribute.getType();
@@ -500,6 +506,21 @@ public class Java {
     	if ( s.endsWith("Blob") ) return false ; 
     	if ( s.endsWith("Clob") ) return false ; 
     	return true ;
+    }
+    
+    /**
+     * @param attribute
+     * @return
+     * @since v 3.0.0
+     */
+    private boolean isArray( AttributeInContext attribute ) {
+    	String type = attribute.getSimpleType();
+		if ( type != null ) {
+			if ( type.trim().endsWith("]")) {
+				return true ;
+			}
+		}
+		return false ;    	
     }
     
 }

@@ -177,7 +177,7 @@ public class Fn {
 		parameters = { "fields : list of fields to be added in the arguments list" },
 		since = "2.0.5"
 			)
-	public String argumentsListWithType( List<AttributeInContext> fieldsList ) {
+	public String argumentsListWithType( List<AttributeInContext> fieldsList )  {
 		if ( fieldsList != null ) {
 			StringBuilder sb = new StringBuilder();
 			int n = 0 ;
@@ -208,7 +208,7 @@ public class Fn {
 			"fields : list of fields to be added in the arguments list" },
 		since = "2.0.5"
 			)
-	public String argumentsListWithGetter( String objectName, List<AttributeInContext> fieldsList ) {
+	public String argumentsListWithGetter( String objectName, List<AttributeInContext> fieldsList )  {
 		if ( fieldsList != null ) {
 			StringBuilder sb = new StringBuilder();
 			int n = 0 ;
@@ -472,6 +472,7 @@ public class Fn {
 			since = "2.1.1"
 			)
 	public ValuesInContext buildValues(final List<AttributeInContext> attributes, final int step) {
-		return new ValuesInContext( attributes, step ) ;
+		// TODO : change the "values builder" according with the current targeted language ( $ENV )
+		return new ValuesInContextForJava( attributes, step ) ;
 	}	
 }

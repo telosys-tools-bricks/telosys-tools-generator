@@ -18,8 +18,6 @@ package org.telosys.tools.generator.context;
 import java.util.List;
 
 import org.telosys.tools.commons.DatabaseUtil;
-import org.telosys.tools.commons.JavaClassUtil;
-import org.telosys.tools.commons.JavaTypeUtil;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.jdbctypes.JdbcTypes;
 import org.telosys.tools.commons.jdbctypes.JdbcTypesManager;
@@ -30,6 +28,11 @@ import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.DateType;
+import org.telosys.tools.generic.model.types.AttributeTypeInfo;
+import org.telosys.tools.generic.model.types.LanguageType;
+import org.telosys.tools.generic.model.types.NeutralType;
+import org.telosys.tools.generic.model.types.TypeConverter;
+import org.telosys.tools.generic.model.types.TypeConverterForJava;
 
 
 /**
@@ -65,18 +68,23 @@ public class AttributeInContext
     
     private final static String VOID_STRING  = "" ;
     
-    private final static String TYPE_INT  = "int" ;
-    private final static String TYPE_NUM  = "num" ;
-    private final static String TYPE_DATE = "date" ;
-    private final static String TYPE_TIME = "time" ;
+//    private final static String TYPE_INT  = "int" ;
+//    private final static String TYPE_NUM  = "num" ;
+//    private final static String TYPE_DATE = "date" ;
+//    private final static String TYPE_TIME = "time" ;
     
 	//--- 
     private final EntityInContext _entity ; // The entity 
     
 	//--- Basic minimal attribute info -------------------------------------------------
 	private final String  _sName ;  // attribute name 
-	private final String  _sSimpleType ;  // Short java type without package, without blank, eg : "int", "BigDecimal", "Date"
-	private final String  _sFullType ;    // Full java type with package, : "java.math.BigDecimal", "java.util.Date"
+	
+//	private final String  _sSimpleType ;  // Short java type without package, without blank, eg : "int", "BigDecimal", "Date"
+//	private final String  _sFullType ;    // Full java type with package, : "java.math.BigDecimal", "java.util.Date"
+	private final String  _sNeutralType ;    //v 3.0.0
+	private final AttributeTypeInfo attributeTypeInfo ; // v 3.0.0
+	
+	
 	private boolean       _bUseFullType = false ;
 	
 	private final String  _sInitialValue ; // can be null 
@@ -158,9 +166,11 @@ public class AttributeInContext
 		//_sName   = column.getJavaName();
 		_sName   = attribute.getName(); // v 3.0.0
 		
-		//_sFullType   = StrUtil.removeAllBlanks( column.getJavaType() );
-		_sFullType   = StrUtil.removeAllBlanks( attribute.getFullType() ); // v 3.0.0
-		_sSimpleType = JavaClassUtil.shortName( _sFullType );    // v 2.0.7
+//		//_sFullType   = StrUtil.removeAllBlanks( column.getJavaType() );
+//		_sFullType   = StrUtil.removeAllBlanks( attribute.getFullType() ); // v 3.0.0
+//		_sSimpleType = JavaClassUtil.shortName( _sFullType );    // v 2.0.7
+		_sNeutralType     = attribute.getNeutralType() ; // v 3.0.0
+		this.attributeTypeInfo = new AttributeTypeInfo(attribute) ; // v 3.0.0
 				
 		//_bSelected        = column.getSelected(); // v 2.1.1 #LGU
 		_bSelected        = attribute.isSelected(); // v 3.0.0
@@ -300,7 +310,20 @@ public class AttributeInContext
 		}
 		
 	}
-    
+	
+	private final LanguageType getLanguageType() {
+		// TODO : get the converter from "ENV"
+		TypeConverter typeConverter = new TypeConverterForJava() ;
+		
+		LanguageType languageType = typeConverter.getType(this.attributeTypeInfo);
+		if ( languageType != null ) {
+			return languageType ;
+		}
+		else {
+			throw new IllegalStateException("Cannot get language type for '" + this._sNeutralType + "'");
+		}
+	}
+	
 	//-----------------------------------------------------------------------------------------------
 	/* package */ void useFullType ()
 	{
@@ -340,6 +363,23 @@ public class AttributeInContext
 
 	//-------------------------------------------------------------------------------------
 	/**
+	 * Returns the "neutral type" defined in the model <br>
+	 * e.g. : "string", "short", "decimal", "boolean", "date", "time", etc <br>
+	 * 
+	 * @return
+	 */
+	@VelocityMethod(
+		text={	
+			"Returns the 'neutral type', that is to say the type as defined in the model",
+			"e.g. : 'string', 'short', 'decimal', 'boolean', 'date', 'time', etc "
+			}
+	)
+	public String getNeutralType() {
+		return _sNeutralType ;
+	}
+
+	//-------------------------------------------------------------------------------------
+	/**
 	 * Returns the "java type" to use <br>
 	 * usually the simple type ( "int", "BigDecimal", "Date" ) <br>
 	 * sometimes the full type ( if the simple type is ambiguous )
@@ -353,15 +393,23 @@ public class AttributeInContext
 			"Examples for Java : 'int', 'BigDecimal', 'Date', 'java.util.Date', 'java.sql.Date' "
 			}
 	)
-	public String getType()
+	public String getType() 
 	{
-		// return _sType;
-		// v 2.0.7
+//		// return _sType;
+//		// v 2.0.7
+//		if ( _bUseFullType ) {
+//			return _sFullType ;
+//		}
+//		else {
+//			return _sSimpleType ;
+//		}
+		// v 3.0.0
+		LanguageType type = getLanguageType();
 		if ( _bUseFullType ) {
-			return _sFullType ;
+			return type.getFullType() ;
 		}
 		else {
-			return _sSimpleType ;
+			return type.getSimpleType() ;
 		}
 	}
 
@@ -374,7 +422,7 @@ public class AttributeInContext
 			"n : the number of blanks to be added at the end of the name" 
 			}
 	)
-	public String formattedType(int iSize)
+	public String formattedType(int iSize) 
     {
 		String sType = this.getType() ;
         String sTrailingBlanks = "";
@@ -389,23 +437,33 @@ public class AttributeInContext
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the full type ( java.math.BigDecimal, java.util.Date, .. )"
+				"Returns the full type name",
+				"e.g. for a Java object type : java.math.BigDecimal, java.util.Date,  .. ",
+				"  or for a Java primitive type : short, int, .. "
 			}
 	)
-	public String getFullType()
+	public String getFullType() 
 	{
-		return _sFullType;
+		//return _sFullType;
+		// v 3.0.0
+		LanguageType type = getLanguageType();
+		return type.getFullType() ;
 	}
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the simple type ( BigDecimal, Date, int, Integer, .. )"
+			"Returns the simple type name ",
+			"e.g. for a Java object type : BigDecimal, Date, Integer, .. ",
+			"  or for a Java primitive type : short, int, .. "
 			}
 	)
-	public String getSimpleType()
+	public String getSimpleType() 
 	{
-		return _sSimpleType;
+		//return _sSimpleType;
+		// v 3.0.0
+		LanguageType type = getLanguageType();
+		return type.getSimpleType() ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -415,35 +473,38 @@ public class AttributeInContext
 	 */
 	@VelocityMethod(
 		text={	
-			"Returns the Java wrapper type corresponding to the attribute's primitive type",
+			"Returns the wrapper type corresponding to the attribute's primitive type",
 			"Examples : 'Float' for 'float', 'Integer' for 'int', 'Boolean' for 'boolean', ... ",
 			"The attribute's type is retuned as is if it's not a primitive type"
 			}
 	)
 	public String getWrapperType()
 	{
-		if ( null == _sSimpleType ) return "UnknownType" ;
-		
-		final String t = _sSimpleType;
-		if ("byte".equals(t)) {
-			return "Byte";
-		} else if ("short".equals(t)) {
-			return "Short";
-		} else if ("int".equals(t)) {
-			return "Integer";
-		} else if ("long".equals(t)) {
-			return "Long";
-		} else if ("float".equals(t)) {
-			return "Float";
-		} else if ("double".equals(t)) {
-			return "Double";
-		} else if ("boolean".equals(t)) {
-			return "Boolean";
-		} else if ("char".equals(t)) {
-			return "Character";
-		} else {
-			return t;
-		}
+//		if ( null == _sSimpleType ) return "UnknownType" ;
+//		
+//		final String t = _sSimpleType;
+//		if ("byte".equals(t)) {
+//			return "Byte";
+//		} else if ("short".equals(t)) {
+//			return "Short";
+//		} else if ("int".equals(t)) {
+//			return "Integer";
+//		} else if ("long".equals(t)) {
+//			return "Long";
+//		} else if ("float".equals(t)) {
+//			return "Float";
+//		} else if ("double".equals(t)) {
+//			return "Double";
+//		} else if ("boolean".equals(t)) {
+//			return "Boolean";
+//		} else if ("char".equals(t)) {
+//			return "Character";
+//		} else {
+//			return t;
+//		}
+		// v 3.0.0
+		LanguageType type = getLanguageType();
+		return type.getWrapperType() ;		
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -488,7 +549,7 @@ public class AttributeInContext
 				"e.g : 'getFoo' for 'foo' (or 'isFoo' for a boolean primitive type)"
 					}
 	)
-	public String getGetter()
+	public String getGetter() 
 	{
 		return Util.buildGetter(_sName, this.getType() ); // v 2.0.7
 	}
@@ -805,6 +866,7 @@ public class AttributeInContext
     }
     
 	//-------------------------------------------------------------------------------------
+/*****
 	@VelocityMethod(
 		text={	
 			"Returns maximum input length to be used in the GUI ",
@@ -815,88 +877,89 @@ public class AttributeInContext
 	)
     public String getGuiMaxLength() 
     {
-		String t = _sSimpleType ;
-    	//--- Max length depending on the Java type
-    	if ( "byte".equals(t)  || "Byte".equals(t)    ) return  "4" ; // -128 to +127
-    	if ( "short".equals(t) || "Short".equals(t)   ) return  "6" ; // -32768 to +32767
-    	if ( "int".equals(t)   || "Integer".equals(t) ) return "11" ; // -2147483648 to +2147483647
-    	if ( "long".equals(t)  || "Long".equals(t)    ) return "20" ; // -9223372036854775808 to +9223372036854775807
-    	
-    	if ( "double".equals(t) || "Double".equals(t) ) return "20" ; // Arbitrary fixed value like long
-    	if ( "float".equals(t)  || "Float".equals(t)  ) return "20" ; // Arbitrary fixed value like long
-    	
-    	if ( "BigDecimal".equals(t) ) return "20" ; // Arbitrary fixed value like long
-    	if ( "BigInteger".equals(t) ) return "20" ; // Arbitrary fixed value like long
-    	
-    	if ( "Date".equals(t) ) return "10" ; // "YYYY-MM-DD", "DD/MM/YYYY", etc ...
-    	if ( "Time".equals(t) ) return "8" ; // "HH:MM:SS"
-
-    	//--- Max length from Database column size (only for String)
-    	if ( "String".equals(t) )
-    	{
-    		return voidIfNull ( _sMaxLength ) ;
-    	}
-		return "";
+//		String t = _sSimpleType ;
+//    	//--- Max length depending on the Java type
+//    	if ( "byte".equals(t)  || "Byte".equals(t)    ) return  "4" ; // -128 to +127
+//    	if ( "short".equals(t) || "Short".equals(t)   ) return  "6" ; // -32768 to +32767
+//    	if ( "int".equals(t)   || "Integer".equals(t) ) return "11" ; // -2147483648 to +2147483647
+//    	if ( "long".equals(t)  || "Long".equals(t)    ) return "20" ; // -9223372036854775808 to +9223372036854775807
+//    	
+//    	if ( "double".equals(t) || "Double".equals(t) ) return "20" ; // Arbitrary fixed value like long
+//    	if ( "float".equals(t)  || "Float".equals(t)  ) return "20" ; // Arbitrary fixed value like long
+//    	
+//    	if ( "BigDecimal".equals(t) ) return "20" ; // Arbitrary fixed value like long
+//    	if ( "BigInteger".equals(t) ) return "20" ; // Arbitrary fixed value like long
+//    	
+//    	if ( "Date".equals(t) ) return "10" ; // "YYYY-MM-DD", "DD/MM/YYYY", etc ...
+//    	if ( "Time".equals(t) ) return "8" ; // "HH:MM:SS"
+//
+//    	//--- Max length from Database column size (only for String)
+//    	if ( "String".equals(t) )
+//    	{
+//    		return voidIfNull ( _sMaxLength ) ;
+//    	}
+//		return "";
     }
+****/
+	
+//    /**
+//     * Shortcut for Velocity attribute syntax : $var.guiMaxLengthAttribute 
+//     * @return
+//     */
+//	//-------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns the GUI 'maxlength' attribute (or void if none) ",
+//			"e.g 'maxlength=12' "
+//			}
+//	)
+//    public String getGuiMaxLengthAttribute() 
+//    {
+//    	// return guiMaxLengthAttribute() ;
+//    }
     
-    /**
-     * Shortcut for Velocity attribute syntax : $var.guiMaxLengthAttribute 
-     * @return
-     */
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the GUI 'maxlength' attribute (or void if none) ",
-			"e.g 'maxlength=12' "
-			}
-	)
-    public String getGuiMaxLengthAttribute() 
-    {
-    	return guiMaxLengthAttribute() ;
-    }
+//    //-------------------------------------------------------------------------------------------
+//    /**
+//     * For Velocity function call syntax : $var.guiMaxLengthAttribute() 
+//     * @return
+//     */
+//	//-------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns the GUI 'maxlength' attribute (or void if none) ",
+//			"e.g 'maxlength=12' "
+//			}
+//	)
+//    public String guiMaxLengthAttribute() 
+//    {
+//    	return guiMaxLengthAttribute("maxlength") ;
+//    }
     
-    //-------------------------------------------------------------------------------------------
-    /**
-     * For Velocity function call syntax : $var.guiMaxLengthAttribute() 
-     * @return
-     */
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the GUI 'maxlength' attribute (or void if none) ",
-			"e.g 'maxlength=12' "
-			}
-	)
-    public String guiMaxLengthAttribute() 
-    {
-    	return guiMaxLengthAttribute("maxlength") ;
-    }
-    
-    /**
-     * For Velocity function call syntax : $var.guiMaxLengthAttribute('maxlength') 
-     * @param attributeName
-     * @return
-     */
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the GUI specific attribute for maximum length (or void if none) ",
-			"e.g 'myattribute=12' for guiMaxLengthAttribute('myattribute') "
-			},
-		parameters = "guiAttributeName : the name of the attribute to be set in the GUI"
-	)
-    public String guiMaxLengthAttribute(String attributeName) 
-    {
-    	if ( attributeName != null )
-    	{
-    		String s = getGuiMaxLength();
-    		if ( ! StrUtil.nullOrVoid(s) )
-    		{
-    			return attributeName + "=\"" + s + "\"" ;
-    		}
-    	}
-    	return "";
-    }
+//    /**
+//     * For Velocity function call syntax : $var.guiMaxLengthAttribute('maxlength') 
+//     * @param attributeName
+//     * @return
+//     */
+//	//-------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns the GUI specific attribute for maximum length (or void if none) ",
+//			"e.g 'myattribute=12' for guiMaxLengthAttribute('myattribute') "
+//			},
+//		parameters = "guiAttributeName : the name of the attribute to be set in the GUI"
+//	)
+//    public String guiMaxLengthAttribute(String attributeName) 
+//    {
+//    	if ( attributeName != null )
+//    	{
+//    		String s = getGuiMaxLength();
+//    		if ( ! StrUtil.nullOrVoid(s) )
+//    		{
+//    			return attributeName + "=\"" + s + "\"" ;
+//    		}
+//    	}
+//    	return "";
+//    }
     
     //-------------------------------------------------------------------------------------------
     /**
@@ -971,163 +1034,163 @@ public class AttributeInContext
     	return voidIfNull(_sMaxValue) ;
     }
     //-------------------------------------------------------------------------------------------
-    /**
-     * Synonym for Velocity attribute syntax : $var.guiMinMaxAttributes 
-     * @return
-     */
-	@VelocityMethod(
-		text={	
-			"Returns the GUI attributes for minimum and maximum values (or void if none)",
-			"e.g 'min=10 max=20' "
-			}
-	)
-    public String getGuiMinMaxAttributes() 
-    {
-    	return guiMinMaxAttributes() ;
-    }
+//    /**
+//     * Synonym for Velocity attribute syntax : $var.guiMinMaxAttributes 
+//     * @return
+//     */
+//	@VelocityMethod(
+//		text={	
+//			"Returns the GUI attributes for minimum and maximum values (or void if none)",
+//			"e.g 'min=10 max=20' "
+//			}
+//	)
+//    public String getGuiMinMaxAttributes() 
+//    {
+//    	//return guiMinMaxAttributes() ;
+//    }
     
-	//-------------------------------------------------------------------------------------
-    /**
-     * For Velocity function call syntax : $var.guiMinMaxAttributes() 
-     * @return
-     */
-	@VelocityMethod(
-		text={	
-			"Returns the GUI attributes for minimum and maximum values (or void if none)",
-			"e.g 'min=10 max=20' "
-			}
-	)
-    public String guiMinMaxAttributes() 
-    {
-    	return guiMinMaxAttributes("min", "max") ;
-    }
+//	//-------------------------------------------------------------------------------------
+//    /**
+//     * For Velocity function call syntax : $var.guiMinMaxAttributes() 
+//     * @return
+//     */
+//	@VelocityMethod(
+//		text={	
+//			"Returns the GUI attributes for minimum and maximum values (or void if none)",
+//			"e.g 'min=10 max=20' "
+//			}
+//	)
+//    public String guiMinMaxAttributes() 
+//    {
+//    	return guiMinMaxAttributes("min", "max") ;
+//    }
 
-    //-------------------------------------------------------------------------------------------
-    /**
-     * For Velocity function call syntax : $var.guiMinMaxAttributes('min','max') 
-     * @param attributeName
-     * @return
-     */
-	@VelocityMethod(
-		text={	
-			"Returns the GUI specific attribute for minimum and maximum values (or void if none) ",
-			"e.g 'mini=10 maxi=20' for guiMaxLengthAttribute('mini', 'maxi') "
-			},
-		parameters = {
-			"guiMinAttributeName : the name of the MIN attribute to be set in the GUI",
-			"guiMaxAttributeName : the name of the MAX attribute to be set in the GUI"
-		}
-	)
-    public String guiMinMaxAttributes(String minAttributeName, String maxAttributeName  ) 
-    {
-    	if ( minAttributeName != null && maxAttributeName != null )
-    	{
-    		String sMin = getMinValue();
-    		String sMinAttr = "" ;
-    		if ( ! StrUtil.nullOrVoid(sMin) )
-    		{
-    			sMinAttr = minAttributeName + "=\"" + sMin + "\"" ;
-    		}
-    		
-    		String sMax = getMaxValue();
-    		String sMaxAttr = "" ;
-    		if ( ! StrUtil.nullOrVoid(sMax) )
-    		{
-    			sMaxAttr = maxAttributeName + "=\"" + sMax + "\"" ;
-    		}
-    		return sMinAttr + " " + sMaxAttr ;
-    	}
-    	return "" ;
-    }
+//    //-------------------------------------------------------------------------------------------
+//    /**
+//     * For Velocity function call syntax : $var.guiMinMaxAttributes('min','max') 
+//     * @param attributeName
+//     * @return
+//     */
+//	@VelocityMethod(
+//		text={	
+//			"Returns the GUI specific attribute for minimum and maximum values (or void if none) ",
+//			"e.g 'mini=10 maxi=20' for guiMaxLengthAttribute('mini', 'maxi') "
+//			},
+//		parameters = {
+//			"guiMinAttributeName : the name of the MIN attribute to be set in the GUI",
+//			"guiMaxAttributeName : the name of the MAX attribute to be set in the GUI"
+//		}
+//	)
+//    public String guiMinMaxAttributes(String minAttributeName, String maxAttributeName  ) 
+//    {
+//    	if ( minAttributeName != null && maxAttributeName != null )
+//    	{
+//    		String sMin = getMinValue();
+//    		String sMinAttr = "" ;
+//    		if ( ! StrUtil.nullOrVoid(sMin) )
+//    		{
+//    			sMinAttr = minAttributeName + "=\"" + sMin + "\"" ;
+//    		}
+//    		
+//    		String sMax = getMaxValue();
+//    		String sMaxAttr = "" ;
+//    		if ( ! StrUtil.nullOrVoid(sMax) )
+//    		{
+//    			sMaxAttr = maxAttributeName + "=\"" + sMax + "\"" ;
+//    		}
+//    		return sMinAttr + " " + sMaxAttr ;
+//    	}
+//    	return "" ;
+//    }
 
-    /**
-     * Returns the GUI "type" if any, else returns "" 
-     * @return
-     */
-	@VelocityMethod(
-			text={	
-				"Returns the GUI type if any (else returns a void string)",
-				"e.g 'int', 'num', 'date', 'time', '' "
-				}
-		)
-    public String getGuiType() 
-    {
-		String t = _sSimpleType ; // v 2.0.7
-    	//--- type="int"
-    	if ( "byte".equals(t)  || "Byte".equals(t)    ) return TYPE_INT ;
-    	if ( "short".equals(t) || "Short".equals(t)   ) return TYPE_INT ; 
-    	if ( "int".equals(t)   || "Integer".equals(t) ) return TYPE_INT ; 
-    	if ( "long".equals(t)  || "Long".equals(t) )    return TYPE_INT ; 
-    	if ( "BigInteger".equals(t) )   return TYPE_INT ;
-
-    	//--- type="num"
-    	if ( "float".equals(t)  || "Float".equals(t) )    return TYPE_NUM ; 
-    	if ( "double".equals(t) || "Double".equals(t) )   return TYPE_NUM ; 
-    	if ( "BigDecimal".equals(t) )   return TYPE_NUM ;
-    	
-    	//--- type="date"
-    	if ( "Date".equals(t) )   return TYPE_DATE ;
-    	
-    	//--- type="time"
-    	if ( "Time".equals(t) )   return TYPE_TIME ;
-    	
-    	return "" ;
-    }
+//    /**
+//     * Returns the GUI "type" if any, else returns "" 
+//     * @return
+//     */
+//	@VelocityMethod(
+//			text={	
+//				"Returns the GUI type if any (else returns a void string)",
+//				"e.g 'int', 'num', 'date', 'time', '' "
+//				}
+//		)
+//    public String getGuiType() 
+//    {
+////		String t = _sSimpleType ; // v 2.0.7
+////    	//--- type="int"
+////    	if ( "byte".equals(t)  || "Byte".equals(t)    ) return TYPE_INT ;
+////    	if ( "short".equals(t) || "Short".equals(t)   ) return TYPE_INT ; 
+////    	if ( "int".equals(t)   || "Integer".equals(t) ) return TYPE_INT ; 
+////    	if ( "long".equals(t)  || "Long".equals(t) )    return TYPE_INT ; 
+////    	if ( "BigInteger".equals(t) )   return TYPE_INT ;
+////
+////    	//--- type="num"
+////    	if ( "float".equals(t)  || "Float".equals(t) )    return TYPE_NUM ; 
+////    	if ( "double".equals(t) || "Double".equals(t) )   return TYPE_NUM ; 
+////    	if ( "BigDecimal".equals(t) )   return TYPE_NUM ;
+////    	
+////    	//--- type="date"
+////    	if ( "Date".equals(t) )   return TYPE_DATE ;
+////    	
+////    	//--- type="time"
+////    	if ( "Time".equals(t) )   return TYPE_TIME ;
+////    	
+////    	return "" ;
+//    }
     
-    /**
-     * For Velocity attribute syntax : $var.guiTypeAttribute
-     * @return
-     */
-	@VelocityMethod(
-			text={	
-				"Returns the GUI type attribute ",
-				"e.g : type='int' "
-				}
-				)
-    public String getGuiTypeAttribute() 
-    {
-    	return guiTypeAttribute() ;
-    }
-    /**
-     * For Velocity function call syntax : $var.guiTypeAttribute() 
-     * @return
-     */
-	@VelocityMethod(
-			text={	
-				"Returns the GUI type attribute ",
-				"e.g : type='int' "
-				}
-				)
-    public String guiTypeAttribute() 
-    {
-    	return guiTypeAttribute("type") ;
-    }
-    /**
-     * For Velocity function call syntax : $var.guiTypeAttribute('type') 
-     * @param attributeName
-     * @return
-     */
-	@VelocityMethod(
-	text={	
-		"Returns the GUI type attribute ",
-		"e.g : type='int' "
-		},
-	parameters={
-			"guiTypeAttributeName : name of the TYPE attribute to be set in the GUI "
-		}
-		)
-    public String guiTypeAttribute(String attributeName) 
-    {
-    	if ( attributeName != null )
-    	{
-    		String s = getGuiType();
-    		if ( ! StrUtil.nullOrVoid(s) )
-    		{
-    			return attributeName + "=\"" + s + "\"" ;
-    		}
-    	}
-    	return "";
-    }
+//    /**
+//     * For Velocity attribute syntax : $var.guiTypeAttribute
+//     * @return
+//     */
+//	@VelocityMethod(
+//			text={	
+//				"Returns the GUI type attribute ",
+//				"e.g : type='int' "
+//				}
+//				)
+//    public String getGuiTypeAttribute() 
+//    {
+//    	return guiTypeAttribute() ;
+//    }
+//    /**
+//     * For Velocity function call syntax : $var.guiTypeAttribute() 
+//     * @return
+//     */
+//	@VelocityMethod(
+//			text={	
+//				"Returns the GUI type attribute ",
+//				"e.g : type='int' "
+//				}
+//				)
+//    public String guiTypeAttribute() 
+//    {
+//    	return guiTypeAttribute("type") ;
+//    }
+//    /**
+//     * For Velocity function call syntax : $var.guiTypeAttribute('type') 
+//     * @param attributeName
+//     * @return
+//     */
+//	@VelocityMethod(
+//	text={	
+//		"Returns the GUI type attribute ",
+//		"e.g : type='int' "
+//		},
+//	parameters={
+//			"guiTypeAttributeName : name of the TYPE attribute to be set in the GUI "
+//		}
+//		)
+//    public String guiTypeAttribute(String attributeName) 
+//    {
+//    	if ( attributeName != null )
+//    	{
+//    		String s = getGuiType();
+//    		if ( ! StrUtil.nullOrVoid(s) )
+//    		{
+//    			return attributeName + "=\"" + s + "\"" ;
+//    		}
+//    	}
+//    	return "";
+//    }
     
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -1248,10 +1311,10 @@ public class AttributeInContext
     	return _sDefaultValue ;
     }
 
-	public String toString()
+	public String toString() 
 	{
 		String s =  _sInitialValue != null ? " = " + _sInitialValue : "" ;
-		return this.getType() + " " + _sName + s ; // + " ( " + _sGetter + "/" + _sSetter + " ) ";
+		return this.getType() + " " + _sName + s ; 
 	}
 
 	private String voidIfNull ( String s ) {
@@ -1271,141 +1334,154 @@ public class AttributeInContext
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is a Java primitive type",
-		"i.e. int, float, boolean, ..."
+		"Returns TRUE if the attribute's language type is a primitive type",
+		"i.e. for Java : int, float, boolean, ..."
 		}
 	)
 	public boolean isPrimitiveType()
 	{
-		return JavaTypeUtil.isPrimitiveType( _sSimpleType );
+//		return JavaTypeUtil.isPrimitiveType( _sSimpleType );
+		// v 3.0.0
+		LanguageType type = getLanguageType();
+		return type.isPrimitiveType() ;		
 	}
+
+//	//------------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//	text={	
+//		"Returns TRUE if the attribute's type is a Java array ( byte[], String[], ... )"
+//		},
+//	since="2.0.7"
+//	)
+//	public boolean isArrayType()
+//	{
+//		String s = _sSimpleType ;
+//		if ( s != null ) {
+//			if ( s.trim().endsWith("]")) {
+//				return true ;
+//			}
+//		}
+//    	return false ;
+//	}
 
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is a Java array ( byte[], String[], ... )"
-		},
-	since="2.0.7"
-	)
-	public boolean isArrayType()
-	{
-		String s = _sSimpleType ;
-		if ( s != null ) {
-			if ( s.trim().endsWith("]")) {
-				return true ;
-			}
-		}
-    	return false ;
-	}
-
-	//------------------------------------------------------------------------------------------
-	@VelocityMethod(
-	text={	
-		"Returns TRUE if the attribute's type is a Java 'boolean/Boolean' type"
+		"Returns TRUE if the attribute's neutral type is'boolean' "
 		},
 	since="2.0.7"
 	)
 	public boolean isBooleanType()
 	{
-    	if ( "boolean".equals(_sSimpleType) )   return true ;
-    	if ( "Boolean".equals(_sSimpleType) )   return true ;
+//    	if ( "boolean".equals(_sSimpleType) )   return true ;
+//    	if ( "Boolean".equals(_sSimpleType) )   return true ;
+    	if ( NeutralType.BOOLEAN.equals(this._sNeutralType ) ) return true ; // v 3.0.0
     	return false ;
 	}
 
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is a Java 'byte/Byte' type"
+		"Returns TRUE if the attribute's neutral type is 'byte' "
 		},
 	since="2.0.7"
 	)
 	public boolean isByteType()
 	{
-    	if ( "byte".equals(_sSimpleType) )   return true ;
-    	if ( "Byte".equals(_sSimpleType) )   return true ;
+//    	if ( "byte".equals(_sSimpleType) )   return true ;
+//    	if ( "Byte".equals(_sSimpleType) )   return true ;
+    	if ( NeutralType.BYTE.equals(this._sNeutralType ) ) return true ; // v 3.0.0
     	return false ;
 	}
 
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is a Java 'short/Short' type"
+		"Returns TRUE if the attribute's neutral type is 'short' "
 		},
 	since="2.0.7"
 	)
 	public boolean isShortType()
 	{
-    	if ( "short".equals(_sSimpleType) )   return true ;
-    	if ( "Short".equals(_sSimpleType) )   return true ;
+//    	if ( "short".equals(_sSimpleType) )   return true ;
+//    	if ( "Short".equals(_sSimpleType) )   return true ;
+    	if ( NeutralType.SHORT.equals(this._sNeutralType ) ) return true ; // v 3.0.0
     	return false ;
 	}
 
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is a Java 'int/Integer' type"
+		"Returns TRUE if the attribute's neutral type is 'int' "
 		},
 	since="2.0.7"
 	)
 	public boolean isIntegerType()
 	{
-    	if ( "int".equals(_sSimpleType) )   return true ;
-    	if ( "Integer".equals(_sSimpleType) ) return true ;
+//    	if ( "int".equals(_sSimpleType) )   return true ;
+//    	if ( "Integer".equals(_sSimpleType) ) return true ;
+    	if ( NeutralType.INTEGER.equals(this._sNeutralType ) ) return true ; // v 3.0.0
     	return false ;
 	}
 
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is a Java 'long/Long' type"
+		"Returns TRUE if the attribute's neutral type is 'long' "
 		},
 	since="2.0.7"
 	)
 	public boolean isLongType()
 	{
-    	if ( "long".equals(_sSimpleType) )   return true ;
-    	if ( "Long".equals(_sSimpleType) )   return true ;
+//    	if ( "long".equals(_sSimpleType) )   return true ;
+//    	if ( "Long".equals(_sSimpleType) )   return true ;
+    	if ( NeutralType.LONG.equals(this._sNeutralType ) ) return true ; // v 3.0.0
     	return false ;
 	}
 
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is a Java 'float/Float' type"
+			"Returns TRUE if the attribute's neutral type is 'float' "
 		},
 	since="2.0.7"
 	)
 	public boolean isFloatType()
 	{
-    	if ( "float".equals(_sSimpleType) )   return true ;
-    	if ( "Float".equals(_sSimpleType) )   return true ;
+//    	if ( "float".equals(_sSimpleType) )   return true ;
+//    	if ( "Float".equals(_sSimpleType) )   return true ;
+    	if ( NeutralType.FLOAT.equals(this._sNeutralType ) ) return true ; // v 3.0.0
     	return false ;
 	}
 	
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is a Java 'double/Double' type"
+			"Returns TRUE if the attribute's neutral type is 'double' "
 		},
 	since="2.0.7"
 	)
 	public boolean isDoubleType()
 	{
-    	if ( "double".equals(_sSimpleType) )   return true ;
-    	if ( "Double".equals(_sSimpleType) )   return true ;
+//    	if ( "double".equals(_sSimpleType) )   return true ;
+//    	if ( "Double".equals(_sSimpleType) )   return true ;
+    	if ( NeutralType.DOUBLE.equals(this._sNeutralType ) ) return true ; // v 3.0.0
     	return false ;
 	}
 
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is a Java 'BigDecimal' type"
+			"Returns TRUE if the attribute's neutral type is 'decimal' "
 		},
-	since="2.0.7"
+//	since="2.0.7"
+	since="3.0.0"
 	)
-	public boolean isBigDecimalType()
+//	public boolean isBigDecimalType()
+	public boolean isDecimalType()
 	{
-    	if ( "BigDecimal".equals(_sSimpleType) )   return true ;
+//    	if ( "BigDecimal".equals(_sSimpleType) )   return true ;
+    	if ( NeutralType.DECIMAL.equals(this._sNeutralType ) ) return true ; // v 3.0.0
     	return false ;
 	}
 
@@ -1413,8 +1489,8 @@ public class AttributeInContext
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is a Java number type",
-		"(byte, Byte, int, Integer, float ,Float, BigDecimal, etc... )"
+		"Returns TRUE if the attribute's neutral type is a number type",
+		"( byte, short, int, long, decimal, float, double )"
 		},
 	since="2.0.7"
 	)
@@ -1422,109 +1498,154 @@ public class AttributeInContext
 	{
     	if ( isByteType() || isShortType() || isIntegerType() || isLongType() )   return true ;
     	if ( isFloatType() || isDoubleType() )   return true ;
-    	if ( isBigDecimalType() )   return true ;
+//    	if ( isBigDecimalType() )   return true ;
+    	if ( isDecimalType() )   return true ;
     	return false ;
 	}
 
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is a Java 'String' type"
+			"Returns TRUE if the attribute's neutral type is 'string' "
 		},
 	since="2.0.7"
 	)
 	public boolean isStringType()
 	{
-    	if ( "String".equals(_sSimpleType) )   return true ;
+//    	if ( "String".equals(_sSimpleType) )   return true ;
+    	if ( NeutralType.STRING.equals(this._sNeutralType ) ) return true ; // v 3.0.0
     	return false ;
 	}
 
+//	//------------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//	text={	
+//		"Returns TRUE if the attribute's type is 'java.util.Date' type"
+//		},
+//	since="2.0.7"
+//	)
+//	public boolean isUtilDateType()
+//	{
+//    	if ( "java.util.Date".equals(_sFullType) ) return true ;
+//    	return false ;
+//	}
+//	//------------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//	text={	
+//		"Returns TRUE if the attribute's type is 'java.sql.Date' type"
+//		},
+//	since="2.0.7"
+//	)
+//	public boolean isSqlDateType()
+//	{
+//    	if ( "java.sql.Date".equals(_sFullType) ) return true ;
+//    	return false ;
+//	}
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is 'java.util.Date' type"
+		"Returns TRUE if the attribute's neutral type is 'date' "
 		},
-	since="2.0.7"
+	since="3.0.0"
 	)
-	public boolean isUtilDateType()
+	public boolean isDateType()
 	{
-    	if ( "java.util.Date".equals(_sFullType) ) return true ;
-    	return false ;
+		return NeutralType.DATE.equals(this._sNeutralType ) ; // v 3.0.0
 	}
+//	//------------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//	text={	
+//		"Returns TRUE if the attribute's type is 'java.sql.Time' type"
+//		},
+//	since="2.0.7"
+//	)
+//	public boolean isSqlTimeType()
+//	{
+//    	if ( "java.sql.Time".equals(_sFullType) ) return true ;
+//    	return false ;
+//	}
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is 'java.sql.Date' type"
+		"Returns TRUE if the attribute's neutral type is 'time' "
 		},
-	since="2.0.7"
+	since="3.0.0"
 	)
-	public boolean isSqlDateType()
-	{
-    	if ( "java.sql.Date".equals(_sFullType) ) return true ;
-    	return false ;
+	public boolean isTimeType() {
+		return NeutralType.TIME.equals(this._sNeutralType ) ; // v 3.0.0
 	}
+//	//------------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//	text={	
+//		"Returns TRUE if the attribute's type is 'java.sql.Timestamp' type"
+//		},
+//	since="2.0.7"
+//	)
+//	public boolean isSqlTimestampType()
+//	{
+//    	if ( "java.sql.Timestamp".equals(_sFullType) ) return true ;
+//    	return false ;
+//	}
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is 'java.sql.Time' type"
+			"Returns TRUE if the attribute's neutral type is 'timestamp' "
 		},
-	since="2.0.7"
+	since="3.0.0"
 	)
-	public boolean isSqlTimeType()
-	{
-    	if ( "java.sql.Time".equals(_sFullType) ) return true ;
-    	return false ;
+	public boolean isTimestampType() {
+		return NeutralType.TIMESTAMP.equals(this._sNeutralType ) ; // v 3.0.0
 	}
+	
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is 'java.sql.Timestamp' type"
-		},
-	since="2.0.7"
-	)
-	public boolean isSqlTimestampType()
-	{
-    	if ( "java.sql.Timestamp".equals(_sFullType) ) return true ;
-    	return false ;
-	}
-	//------------------------------------------------------------------------------------------
-	@VelocityMethod(
-	text={	
-		"Returns TRUE if the attribute's type is a Java temporal type",
-		"( java.util.Date, java.sql.Date, java.sql.Time, java.sql.Timestamp )"
+		"Returns TRUE if the attribute's neutral type is a temporal type",
+		"( date, time, timestamp )"
 		},
 	since="2.0.7"
 	)
 	public boolean isTemporalType()
 	{
-    	if ( isUtilDateType() || isSqlDateType() || isSqlTimeType() || isSqlTimestampType() ) return true ;
+//    	if ( isUtilDateType() || isSqlDateType() || isSqlTimeType() || isSqlTimestampType() ) return true ;
+    	if ( isDateType() || isTimeType() || isTimestampType() ) return true ;
     	return false ;
 	}
 
+//	//------------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//	text={	
+//		"Returns TRUE if the attribute's type is a Java 'Blob' type"
+//		},
+//	since="2.0.7"
+//	)
+//	public boolean isBlobType()
+//	{
+//    	if ( "Blob".equals(_sSimpleType) )   return true ;
+//    	return false ;
+//	}
+//
+//	//------------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//	text={	
+//		"Returns TRUE if the attribute's type is a Java 'Clob' type"
+//		},
+//	since="2.0.7"
+//	)
+//	public boolean isClobType()
+//	{
+//    	if ( "Clob".equals(_sSimpleType) )   return true ;
+//    	return false ;
+//	}
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute's type is a Java 'Blob' type"
+			"Returns TRUE if the attribute's neutral type is 'binary' "
 		},
-	since="2.0.7"
+	since="3.0.0"
 	)
-	public boolean isBlobType()
-	{
-    	if ( "Blob".equals(_sSimpleType) )   return true ;
-    	return false ;
-	}
-
-	//------------------------------------------------------------------------------------------
-	@VelocityMethod(
-	text={	
-		"Returns TRUE if the attribute's type is a Java 'Clob' type"
-		},
-	since="2.0.7"
-	)
-	public boolean isClobType()
-	{
-    	if ( "Clob".equals(_sSimpleType) )   return true ;
-    	return false ;
+	public boolean isBinaryType() {
+		return NeutralType.BINARY.equals(this._sNeutralType )  ; // v 3.0.0
 	}
 
 	//-----------------------------------------------------------------------------------------

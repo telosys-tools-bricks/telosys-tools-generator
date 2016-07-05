@@ -55,6 +55,7 @@ public class ContextName {
 	public final static String  LOADER            = "loader" ;
 	public final static String  PROJECT           = "project" ;
 	public final static String  GENERATION        = "generation" ; // ver 2.1.0
+	public final static String  HTML              = "html" ; // ver 3.0.0
 	public final static String  JAVA              = "java" ; // ver 2.0.7
 	public final static String  JPA               = "jpa" ; // ver 2.0.7
 	public final static String  BEAN_VALIDATION   = "beanValidation" ; // ver 2.0.7

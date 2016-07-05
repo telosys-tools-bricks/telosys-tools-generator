@@ -1101,7 +1101,7 @@ public class EntityInContext
 	 * and managed the imports list and attributes declarations types to avoid imports error
 	 *  
 	 */
-	private void endOfAttributesDefinition() // v 2.1.0
+	private void endOfAttributesDefinition() throws GeneratorException // v 2.1.0
 	{
 		if ( _attributes == null ) return ;
 		

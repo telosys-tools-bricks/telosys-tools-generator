@@ -18,15 +18,9 @@ package junit.env.telosys.tools.generator.fakemodel;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import org.telosys.tools.commons.DatabaseUtil;
-import org.telosys.tools.commons.JavaTypeUtil;
-import org.telosys.tools.commons.StrUtil;
-import org.telosys.tools.commons.javatypes.JavaTypes;
-import org.telosys.tools.commons.javatypes.JavaTypesManager;
 import org.telosys.tools.commons.jdbctypes.JdbcTypesManager;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.DateType;
-import org.telosys.tools.generic.model.types.TypeReverser;
 
 /**
  * Column of a table/entity in the Repository Model <br>
@@ -58,7 +52,7 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 
 	private boolean _bAutoIncremented  = false ; // autoIncremented="true|false" ( false by default )
 	
-	private int     _iDatabasePosition = 0 ;     // position="" ( database ordinal position ) #LGU 10/08/2011
+//	private int     _iDatabasePosition = 0 ;     // position="" ( database ordinal position ) #LGU 10/08/2011
 	
 	private String  _sDatabaseDefaultValue = null ;  // dbDefaultValue="" ( database default value ) #LGU 10/08/2011
 	
@@ -70,9 +64,10 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 	
 	//----- JAVA -----
 
-	private String  _sName        = null ;  // javaName=""
+	private final String  _sName         ;  
 	
-	private String  _sFullType    = null ;  // javaType="int|...." 
+//	private String  _sFullType    = null ;  // javaType="int|...." 
+	private final String  _sNeutralType    ;  // v 3.0.0
 	
 	private boolean _bNotNull = false ;  // javaNotNull="true|false" 
 	
@@ -112,7 +107,7 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 	private String  _sBooleanFalseValue = null ; // the special value for FALSE 
 	
 	//----- OTHER SPECIAL DATA -----
-	private String  _sFormat = null ;  // Used with NUMERIC, DATE/TIME
+//	private String  _sFormat = null ;  // Used with NUMERIC, DATE/TIME
 
 	//----- SPECIAL DATA for key generation -----
 	
@@ -123,6 +118,14 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 //	private SequenceGeneratorInDbModel sequenceGenerator = null ;
 	
 	//-----------------------------------------------------------------------------
+//	public AttributeInFakeModel() {
+//		super();
+//	}
+	public AttributeInFakeModel(String name, String neutralType) {
+		super();
+		this._sName = name ;
+		this._sNeutralType = neutralType ;
+	}
 	
 //	public GeneratedValueInDbModel getGeneratedValue() {
 //		return generatedValue;
@@ -212,9 +215,9 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		return _bDatabaseNotNull ;
 	}
 
-	public String getDatabaseNotNullAsString() {
-		return ( _bDatabaseNotNull ? "true" : "false" ) ;
-	}
+//	public String getDatabaseNotNullAsString() {
+//		return ( _bDatabaseNotNull ? "true" : "false" ) ;
+//	}
 
 	//-----------------------------------------------------------------------------
 	public void setDatabaseSize(int size) {
@@ -225,21 +228,21 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		return _iDatabaseSize ;
 	}
 
-	//-----------------------------------------------------------------------------
-	/**
-	 * Returns the ordinal position of the column in the database table
-	 * @param v
-	 */
-	public void setDatabasePosition(int v) { // #LGU 10/08/2011
-		_iDatabasePosition = v ;
-	}
-	/**
-	 * Set the ordinal position of the column in the database table
-	 * @return
-	 */
-	public int getDatabasePosition() { // #LGU 10/08/2011
-		return _iDatabasePosition ;
-	}
+//	//-----------------------------------------------------------------------------
+//	/**
+//	 * Returns the ordinal position of the column in the database table
+//	 * @param v
+//	 */
+//	public void setDatabasePosition(int v) { // #LGU 10/08/2011
+//		_iDatabasePosition = v ;
+//	}
+//	/**
+//	 * Set the ordinal position of the column in the database table
+//	 * @return
+//	 */
+//	public int getDatabasePosition() { // #LGU 10/08/2011
+//		return _iDatabasePosition ;
+//	}
 	
 	//-----------------------------------------------------------------------------
 //	/**
@@ -296,13 +299,13 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		return text != null ? text : "???" ;
 	}
 
-	public String getJdbcTypeCodeWithText() {
-		int code = getJdbcTypeCode();
-		//String text = _jdbcTypes.getTextForCode(code);
-		String text = JdbcTypesManager.getJdbcTypes().getTextForCode( code );
-		if ( text == null ) text = "???" ;
-		return code + " : " + text.toLowerCase() ;
-	}
+//	public String getJdbcTypeCodeWithText() {
+//		int code = getJdbcTypeCode();
+//		//String text = _jdbcTypes.getTextForCode(code);
+//		String text = JdbcTypesManager.getJdbcTypes().getTextForCode( code );
+//		if ( text == null ) text = "???" ;
+//		return code + " : " + text.toLowerCase() ;
+//	}
 
 	//-----------------------------------------------------------------------------
 
@@ -319,14 +322,14 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		return _sDatabaseTypeName;
 	}
 	
-	/**
-     * Returns the database native type name with its size if the size make sense.<br>
-     * Examples : INTEGER, VARCHAR(24), NUMBER, CHAR(3), etc... 
-	 * @return
-	 */
-	public String getDatabaseTypeNameWithSize() {
-		return DatabaseUtil.getNativeTypeWithSize(_sDatabaseTypeName, _iDatabaseSize, _iJdbcTypeCode);
-	}
+//	/**
+//     * Returns the database native type name with its size if the size make sense.<br>
+//     * Examples : INTEGER, VARCHAR(24), NUMBER, CHAR(3), etc... 
+//	 * @return
+//	 */
+//	public String getDatabaseTypeNameWithSize() {
+//		return DatabaseUtil.getNativeTypeWithSize(_sDatabaseTypeName, _iDatabaseSize, _iJdbcTypeCode);
+//	}
 
 	public void setDatabaseTypeName(String databaseTypeName) {
 		_sDatabaseTypeName = databaseTypeName;
@@ -345,56 +348,57 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 	public String getName() { // v 3.0.0
 		return _sName;
 	}
-	public void setName(String s) { // v 3.0.0
-		_sName = s ;
-	}
+//	public void setName(String s) { // v 3.0.0
+//		_sName = s ;
+//	}
 	
 	//-----------------------------------------------------------------------------
 	
-	/**
-	 * Returns the primitive Java type or the full java class name ( with package )
-	 * e.g. : "boolean", "java.lang.Boolean", "java.util.Date", etc...
-	 * @return
-	 */
-//	public String getJavaType() {
-	@Override
-	public String getFullType() { // v 3.0.0
-		
-		String sType = _sFullType ;
-		
-		//--- Backward compatibility with old repository
-		
-		JavaTypes javaTypes = JavaTypesManager.getJavaTypes();
-		if ( javaTypes.getTypeIndex(sType) < 0 )
-		{
-			// Type NOT FOUND : may be a short type ( from an old repository ) 
-			return javaTypes.getTypeForShortType(sType); 
-		}
-		else
-		{
-			// Type found => Type OK
-			return sType ;
-		}
-	}
+//	/**
+//	 * Returns the primitive Java type or the full java class name ( with package )
+//	 * e.g. : "boolean", "java.lang.Boolean", "java.util.Date", etc...
+//	 * @return
+//	 */
+////	public String getJavaType() {
+//	@Override
+//	public String getFullType() { // v 3.0.0
+//		
+//		String sType = _sFullType ;
+//		
+//		//--- Backward compatibility with old repository
+//		
+//		JavaTypes javaTypes = JavaTypesManager.getJavaTypes();
+//		if ( javaTypes.getTypeIndex(sType) < 0 )
+//		{
+//			// Type NOT FOUND : may be a short type ( from an old repository ) 
+//			return javaTypes.getTypeForShortType(sType); 
+//		}
+//		else
+//		{
+//			// Type found => Type OK
+//			return sType ;
+//		}
+//	}
 	//-----------------------------------------------------------------------------
 	@Override
 	public String getNeutralType() { // v 3.0.0
-		TypeReverser typeReverser = TypeReverser.getInstance() ;
-		return typeReverser.getNeutralType(_sFullType, dateType) ;
+//		TypeReverser typeReverser = TypeReverser.getInstance() ;
+//		return typeReverser.getNeutralType(_sFullType, dateType) ;
+		return _sNeutralType ;
 	}
 	//-----------------------------------------------------------------------------
 
-//	public void setJavaType(String s) {
-	public void setFullType(String s) { // v 3.0.0
-		_sFullType = s ;
-	}
+////	public void setJavaType(String s) {
+//	public void setFullType(String s) { // v 3.0.0
+//		_sFullType = s ;
+//	}
 
-	@Override
-	public String getSimpleType() {
-		// TODO Auto-generated method stub
-		// TODO : really useful ?
-		return null;
-	}
+//	@Override
+//	public String getSimpleType() {
+//		// TODO Auto-generated method stub
+//		// TODO : really useful ?
+//		return null;
+//	}
 
 	//-----------------------------------------------------------------------------
 //	/**
@@ -425,59 +429,59 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		return null; // Not yet implemented 
 	}
 
-	//-----------------------------------------------------------------------------
-	/**
-	 * Returns true is the Java type is "boolean" or "java.lang.Boolean"
-	 * @return
-	 */
-	public boolean isJavaTypeBoolean() 
-	{
-		//return JavaTypeUtil.isCategoryBoolean( getJavaType() ) ;
-		return JavaTypeUtil.isCategoryBoolean( getFullType() ) ;  // v 3.0.0
-	}
+//	//-----------------------------------------------------------------------------
+//	/**
+//	 * Returns true is the Java type is "boolean" or "java.lang.Boolean"
+//	 * @return
+//	 */
+//	public boolean isJavaTypeBoolean() 
+//	{
+//		//return JavaTypeUtil.isCategoryBoolean( getJavaType() ) ;
+//		return JavaTypeUtil.isCategoryBoolean( getFullType() ) ;  // v 3.0.0
+//	}
 	
-	/**
-	 * Returns true is the Java type is "java.lang.String"
-	 * @return
-	 */
-	public boolean isJavaTypeString() 
-	{
-		//return JavaTypeUtil.isCategoryString( getJavaType() ) ;
-		return JavaTypeUtil.isCategoryString( getFullType() ) ; // v 3.0.0
-	}
+//	/**
+//	 * Returns true is the Java type is "java.lang.String"
+//	 * @return
+//	 */
+//	public boolean isJavaTypeString() 
+//	{
+//		//return JavaTypeUtil.isCategoryString( getJavaType() ) ;
+//		return JavaTypeUtil.isCategoryString( getFullType() ) ; // v 3.0.0
+//	}
 
-	/**
-	 * Returns true if the Java type is a numeric type : <br>
-	 * "byte", "short", "int", "long", "double", "float" <br>
-	 * or respective wrappers, or "BigDecimal", or "BigInteger"<br>
-	 * @return
-	 */
-	public boolean isJavaTypeNumber() 
-	{
-		//return JavaTypeUtil.isCategoryNumber( getJavaType() ) ;
-		return JavaTypeUtil.isCategoryNumber( getFullType() ) ; // v 3.0.0
-	}
+//	/**
+//	 * Returns true if the Java type is a numeric type : <br>
+//	 * "byte", "short", "int", "long", "double", "float" <br>
+//	 * or respective wrappers, or "BigDecimal", or "BigInteger"<br>
+//	 * @return
+//	 */
+//	public boolean isJavaTypeNumber() 
+//	{
+//		//return JavaTypeUtil.isCategoryNumber( getJavaType() ) ;
+//		return JavaTypeUtil.isCategoryNumber( getFullType() ) ; // v 3.0.0
+//	}
 	
-	/**
-	 * Returns true if the Java type is "java.util.Date" or "java.sql.Date" <br>
-	 * or "java.sql.Time" or "java.sql.Timestamp" <br>
-	 * @return
-	 */
-	public boolean isJavaTypeDateOrTime() 
-	{
-		//return JavaTypeUtil.isCategoryDateOrTime( getJavaType() ) ;
-		return JavaTypeUtil.isCategoryDateOrTime( getFullType() ) ; // v 3.0.0
-	}
+//	/**
+//	 * Returns true if the Java type is "java.util.Date" or "java.sql.Date" <br>
+//	 * or "java.sql.Time" or "java.sql.Timestamp" <br>
+//	 * @return
+//	 */
+//	public boolean isJavaTypeDateOrTime() 
+//	{
+//		//return JavaTypeUtil.isCategoryDateOrTime( getJavaType() ) ;
+//		return JavaTypeUtil.isCategoryDateOrTime( getFullType() ) ; // v 3.0.0
+//	}
 	
-	/**
-	 * Returns true if the Java type is a "primitive type" ( "int", "boolean", "short", ... )
-	 * @return
-	 */
-	public boolean isJavaPrimitiveType()
-	{
-		//return JavaTypeUtil.isPrimitiveType( getJavaType() );
-		return JavaTypeUtil.isPrimitiveType( getFullType() ); // v 3.0.0
-	}
+//	/**
+//	 * Returns true if the Java type is a "primitive type" ( "int", "boolean", "short", ... )
+//	 * @return
+//	 */
+//	public boolean isJavaPrimitiveType()
+//	{
+//		//return JavaTypeUtil.isPrimitiveType( getJavaType() );
+//		return JavaTypeUtil.isPrimitiveType( getFullType() ); // v 3.0.0
+//	}
 
 	//-----------------------------------------------------------------------------
 //	public boolean getJavaNotNull() {
@@ -630,6 +634,7 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		dateType = v ;
 	}
 	
+	@Override
 	public boolean isDatePast() {
 		return _bDatePast;
 	}
@@ -637,6 +642,7 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		_bDatePast = v;
 	}
 
+	@Override
 	public boolean isDateFuture() {
 		return _bDateFuture;
 	}
@@ -644,6 +650,7 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		_bDateFuture = v;
 	}
 
+	@Override
 	public boolean isDateBefore() {
 		return _bDateBefore;
 	}
@@ -695,13 +702,13 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 
 	//-----------------------------------------------------------------------------
 
-	public String getFormat() {
-		return _sFormat ; 
-	}
-	public void setFormat(String v) {
-		_sFormat = v ;
-	}
-	
+//	public String getFormat() {
+//		return _sFormat ; 
+//	}
+//	public void setFormat(String v) {
+//		_sFormat = v ;
+//	}
+//	
 	//-----------------------------------------------------------------------------
 
 //	public Integer getMinValue() { // ver 3.0.0
@@ -724,88 +731,88 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 	
 	//-----------------------------------------------------------------------------
 
-	/**
-	 * Returns the "special type informations" for this column if any ( else "", never null )
-	 * @return : Special information, ie "Long Text", "Date only", "Time only", boolean true/false value
-	 */
-	public String getSpecialTypeInfo() 
-	{
-//		String sJavaType = getJavaType();
-//		if ( sJavaType != null )
-//		{
-//			if ( "java.lang.String".equals(sJavaType) ) {
-//				if ( getLongText() ) return "Long Text" ;
+//	/**
+//	 * Returns the "special type informations" for this column if any ( else "", never null )
+//	 * @return : Special information, ie "Long Text", "Date only", "Time only", boolean true/false value
+//	 */
+//	public String getSpecialTypeInfo() 
+//	{
+////		String sJavaType = getJavaType();
+////		if ( sJavaType != null )
+////		{
+////			if ( "java.lang.String".equals(sJavaType) ) {
+////				if ( getLongText() ) return "Long Text" ;
+////			}
+////			if ( "java.lang.Boolean".equals(sJavaType) || "boolean".equals(sJavaType) ) {
+////				return getBooleanTrueValue() + ":" + getBooleanFalseValue() ;
+////			}
+////			if ( "java.util.Date".equals(sJavaType) ) {
+////				String sDateType = getDateType() ;
+////				if ( SPECIAL_DATE_ONLY.equals(sDateType) )     return "Date only" ;
+////				if ( SPECIAL_TIME_ONLY.equals(sDateType) )     return "Time only" ;
+////				if ( SPECIAL_DATE_AND_TIME.equals(sDateType) ) return "Date + Time" ;
+////			}
+////		}
+//		
+//		StringBuffer sb = new StringBuffer();
+//		if ( this.isJavaTypeString() ) {
+//			//if ( getLongText() ) addStr(sb, "Long Text") ;
+//			if ( isLongText() ) addStr(sb, "Long Text") ; // v 3.0.0
+//			//if ( getNotEmpty() ) addStr(sb, "NE") ;
+//			if ( isNotEmpty() ) addStr(sb, "NE") ; // v 3.0.0
+//			//if ( getNotBlank() ) addStr(sb, "NB") ;
+//			if ( isNotBlank() ) addStr(sb, "NB") ; // v 3.0.0
+//			//if ( ( ! StrUtil.nullOrVoid( getMinLength() ) ) || ( ! StrUtil.nullOrVoid( getMaxLength() ) ) )
+//			if ( ( getMinLength() != null ) || ( getMaxLength() != null ) )
+//			{
+//				//addStr( sb, "[" + str(getMinLength()) + ";" + str(getMaxLength()) + "]" );
+//				addStr( sb, "[" + getMinLength() + ";" + getMaxLength() + "]" );
 //			}
-//			if ( "java.lang.Boolean".equals(sJavaType) || "boolean".equals(sJavaType) ) {
-//				return getBooleanTrueValue() + ":" + getBooleanFalseValue() ;
+//			if ( ! StrUtil.nullOrVoid( getPattern() ) ) addStr(sb, "P" ) ;
+//		}
+////		else if ( this.isJavaTypeBoolean() ) {
+////			if ( ! StrUtil.nullOrVoid( getBooleanTrueValue() ) ) {
+////				addStr( sb, getBooleanTrueValue() + ":" + getBooleanFalseValue() );
+////			}
+////		}
+//		else if ( this.isJavaTypeNumber() ) {
+//			if ( ! StrUtil.nullOrVoid( getDefaultValue() ) )
+//			{
+//				addStr( sb, getDefaultValue() );
 //			}
-//			if ( "java.util.Date".equals(sJavaType) ) {
-//				String sDateType = getDateType() ;
-//				if ( SPECIAL_DATE_ONLY.equals(sDateType) )     return "Date only" ;
-//				if ( SPECIAL_TIME_ONLY.equals(sDateType) )     return "Time only" ;
-//				if ( SPECIAL_DATE_AND_TIME.equals(sDateType) ) return "Date + Time" ;
+//			//if ( ( ! StrUtil.nullOrVoid( getMinValue() ) ) || ( ! StrUtil.nullOrVoid( getMaxValue() ) ) )
+//			if ( ( getMinValue() != null ) || ( getMaxValue() != null ) )
+//			{
+//				//addStr( sb, "[" + str(getMinValue()) + ";" + str(getMaxValue()) + "]" );
+//				addStr( sb, "[" + getMinValue() + ";" + getMaxValue() + "]" );
 //			}
 //		}
-		
-		StringBuffer sb = new StringBuffer();
-		if ( this.isJavaTypeString() ) {
-			//if ( getLongText() ) addStr(sb, "Long Text") ;
-			if ( isLongText() ) addStr(sb, "Long Text") ; // v 3.0.0
-			//if ( getNotEmpty() ) addStr(sb, "NE") ;
-			if ( isNotEmpty() ) addStr(sb, "NE") ; // v 3.0.0
-			//if ( getNotBlank() ) addStr(sb, "NB") ;
-			if ( isNotBlank() ) addStr(sb, "NB") ; // v 3.0.0
-			//if ( ( ! StrUtil.nullOrVoid( getMinLength() ) ) || ( ! StrUtil.nullOrVoid( getMaxLength() ) ) )
-			if ( ( getMinLength() != null ) || ( getMaxLength() != null ) )
-			{
-				//addStr( sb, "[" + str(getMinLength()) + ";" + str(getMaxLength()) + "]" );
-				addStr( sb, "[" + getMinLength() + ";" + getMaxLength() + "]" );
-			}
-			if ( ! StrUtil.nullOrVoid( getPattern() ) ) addStr(sb, "P" ) ;
-		}
-		else if ( this.isJavaTypeBoolean() ) {
-			if ( ! StrUtil.nullOrVoid( getBooleanTrueValue() ) ) {
-				addStr( sb, getBooleanTrueValue() + ":" + getBooleanFalseValue() );
-			}
-		}
-		else if ( this.isJavaTypeNumber() ) {
-			if ( ! StrUtil.nullOrVoid( getDefaultValue() ) )
-			{
-				addStr( sb, getDefaultValue() );
-			}
-			//if ( ( ! StrUtil.nullOrVoid( getMinValue() ) ) || ( ! StrUtil.nullOrVoid( getMaxValue() ) ) )
-			if ( ( getMinValue() != null ) || ( getMaxValue() != null ) )
-			{
-				//addStr( sb, "[" + str(getMinValue()) + ";" + str(getMaxValue()) + "]" );
-				addStr( sb, "[" + getMinValue() + ";" + getMaxValue() + "]" );
-			}
-		}
-		else if ( this.isJavaTypeDateOrTime() ) {
-			//String sDateType = getDateType() ;
-			//if ( SPECIAL_DATE_ONLY.equals(sDateType) )     addStr( sb, "Date only" );
-			//if ( SPECIAL_TIME_ONLY.equals(sDateType) )     addStr( sb, "Time only" );
-			//if ( SPECIAL_DATE_AND_TIME.equals(sDateType) ) addStr( sb, "Date & Time" );
-			DateType dateType = getDateType();
-			if ( dateType == DateType.DATE_ONLY )     addStr( sb, "Date only" );
-			if ( dateType == DateType.TIME_ONLY )     addStr( sb, "Time only" );
-			if ( dateType == DateType.DATE_AND_TIME ) addStr( sb, "Date & Time" );
-			
-			if ( isDatePast() ) addStr( sb, "P" ); 
-			if ( isDateFuture() ) addStr( sb, "F" ); 
-			if ( isDateBefore() ) addStr( sb, "B" ); 
-			if ( isDateAfter() ) addStr( sb, "A" ); 
-		}
-		return sb.toString();
-	}
+//		else if ( this.isJavaTypeDateOrTime() ) {
+//			//String sDateType = getDateType() ;
+//			//if ( SPECIAL_DATE_ONLY.equals(sDateType) )     addStr( sb, "Date only" );
+//			//if ( SPECIAL_TIME_ONLY.equals(sDateType) )     addStr( sb, "Time only" );
+//			//if ( SPECIAL_DATE_AND_TIME.equals(sDateType) ) addStr( sb, "Date & Time" );
+//			DateType dateType = getDateType();
+//			if ( dateType == DateType.DATE_ONLY )     addStr( sb, "Date only" );
+//			if ( dateType == DateType.TIME_ONLY )     addStr( sb, "Time only" );
+//			if ( dateType == DateType.DATE_AND_TIME ) addStr( sb, "Date & Time" );
+//			
+//			if ( isDatePast() ) addStr( sb, "P" ); 
+//			if ( isDateFuture() ) addStr( sb, "F" ); 
+//			if ( isDateBefore() ) addStr( sb, "B" ); 
+//			if ( isDateAfter() ) addStr( sb, "A" ); 
+//		}
+//		return sb.toString();
+//	}
 //	private String str(String s)
 //	{
 //		return s != null ? s : "" ;
 //	}
-	private void addStr(StringBuffer sb, String s)
-	{
-		if ( sb.length() > 0 ) sb.append(",");
-		sb.append(s);
-	}
+//	private void addStr(StringBuffer sb, String s)
+//	{
+//		if ( sb.length() > 0 ) sb.append(",");
+//		sb.append(s);
+//	}
 	
 	/**
 	 * Clear all the "special type informations" for this column
@@ -839,11 +846,11 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 	
 	//public int compareTo(Object o) {
 	public int compareTo(AttributeInFakeModel other) {
-		if ( other != null )
-		{
-			//Column other = (Column) o;
-			return ( this.getDatabasePosition() - other.getDatabasePosition() );
-		}
+//		if ( other != null )
+//		{
+//			//Column other = (Column) o;
+//			return ( this.getDatabasePosition() - other.getDatabasePosition() );
+//		}
 		return 0;
 	}
 
@@ -864,7 +871,7 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 			//+ getJavaName() + "|" 
 			//+ getName() + "|" // v 3.0.0 
 			// + getJavaType() ;
-			+ getFullType() ; // v 3.0.0
+			+ getNeutralType() ; // v 3.0.0
 	}
 
 	//---------------------------------------------------------------------------------------------------
