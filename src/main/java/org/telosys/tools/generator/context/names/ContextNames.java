@@ -80,6 +80,7 @@ public class ContextNames {
 		GENERATOR_OBJECTS_LIST.add( ContextName.ENV ); // ver 2.1.0
 		GENERATOR_OBJECTS_LIST.add( ContextName.JDBC_FACTORY ); // ver 2.1.1
 		GENERATOR_OBJECTS_LIST.add( ContextName.H2 ); // ver 2.1.1
+		GENERATOR_OBJECTS_LIST.add( ContextName.HTML ); // ver 3.0.0
 
 		//--- Current Entity/Target objects
 		GENERATOR_OBJECTS_LIST.add( ContextName.TARGET      );

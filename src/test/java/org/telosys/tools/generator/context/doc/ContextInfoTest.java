@@ -46,7 +46,8 @@ public class ContextInfoTest  extends TestCase {
 		
 		//assertTrue ( names.length == 11 );
 		//assertTrue ( names.length == 16 ); // v 2.1.0
-		assertTrue ( names.length == 18 ); // v 2.1.1
+		//assertTrue ( names.length == 18 ); // v 2.1.1
+		assertTrue ( names.length == 19 ); // v 3.0.0
 	}
 
 	public void testObjectAndVariableNames() {

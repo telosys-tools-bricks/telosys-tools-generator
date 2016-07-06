@@ -15,15 +15,10 @@
  */
 package org.telosys.tools.generator.context;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.telosys.tools.commons.StrUtil;
-import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.generator.context.tools.LinesBuilder;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 //-------------------------------------------------------------------------------------
@@ -41,8 +36,8 @@ public class HtmlInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 			text={	
-				"Returns the HTML5 'type' attribute ",
-				"The 'type' is determinded from the 'input type' or computed from the model type ",
+				"Returns the HTML5 'type' attribute for 'input' tag ",
+				"The 'type' is determinded from the 'input type' if any or computed from the model type ",
 				"e.g : type='text', type='number', type='date', type='time', etc "
 				}
 		)
@@ -50,7 +45,7 @@ public class HtmlInContext {
 		String type = attribute.getInputType() ; // by default
 		if ( StrUtil.nullOrVoid(type) ) {
 			// input type not defined => try to compute it
-			type = computeType( attribute.getNeutralType() ); 
+			type = computeType( attribute ); 
 		}
 		if ( ! StrUtil.nullOrVoid(type) ) {
 			return "type=\"" + type + "\"" ;
@@ -58,7 +53,15 @@ public class HtmlInContext {
 		return "";
     }
     
-	private String computeType( String attributeType ) {
+	private String computeType( AttributeInContext attribute  ) {
+		
+		// HTML5 types examples : 
+		// <input type="text" > 
+		// <input type="checkbox" value="Bike"> 
+		// <input type="number" step="8"> 
+		// <input type="number" step="8" value="0" min="0" max="64">
+		// , number, date, time, datetime
+		String attributeType = attribute.getNeutralType();
 		String type = "text" ; // "text" by default
 		if (    NeutralType.BYTE.equals(attributeType) 
 			 || NeutralType.SHORT.equals(attributeType) 	
@@ -76,7 +79,10 @@ public class HtmlInContext {
 		else if ( NeutralType.TIMESTAMP.equals(attributeType) ) {
 			type = "datetime" ;
 		}
-		return "";
+		else if ( NeutralType.BOOLEAN.equals(attributeType) ) {
+			type = "checkbox" ;
+		}
+		return type;
     }
     
 	//-------------------------------------------------------------------------------------
