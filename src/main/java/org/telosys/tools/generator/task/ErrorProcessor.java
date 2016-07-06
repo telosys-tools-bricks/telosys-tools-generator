@@ -26,44 +26,65 @@ import org.apache.velocity.runtime.directive.MacroParseException;
 import org.apache.velocity.runtime.parser.ParseException;
 import org.apache.velocity.runtime.parser.TemplateParseException;
 import org.telosys.tools.commons.StrUtil;
+import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.engine.GeneratorContextException;
 import org.telosys.tools.generator.engine.directive.DirectiveException;
 
 
 /**
  * Generation task error processor <br>
+ * Used to build an 'ErrorReport'
  *  
  * @author Laurent Guerin
  *
  */
 public abstract class ErrorProcessor
 {	
+	/**
+	 * Builds an ErrorReport for the given Exception without template/entity
+	 * @param specificErrorType
+	 * @param exception
+	 * @return
+	 */
 	public static ErrorReport buildErrorReport(String specificErrorType, Throwable exception ) {
 		String msg = buildStandardMessage( "", -1, "", exception) ; 
 		return new ErrorReport( specificErrorType, msg, exception);		
 	}
 	
-	public static ErrorReport buildErrorReport(Throwable generatorExceptionCause, String entityName, String templateName ) {
+	/**
+	 * Builds an ErrorReport for the given Exception 
+	 * @param exception
+	 * @param entityName
+	 * @param templateName
+	 * @return
+	 */
+	public static ErrorReport buildErrorReport(Throwable exception, String entityName, String templateName ) {
 		
-		if ( generatorExceptionCause instanceof ParseException ) { // Velocity Checked Exceptions
-			ParseException parseException = (ParseException) generatorExceptionCause ;
+		if ( exception instanceof ParseException ) { // Velocity Checked Exceptions
+			ParseException parseException = (ParseException) exception ;
 			String msg = processVelocityParseException(parseException, templateName, entityName);
-			return new ErrorReport( "Velocity error", msg, parseException);
+			return new ErrorReport( "Velocity error (ParseException)", msg, parseException);
 		}
-		else if ( generatorExceptionCause instanceof VelocityException ) { // Velocity Runtime Exceptions
-			VelocityException velocityException = (VelocityException) generatorExceptionCause ;
+		else if ( exception instanceof VelocityException ) { // Velocity Runtime Exceptions
+			VelocityException velocityException = (VelocityException) exception ;
 			String msg = processVelocityException(velocityException, templateName, entityName);
-			return new ErrorReport( "Velocity error", msg, velocityException);
+			return new ErrorReport( "Velocity error (VelocityException)", msg, velocityException);
 		}
-		else if ( generatorExceptionCause instanceof RuntimeException ) { // Telosys Runtime Exceptions
-			RuntimeException runtimeException = (RuntimeException) generatorExceptionCause ;
+		else if ( exception instanceof RuntimeException ) { // Telosys Runtime Exceptions
+			RuntimeException runtimeException = (RuntimeException) exception ;
 			String msg = processRuntimeException(runtimeException, templateName, entityName);
-			return new ErrorReport( "Generator error", msg, runtimeException);
+			return new ErrorReport( "Generator error (RuntimeException)", msg, runtimeException);
+		}
+		else if ( exception instanceof GeneratorException ) { // Telosys Generator Exception (without cause)
+			GeneratorException generatorException = (GeneratorException) exception ;
+			String msg = buildStandardMessage( templateName, -1, entityName, generatorException) ; 
+			return new ErrorReport( "Generator error (GeneratorException)", msg, generatorException);
 		}
 		else {
 			// Supposed to never happen
-			String msg = buildStandardMessage( templateName, -1, entityName, generatorExceptionCause) ; 
-			return new ErrorReport( "Unknown error", msg, generatorExceptionCause);
+			String msg = buildStandardMessage( templateName, -1, entityName, exception) ; 
+			String exceptionName = exception.getClass().getCanonicalName();
+			return new ErrorReport( "Unknown error ("+exceptionName+")", msg, exception);
 		}
 	}
 	
@@ -96,7 +117,7 @@ public abstract class ErrorProcessor
 			// eg : $entity.tototo / $entity.getTTTTTTTTT() / $entity.name.toAAAAA()
 			// or errors due to invalid model 
 			GeneratorContextException e = (GeneratorContextException) telosysException ;
-			return buildStandardMessage( templateName, -1, entityName, e) ;
+			return buildStandardMessage( templateName, e.getLineNumber(), entityName, e) ;
 		}
 		else {
 			// Supposed to never happen
@@ -107,7 +128,7 @@ public abstract class ErrorProcessor
 	//-------------------------------------------------------------------------------------------------------------
 	/**
 	 * Process all subclasses of ParseException : <br> 
-	 * org.apache.velocity.runtime.parser.ParseException ( Velocity 1.7 Checked Exceptions ) :
+	 * org.apache.velocity.runtime.parser.ParseException ( Velocity 1.7 Checked Exceptions, extends 'java.lang.Exception' ) :
 	 *   - org.apache.velocity.runtime.directive.MacroParseException
 	 *   - org.apache.velocity.runtime.parser.TemplateParseException
 	 * @param parseException
@@ -117,12 +138,12 @@ public abstract class ErrorProcessor
 	 */
 	private static String processVelocityParseException(ParseException parseException, String templateName, String entityName) {
 		
-		if ( parseException instanceof MacroParseException ) {
+		if ( parseException instanceof MacroParseException ) { // Test OK ( Message Ok ) 
 			MacroParseException e = (MacroParseException) parseException ;
 			// No more information about the error
 			return buildStandardMessage( templateName, e.getLineNumber(), entityName, e) ;
 		}
-		else if ( parseException instanceof TemplateParseException ) {
+		else if ( parseException instanceof TemplateParseException ) {  // Test OK ( Message Ok ) 
 			TemplateParseException e = (TemplateParseException) parseException ;
 			// No more information about the error
 			return buildStandardMessage( templateName, e.getLineNumber(), entityName, e) ;
@@ -255,22 +276,7 @@ public abstract class ErrorProcessor
 		
 		return sb.toString();
 	}
-//	//-------------------------------------------------------------------------------------------------------------
-//	private String buildMessageForTemplateAndEntity(String template, int line, String entity ) {
-//		String lineMsg = "" ;
-//		if ( line > 0 ) {
-//			lineMsg = "  ( line " + line + " )" ;
-//		}
-//		return "Template \"" + template + "\"" + lineMsg + "  -  Entity : \"" 
-//				+ entity + "\" \n\n" ;
-//	}
-//	//-------------------------------------------------------------------------------------------------------------
-//	private String buildMessageForException( Throwable exception ) {
-//		String s = exception.getClass().getSimpleName() + " : \n" 
-//					+ exception.getMessage() + "\n"
-//					+ "\n" ;
-//		return s ;
-//	}
+	
 	//-------------------------------------------------------------------------------------------------------------
 	protected static String buildMessageForExceptionCause(Throwable exception) {
 		Throwable cause = exception.getCause();
