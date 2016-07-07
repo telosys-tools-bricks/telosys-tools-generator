@@ -39,7 +39,7 @@ import org.telosys.tools.generator.context.DatabasesInContext;
 import org.telosys.tools.generator.context.EmbeddedGenerator;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
-import org.telosys.tools.generator.context.Fn;
+import org.telosys.tools.generator.context.FnInContext;
 import org.telosys.tools.generator.context.H2InContext;
 import org.telosys.tools.generator.context.HtmlInContext;
 import org.telosys.tools.generator.context.Java;
@@ -371,7 +371,7 @@ public class Generator {
 		generatorContext.put(ContextName.GENERATOR,       new EmbeddedGenerator());  // Limited generator without generation capability 
 		generatorContext.put(ContextName.TODAY,           new Today()); // Current date and time 
 		generatorContext.put(ContextName.CONST,           new Const()); // Constants (static values)
-		generatorContext.put(ContextName.FN,              new Fn(generatorContext));    // Utility function
+		generatorContext.put(ContextName.FN,              new FnInContext(generatorContext));    // Utility function
 		generatorContext.put(ContextName.JAVA,            new Java());  // Java utility functions
 		generatorContext.put(ContextName.JPA,             new Jpa());   // JPA utility functions
 //		_velocityContext.put(ContextName.JDBC,            new JdbcInContext());  // JDBC utility functions ( ver 2.1.1 )

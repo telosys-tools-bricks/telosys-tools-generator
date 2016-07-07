@@ -31,7 +31,7 @@ import org.telosys.tools.generator.context.DatabasesInContext;
 import org.telosys.tools.generator.context.EmbeddedGenerator;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
-import org.telosys.tools.generator.context.Fn;
+import org.telosys.tools.generator.context.FnInContext;
 import org.telosys.tools.generator.context.ForeignKeyColumnInContext;
 import org.telosys.tools.generator.context.ForeignKeyInContext;
 import org.telosys.tools.generator.context.H2InContext;
@@ -222,7 +222,7 @@ public class DocBuilder {
 	private final static Class<?>[] velocityClasses = new Class<?>[] {
 		Const.class,
 		EmbeddedGenerator.class,
-		Fn.class,
+		FnInContext.class,
 		// GenerationInContext.class, // ver 2.1.0 // removed in v 3.0.0
 		Java.class, // ver 2.0.7
 		Jpa.class, // ver 2.0.7

@@ -20,19 +20,22 @@ import java.util.List;
 import org.telosys.tools.commons.StrUtil;
 
 /**
+ * Literal values in Java language
  * 
  * @author Laurent GUERIN
  *
  */
 public class ValuesInContextForJava extends ValuesInContext {
 
+	private final static String NULL_LITERAL = "null" ; // null in Java
+	
 	/**
 	 * Constructor
 	 * @param attributes
 	 * @param step
 	 */
 	public ValuesInContextForJava( final List<AttributeInContext> attributes, int step ) {
-		super(attributes, step );
+		super(attributes, step, NULL_LITERAL );
 	}
 	
 	@Override
@@ -111,38 +114,6 @@ public class ValuesInContextForJava extends ValuesInContext {
 		return null ;
 	}
 
-	private final static String NULL_LITERAL = "null" ; 
-	
-	@Override
-	public String getValue(String attributeName) {
-		String value = _values.get(attributeName) ;
-		if ( value != null ) {
-			return value;
-		}
-		else {
-			return NULL_LITERAL ;
-		}
-	}
-	
-	/**
-	 * Returns a string containing all the java values separated by a comma.<br>
-	 * e.g. : ' "AAAA", (short)10, true '
-	 * @return
-	 */
-	@Override
-	public String getAllValues() {
-		StringBuilder sb = new StringBuilder();
-		int n = 0 ;
-		for ( String name : _attributeNames ) {
-			if ( n > 0 ) {
-				sb.append(", ");
-			}
-			sb.append(getValue(name));
-			n++ ;
-		}
-		return sb.toString();
-	}
-	
 	/* 
 	 * Return something like that : 
 	 *   book.getId() == 100 

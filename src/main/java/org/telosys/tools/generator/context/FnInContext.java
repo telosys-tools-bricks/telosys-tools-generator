@@ -15,6 +15,8 @@
  */
 package org.telosys.tools.generator.context;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,7 +44,7 @@ import org.telosys.tools.generator.engine.GeneratorContext;
 		since = "2.0.3"
  )
 //-------------------------------------------------------------------------------------
-public class Fn {
+public class FnInContext {
 
 //	private final VelocityContext _velocityContext ;
 	private final GeneratorContext _generatorContext ;
@@ -53,7 +55,7 @@ public class Fn {
 //		this._velocityContext = velocityContext;
 //	}
 	
-	public Fn(GeneratorContext generatorContext) {
+	public FnInContext(GeneratorContext generatorContext) {
 		super();
 		this._generatorContext = generatorContext;
 	}
@@ -460,19 +462,148 @@ public class Fn {
 	//==============================================================================================
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(text={	
-			"Builds a list of values (one value for each attribute)",
-			"Those values are usable in test cases"
+			"Builds a list of literal values.",
+			"Returns a list with one literal value for each attribute according with the attribute type.",
+			"e.g. : 12 for an integer, true for a boolean,  230L for a long, 'ABC' for a string, etc ",
+			"Each value can be retrieved by its attribute's name, e.g. $values.getValue($attribute.name)",
+			"A list of all values separated by a comma is returned by $values.allValues",
+			"Those values are typically used to populate attributes in test cases"
 			},
 			parameters = { 
-				"attributes : list of attributes requiring values",
+				"attributes : list of attributes requiring a literal value",
 				"step : a step (from 1 to N) used to change the values builded "
 			},
 			example = {
-				"$fn.buildValues($entity.attributes, 1) " },
+			"#set( $values = $fn.buildValues($entity.attributes, 1) )",
+			"#foreach( $attribute in $entity.attributes )",
+			" Literal value for $attribute.name : $values.getValue($attribute.name)",
+			"#end",
+			" All values : $values.allValues"
+			},
 			since = "2.1.1"
 			)
 	public ValuesInContext buildValues(final List<AttributeInContext> attributes, final int step) {
 		// TODO : change the "values builder" according with the current targeted language ( $ENV )
 		return new ValuesInContextForJava( attributes, step ) ;
 	}	
+	
+	/*** ORIGINAL METHOD DEFINED IN SPECIFIC CLASS
+	public List<Object> randomKeyAttributesValues(EntityInContext entity) {
+		List<AttributeInContext> keys = entity.getKeyAttributes();
+		if(keys == null) {
+			return new ArrayList<Object>();
+		}
+		List<Object> values = new ArrayList<Object>();
+		int i=1;
+		for(AttributeInContext key : keys) {
+			values.add(String.valueOf(i));
+			i++;
+		}
+		return values;
+	}
+	***/
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Builds a list of N integer consecutive values starting with the given value"
+			},
+			parameters = { 
+				"int : the number of values to be created",
+				"int : the first value of the list"
+			},
+			example = {
+				"#set ( $values = $fn.buildIntValues(10,0) ) ## 10 values from 0 to 9",
+				"Values size = $values.size() ",
+				"#foreach( $v in $values )",
+				" . value = $v",
+				"#end",
+				"#set($last = ( $values.size() - 1) )",
+				"#foreach ( $i in [0..$last] )",
+				" . value($i) = $values.get($i)" ,
+				"#end"
+			},
+			since = "3.0.0"
+			)
+	public List<Integer> buildIntValues(final int n, final int firstValue) {
+		List<Integer> values = new ArrayList<Integer>();
+		int currentValue = firstValue ;
+		for ( int i = 0 ; i < n ; i++ ) {
+			values.add( Integer.valueOf(currentValue) );
+			currentValue++;
+		}
+		return values ;
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Builds a list of N integer consecutive values starting with 1"
+			},
+			parameters = { 
+				"int : the number of values to be created"
+			},
+			example = {
+				"#set ( $values = $fn.buildIntValues(5) ) ## 5 values from 1 to 5",
+				"Values size = $values.size() ",
+				"#foreach( $v in $values )",
+				" . value = $v",
+				"#end",
+				"#set($last = ( $values.size() - 1) )",
+				"#foreach ( $i in [0..$last] )",
+				" . value($i) = $values.get($i)" ,
+				"#end"
+			},
+			since = "3.0.0"
+			)
+	public List<Integer> buildIntValues(final int n) {
+		return buildIntValues(n, 1);
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Builds a list of N integer consecutive values starting with the given value"
+			},
+			parameters = { 
+				"collection : the collection determining the number of values (collection size)",
+				"int : the first value of the list"
+			},
+			example = {
+				"#set ( $values = $fn.buildIntValues($entity.attributes, 0) ) ",
+				"Values size = $values.size() ",
+				"#foreach( $v in $values )",
+				" . value = $v",
+				"#end",
+				"#set($last = ( $values.size() - 1) )",
+				"#foreach ( $i in [0..$last] )",
+				" . value($i) = $values.get($i)" ,
+				"#end"
+			},
+			since = "3.0.0"
+			)
+	public List<Integer> buildIntValues(final Collection<?> collection, final int firstValue) {
+		return buildIntValues(collection.size(), firstValue);
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Builds a list of N integer consecutive values starting with 1"
+			},
+			parameters = { 
+				"collection : the collection determining the number of values (collection size)"
+			},
+			example = {
+				"#set ( $values = $fn.buildIntValues($entity.attributes) ) ",
+				"Values size = $values.size() ",
+				"#foreach( $v in $values )",
+				" . value = $v",
+				"#end",
+				"#set($last = ( $values.size() - 1) )",
+				"#foreach ( $i in [0..$last] )",
+				" . value($i) = $values.get($i)" ,
+				"#end"
+			},
+			since = "3.0.0"
+			)
+	public List<Integer> buildIntValues(final Collection<?> collection) {
+		return buildIntValues(collection.size(), 1);		
+	}
 }

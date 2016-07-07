@@ -31,7 +31,6 @@ import org.telosys.tools.generator.context.doc.VelocityObject;
 //-------------------------------------------------------------------------------------
 @VelocityObject(
 		contextName = "no_name_in_context" ,
-		//otherContextNames=ContextName.BEAN_CLASS,
 		text = { 
 				"xxxx",
 				"",
@@ -46,13 +45,15 @@ public abstract class ValuesInContext {
 	protected final LinkedList<String>  _attributeNames ; // to keep the original list order
 	protected final Map<String, String> _values ; // attribute name --> java literal value
 	
+	private final String nullLiteral ;
+	
 	//----------------------------------------------------------------------------------------
 	/**
 	 * Constructor
 	 * @param attributes
 	 * @param step
 	 */
-	public ValuesInContext( final List<AttributeInContext> attributes, int step ) {
+	protected ValuesInContext( final List<AttributeInContext> attributes, int step, String nullLiteral  ) {
 		_values = new HashMap<String, String>();
 		_attributeNames = new LinkedList<String>();
 		
@@ -62,6 +63,16 @@ public abstract class ValuesInContext {
 			// Keep the attribute name
 			_attributeNames.add( attrib.getName() );
 		}
+		this.nullLiteral = nullLiteral ;
+	}
+	
+	//----------------------------------------------------------------------------------------
+	/**
+	 * Returns the size of the values list
+	 * @return
+	 */
+	public int size() {
+		return _values.size();
 	}
 	
 	//----------------------------------------------------------------------------------------
@@ -82,7 +93,15 @@ public abstract class ValuesInContext {
 	 * @param attributeName
 	 * @return
 	 */
-	public abstract String getValue(String attributeName) ;
+	public String getValue(String attributeName) {
+		String value = _values.get(attributeName) ;
+		if ( value != null ) {
+			return value;
+		}
+		else {
+			return nullLiteral ;
+		}
+	}
 	
 	//----------------------------------------------------------------------------------------
 	/**
@@ -91,7 +110,19 @@ public abstract class ValuesInContext {
 	 * Usage example in Velocity template : $keyValues.allValues ( or $keyValues.getAllValues() ) <br>
 	 * @return
 	 */
-	public abstract String getAllValues() ;
+	public String getAllValues() {
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( String name : _attributeNames ) {
+			if ( n > 0 ) {
+				sb.append(", ");
+			}
+			sb.append(getValue(name));
+			n++ ;
+		}
+		return sb.toString();
+	}
+	
 	
 	//----------------------------------------------------------------------------------------
 	/**
