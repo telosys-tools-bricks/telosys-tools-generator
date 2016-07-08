@@ -114,10 +114,11 @@ public class ValuesInContextForJavaTest {
 
 	@Test
 	public void testValuesStep1() {
+		EnvInContext env = new EnvInContext() ;
 		
 		List<AttributeInContext> attributes = new LinkedList<AttributeInContext>() ;
 		
-		AttributeInContext attribId = new AttributeInContext(null, buildAttribute("id",        "int")) ;
+		AttributeInContext attribId = new AttributeInContext(null, buildAttribute("id",        "int"), env) ;
 		attributes.add(attribId);
 		
 //		AttributeInContext attribFirstName =  new AttributeInContext(null, buildAttribute("firstName", "java.lang.String", 10)) ;
@@ -132,16 +133,16 @@ public class ValuesInContextForJavaTest {
 //		attributes.add( new AttributeInContext(null, buildAttribute("time",     "java.sql.Time")) ) ;
 
 		// with neutral types
-		AttributeInContext attribFirstName =  new AttributeInContext(null, buildAttribute("firstName", "string", 10)) ;
+		AttributeInContext attribFirstName =  new AttributeInContext(null, buildAttribute("firstName", "string", 10), env) ;
 		attributes.add(attribFirstName);		
-		attributes.add( new AttributeInContext(null, buildAttribute("age",       "short")) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("num1",      "long")) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("num2",      "double")) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("date1",     "date")) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("date2",     "date")) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("flag",      "boolean")) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("flag2",     "boolean")) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("time",      "time")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("age",       "short"), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("num1",      "long"), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("num2",      "double"), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("date1",     "date"), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("date2",     "date"), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("flag",      "boolean"), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("flag2",     "boolean"), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("time",      "time"), env) ) ;
 		
 		ValuesInContext values = new ValuesInContextForJava( attributes, 1 );
 		
@@ -170,7 +171,8 @@ public class ValuesInContextForJavaTest {
 
 	@Test
 	public void testValuesStep2() {
-		
+		EnvInContext env = new EnvInContext() ;
+
 		List<AttributeInContext> attributes = new LinkedList<AttributeInContext>() ;
 		
 //		attributes.add( new AttributeInContext(null, buildAttribute("id",        "int")) ) ;
@@ -180,11 +182,11 @@ public class ValuesInContextForJavaTest {
 //		attributes.add( new AttributeInContext(null, buildAttribute("date2",     "java.sql.Date")) ) ;
 
 		// with neutral types
-		attributes.add( new AttributeInContext(null, buildAttribute("id",        "int")) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("firstName", "string", 3)) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("age",       "short")) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("date1",     "date")) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("date2",     "date")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("id",        "int"), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("firstName", "string", 3), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("age",       "short"), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("date1",     "date"), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("date2",     "date"), env ) ) ;
 		
 		ValuesInContext values = new ValuesInContextForJava( attributes, 2 );
 		
@@ -196,6 +198,8 @@ public class ValuesInContextForJavaTest {
 	@Test
 	public void testValuesStep3() {
 		
+		EnvInContext env = new EnvInContext() ;
+
 		List<AttributeInContext> attributes = new LinkedList<AttributeInContext>() ;
 		
 //		attributes.add( new AttributeInContext(null, buildAttribute("id",        "short")) ) ;
@@ -205,11 +209,11 @@ public class ValuesInContextForJavaTest {
 //		attributes.add( new AttributeInContext(null, buildAttribute("byteVal",   "byte")) ) ;
 
 		// with neutral types
-		attributes.add( new AttributeInContext(null, buildAttribute("id",        "short")) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("firstName", "string", 3)) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("flag1",     "boolean")) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("flag2",     "boolean")) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("byteVal",   "byte")) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("id",        "short"), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("firstName", "string", 3), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("flag1",     "boolean"), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("flag2",     "boolean"), env) ) ;
+		attributes.add( new AttributeInContext(null, buildAttribute("byteVal",   "byte"), env) ) ;
 		
 		ValuesInContext values = new ValuesInContextForJava( attributes, 3 );
 		

@@ -15,9 +15,14 @@
  */
 package org.telosys.tools.generator.context;
 
+import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generic.model.types.TypeConverter;
+import org.telosys.tools.generic.model.types.TypeConverterForCSharp;
+import org.telosys.tools.generic.model.types.TypeConverterForJava;
+import org.telosys.tools.generic.model.types.TypeConverterForTypeScript;
 
 //-------------------------------------------------------------------------------------
 @VelocityObject(
@@ -30,10 +35,15 @@ import org.telosys.tools.generator.context.names.ContextName;
  )
 //-------------------------------------------------------------------------------------
 public class EnvInContext {
-
+	
+	private final static String JAVA       = "JAVA" ;
+	private final static String CSHARP     = "C#" ;
+	private final static String TYPESCRIPT = "TYPESCRIPT" ;
+	
 	private String _entityClassNamePrefix = "" ;
 	private String _entityClassNameSuffix = "" ;
 	
+	private String _language = "Java" ; // v 3.0.0
 	
 	//-------------------------------------------------------------------------------------
 	// CONSTRUCTOR
@@ -109,5 +119,70 @@ public class EnvInContext {
 	}
 
 	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Set the language for the current code generation",
+			"Supported languages are 'Java', 'C#' and 'TypeScript' ",
+			"( the default language is 'Java' )",
+			"This information is used dermine language peculiarities like types and literal values"
+			},
+		example={ 
+			"#set ( $env.language = 'C#' ) ",
+			"$env.setLanguage('C#') " 
+			},
+		parameters = { 
+			"language : the language to be used (not case sensitive) " 
+			},
+		since = "3.0.0"
+			)
+	public void setLanguage( String language ) throws GeneratorException {
+		checkLanguageValidity(language);
+		_language = language ;
+	}
 	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the current language",
+			"The default value is 'Java' (never null)"
+			},
+		example={ 
+			"$env.language" 
+			},
+		since = "3.0.0"
+			)
+	public String getLanguage() {
+		return _language;
+	}
+	
+	//-------------------------------------------------------------------------------------
+	protected void checkLanguageValidity(String language) throws GeneratorException {
+		String languageUC = language.toUpperCase() ;
+		if ( JAVA.equals(languageUC) ) return ;
+		if ( CSHARP.equals(languageUC) ) return ;
+		if ( TYPESCRIPT.equals(languageUC) ) return ;
+		// Unknown language
+		throw new GeneratorException("Unknown language '" + language + "'");
+	}
+	//-------------------------------------------------------------------------------------
+	/**
+	 * Returns the TypeConverter corresponding to the current language
+	 * @return
+	 */
+	protected TypeConverter getTypeConverter()  {
+		String languageUC = this._language.toUpperCase() ;
+		if ( JAVA.equals(languageUC) ) {
+			return new TypeConverterForJava() ;
+		}
+		else if ( CSHARP.equals(languageUC) ) {
+			return new TypeConverterForCSharp() ; 
+		}
+		else if ( TYPESCRIPT.equals(languageUC) ) {
+			return new TypeConverterForTypeScript() ;
+		}
+		else {
+			// By default : Java  ( not supposed to happen ) 
+			return new TypeConverterForJava() ;
+		}
+	}
 }

@@ -32,7 +32,6 @@ import org.telosys.tools.generic.model.types.AttributeTypeInfo;
 import org.telosys.tools.generic.model.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 import org.telosys.tools.generic.model.types.TypeConverter;
-import org.telosys.tools.generic.model.types.TypeConverterForJava;
 
 
 /**
@@ -73,6 +72,8 @@ public class AttributeInContext
 //    private final static String TYPE_DATE = "date" ;
 //    private final static String TYPE_TIME = "time" ;
     
+	private final EnvInContext    _env ; // ver 3.0.0
+
 	//--- 
     private final EntityInContext _entity ; // The entity 
     
@@ -158,9 +159,12 @@ public class AttributeInContext
 	 * Constructor to create an ATTRIBUTE in the generator context
 	 * @param entity
 	 * @param attribute
+	 * @param env
 	 */
-	public AttributeInContext(final EntityInContext entity, final Attribute attribute) // v 3.0.0
+	public AttributeInContext(final EntityInContext entity, final Attribute attribute, final EnvInContext env) // v 3.0.0
 	{
+		_env = env ; // v 3.0.0
+
 		_entity = entity ;
 		
 		//_sName   = column.getJavaName();
@@ -312,9 +316,8 @@ public class AttributeInContext
 	}
 	
 	private final LanguageType getLanguageType() {
-		// TODO : get the converter from "ENV"
-		TypeConverter typeConverter = new TypeConverterForJava() ;
-		
+		// TypeConverter typeConverter = new TypeConverterForJava() ;
+		TypeConverter typeConverter =_env.getTypeConverter();
 		LanguageType languageType = typeConverter.getType(this.attributeTypeInfo);
 		if ( languageType != null ) {
 			return languageType ;
