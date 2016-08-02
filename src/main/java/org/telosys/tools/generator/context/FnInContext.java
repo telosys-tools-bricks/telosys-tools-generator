@@ -48,6 +48,7 @@ public class FnInContext {
 
 //	private final VelocityContext _velocityContext ;
 	private final GeneratorContext _generatorContext ;
+	private final EnvInContext     _env ;
 	
 	
 //	public Fn(VelocityContext velocityContext) {
@@ -55,9 +56,15 @@ public class FnInContext {
 //		this._velocityContext = velocityContext;
 //	}
 	
-	public FnInContext(GeneratorContext generatorContext) {
+	/**
+	 * Constructor
+	 * @param generatorContext
+	 * @param env
+	 */
+	public FnInContext(GeneratorContext generatorContext, EnvInContext env ) {
 		super();
 		this._generatorContext = generatorContext;
+		this._env = env ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -484,7 +491,8 @@ public class FnInContext {
 			)
 	public ValuesInContext buildValues(final List<AttributeInContext> attributes, final int step) {
 		// TODO : change the "values builder" according with the current targeted language ( $ENV )
-		return new ValuesInContextForJava( attributes, step ) ;
+		// return new ValuesInContextForJava( attributes, step ) ;
+		return new ValuesInContext( attributes, step, _env ) ;
 	}	
 	
 	/*** ORIGINAL METHOD DEFINED IN SPECIFIC CLASS

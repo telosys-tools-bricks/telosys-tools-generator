@@ -315,7 +315,7 @@ public class AttributeInContext
 		
 	}
 	
-	private final LanguageType getLanguageType() {
+	protected final LanguageType getLanguageType() {
 		// TypeConverter typeConverter = new TypeConverterForJava() ;
 		TypeConverter typeConverter =_env.getTypeConverter();
 		LanguageType languageType = typeConverter.getType(this.attributeTypeInfo);

@@ -20,7 +20,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.doc.VelocityObject;
+import org.telosys.tools.generic.model.types.LanguageType;
+import org.telosys.tools.generic.model.types.LiteralValuesProvider;
+import org.telosys.tools.generic.model.types.LiteralValuesProviderForJava;
 
 /**
  * This object holds a set of generated literal values for the given attributes <br>
@@ -33,37 +37,46 @@ import org.telosys.tools.generator.context.doc.VelocityObject;
 		contextName = "no_name_in_context" ,
 		text = { 
 				"xxxx",
-				"",
-				" xxxx ",
 				""
 		},
 		since = "2.0.0"
  )
 //-------------------------------------------------------------------------------------
-public abstract class ValuesInContext {
+public class ValuesInContext {
 	
-	protected final LinkedList<String>  _attributeNames ; // to keep the original list order
-	protected final Map<String, String> _values ; // attribute name --> java literal value
-	
-	private final String nullLiteral ;
+	private final LiteralValuesProvider  literalValuesProvider ;
+	private final LinkedList<String>     attributeNames ; // to keep the original list order
+	private final Map<String, String>    values ; // attribute name --> java literal value
+	private final String                 nullLiteral ;
 	
 	//----------------------------------------------------------------------------------------
+	//protected ValuesInContext( final List<AttributeInContext> attributes, int step, String nullLiteral  ) {
 	/**
 	 * Constructor
 	 * @param attributes
 	 * @param step
+	 * @param env
 	 */
-	protected ValuesInContext( final List<AttributeInContext> attributes, int step, String nullLiteral  ) {
-		_values = new HashMap<String, String>();
-		_attributeNames = new LinkedList<String>();
+	protected ValuesInContext( List<AttributeInContext> attributes, int step, EnvInContext env ) {
+		
+		//LiteralValues literalValues =_env.getLiteralValues();
+		this.literalValuesProvider = new LiteralValuesProviderForJava() ; // TODO : use "env"
+		
+		values = new HashMap<String, String>();
+		attributeNames = new LinkedList<String>();
 		
 		for ( AttributeInContext attrib : attributes ) {
 			// Generates and stores the literal value
-			_values.put ( attrib.getName() , generateLiteralValue(attrib, step)  ) ;
+			//_values.put ( attrib.getName() , generateLiteralValue(attrib, step)  ) ;
+			LanguageType languageType = attrib.getLanguageType() ;
+			int maxLength = StrUtil.getInt(attrib.getMaxLength(), 1) ;
+			String literalValue = literalValuesProvider.generateLiteralValue(languageType, maxLength, step);
+			values.put ( attrib.getName(), literalValue ) ;
 			// Keep the attribute name
-			_attributeNames.add( attrib.getName() );
+			attributeNames.add( attrib.getName() );
 		}
-		this.nullLiteral = nullLiteral ;
+		//this.nullLiteral = nullLiteral ;
+		this.nullLiteral = literalValuesProvider.getLiteralNull() ;
 	}
 	
 	//----------------------------------------------------------------------------------------
@@ -72,19 +85,19 @@ public abstract class ValuesInContext {
 	 * @return
 	 */
 	public int size() {
-		return _values.size();
+		return values.size();
 	}
 	
-	//----------------------------------------------------------------------------------------
-	/**
-	 * Generates a literal value for the given attribute <br>
-	 * ( this method is not usable in a ".vm" template )
-	 * @param attribute
-	 * @param step
-	 * @return
-	 */
-	protected abstract String generateLiteralValue(AttributeInContext attribute, int step) ;
-
+//	//----------------------------------------------------------------------------------------
+//	/**
+//	 * Generates a literal value for the given attribute <br>
+//	 * ( this method is not usable in a ".vm" template )
+//	 * @param attribute
+//	 * @param step
+//	 * @return
+//	 */
+//	protected abstract String generateLiteralValue(AttributeInContext attribute, int step) ;
+//
 	//----------------------------------------------------------------------------------------
 	/**
 	 * Returns a string containing the value for the given attribute <br>
@@ -94,7 +107,7 @@ public abstract class ValuesInContext {
 	 * @return
 	 */
 	public String getValue(String attributeName) {
-		String value = _values.get(attributeName) ;
+		String value = values.get(attributeName) ;
 		if ( value != null ) {
 			return value;
 		}
@@ -113,7 +126,7 @@ public abstract class ValuesInContext {
 	public String getAllValues() {
 		StringBuilder sb = new StringBuilder();
 		int n = 0 ;
-		for ( String name : _attributeNames ) {
+		for ( String name : attributeNames ) {
 			if ( n > 0 ) {
 				sb.append(", ");
 			}
@@ -135,5 +148,20 @@ public abstract class ValuesInContext {
 	 * @param attribute the attribute to be used to retrieve the 'right part' (the 'literal value')
 	 * @return
 	 */
-	public abstract String comparisonStatement(String entityVariableName, AttributeInContext attribute);
+	public String comparisonStatement(String entityVariableName, AttributeInContext attribute) {
+		StringBuilder sb = new StringBuilder();
+		sb.append( entityVariableName ) ;
+		sb.append( "." ) ;
+		sb.append( attribute.getGetter() ) ;
+		sb.append( "()" ) ;
+		
+		String value = values.get( attribute.getName() ) ; // Value for the given attribute
+
+		String equalsStatement = literalValuesProvider.getEqualsStatement(value, attribute.getLanguageType() );
+		
+		sb.append( equalsStatement ) ;
+		
+		return sb.toString();
+
+	}
 }

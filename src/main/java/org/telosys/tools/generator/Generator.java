@@ -367,11 +367,15 @@ public class Generator {
 		generatorContext.put(ContextName.LBRACE,  "{"  ); // left brace
 		generatorContext.put(ContextName.RBRACE,  "}"  ); // right brace
 		
+		//--- Set "$env" object ( environment configuration )
+		EnvInContext env = new EnvInContext() ;
+		generatorContext.put(ContextName.ENV, env);  
+
 		//--- Set the standard Velocity variables in the context
 		generatorContext.put(ContextName.GENERATOR,       new EmbeddedGenerator());  // Limited generator without generation capability 
 		generatorContext.put(ContextName.TODAY,           new Today()); // Current date and time 
 		generatorContext.put(ContextName.CONST,           new Const()); // Constants (static values)
-		generatorContext.put(ContextName.FN,              new FnInContext(generatorContext));    // Utility function
+		generatorContext.put(ContextName.FN,              new FnInContext(generatorContext, env)); // Utility functions
 		generatorContext.put(ContextName.JAVA,            new Java());  // Java utility functions
 		generatorContext.put(ContextName.JPA,             new Jpa());   // JPA utility functions
 //		_velocityContext.put(ContextName.JDBC,            new JdbcInContext());  // JDBC utility functions ( ver 2.1.1 )
@@ -566,10 +570,15 @@ public class Generator {
 		
 //		GeneratorContext generatorContext = createContext(this._generatorConfig, this._logger);
 		GeneratorContext generatorContext = createContext(this._logger); // v 3.0.0
-		
-		//--- Set "$env" object ( environment configuration )
-		EnvInContext env = new EnvInContext() ;
-		generatorContext.put(ContextName.ENV, env);  
+	
+// Moved in createContext
+//		//--- Set "$env" object ( environment configuration )
+//		EnvInContext env = new EnvInContext() ;
+//		generatorContext.put(ContextName.ENV, env);  
+		EnvInContext env = (EnvInContext) generatorContext.get(ContextName.ENV); // v 3.0.0
+		if ( env == null ) {
+			throw new GeneratorException("$env not defined in context");
+		}
 		
 //		EntitiesManager entitiesManager = new EntitiesManager(model, _generatorConfig, env); 
 //		EntitiesManager entitiesManager = new EntitiesManager(model, _telosysToolsCfg.getEntityPackage(), env); // v 3.0.0
