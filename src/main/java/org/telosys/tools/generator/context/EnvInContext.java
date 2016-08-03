@@ -19,6 +19,8 @@ import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generic.model.types.LiteralValuesProvider;
+import org.telosys.tools.generic.model.types.LiteralValuesProviderForJava;
 import org.telosys.tools.generic.model.types.TypeConverter;
 import org.telosys.tools.generic.model.types.TypeConverterForCSharp;
 import org.telosys.tools.generic.model.types.TypeConverterForJava;
@@ -168,6 +170,7 @@ public class EnvInContext {
 	/**
 	 * Returns the TypeConverter corresponding to the current language
 	 * @return
+	 * @since ver 3.0.0
 	 */
 	protected TypeConverter getTypeConverter()  {
 		String languageUC = this._language.toUpperCase() ;
@@ -183,6 +186,28 @@ public class EnvInContext {
 		else {
 			// By default : Java  ( not supposed to happen ) 
 			return new TypeConverterForJava() ;
+		}
+	}
+
+	/**
+	 * Returns the LiteralValuesProvider for the current language
+	 * @return
+	 * @since ver 3.0.0
+	 */
+	protected LiteralValuesProvider getLiteralValuesProvider()  {
+		String languageUC = this._language.toUpperCase() ;
+		if ( JAVA.equals(languageUC) ) {
+			return new LiteralValuesProviderForJava() ;
+		}
+		else if ( CSHARP.equals(languageUC) ) {
+			return new LiteralValuesProviderForJava() ; // TODO
+		}
+		else if ( TYPESCRIPT.equals(languageUC) ) {
+			return new LiteralValuesProviderForJava() ; // TODO
+		}
+		else {
+			// By default : Java  ( not supposed to happen ) 
+			return new LiteralValuesProviderForJava() ;
 		}
 	}
 }

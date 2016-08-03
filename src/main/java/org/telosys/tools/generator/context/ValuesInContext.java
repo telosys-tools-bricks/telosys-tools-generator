@@ -24,10 +24,12 @@ import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generic.model.types.LanguageType;
 import org.telosys.tools.generic.model.types.LiteralValuesProvider;
-import org.telosys.tools.generic.model.types.LiteralValuesProviderForJava;
 
 /**
  * This object holds a set of generated literal values for the given attributes <br>
+ * Values instances are created by '$fn.builValues' <br>
+ * Example : <br>
+ *   #set( $values = $fn.buildValues($entity.attributes, 1) ) <br>
  * 
  * @author Laurent GUERIN
  *
@@ -50,7 +52,6 @@ public class ValuesInContext {
 	private final String                 nullLiteral ;
 	
 	//----------------------------------------------------------------------------------------
-	//protected ValuesInContext( final List<AttributeInContext> attributes, int step, String nullLiteral  ) {
 	/**
 	 * Constructor
 	 * @param attributes
@@ -59,8 +60,8 @@ public class ValuesInContext {
 	 */
 	protected ValuesInContext( List<AttributeInContext> attributes, int step, EnvInContext env ) {
 		
-		//LiteralValues literalValues =_env.getLiteralValues();
-		this.literalValuesProvider = new LiteralValuesProviderForJava() ; // TODO : use "env"
+		// this.literalValuesProvider = new LiteralValuesProviderForJava() ; 
+		this.literalValuesProvider = env.getLiteralValuesProvider() ; 
 		
 		values = new HashMap<String, String>();
 		attributeNames = new LinkedList<String>();
@@ -88,21 +89,14 @@ public class ValuesInContext {
 		return values.size();
 	}
 	
-//	//----------------------------------------------------------------------------------------
-//	/**
-//	 * Generates a literal value for the given attribute <br>
-//	 * ( this method is not usable in a ".vm" template )
-//	 * @param attribute
-//	 * @param step
-//	 * @return
-//	 */
-//	protected abstract String generateLiteralValue(AttributeInContext attribute, int step) ;
-//
 	//----------------------------------------------------------------------------------------
 	/**
-	 * Returns a string containing the value for the given attribute <br>
+	 * Returns a string containing the literal value for the given attribute's name <br>
 	 * e.g. : '"AAAA"' or '(short)10' or 'true' etc... <br>
-	 * Usage example in Velocity template : $keyValues.getValue($attribute.name) <br>
+	 * <br>
+	 * Usage example in Velocity template : <br>
+	 *   $values.getValue($attribute.name) <br>
+	 *   
 	 * @param attributeName
 	 * @return
 	 */
@@ -118,9 +112,14 @@ public class ValuesInContext {
 	
 	//----------------------------------------------------------------------------------------
 	/**
-	 * Returns a string containing all the values separated by a comma. <br>
+	 * Returns a string containing all the literal values separated by a comma. <br>
 	 * e.g. : ' "AAAA", (short)10, true ' <br>
-	 * Usage example in Velocity template : $keyValues.allValues ( or $keyValues.getAllValues() ) <br>
+	 * <br>
+	 * Usage example in Velocity template : <br>
+	 *   $values.allValues <br>
+	 *   or <br>
+	 *   $values.getAllValues()  <br>
+	 *   
 	 * @return
 	 */
 	public String getAllValues() {
@@ -139,10 +138,13 @@ public class ValuesInContext {
 	
 	//----------------------------------------------------------------------------------------
 	/**
-	 * Returns a comparison statement <br>
-	 * Example in Java : <br>
+	 * Returns a comparison statement between the attribute's current value and its associated literal value <br>
+	 * Example of strings returned for Java language : <br>
 	 *   book.getId() == 100  <br>
 	 *   book.getFirstName().equals("abcd") <br>
+	 * Usage example in Velocity template : <br>
+	 *   $values.comparisonStatement("book", $attribute) <br>
+	 *   or <br>
 	 *   
 	 * @param entityVariableName the variable name used in the 'left part' with the 'getter'
 	 * @param attribute the attribute to be used to retrieve the 'right part' (the 'literal value')
