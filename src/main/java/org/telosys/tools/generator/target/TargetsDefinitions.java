@@ -15,6 +15,7 @@
  */
 package org.telosys.tools.generator.target;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class TargetsDefinitions {
@@ -22,10 +23,25 @@ public class TargetsDefinitions {
 	private final List<TargetDefinition> templatesTargets ;
 	private final List<TargetDefinition> resourcesTargets ;
 	
+	/**
+	 * Constructor
+	 * @param templatesTargets list of templates (vm files)
+	 * @param resourcesTargets list of resources (static files)
+	 */
 	public TargetsDefinitions(List<TargetDefinition> templatesTargets, List<TargetDefinition> resourcesTargets) {
 		super();
 		this.templatesTargets = templatesTargets ;
 		this.resourcesTargets = resourcesTargets ;
+	}
+
+	/**
+	 * Default constructor <br>
+	 * Creates an instance with 2 void lists <br>
+	 */
+	public TargetsDefinitions() {
+		super();
+		this.templatesTargets = new LinkedList<TargetDefinition>() ;
+		this.resourcesTargets = new LinkedList<TargetDefinition>() ;
 	}
 
 	/**

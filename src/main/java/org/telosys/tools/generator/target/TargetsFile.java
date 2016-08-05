@@ -24,10 +24,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.telosys.tools.commons.StrUtil;
+import org.telosys.tools.commons.TelosysToolsException;
 import org.telosys.tools.generator.GeneratorException;
 
 /**
- * Targets file loader 
+ * Targets file manager <br>
+ * 
  * 
  * @author L. Guerin
  *
@@ -36,15 +38,15 @@ public class TargetsFile {
 	
     private static final int  BUFFER_SIZE  = 2048;
 	
-    private final String targetsFileName ;
+    private final String templatesCfgAbsolutePath ;
     
     /**
      * Constructor 
-	 * @param fileName
+	 * @param templatesCfgAbsolutePath the "templates.cfg" absolute path 
 	 */
-	public TargetsFile(String fileName) {
+	public TargetsFile(String templatesCfgAbsolutePath) {
 		super();
-		targetsFileName = fileName;
+		this.templatesCfgAbsolutePath = templatesCfgAbsolutePath;
 	}
 
 	/**
@@ -52,7 +54,7 @@ public class TargetsFile {
 	 * @return true if the file exists, else false
 	 */
 	public boolean exists() {
-		File file = new File(targetsFileName);
+		File file = new File(templatesCfgAbsolutePath);
 		return file.exists() ;
 	}
 	
@@ -61,7 +63,7 @@ public class TargetsFile {
 	 * @return
 	 * @throws GeneratorException
 	 */
-	public List<TargetDefinition> load() throws GeneratorException
+	public List<TargetDefinition> load() throws TelosysToolsException
     {
     	List<TargetDefinition> list = null ;
         FileReader fr = getFileReader();
@@ -69,23 +71,20 @@ public class TargetsFile {
         {
         	boolean ioException = false ;
             BufferedReader br = new BufferedReader(fr, BUFFER_SIZE);
-            try
-            {
+            try {
             	list = parse(br);
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
             	ioException = true ;
-            } finally
-            {
+            } finally {
                 close(br);
             }
             close(fr);
             if ( ioException ) {
-            	throw new GeneratorException("IOException while reading file : '" + targetsFileName + "'");
+            	throw new TelosysToolsException("IOException while reading file : '" + templatesCfgAbsolutePath + "'");
             }
         }
         else {
-        	throw new GeneratorException("Targets file '" + targetsFileName + "' not found");
+        	throw new TelosysToolsException("Targets file '" + templatesCfgAbsolutePath + "' not found");
         }
         return list ;
     }
@@ -143,10 +142,10 @@ public class TargetsFile {
     private FileReader getFileReader()
     {
     	FileReader fr = null ;
-    	if ( targetsFileName != null )
+    	if ( templatesCfgAbsolutePath != null )
     	{
             try {
-				fr = new FileReader(targetsFileName);
+				fr = new FileReader(templatesCfgAbsolutePath);
 			} catch (FileNotFoundException e) {
 				// Not an error // MsgBox.error("File '" + sFileName + "' not found");
 				fr = null ;
