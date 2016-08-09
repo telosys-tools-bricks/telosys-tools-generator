@@ -43,16 +43,18 @@ public class TargetsLoader {
 	 */
 	public TargetsLoader(TelosysToolsCfg telosysToolsCfg) {
 		super();
-		// Templates folder : standard or specific ?
-		if ( telosysToolsCfg.hasSpecificTemplatesFolders() ) {
-			// specific folder defined => use it 
-			this.templatesFolderAbsolutePath = telosysToolsCfg.getSpecificTemplatesFolderAbsolutePath();
-		}
-		else {
-			// no specific folder defined => use the standard folder (in the project)
-			this.templatesFolderAbsolutePath = telosysToolsCfg.getTemplatesFolderAbsolutePath();
-		}
-		specificTemplatesFolder = true ;
+//		// Templates folder : standard or specific ?
+//		if ( telosysToolsCfg.hasSpecificTemplatesFolders() ) {
+//			// specific folder defined => use it 
+//			this.templatesFolderAbsolutePath = telosysToolsCfg.getSpecificTemplatesFolderAbsolutePath();
+//		}
+//		else {
+//			// no specific folder defined => use the standard folder (in the project)
+//			this.templatesFolderAbsolutePath = telosysToolsCfg.getTemplatesFolderAbsolutePath();
+//		}
+//		specificTemplatesFolder = true ;
+		this.specificTemplatesFolder = telosysToolsCfg.hasSpecificTemplatesFolders() ;
+		this.templatesFolderAbsolutePath = telosysToolsCfg.getTemplatesFolderAbsolutePath();
 	}
 	
 	/**
