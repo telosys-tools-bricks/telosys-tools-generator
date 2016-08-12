@@ -177,9 +177,10 @@ public class ValuesInContextForJavaTest {
 		System.out.println(listOfValues);
 		
 		assertEquals("int", id.getNeutralType() );
+		assertFalse( id.isPrimitiveType() ) ;
 		assertFalse( id.isNotNull() );
-		checkValue(values, "id",        "100") ;
-		checkCompareValue(values, "book", id,        "book.getId().equals(100)");
+		checkValue(values, "id",        "Integer.valueOf(100)") ;
+		checkCompareValue(values, "book", id,   "book.getId().equals(Integer.valueOf(100))");
 
 		assertEquals("int", code.getNeutralType() );
 		assertTrue( code.isNotNull() );
@@ -190,14 +191,16 @@ public class ValuesInContextForJavaTest {
 		checkCompareValue(values, "book", firstName, "book.getFirstName().equals(" + buildString('A', 10) + ")");
 		
 		assertEquals("short", age.getNeutralType() );
-		checkValue(values, "age",       "(short)1") ;
 		assertFalse( age.isNotNull() );
-		checkCompareValue(values, "book", age,        "book.getAge().equals((short)1)"); 
+		assertFalse( id.isPrimitiveType() ) ;
+		checkValue(values, "age",       "Short.valueOf((short)1)") ;
+		checkCompareValue(values, "book", age,  "book.getAge().equals(Short.valueOf((short)1))"); 
 		
 		assertEquals("boolean", flag.getNeutralType() );
-		checkValue(values, "flag",      "true") ;
 		assertFalse( flag.isNotNull() );
-		checkCompareValue(values, "book", flag,        "book.getFlag().equals(true)"); 
+		assertFalse( id.isPrimitiveType() ) ;
+		checkValue(values, "flag",      "Boolean.valueOf(true)") ;
+		checkCompareValue(values, "book", flag,        "book.getFlag().equals(Boolean.valueOf(true))"); 
 		
 		assertEquals("boolean", flag2.getNeutralType() );
 		checkValue(values, "flag2",      "true") ;
@@ -219,16 +222,16 @@ public class ValuesInContextForJavaTest {
 		checkCompareValue(values, "book", time,        "book.getTime().equals(java.sql.Time.valueOf(\"01:46:52\"))"); 
 		
 		assertEquals("long", num1.getNeutralType() );
-		checkValue(values, "num1",      "1000L") ;
-		checkCompareValue(values, "book", num1,        "book.getNum1().equals(1000L)"); 
+		checkValue(values, "num1",      "Long.valueOf(1000L)") ;
+		checkCompareValue(values, "book", num1,        "book.getNum1().equals(Long.valueOf(1000L))"); 
 		
 		assertEquals("double", num2.getNeutralType() );
-		checkValue(values, "num2",      "1000.66D") ;
-		checkCompareValue(values, "book", num2,        "book.getNum2().equals(1000.66D)"); 
+		checkValue(values, "num2",      "Double.valueOf(1000.66D)") ;
+		checkCompareValue(values, "book", num2,        "book.getNum2().equals(Double.valueOf(1000.66D))"); 
 		
 		assertEquals("decimal", dec.getNeutralType() );
-		checkValue(values, "dec",      "(new BigDecimal(10000))") ;
-		checkCompareValue(values, "book", dec,        "book.getDec().equals((new BigDecimal(10000)))"); 
+		checkValue(values, "dec",      "java.math.BigDecimal.valueOf(10000)") ;
+		checkCompareValue(values, "book", dec,        "book.getDec().equals(java.math.BigDecimal.valueOf(10000))"); 
 		BigDecimal foo = new BigDecimal(2.3);
 		assertTrue ( foo.equals((new BigDecimal(2.3))) ) ;
 		
@@ -256,9 +259,9 @@ public class ValuesInContextForJavaTest {
 		
 		ValuesInContext values = new ValuesInContext( attributes, 2, env );
 		
-		checkValue(values, "id",        "200") ;
+		checkValue(values, "id",        "Integer.valueOf(200)") ;
 		checkValue(values, "firstName", buildString('B', 3)) ;
-		checkValue(values, "age",       "(short)2") ;
+		checkValue(values, "age",       "Short.valueOf((short)2)") ;
 	}
 	
 	@Test
@@ -283,11 +286,11 @@ public class ValuesInContextForJavaTest {
 		
 		ValuesInContext values = new ValuesInContext( attributes, 3, env );
 		
-		checkValue(values, "id",        "(short)3") ;
+		checkValue(values, "id",        "Short.valueOf((short)3)") ;
 		checkValue(values, "firstName", buildString('C', 3)) ;
-		checkValue(values, "flag1",     "true") ;
-		checkValue(values, "flag2",     "true") ;
-		checkValue(values, "byteVal",   "(byte)3") ;
+		checkValue(values, "flag1",     "Boolean.valueOf(true)") ;
+		checkValue(values, "flag2",     "Boolean.valueOf(true)") ;
+		checkValue(values, "byteVal",   "Byte.valueOf((byte)3)") ;
 	}
 	
 	private void checkValue(ValuesInContext values, String attributeName, String expectedValue) {

@@ -258,9 +258,10 @@ public class Java {
 				// register the type to be imported if necessary
 				imports.declareType( attribute.getFullType() ); 
 			}
-			List<String> resultList = imports.getList();
-			java.util.Collections.sort(resultList);
-			return resultList ;
+//			List<String> resultList = imports.getList();
+//			java.util.Collections.sort(resultList);
+//			return resultList ;
+			return imports.getFinalImportsList();			
 		}
 		return VOID_STRINGS_LIST ;
 	}
@@ -300,9 +301,10 @@ public class Java {
 				}
 			}
 			//--- Resulting list of imports
-			List<String> resultList = imports.getList();
-			java.util.Collections.sort(resultList);
-			return resultList ;
+//			List<String> resultList = imports.getList();
+//			java.util.Collections.sort(resultList);
+//			return resultList ;
+			return imports.getFinalImportsList();
 		}
 		return VOID_STRINGS_LIST ;
 	}

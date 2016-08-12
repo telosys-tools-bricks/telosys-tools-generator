@@ -78,6 +78,31 @@ public class ImportsList {
 		_list.add(type);
 	}
 	
+	private final static String JAVA_UTIL_DATE = "java.util.Date" ;
+	private final static String JAVA_SQL_DATE  = "java.sql.Date" ;
+	/**
+	 * Removes the "collided types" <br>
+	 * e.g. it's impossible to import both "java.util.Date" and "java.sql.Date" 
+	 */
+	public void removeCollidedTypes() {
+		if ( _list.contains(JAVA_UTIL_DATE) && _list.contains(JAVA_SQL_DATE) ) {
+			_list.remove(JAVA_UTIL_DATE) ;
+			_list.remove(JAVA_SQL_DATE) ;
+		}		
+	}
+	
+	/**
+	 * Returns the list of all the imports "ready to use" <br>
+	 * sorted and without collided types
+	 * @return
+	 */
+	public List<String> getFinalImportsList() {
+		removeCollidedTypes();
+		//List<String> resultList = imports.getList();
+		java.util.Collections.sort(_list);
+		return _list ;		
+	}
+	
 //	private int shortNameCount(String shortName)
 //	{
 //		int count = 0 ;
