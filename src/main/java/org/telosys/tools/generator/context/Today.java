@@ -37,15 +37,13 @@ import org.telosys.tools.generator.context.names.ContextName;
 //-------------------------------------------------------------------------------------
 public class Today
 {
-//    private static final SimpleDateFormat defaultDateFormat = new SimpleDateFormat("d MMM yyyy");
-//    private static final SimpleDateFormat defaultTimeFormat = new SimpleDateFormat("HH:mm:ss");
-    private static final String DEFAULT_DATE_FORMAT = "d MMM yyyy" ;
-    private static final String DEFAULT_TIME_FORMAT = "HH:mm:ss"   ;
+    private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd" ; // ISO
+    private static final String DEFAULT_TIME_FORMAT = "HH:mm:ss"   ; // ISO
     
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the current date with the default format"
+			"Returns the current date with the default format (ISO date format)"
 			}
 	)
     public String getDate()
@@ -74,7 +72,7 @@ public class Today
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the current time with the default format"
+			"Returns the current time with the default format (ISO time format)"
 			}
 	)
     public String getTime()
