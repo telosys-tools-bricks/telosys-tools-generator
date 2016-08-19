@@ -1882,14 +1882,15 @@ public class AttributeInContext
 	}
 	
 	//------------------------------------------------------------------------------------------
-	@VelocityMethod(
-	text={	
-		"Returns TRUE if the attribute is referencing another entity by itself ",
-		"(if the attribute is the only 'join column' of a link)"
-		},
-		since="2.1.0"
-	)
-	public boolean isReferencingAnotherEntity() throws GeneratorException {
-		return getReferencedEntityType().length() > 0 ;
-	}
+// REMOVED in v 3.0.0
+//	@VelocityMethod(
+//	text={	
+//		"Returns TRUE if the attribute is referencing another entity by itself ",
+//		"(if the attribute is the only 'join column' of a link)"
+//		},
+//		since="2.1.0"
+//	)
+//	public boolean isReferencingAnotherEntity() throws GeneratorException {
+//		return getReferencedEntityType().length() > 0 ;
+//	}
 }
