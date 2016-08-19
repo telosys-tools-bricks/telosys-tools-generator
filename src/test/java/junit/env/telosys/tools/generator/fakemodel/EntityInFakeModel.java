@@ -102,7 +102,8 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 		//--- Check if all the columns are in a Foreign Key
 		for ( Attribute column : getAttributesArray() ) {
 			//if ( ! column.isForeignKey() ) {
-			if ( ! column.isUsedInForeignKey() ) {
+			//if ( ! column.isUsedInForeignKey() ) {
+			if ( ! column.isFK() ) {
 				return false ;
 			}
 		}

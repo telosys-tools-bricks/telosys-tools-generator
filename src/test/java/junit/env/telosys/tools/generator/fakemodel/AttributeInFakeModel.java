@@ -48,7 +48,10 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 	
 	private boolean _bKeyElement        = false ; // primaryKey="true|false" ( false by default ) // v 3.0.0
 	
-	private boolean _bForeignKey       = false ; // foreignKey="true|false" ( false by default )
+//	private boolean _bForeignKey       = false ; // foreignKey="true|false" ( false by default )
+	private boolean _bForeignKeySimple     = false ; // ( false by default )
+	private boolean _bForeignKeyComposite  = false ; // ( false by default )
+
 
 	private boolean _bAutoIncremented  = false ; // autoIncremented="true|false" ( false by default )
 	
@@ -178,15 +181,35 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 	}
 
 	//-----------------------------------------------------------------------------
-	public void setForeignKey(boolean b) {
-		_bForeignKey = b ;
-	}
+//	public void setForeignKey(boolean b) {
+//		_bForeignKey = b ;
+//	}
 //	public boolean isForeignKey() {
 //		return _bForeignKey ;
 //	}
+//	@Override
+//	public boolean isUsedInForeignKey() { // v 3.0.0
+//		return _bForeignKey;
+//	}
 	@Override
-	public boolean isUsedInForeignKey() { // v 3.0.0
-		return _bForeignKey;
+	public boolean isFK() {
+		return _bForeignKeySimple || _bForeignKeyComposite ;
+	}
+
+	public void setFKSimple(boolean flag) {
+		_bForeignKeySimple = flag ;
+	}
+	@Override
+	public boolean isFKSimple() {
+		return _bForeignKeySimple;
+	}
+
+	public void setFKComposite(boolean flag) {
+		_bForeignKeyComposite = flag ;
+	}
+	@Override
+	public boolean isFKComposite() {
+		return _bForeignKeyComposite;
 	}
 	
 	//-----------------------------------------------------------------------------

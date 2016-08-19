@@ -95,7 +95,14 @@ public class AttributeInContext
 	
 	//--- Database info -------------------------------------------------
     private final boolean _bKeyElement      ;  // True if primary key
-    private final boolean _bUsedInForeignKey  ;
+    
+    // Removed in  v 3.0.0
+    // private final boolean _bUsedInForeignKey    ;
+    private final boolean _bForeignKey          ; // v 3.0.0
+    private final boolean _bForeignKeySimple    ; // v 3.0.0
+    private final boolean _bForeignKeyComposite ; // v 3.0.0
+    
+    
     private final boolean _bAutoIncremented  ;  // True if auto-incremented by the database
     private final String  _sDataBaseName     ;  // Column name in the DB table
     private final String  _sDataBaseType      ;  // Column type in the DB table
@@ -192,7 +199,12 @@ public class AttributeInContext
         //_bKeyElement       = column.isPrimaryKey() ;
         _bKeyElement       = attribute.isKeyElement(); // v 3.0.0
         //_bUsedInForeignKey = column.isForeignKey(); 
-        _bUsedInForeignKey = attribute.isUsedInForeignKey() ; // v 3.0.0
+        
+        //_bUsedInForeignKey = attribute.isUsedInForeignKey() ; // v 3.0.0
+        _bForeignKey          = attribute.isFK() ; // v 3.0.0
+        _bForeignKeySimple    = attribute.isFKSimple() ; // v 3.0.0
+        _bForeignKeyComposite = attribute.isFKComposite() ; // v 3.0.0
+
         _bAutoIncremented  = attribute.isAutoIncremented();
         _iDatabaseSize     = attribute.getDatabaseSize() != null ? attribute.getDatabaseSize() : 0 ;
         _sDatabaseComment  = StrUtil.notNull( attribute.getDatabaseComment() ) ; // Added in v 2.1.1 - #LCH
@@ -760,21 +772,40 @@ public class AttributeInContext
     }
 
 	//----------------------------------------------------------------------
-    /**
-     * Returns TRUE if the attribute is used in (at least) one Foreign Key 
-     * @return 
-     */
 	@VelocityMethod(
-	text={	
-		"Returns TRUE if the attribute is used in (at least) one Foreign Key"
-		}
+	text={ "Returns TRUE if the attribute is used in (at least) one Foreign Key",
+		"( it can be an 'Simple FK' or a 'Composite FK' or both )" },
+	since="3.0.0"
 	)
-    public boolean isUsedInForeignKey()
-    {
-        return _bUsedInForeignKey ;
+//    public boolean isUsedInForeignKey() {
+//        return _bUsedInForeignKey ;
+//    }
+    public boolean isFK() { // v 3.0.0
+        return _bForeignKey ;
     }
 
-    /**
+	//----------------------------------------------------------------------
+	@VelocityMethod(
+	text={ "Returns TRUE if the attribute is itself a 'Simple Foreign Key' ",
+		   "( the FK is based only on this single attribute ) " },
+	since="3.0.0"
+	)
+    public boolean isFKSimple() { // v 3.0.0
+        return _bForeignKeySimple ;
+    }
+
+	//----------------------------------------------------------------------
+	@VelocityMethod(
+	text={ "Returns TRUE if the attribute is a part of a 'Composite Foreign Key' ",
+		   "( the FK is based on many attributes including this attribute ) " },
+	since="3.0.0"
+	)
+    public boolean isFKComposite() { // v 3.0.0
+        return _bForeignKeyComposite ;
+    }
+
+	//----------------------------------------------------------------------
+	/**
      * Returns TRUE if the attribute is involved in a link Foreign Key <br>
      * Useful for JPA, to avoid double mapping ( FK field and owning side link )
      * @param linksArray - list of the links to be checked 
