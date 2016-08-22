@@ -72,10 +72,13 @@ public class AttributeInContext
 //    private final static String TYPE_DATE = "date" ;
 //    private final static String TYPE_TIME = "time" ;
     
-	private final EnvInContext    _env ; // ver 3.0.0
+	private final EnvInContext     _env ; // ver 3.0.0
 
 	//--- 
-    private final EntityInContext _entity ; // The entity 
+    private final EntityInContext  _entity ; // The entity 
+    
+	private final ModelInContext   _modelInContext ;  // v 3.0.0
+
     
 	//--- Basic minimal attribute info -------------------------------------------------
 	private final String  _sName ;  // attribute name 
@@ -101,7 +104,7 @@ public class AttributeInContext
     private final boolean _bForeignKey          ; // v 3.0.0
     private final boolean _bForeignKeySimple    ; // v 3.0.0
     private final boolean _bForeignKeyComposite ; // v 3.0.0
-    
+    private final String  _sReferencedEntityClassName ; // v 3.0.0
     
     private final boolean _bAutoIncremented  ;  // True if auto-incremented by the database
     private final String  _sDataBaseName     ;  // Column name in the DB table
@@ -168,9 +171,13 @@ public class AttributeInContext
 	 * @param attribute
 	 * @param env
 	 */
-	public AttributeInContext(final EntityInContext entity, final Attribute attribute, final EnvInContext env) // v 3.0.0
+	public AttributeInContext(final EntityInContext entity, 
+			final Attribute attribute, 
+			final ModelInContext modelInContext, // v 3.0.0
+			final EnvInContext env) // v 3.0.0
 	{
 		_env = env ; // v 3.0.0
+		_modelInContext = modelInContext ; // v 3.0.0
 
 		_entity = entity ;
 		
@@ -204,6 +211,7 @@ public class AttributeInContext
         _bForeignKey          = attribute.isFK() ; // v 3.0.0
         _bForeignKeySimple    = attribute.isFKSimple() ; // v 3.0.0
         _bForeignKeyComposite = attribute.isFKComposite() ; // v 3.0.0
+        _sReferencedEntityClassName = attribute.getReferencedEntityClassName() ;  // v 3.0.0
 
         _bAutoIncremented  = attribute.isAutoIncremented();
         _iDatabaseSize     = attribute.getDatabaseSize() != null ? attribute.getDatabaseSize() : 0 ;
@@ -353,6 +361,17 @@ public class AttributeInContext
 	public String getName()
 	{
 		return _sName;
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+			text={	
+				"Returns the entity owning the attribute "
+				}
+		)
+	public EntityInContext getEntity()
+	{
+		return _entity;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -1860,27 +1879,64 @@ public class AttributeInContext
 		return _sTableGeneratorPkColumnValue;
 	}
 	
+// Removed in v 3.0.0
+//	//------------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//	text={	
+//		"Returns the 'simple type' of the entity referenced by this attribute (if any) ",
+//		"Returns a type only if the attribute is the only 'join column' of the link",
+//		"else returns a 'void string' (if the attribute is not involved in a link, ",
+//		"or if the link as many join columns)"
+//		},
+//	since="2.1.0"
+//	)
+//	public String getReferencedEntityType() throws GeneratorException {
+//		for( LinkInContext link : _entity.getLinks()  ) {
+//			if( link.isOwningSide() && link.getAttributesCount() == 1 ) {
+//				if ( link.usesAttribute(this) ) {
+//					return link.getTargetEntitySimpleType() ;
+//				}					
+//			}
+//		}
+//		return "";
+//	}
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns the 'simple type' of the entity referenced by this attribute (if any) ",
-		"Returns a type only if the attribute is the only 'join column' of the link",
-		"else returns a 'void string' (if the attribute is not involved in a link, ",
-		"or if the link as many join columns)"
+		"Returns the entity referenced by this attribute (if any) ",
+		"Can be used only if the attribute 'isFK' ",
+		"Throws an exception if no entity is refrerenced by the attribute",
 		},
-	since="2.1.0"
+	since="3.0.0"
 	)
-	public String getReferencedEntityType() throws GeneratorException {
-		for( LinkInContext link : _entity.getLinks()  ) {
-			if( link.isOwningSide() && link.getAttributesCount() == 1 ) {
-				if ( link.usesAttribute(this) ) {
-					return link.getTargetEntitySimpleType() ;
-				}					
+	public EntityInContext getReferencedEntity() throws GeneratorException {
+		if ( ! StrUtil.nullOrVoid(_sReferencedEntityClassName) ) {
+			EntityInContext entity = this._modelInContext.getEntityByClassName(_sReferencedEntityClassName);
+			if ( entity != null ) {
+				return entity ;
+			}
+			else {
+				throw new IllegalStateException("getReferencedEntityType() : Cannot get Entity for '" + _sReferencedEntityClassName + "'");				
 			}
 		}
-		return "";
+		else {
+			throw new GeneratorException("No entity referenced by this attribute (" + _sName + ")");
+		}
 	}
-	
+
+	//------------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+		"Returns the name (class name) of the entity referenced by this attribute (if any) ",
+		"Can be used only if the attribute 'isFK' ",
+		"Throws an exception if no entity is refrerenced by the attribute",
+		},
+	since="3.0.0"
+	)
+	public String getReferencedEntityName() throws GeneratorException {
+		return getReferencedEntity().getName();
+	}
+
 	//------------------------------------------------------------------------------------------
 // REMOVED in v 3.0.0
 //	@VelocityMethod(

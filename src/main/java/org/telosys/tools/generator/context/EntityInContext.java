@@ -127,7 +127,7 @@ public class EntityInContext
 //			_attributes.add(attribute);
 //		}
 		for ( Attribute attribute : entity.getAttributes() ) { // v 3.0.0
-			AttributeInContext attributeInContext = new AttributeInContext(this, attribute, _env);
+			AttributeInContext attributeInContext = new AttributeInContext(this, attribute, _modelInContext, _env);
 			_attributes.add(attributeInContext);
 		}
 

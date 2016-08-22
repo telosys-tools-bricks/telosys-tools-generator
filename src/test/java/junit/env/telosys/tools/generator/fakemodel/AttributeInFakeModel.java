@@ -1050,5 +1050,11 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		return false;
 	}
 
+	@Override
+	public String getReferencedEntityClassName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	//---------------------------------------------------------------------------------------------------
 }

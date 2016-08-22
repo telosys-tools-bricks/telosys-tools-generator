@@ -128,34 +128,47 @@ public class ValuesInContextForJavaTest {
 	
 	@Test
 	public void testValuesStep1() {
-		EnvInContext env = getEnvInContext() ;
+		EnvInContext    env = getEnvInContext() ;
 		
 		
 		
-//		AttributeInContext attribFirstName =  new AttributeInContext(null, buildAttribute("firstName", "java.lang.String", 10)) ;
+//		AttributeInContext attribFirstName =  new AttributeInContext("firstName", "java.lang.String", 10)) ;
 //		attributes.add(attribFirstName);		
-//		attributes.add( new AttributeInContext(null, buildAttribute("age",       "java.lang.Short")) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("num1",      "long")) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("num2",      "java.lang.Double")) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("date1",     "java.util.Date")) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("date2",     "java.sql.Date")) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("flag",      "boolean")) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("flag2",     "boolean")) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("time",     "java.sql.Time")) ) ;
+//		attributes.add( new AttributeInContext("age",       "java.lang.Short")) ) ;
+//		attributes.add( new AttributeInContext("num1",      "long")) ) ;
+//		attributes.add( new AttributeInContext("num2",      "java.lang.Double")) ) ;
+//		attributes.add( new AttributeInContext("date1",     "java.util.Date")) ) ;
+//		attributes.add( new AttributeInContext("date2",     "java.sql.Date")) ) ;
+//		attributes.add( new AttributeInContext("flag",      "boolean")) ) ;
+//		attributes.add( new AttributeInContext("flag2",     "boolean")) ) ;
+//		attributes.add( new AttributeInContext("time",     "java.sql.Time")) ) ;
 
 		// with neutral types
-		AttributeInContext id        = new AttributeInContext(null, buildAttribute("id",        "int"), env) ;
-		AttributeInContext code      = new AttributeInContext(null, buildAttribute("code",      "int", true), env) ; // NOT NULL
-		AttributeInContext firstName = new AttributeInContext(null, buildAttribute("firstName", "string", 10), env) ;
-		AttributeInContext age       = new AttributeInContext(null, buildAttribute("age",       "short"), env) ;
-		AttributeInContext num1      = new AttributeInContext(null, buildAttribute("num1",      "long"), env)  ;
-		AttributeInContext num2      = new AttributeInContext(null, buildAttribute("num2",      "double"), env)  ;
-		AttributeInContext dec       = new AttributeInContext(null, buildAttribute("dec",       "decimal"), env)  ;
-		AttributeInContext date1     = new AttributeInContext(null, buildAttribute("date1",     "date"), env)  ;
-		AttributeInContext date2     = new AttributeInContext(null, buildAttribute("date2",     "date"), env) ;
-		AttributeInContext flag      = new AttributeInContext(null, buildAttribute("flag",      "boolean"), env) ;
-		AttributeInContext flag2     = new AttributeInContext(null, buildAttribute("flag2",     "boolean", true), env) ;
-		AttributeInContext time      = new AttributeInContext(null, buildAttribute("time",      "time"), env) ;
+//		AttributeInContext id        = new AttributeInContext("id",        "int"), modelInContext, env) ;
+//		AttributeInContext code      = new AttributeInContext("code",      "int", true), modelInContext, env) ; // NOT NULL
+//		AttributeInContext firstName = new AttributeInContext("firstName", "string", 10), modelInContext, env) ;
+//		AttributeInContext age       = new AttributeInContext("age",       "short"), modelInContext, env) ;
+//		AttributeInContext num1      = new AttributeInContext("num1",      "long"), modelInContext, env)  ;
+//		AttributeInContext num2      = new AttributeInContext("num2",      "double"), modelInContext, env)  ;
+//		AttributeInContext dec       = new AttributeInContext("dec",       "decimal"), modelInContext, env)  ;
+//		AttributeInContext date1     = new AttributeInContext("date1",     "date"), modelInContext, env)  ;
+//		AttributeInContext date2     = new AttributeInContext("date2",     "date"), modelInContext, env) ;
+//		AttributeInContext flag      = new AttributeInContext("flag",      "boolean"), modelInContext, env) ;
+//		AttributeInContext flag2     = new AttributeInContext("flag2",     "boolean", true), modelInContext, env) ;
+//		AttributeInContext time      = new AttributeInContext("time",      "time"), modelInContext, env) ;
+
+		AttributeInContext id        = buildAttributeInContext("id",        "int"      ) ;
+		AttributeInContext code      = buildAttributeInContext("code",      "int",    true) ; // NOT NULL
+		AttributeInContext firstName = buildAttributeInContext("firstName", "string", 10) ;
+		AttributeInContext age       = buildAttributeInContext("age",       "short"    ) ;
+		AttributeInContext num1      = buildAttributeInContext("num1",      "long"     ) ;
+		AttributeInContext num2      = buildAttributeInContext("num2",      "double"   ) ;
+		AttributeInContext dec       = buildAttributeInContext("dec",       "decimal"  ) ;
+		AttributeInContext date1     = buildAttributeInContext("date1",     "date"     ) ;
+		AttributeInContext date2     = buildAttributeInContext("date2",     "date"     ) ;
+		AttributeInContext flag      = buildAttributeInContext("flag",      "boolean"  ) ;
+		AttributeInContext flag2     = buildAttributeInContext("flag2",     "boolean", true) ;
+		AttributeInContext time      = buildAttributeInContext("time",      "time"     ) ;
 				
 		List<AttributeInContext> attributes = new LinkedList<AttributeInContext>() ;
 		attributes.add( id );
@@ -244,18 +257,25 @@ public class ValuesInContextForJavaTest {
 
 		List<AttributeInContext> attributes = new LinkedList<AttributeInContext>() ;
 		
-//		attributes.add( new AttributeInContext(null, buildAttribute("id",        "int")) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("firstName", "java.lang.String", 3)) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("age",       "java.lang.Short")) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("date1",     "java.util.Date")) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("date2",     "java.sql.Date")) ) ;
+//		attributes.add( new AttributeInContext("id",        "int")) ) ;
+//		attributes.add( new AttributeInContext("firstName", "java.lang.String", 3)) ) ;
+//		attributes.add( new AttributeInContext("age",       "java.lang.Short")) ) ;
+//		attributes.add( new AttributeInContext("date1",     "java.util.Date")) ) ;
+//		attributes.add( new AttributeInContext("date2",     "java.sql.Date")) ) ;
 
 		// with neutral types
-		attributes.add( new AttributeInContext(null, buildAttribute("id",        "int"), env) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("firstName", "string", 3), env) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("age",       "short"), env) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("date1",     "date"), env) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("date2",     "date"), env ) ) ;
+//		attributes.add( new AttributeInContext("id",        "int"), modelInContext, env) ) ;
+//		attributes.add( new AttributeInContext("firstName", "string", 3), modelInContext, env) ) ;
+//		attributes.add( new AttributeInContext("age",       "short"), modelInContext, env) ) ;
+//		attributes.add( new AttributeInContext("date1",     "date"), modelInContext, env) ) ;
+//		attributes.add( new AttributeInContext("date2",     "date"),modelInContext,  env ) ) ;
+		
+		attributes.add( buildAttributeInContext("id",        "int"     ) );
+		attributes.add( buildAttributeInContext("firstName", "string", 3 ) );
+		attributes.add( buildAttributeInContext("age",       "short"     ) );
+		attributes.add( buildAttributeInContext("date1",     "date"      ) );
+		attributes.add( buildAttributeInContext("date2",     "date"      ) );
+
 		
 		ValuesInContext values = new ValuesInContext( attributes, 2, env );
 		
@@ -271,18 +291,25 @@ public class ValuesInContextForJavaTest {
 
 		List<AttributeInContext> attributes = new LinkedList<AttributeInContext>() ;
 		
-//		attributes.add( new AttributeInContext(null, buildAttribute("id",        "short")) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("firstName", "java.lang.String", 3)) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("flag1",     "java.lang.Boolean")) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("flag2",     "boolean")) ) ;
-//		attributes.add( new AttributeInContext(null, buildAttribute("byteVal",   "byte")) ) ;
+//		attributes.add( new AttributeInContext("id",        "short")) ) ;
+//		attributes.add( new AttributeInContext("firstName", "java.lang.String", 3)) ) ;
+//		attributes.add( new AttributeInContext("flag1",     "java.lang.Boolean")) ) ;
+//		attributes.add( new AttributeInContext("flag2",     "boolean")) ) ;
+//		attributes.add( new AttributeInContext("byteVal",   "byte")) ) ;
 
 		// with neutral types
-		attributes.add( new AttributeInContext(null, buildAttribute("id",        "short"), env) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("firstName", "string", 3), env) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("flag1",     "boolean"), env) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("flag2",     "boolean"), env) ) ;
-		attributes.add( new AttributeInContext(null, buildAttribute("byteVal",   "byte"), env) ) ;
+//		attributes.add( new AttributeInContext("id",        "short"), modelInContext, env) ) ;
+//		attributes.add( new AttributeInContext("firstName", "string", 3), modelInContext, env) ) ;
+//		attributes.add( new AttributeInContext("flag1",     "boolean"), modelInContext, env) ) ;
+//		attributes.add( new AttributeInContext("flag2",     "boolean"), modelInContext, env) ) ;
+//		attributes.add( new AttributeInContext("byteVal",   "byte"), modelInContext, env) ) ;
+		
+		attributes.add( buildAttributeInContext("id",        "short"    ) );
+		attributes.add( buildAttributeInContext("firstName", "string", 3) );
+		attributes.add( buildAttributeInContext("flag1",     "boolean"  ) );
+		attributes.add( buildAttributeInContext("flag2",     "boolean"  ) );
+		attributes.add( buildAttributeInContext("byteVal",   "byte"     ) );
+		
 		
 		ValuesInContext values = new ValuesInContext( attributes, 3, env );
 		
@@ -308,6 +335,23 @@ public class ValuesInContextForJavaTest {
 		Assert.assertEquals(expectedValue.trim(), v2);
 	}
 	
+	//------------------------
+	private AttributeInContext buildAttributeInContext(String attributeName, String neutralType)  {
+		EnvInContext envInContext = getEnvInContext();
+		Attribute attribute = buildAttribute(attributeName, neutralType);
+		return new AttributeInContext(null, attribute, null, envInContext);
+	}
+	private AttributeInContext buildAttributeInContext(String attributeName, String neutralType, int maxLength)  {
+		EnvInContext envInContext = getEnvInContext();
+		Attribute attribute = buildAttribute(attributeName, neutralType, maxLength);
+		return new AttributeInContext(null, attribute, null, envInContext);
+	}
+	private AttributeInContext buildAttributeInContext(String attributeName, String neutralType, boolean notNull)  {
+		EnvInContext envInContext = getEnvInContext();
+		Attribute attribute = buildAttribute(attributeName, neutralType, notNull);
+		return new AttributeInContext(null, attribute, null, envInContext);
+	}
+	//------------------------	
 	private Attribute buildAttribute(String attributeName, String neutralType) {
 		return buildAttribute( attributeName, neutralType, 0, false);
 	}
@@ -317,7 +361,7 @@ public class ValuesInContextForJavaTest {
 	private Attribute buildAttribute(String attributeName, String neutralType, boolean notNull) {
 		return buildAttribute( attributeName, neutralType, 0, notNull);
 	}
-	
+	//------------------------
 	private Attribute buildAttribute(String attributeName, String neutralType, int maxLength, boolean notNull) {
 		AttributeInFakeModel attribute = new AttributeInFakeModel(attributeName, neutralType );
 //		attribute.setName(attributeName);
