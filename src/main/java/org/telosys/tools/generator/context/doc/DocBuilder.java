@@ -41,7 +41,7 @@ import org.telosys.tools.generator.context.JdbcFactoryInContext;
 import org.telosys.tools.generator.context.JdbcInContext;
 import org.telosys.tools.generator.context.JoinColumnInContext;
 import org.telosys.tools.generator.context.Jpa;
-import org.telosys.tools.generator.context.LinkAttributeInContext;
+import org.telosys.tools.generator.context.LinkAttributesPairInContext;
 import org.telosys.tools.generator.context.LinkInContext;
 import org.telosys.tools.generator.context.Loader;
 import org.telosys.tools.generator.context.ModelInContext;
@@ -234,7 +234,7 @@ public class DocBuilder {
 		ForeignKeyColumnInContext.class, // ver 2.0.7
 		JoinColumnInContext.class, // ver 2.1.0
 		LinkInContext.class,
-		LinkAttributeInContext.class, // ver 2.1.0
+		LinkAttributesPairInContext.class, // ver 2.1.0
 		Loader.class,
 		//Model.class, // ver 2.0.7
 		ModelInContext.class, // ver 2.1.0

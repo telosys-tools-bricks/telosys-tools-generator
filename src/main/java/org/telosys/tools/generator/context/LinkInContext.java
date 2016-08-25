@@ -333,12 +333,14 @@ public class LinkInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the attributes for the two sides of the link "
+			"Returns a list of attributes pair defining the link ",
+			"Each pair contains the owning side attribute and its corresponding reverse side attribute ",
+			"Each link is supposed to contain at least 1 pair of attributes"
 			}
 	)
 	@VelocityReturnType("List of '$linkAttribute' (origin-target association) ")	
-	public List<LinkAttributeInContext> getAttributes() throws GeneratorException {
-		List<LinkAttributeInContext> list = new LinkedList<LinkAttributeInContext>();
+	public List<LinkAttributesPairInContext> getAttributes() throws GeneratorException {
+		List<LinkAttributesPairInContext> list = new LinkedList<LinkAttributesPairInContext>();
 		if ( _joinColumns != null ) {
 			for ( JoinColumnInContext jc : _joinColumns ) {
 				//--- ORIGIN attribute
@@ -347,7 +349,7 @@ public class LinkInContext {
 				EntityInContext referencedEntity = this.getTargetEntity();
 				AttributeInContext attribTarget = referencedEntity.getAttributeByColumnName(jc.getReferencedColumnName());
 				//--- New attribute mapping in the list
-				list.add( new LinkAttributeInContext(attribOrigin, attribTarget) );
+				list.add( new LinkAttributesPairInContext(attribOrigin, attribTarget) );
 			}
 		}
 		return list ;
