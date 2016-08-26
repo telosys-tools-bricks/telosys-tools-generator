@@ -427,8 +427,8 @@ public class EntityInContext
 	private List<AttributeInContext> getAttributesByAddedCriteria( int criteria ) 
 	{
 		ContextLogger.log("getAttributesByAddedCriteria(" + criteria + ")" );
-		List<LinkInContext> allLinks = getLinks() ;
-		List<LinkInContext> selectedLinks = getSelectedLinks() ;
+//		List<LinkInContext> allLinks = getLinks() ;
+//		List<LinkInContext> selectedLinks = getSelectedLinks() ;
 		
 		LinkedList<AttributeInContext> selectedAttributes = new LinkedList<AttributeInContext>();
 		
@@ -456,18 +456,22 @@ public class EntityInContext
 			
 			//--- IS IN LINK ?
 			if ( ( criteria & Const.IN_LINKS ) != 0 ) {
-				selectedByLink = attribute.isUsedInLinkJoinColumn( allLinks ) ;
+				//selectedByLink = attribute.isUsedInLinkJoinColumn( allLinks ) ;
+				selectedByLink = attribute.isUsedInLinks();
 			}
 			if ( ( criteria & Const.NOT_IN_LINKS ) != 0 ) {
-				selectedByLink = ! attribute.isUsedInLinkJoinColumn( allLinks ) ;
+				//selectedByLink = ! attribute.isUsedInLinkJoinColumn( allLinks ) ;
+				selectedByLink = ! attribute.isUsedInLinks();
 			}
 			
 			//--- IS IN SELECTED LINK ?
 			if ( ( criteria & Const.IN_SELECTED_LINKS ) != 0 ) {
-				selectedBySelectedLink = attribute.isUsedInLinkJoinColumn( selectedLinks ) ;
+				//selectedBySelectedLink = attribute.isUsedInLinkJoinColumn( selectedLinks ) ;
+				selectedBySelectedLink = attribute.isUsedInSelectedLinks() ;
 			}			
 			if ( ( criteria & Const.NOT_IN_SELECTED_LINKS ) != 0 ) {
-				selectedBySelectedLink = ! attribute.isUsedInLinkJoinColumn( selectedLinks ) ;
+				//selectedBySelectedLink = ! attribute.isUsedInLinkJoinColumn( selectedLinks ) ;
+				selectedBySelectedLink = ! attribute.isUsedInSelectedLinks() ;
 			}
 			
 			int criteriaCount = 0 ;

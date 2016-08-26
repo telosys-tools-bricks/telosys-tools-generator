@@ -1056,5 +1056,17 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		return null;
 	}
 
+	@Override
+	public boolean isUsedInLinks() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isUsedInSelectedLinks() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	//---------------------------------------------------------------------------------------------------
 }

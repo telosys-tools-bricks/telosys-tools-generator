@@ -15,8 +15,6 @@
  */
 package org.telosys.tools.generator.context;
 
-import java.util.List;
-
 import org.telosys.tools.commons.DatabaseUtil;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.jdbctypes.JdbcTypes;
@@ -163,6 +161,9 @@ public class AttributeInContext
 	private final String  _sTableGeneratorValueColumnName  ;
 	private final String  _sTableGeneratorPkColumnValue   ;
 
+	private final boolean _bIsUsedInLinks ; // v 3.0.0 #LGU
+	private final boolean _bIsUsedInSelectedLinks ; // v 3.0.0 #LGU
+	
 	//-----------------------------------------------------------------------------------------------
 	//public AttributeInContext(final EntityInContext entity, final Column column) 
 	/**
@@ -333,6 +334,9 @@ public class AttributeInContext
 			_iSequenceGeneratorAllocationSize = -1;
 		}
 		
+		
+		_bIsUsedInLinks         = attribute.isUsedInLinks(); // v 3.0.0 #LGU
+		_bIsUsedInSelectedLinks = attribute.isUsedInSelectedLinks(); // v 3.0.0 #LGU
 	}
 	
 	protected final LanguageType getLanguageType() {
@@ -824,34 +828,74 @@ public class AttributeInContext
     }
 
 	//----------------------------------------------------------------------
-	/**
-     * Returns TRUE if the attribute is involved in a link Foreign Key <br>
-     * Useful for JPA, to avoid double mapping ( FK field and owning side link )
-     * @param linksArray - list of the links to be checked 
-     * @return
-     */
-	@VelocityMethod(
-	text={	
-		"Returns TRUE if the attribute is involved in a link Foreign Key",
-		"Useful for JPA, to avoid double mapping ( FK field and owning side link )"
-		},
-	parameters="links : list of links where to search the attribute"
-	)
-    public boolean isUsedInLinkJoinColumn( List<LinkInContext> links )
-    {
-    	if ( null == _sDataBaseName ) {
-    		return false ; // No mapping 
-    	}
-    	
-		for ( LinkInContext link : links ) {
-			if( link.isOwningSide() ) {
-				if ( link.usesAttribute(this) ) {
-					return true ;
-				}					
-			}
-		}
-		return false ;
-    }
+//	/**
+//     * Returns TRUE if the attribute is involved in a link Foreign Key <br>
+//     * Useful for JPA, to avoid double mapping ( FK field and owning side link )
+//     * @param linksArray - list of the links to be checked 
+//     * @return
+//     */
+//	@VelocityMethod(
+//	text={	
+//		"Returns TRUE if the attribute is involved in a link Foreign Key",
+//		"Useful for JPA, to avoid double mapping ( FK field and owning side link )"
+//		},
+//	parameters="links : list of links where to search the attribute"
+//	)
+//    public boolean isUsedInLinkJoinColumn( List<LinkInContext> links )
+//    {
+//    	if ( null == _sDataBaseName ) {
+//    		return false ; // No mapping 
+//    	}
+//    	
+//		for ( LinkInContext link : links ) {
+//			if( link.isOwningSide() ) {
+//				if ( link.usesAttribute(this) ) {
+//					return true ;
+//				}					
+//			}
+//		}
+//		return false ;
+//    }
+	
+	public boolean isUsedInLinks() { // v 3.0.0 #LGU
+		return _bIsUsedInLinks ;
+	}
+	public boolean isUsedInSelectedLinks() { // v 3.0.0 #LGU
+		return _bIsUsedInSelectedLinks ;
+	}
+	
+	// Implementation in each MODEL :
+//	public boolean isUsedInLinks_DBREP() {
+//		return isUsedInLink_DBREP( this.getEntity().getLinks() );
+//	}
+//	public boolean isUsedInSelectedLinks_DBREP() {
+//		return isUsedInLink_DBREP( this.getEntity().getSelectedLinks() );
+//	}
+//
+//	public boolean isUsedInLinks_DSL() {
+//		// In this model no "selected link" vs "all links" => don't care the given links list
+//		return this.isFK() ;
+//	}
+//	public boolean isUsedInSelectedLinks_DSL() {
+//		// In this model no "selected link" vs "all links" => don't care the given links list
+//		return this.isFK() ;
+//	}
+//	private boolean isUsedInLink_DBREP( List<LinkInContext> links ) // SAME AS BEFORE
+//	{
+////		if ( null == this._sDataBaseName ) {
+////			return false ; // No mapping for this attribute
+////	    }
+//		if ( links != null ) {
+//			for ( LinkInContext link : links ) {
+//				if( link.isOwningSide() ) {
+//					if ( link.usesAttribute(this) ) {
+//						return true ;
+//					}
+//				}
+//			}
+//		}
+//		return false ;
+//	}
 
 	//-------------------------------------------------------------------------------------
     /**
