@@ -99,7 +99,7 @@ public class EntityInContext
 	public EntityInContext( final Entity entity, final String entityPackage, 
 //							final EntitiesManager entitiesManager,  // removed in v 3.0.0
 							final ModelInContext modelInContext, // v 3.0.0
-							final EnvInContext env ) throws GeneratorException
+							final EnvInContext env ) // throws GeneratorException
 	{
 		//_sName = entity.getBeanJavaClass() ;
 		_sClassName = entity.getClassName();  // v 3.0.0
@@ -1105,7 +1105,7 @@ public class EntityInContext
 	 * and managed the imports list and attributes declarations types to avoid imports error
 	 *  
 	 */
-	private void endOfAttributesDefinition() throws GeneratorException // v 2.1.0
+	private void endOfAttributesDefinition() // throws GeneratorException // v 2.1.0
 	{
 		if ( _attributes == null ) return ;
 		

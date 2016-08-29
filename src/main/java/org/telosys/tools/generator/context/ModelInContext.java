@@ -56,9 +56,9 @@ public class ModelInContext
 	 * @throws GeneratorException
 	 */
 //	public ModelInContext( Model model, EntitiesManager entitiesManager ) throws GeneratorException  {
-	public ModelInContext( Model model, String entitiesPackage, EnvInContext env ) throws GeneratorException  {
+	public ModelInContext( Model model, String entitiesPackage, EnvInContext env ) { // throws GeneratorException  {
 		super();
-		if ( model == null ) throw new GeneratorException("Model is null");
+		if ( model == null ) throw new IllegalArgumentException("Model is null");
 //		if ( entitiesManager == null ) throw new GeneratorException("EntitiesBuilder is null");
 		
 		//--- All the entities (the original model order is kept)
