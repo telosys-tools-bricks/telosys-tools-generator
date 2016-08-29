@@ -32,25 +32,7 @@ import org.telosys.tools.commons.TelosysToolsLogger;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.dbcfg.DatabasesConfigurations;
 import org.telosys.tools.commons.dbcfg.DbConfigManager;
-import org.telosys.tools.commons.variables.Variable;
-import org.telosys.tools.generator.context.BeanValidation;
-import org.telosys.tools.generator.context.Const;
-import org.telosys.tools.generator.context.DatabasesInContext;
-import org.telosys.tools.generator.context.EmbeddedGenerator;
-import org.telosys.tools.generator.context.EntityInContext;
-import org.telosys.tools.generator.context.EnvInContext;
-import org.telosys.tools.generator.context.FnInContext;
-import org.telosys.tools.generator.context.H2InContext;
-import org.telosys.tools.generator.context.HtmlInContext;
-import org.telosys.tools.generator.context.Java;
-import org.telosys.tools.generator.context.JdbcFactoryInContext;
-import org.telosys.tools.generator.context.Jpa;
-import org.telosys.tools.generator.context.Loader;
-import org.telosys.tools.generator.context.ModelInContext;
-import org.telosys.tools.generator.context.ProjectInContext;
 import org.telosys.tools.generator.context.Target;
-import org.telosys.tools.generator.context.Today;
-import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.engine.GeneratorContext;
 import org.telosys.tools.generator.engine.GeneratorEngine;
 import org.telosys.tools.generator.engine.GeneratorTemplate;
@@ -334,9 +316,19 @@ public class Generator {
 //		return p;
 //	}
 	
-	//========================================================================
-	// CONTEXT MANAGEMENT
-	//========================================================================
+//	//========================================================================
+//	// CONTEXT MANAGEMENT
+//	//========================================================================
+//	private GeneratorContext createContext( Model model, TelosysToolsLogger logger) {  
+//		// v 3.0.0 : centralized in GeneratorContextBuilder
+//		GeneratorContextBuilder generatorContextBuilder = new GeneratorContextBuilder(_telosysToolsCfg, logger);
+//		return generatorContextBuilder.initFullContext(model, _databasesConfigurations, _bundleName,
+//				selectedEntitiesNames, 
+//				target, 
+//				generatedTargets);
+//	}
+	
+/****
 //	private GeneratorContext createContext( GeneratorConfig generatorConfig, TelosysToolsLogger logger)
 //			//throws GeneratorException
 	private GeneratorContext createContext( TelosysToolsLogger logger) // v 3.0.0
@@ -422,7 +414,7 @@ public class Generator {
 			}
 		}
 	}
-
+****/
 // Unused : removed in v 3.0
 //	/**
 //	 * Set a new attribute (variable) in the Velocity Context <br>
@@ -568,57 +560,68 @@ public class Generator {
 	{
 		_logger.info("Generation in progress : target = " + target.getTargetName() + " / entity = " + target.getEntityName() );
 		
-//		GeneratorContext generatorContext = createContext(this._generatorConfig, this._logger);
-		GeneratorContext generatorContext = createContext(this._logger); // v 3.0.0
+//		//GeneratorContext generatorContext = createContext(this._generatorConfig, this._logger);
+//		//GeneratorContext generatorContext = createContext(this._logger); // v 3.0.0
+//		GeneratorContext generatorContext = createContext(model, this._logger); // v 3.0.0
 	
 // Moved in createContext
-//		//--- Set "$env" object ( environment configuration )
-//		EnvInContext env = new EnvInContext() ;
-//		generatorContext.put(ContextName.ENV, env);  
-		EnvInContext env = (EnvInContext) generatorContext.get(ContextName.ENV); // v 3.0.0
-		if ( env == null ) {
-			throw new GeneratorException("$env not defined in context");
-		}
+////		//--- Set "$env" object ( environment configuration )
+////		EnvInContext env = new EnvInContext() ;
+////		generatorContext.put(ContextName.ENV, env);  
+//		EnvInContext env = (EnvInContext) generatorContext.get(ContextName.ENV); // v 3.0.0
+//		if ( env == null ) {
+//			throw new GeneratorException("$env not defined in context");
+//		}
+//		
+////		EntitiesManager entitiesManager = new EntitiesManager(model, _generatorConfig, env); 
+////		EntitiesManager entitiesManager = new EntitiesManager(model, _telosysToolsCfg.getEntityPackage(), env); // v 3.0.0
+//		
+//		//--- Set "$model" object : full model with  all the entities (v 2.0.7)
+////		ModelInContext modelInContext = new ModelInContext(model, entitiesManager );
+//		ModelInContext modelInContext = new ModelInContext(model, _telosysToolsCfg.getEntityPackage(), env ); // v 3.0.0
+//		generatorContext.put(ContextName.MODEL, modelInContext); 
 		
-//		EntitiesManager entitiesManager = new EntitiesManager(model, _generatorConfig, env); 
-//		EntitiesManager entitiesManager = new EntitiesManager(model, _telosysToolsCfg.getEntityPackage(), env); // v 3.0.0
-		
-		//--- Set "$model" object : full model with  all the entities (v 2.0.7)
-//		ModelInContext modelInContext = new ModelInContext(model, entitiesManager );
-		ModelInContext modelInContext = new ModelInContext(model, _telosysToolsCfg.getEntityPackage(), env ); // v 3.0.0
-		generatorContext.put(ContextName.MODEL, modelInContext); 
-		
-		//--- Set "$target" object in the context 
-		generatorContext.put(ContextName.TARGET, target);
+//		//--- Set "$target" object in the context 
+//		generatorContext.put(ContextName.TARGET, target);
 
-		//--- List of selected entities ( $selectedEntities )
-//		List<EntityInContext> selectedEntities = entitiesManager.getEntities( selectedEntitiesNames );
-		List<EntityInContext> selectedEntities = modelInContext.getEntities(selectedEntitiesNames); // v 3.0.0
-		generatorContext.put(ContextName.SELECTED_ENTITIES, selectedEntities);
+//		//--- List of selected entities ( $selectedEntities )
+////		List<EntityInContext> selectedEntities = entitiesManager.getEntities( selectedEntitiesNames );
+//		List<EntityInContext> selectedEntities = modelInContext.getEntities(selectedEntitiesNames); // v 3.0.0
+//		generatorContext.put(ContextName.SELECTED_ENTITIES, selectedEntities);
 		
-		//--- Set "$entity" object in the context ( the current entity for this target )
-		EntityInContext entity = null ;
-		//if ( target.getEntityName().trim().length() > 0 ) {
-		if ( ! StrUtil.nullOrVoid( target.getEntityName() ) ) { // v 3.0.0
-			//--- Target with entity ( classical target )
-			//entity = entitiesManager.getEntity(target.getEntityName() );
-			entity = modelInContext.getEntityByClassName( target.getEntityName() ); // v 3.0.0
-		}
-		else {
-			//--- Target without entity ( e.g. "once" target )
-			entity = null ;
-		}
-		generatorContext.put(ContextName.ENTITY, entity ); 
+//		//--- Set "$entity" object in the context ( the current entity for this target )
+//		EntityInContext entity = null ;
+//		//if ( target.getEntityName().trim().length() > 0 ) {
+//		if ( ! StrUtil.nullOrVoid( target.getEntityName() ) ) { // v 3.0.0
+//			//--- Target with entity ( classical target )
+//			//entity = entitiesManager.getEntity(target.getEntityName() );
+//			entity = modelInContext.getEntityByClassName( target.getEntityName() ); // v 3.0.0
+//		}
+//		else {
+//			//--- Target without entity ( e.g. "once" target )
+//			entity = null ;
+//		}
+//		generatorContext.put(ContextName.ENTITY, entity ); 
 		
-		//--- Set the "$generator"  in the context ( "real" embedded generator )
-//		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator(
-//				model, _generatorConfig, _logger, selectedEntitiesNames, generatedTargets );
-//		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator(
-//				model, _telosysToolsCfg, _logger, selectedEntitiesNames, generatedTargets ); // v 3.0.0
-		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator( _telosysToolsCfg, _bundleName, _logger,
-				model, selectedEntitiesNames, generatedTargets ); // v 3.0.0
-		generatorContext.put(ContextName.GENERATOR, embeddedGenerator );
+//		//--- Set the "$generator"  in the context ( "real" embedded generator )
+////		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator(
+////				model, _generatorConfig, _logger, selectedEntitiesNames, generatedTargets );
+////		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator(
+////				model, _telosysToolsCfg, _logger, selectedEntitiesNames, generatedTargets ); // v 3.0.0
+//		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator( _telosysToolsCfg, _bundleName, _logger,
+//				model, selectedEntitiesNames, generatedTargets ); // v 3.0.0
+//		generatorContext.put(ContextName.GENERATOR, embeddedGenerator );
 		
+		//--- Creation of a full context for the generator
+		GeneratorContextBuilder generatorContextBuilder = new GeneratorContextBuilder(_telosysToolsCfg, _logger);
+		GeneratorContext generatorContext = generatorContextBuilder.initFullContext(
+				model, 
+				_databasesConfigurations, 
+				_bundleName,
+				selectedEntitiesNames, 
+				target, 
+				generatedTargets);
+
 		//---------- ((( GENERATION ))) 
 		InputStream is;
 		try {
