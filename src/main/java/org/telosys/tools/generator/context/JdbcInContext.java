@@ -82,7 +82,7 @@ public class JdbcInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
-			"Returns the JDBC SQL 'SELECT COUNT(*) FROM xxx' request to check existence",
+			"Returns the JDBC SQL 'SELECT COUNT(*) FROM xxx' request ",
 			""
 		},
 		example={	
@@ -98,8 +98,8 @@ public class JdbcInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
-			"Returns the JDBC SQL 'SELECT COUNT(*) FROM xxx WHERE pk = xxx' request to check existence",
-			""
+			"Returns the JDBC SQL 'SELECT COUNT(*) FROM xxx WHERE pk = xxx' request ",
+			"Can be used to check the existence of a record for the given PK"
 		},
 		example={	
 				"$jdbc.sqlSelectCountWherePK"
@@ -167,7 +167,7 @@ public class JdbcInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
-			"Returns the list of all the attributes of the Primary Key",
+			"Returns the list of all the attributes required for the Primary Key",
 			""
 		},
 		example={	

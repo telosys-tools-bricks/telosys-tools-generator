@@ -381,22 +381,23 @@ public class AttributeInContext
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the attribute's name with n trailing blanks "
+			"Returns the attribute's name with trailing blanks in order to obtain the expected size "
 			},
 		parameters = { 
-			"n : the number of blanks to be added at the end of the name" 
+			"n : the expected size" 
 			}
 	)
 	public String formattedName(int iSize)
     {
-        String s = _sName ;
-        String sTrailingBlanks = "";
-        int iDelta = iSize - s.length();
-        if (iDelta > 0) // if needs trailing blanks
-        {
-            sTrailingBlanks = GeneratorUtil.blanks(iDelta);
-        }
-        return s + sTrailingBlanks;
+//        String s = _sName ;
+//        String sTrailingBlanks = "";
+//        int iDelta = iSize - s.length();
+//        if (iDelta > 0) // if needs trailing blanks
+//        {
+//            sTrailingBlanks = GeneratorUtil.blanks(iDelta);
+//        }
+//        return s + sTrailingBlanks;
+        return format(this.getName(), iSize);
     }
 
 	//-------------------------------------------------------------------------------------
@@ -454,24 +455,48 @@ public class AttributeInContext
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the attribute's type with n trailing blanks "
+			"Returns the attribute's type with trailing blanks in order to obtain the expected size"
 			},
 		parameters = { 
-			"n : the number of blanks to be added at the end of the name" 
+			"n : the expected size " 
 			}
 	)
 	public String formattedType(int iSize) 
     {
-		String sType = this.getType() ;
-        String sTrailingBlanks = "";
-        int iDelta = iSize - sType.length();
-        if (iDelta > 0) // if needs trailing blanks
-        {
-            sTrailingBlanks = GeneratorUtil.blanks(iDelta);
-        }
-        return sType + sTrailingBlanks;
+//		String sType = this.getType() ;
+//        String sTrailingBlanks = "";
+//        int iDelta = iSize - sType.length();
+//        if (iDelta > 0) // if needs trailing blanks
+//        {
+//            sTrailingBlanks = GeneratorUtil.blanks(iDelta);
+//        }
+//        return sType + sTrailingBlanks;
+        return format(this.getType(), iSize);
     }	
     
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the attribute's wrapper type with trailing blanks in order to obtain the expected size"
+			},
+		parameters = { 
+			"n : the expected size " 
+			}
+	)
+	public String formattedWrapperType(int iSize) 
+    {
+        return format(this.getWrapperType(), iSize);
+    }	
+    
+	private String format(String s, int iSize) {
+        String sTrailingBlanks = "";
+        int iDelta = iSize - s.length();
+        if (iDelta > 0) { // if trailing blanks needed
+            sTrailingBlanks = GeneratorUtil.blanks(iDelta);
+        }
+        return s + sTrailingBlanks;
+    }	
+
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	

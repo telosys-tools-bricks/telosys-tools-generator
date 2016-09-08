@@ -184,6 +184,7 @@ public class H2InContext {
 		}
 	}
 	
+/****
 	private String getColumnTypeOLD (final AttributeInContext attribute ) {
 		
 		//--- Particular case : Auto-incremented column
@@ -264,4 +265,6 @@ public class H2InContext {
 				return "OTHER"; // H2 type mapped to java.lang.Object 
 		}
 	}
+*****/
+	
 }
