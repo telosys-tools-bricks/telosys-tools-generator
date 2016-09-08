@@ -15,12 +15,15 @@
  */
 package org.telosys.tools.generator.context;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generic.model.types.NeutralType;
 
 /**
  * Set of functions dedicated to the 'H2' database ( $h2.functionName(...) ) <br>
@@ -30,6 +33,22 @@ import org.telosys.tools.generator.context.names.ContextName;
  *
  */
 //-------------------------------------------------------------------------------------
+/**
+ * @author laguerin
+ *
+ */
+/**
+ * @author laguerin
+ *
+ */
+/**
+ * @author laguerin
+ *
+ */
+/**
+ * @author laguerin
+ *
+ */
 @VelocityObject(
 		contextName=ContextName.H2,
 		text = { 
@@ -129,7 +148,43 @@ public class H2InContext {
 		return sb.toString();
 	}
 	
+	/*
+	 * Mapping : "Neutral type" --> "H2 database type"
+	 */
+	private final static Map<String,String> mappingNeutralTypeToH2Type = new HashMap<String,String>() ; 
+	static {
+		mappingNeutralTypeToH2Type.put(NeutralType.BINARY,    "BINARY"   );
+		mappingNeutralTypeToH2Type.put(NeutralType.BOOLEAN,   "BOOLEAN"  );
+		mappingNeutralTypeToH2Type.put(NeutralType.BYTE,      "TINYINT"  );
+		mappingNeutralTypeToH2Type.put(NeutralType.DATE,      "DATE"     );
+		mappingNeutralTypeToH2Type.put(NeutralType.DECIMAL,   "DECIMAL"  );
+		mappingNeutralTypeToH2Type.put(NeutralType.DOUBLE,    "DOUBLE"   );
+		mappingNeutralTypeToH2Type.put(NeutralType.FLOAT,     "FLOAT"    );
+		mappingNeutralTypeToH2Type.put(NeutralType.INTEGER,   "INTEGER"  );
+		mappingNeutralTypeToH2Type.put(NeutralType.LONG,      "BIGINT"   );
+		mappingNeutralTypeToH2Type.put(NeutralType.SHORT,     "SMALLINT" );
+		mappingNeutralTypeToH2Type.put(NeutralType.STRING,    "VARCHAR"  );
+		mappingNeutralTypeToH2Type.put(NeutralType.TIME,      "TIME"     );
+		mappingNeutralTypeToH2Type.put(NeutralType.TIMESTAMP, "TIMESTAMP");
+	}
+	
 	private String getColumnType (final AttributeInContext attribute ) {
+		
+		if ( attribute.isAutoIncremented() ) {
+			//--- Particular case : Auto-incremented column
+			return "IDENTITY" ; // H2 type mapped to java.lang.Long 
+		}
+		else {
+			//--- Standard case : get the mapped type
+			String H2Type = mappingNeutralTypeToH2Type.get(attribute.getNeutralType()) ;
+			if ( H2Type == null ) {
+				H2Type = "UNKNOWN_TYPE";
+			}
+			return H2Type ;
+		}
+	}
+	
+	private String getColumnTypeOLD (final AttributeInContext attribute ) {
 		
 		//--- Particular case : Auto-incremented column
 		if ( attribute.isAutoIncremented() ) {
