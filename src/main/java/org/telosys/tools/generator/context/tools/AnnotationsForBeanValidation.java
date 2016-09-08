@@ -20,7 +20,7 @@ import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.AttributeInContext;
 
 /**
- * Attribute (field) annotations for "Bean Validation"  ( JSR 303 strict )
+ * Java "Bean Validation" annotations for a field/attribute  ( JSR 303 strict ) 
  * 
  * @author Laurent GUERIN
  *
@@ -39,33 +39,100 @@ public class AnnotationsForBeanValidation
 	}
 
 	/**
-	 * Returns the validation annotations
+	 * Returns the validation annotations based on the 'actual type' 
 	 * @param iLeftMargin
 	 * @return
 	 */
-	public String getValidationAnnotations( int iLeftMargin )
-	{
-//		boolean bJSR303strict = false ;
-//		if ( sFlagJSR303 != null ) {
-//			if ( sFlagJSR303.equalsIgnoreCase("JSR303") ) {
-//				bJSR303strict = true ;
-//			}
-//		}
-		
+	public String getValidationAnnotations( int iLeftMargin ) {
 		//--- Reset everything at each call 
 		AnnotationsBuilder annotations = new AnnotationsBuilder(iLeftMargin);
 
-		String sJavaFullType = _attribute.getFullType() ;
-		
-		//--- Annotations for all categories 
-		if ( ! JavaTypeUtil.isPrimitiveType(sJavaFullType) ) 
-		{
-			if ( _attribute.isNotNull() ) 
-			{
+		//--- Build Annotations 
+		if ( _attribute.isNotNull() ) {
+			//--- Only if not a primitive type ( @NotNull is useless for a primitive type ) 
+			if ( JavaTypeUtil.isPrimitiveType( _attribute.getFullType() ) == false ) {
 				annotations.addLine("@NotNull" );
 			}
 		}
+		addOtherAnnotations(annotations);
 
+		return annotations.getAnnotations() ;
+	}
+
+	/**
+	 * Returns the validation annotations based on the 'wrapper type' 
+	 * @param iLeftMargin
+	 * @return
+	 */
+	public String getValidationAnnotationsForWrapperType( int iLeftMargin ) {
+		//--- Reset everything at each call 
+		AnnotationsBuilder annotations = new AnnotationsBuilder(iLeftMargin);
+
+		//--- Build annotations 
+		if ( _attribute.isNotNull() ) {
+			annotations.addLine("@NotNull" ); // Wrapper type => don't care if primitive type 
+		}
+		addOtherAnnotations(annotations);
+
+		return annotations.getAnnotations() ;
+	}
+	
+//	/**
+//	 * Returns the validation annotations
+//	 * @param iLeftMargin
+//	 * @return
+//	 */
+//	public String getValidationAnnotations( int iLeftMargin ) {
+//		//--- Reset everything at each call 
+//		AnnotationsBuilder annotations = new AnnotationsBuilder(iLeftMargin);
+//
+//		String sJavaFullType = _attribute.getFullType() ;
+//		
+//		//--- Annotations for all categories 
+//		if ( ! JavaTypeUtil.isPrimitiveType(sJavaFullType) ) 
+//		{
+//			if ( _attribute.isNotNull() ) 
+//			{
+//				annotations.addLine("@NotNull" );
+//			}
+//		}
+//
+//		//--- Annotations for each type category 
+//		if ( JavaTypeUtil.isCategoryBoolean( sJavaFullType ) )
+//		{
+//			// Nothing to do !
+//		}
+//		else if ( JavaTypeUtil.isCategoryString( sJavaFullType ) )
+//		{
+//			annotationSize(annotations);
+//			annotationPattern(annotations);
+//		}
+//		else if ( JavaTypeUtil.isCategoryNumber( sJavaFullType ) )
+//		{
+//			annotationMin(annotations);
+//			annotationMax(annotations);
+//		}
+//		else if ( JavaTypeUtil.isCategoryDateOrTime( sJavaFullType ) )
+//		{
+//			if ( _attribute.hasDatePastValidation() ) {
+//				annotations.addLine("@Past" );
+//			}
+//			if ( _attribute.hasDateFutureValidation() ) {
+//				annotations.addLine("@Future" );
+//			}
+//		}
+//		
+//		return annotations.getAnnotations() ;
+//	}
+	
+	/**
+	 * Add all required annotations for the current attribute ( except '@NotNull' annotation ) 
+	 * @param annotations
+	 * @param sJavaFullType
+	 */
+	private void addOtherAnnotations(AnnotationsBuilder annotations ) {
+		String sJavaFullType = _attribute.getFullType() ;
+		
 		//--- Annotations for each type category 
 		if ( JavaTypeUtil.isCategoryBoolean( sJavaFullType ) )
 		{
@@ -75,17 +142,6 @@ public class AnnotationsForBeanValidation
 		{
 			annotationSize(annotations);
 			annotationPattern(annotations);
-//			if ( ! bJSR303strict )
-//			{
-//				if ( _attribute.isNotEmpty() ) 
-//				{
-//					annotations.addLine("@NotEmpty" );
-//				}
-//				if ( _attribute.isNotBlank() ) 
-//				{
-//					annotations.addLine("@NotBlank" );
-//				}
-//			}			
 		}
 		else if ( JavaTypeUtil.isCategoryNumber( sJavaFullType ) )
 		{
@@ -94,21 +150,15 @@ public class AnnotationsForBeanValidation
 		}
 		else if ( JavaTypeUtil.isCategoryDateOrTime( sJavaFullType ) )
 		{
-			//if ( _attribute.isDatePast() ) 
-			if ( _attribute.hasDatePastValidation() ) // v 2.0.5
-			{
+			if ( _attribute.hasDatePastValidation() ) {
 				annotations.addLine("@Past" );
 			}
-			//if ( _attribute.isDateFuture() ) 
-			if ( _attribute.hasDateFutureValidation() )  // v 2.0.5
-			{
+			if ( _attribute.hasDateFutureValidation() ) {
 				annotations.addLine("@Future" );
 			}
 		}
-		
-		return annotations.getAnnotations() ;
 	}
-	
+
 	private boolean hasSizeConstraint()
 	{
 		if ( ! StrUtil.nullOrVoid ( _attribute.getMinLength() ) ) return true ;

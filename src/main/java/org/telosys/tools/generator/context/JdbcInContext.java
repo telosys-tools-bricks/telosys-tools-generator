@@ -35,65 +35,83 @@ import org.telosys.tools.generator.context.tools.JdbcTypesMapper;
 //-------------------------------------------------------------------------------------
 public class JdbcInContext {
 
-	//private final SqlCRUDRequests sqlCRUDRequests ;
-	private final JdbcRequests sqlCRUDRequests ;
+	private final JdbcRequests requests ;
 	
 	//-------------------------------------------------------------------------------------
 	// CONSTRUCTOR
 	//-------------------------------------------------------------------------------------
 	public JdbcInContext(EntityInContext entity, boolean useSchema) {
 		super();
-		//this.sqlCRUDRequests = buildJdbc(entity, useSchema );
-		this.sqlCRUDRequests = new JdbcRequests(entity, useSchema );
+		this.requests = new JdbcRequests(entity, useSchema );
 	}
-	
-
-//	private String[] getColumnNames(List<AttributeInContext> attributes) {
-//		String[] columnNames = new String[attributes.size()] ;
-//		int i = 0 ;
-//		for ( AttributeInContext attr : attributes ) {
-//			columnNames[i] = attr.getDatabaseName() ; 
-//			i++;
-//		}
-//		return columnNames;
-//	}
-	
-//	private SqlCRUDRequests buildJdbc(EntityInContext entity, boolean useSchema) {
-//		String table = entity.getDatabaseTable();
-//		if ( useSchema ) {
-//			table = entity.getDatabaseSchema() + "." + entity.getDatabaseTable();
-//		}
-//		String[] keyColumns    = getColumnNames(entity.getKeyAttributes());
-//		String[] nonKeyColumns = getColumnNames(entity.getNonKeyAttributes());
-//		if ( entity.hasAutoIncrementedKey() ) {
-//			// This entity has an auto-incremented column
-//			String autoincrColumn = entity.getAutoincrementedKeyAttribute().getDatabaseName() ;
-//			return new SqlCRUDRequests(table, keyColumns, nonKeyColumns, autoincrColumn ) ;
-//		}
-//		else {
-//			// No auto-incremented column
-//			return new SqlCRUDRequests(table, keyColumns, nonKeyColumns ) ;
-//		}
-//	}
 	
 	//-------------------------------------------------------------------------------------
 	// SQL REQUESTS
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
-			"Returns the JDBC SQL SELECT request",
+			"Returns the JDBC SQL 'SELECT xxx FROM xxx' request",
 			""
 		},
 		example={	
 				"$jdbc.sqlSelect"
 			},
-		since = "2.1.1"
+		since = "3.0.0"
 	)
 	public String getSqlSelect()
     {
-		return this.sqlCRUDRequests.getSqlSelect();
+		return this.requests.getSqlSelect();
     }
 	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns the JDBC SQL 'SELECT xxx FROM xxx WHERE pk = xxx' request",
+			""
+		},
+		example={	
+				"$jdbc.sqlSelectWherePK"
+			},
+		since = "3.0.0"
+	)
+	public String getSqlSelectWherePK()
+    {
+		return this.requests.getSqlSelectWherePK();
+    }
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns the JDBC SQL 'SELECT COUNT(*) FROM xxx' request to check existence",
+			""
+		},
+		example={	
+				"$jdbc.sqlSelectCount"
+			},
+		since = "3.0.0"
+	)
+	public String getSqlSelectCount()
+    {
+		return this.requests.getSqlSelectCount();
+    }
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns the JDBC SQL 'SELECT COUNT(*) FROM xxx WHERE pk = xxx' request to check existence",
+			""
+		},
+		example={	
+				"$jdbc.sqlSelectCountWherePK"
+			},
+		since = "3.0.0"
+	)
+	public String getSqlSelectCountWherePK()
+    {
+		//return this.sqlCRUDRequests.getSqlExists();
+		return this.requests.getSqlSelectCountWherePK();
+    }
+
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
@@ -107,7 +125,7 @@ public class JdbcInContext {
 	)
 	public String getSqlInsert()
     {
-		return this.sqlCRUDRequests.getSqlInsert();
+		return this.requests.getSqlInsert();
     }
 	
 	//-------------------------------------------------------------------------------------
@@ -126,7 +144,7 @@ public class JdbcInContext {
 	)
 	public String getSqlUpdate()
     {
-		return this.sqlCRUDRequests.getSqlUpdate();
+		return this.requests.getSqlUpdate();
     }
 
 	//-------------------------------------------------------------------------------------
@@ -142,22 +160,7 @@ public class JdbcInContext {
 	)
 	public String getSqlDelete()
     {
-		return this.sqlCRUDRequests.getSqlDelete();
-    }
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod ( 
-		text= { 
-			"Returns the JDBC SQL COUNT request to check existence",
-			""
-		},
-		example={	
-				"$jdbc.sqlExists"
-			},
-		since = "2.1.1"
-	)
-	public String getSqlExists()
-    {
-		return this.sqlCRUDRequests.getSqlExists();
+		return this.requests.getSqlDelete();
     }
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -174,7 +177,7 @@ public class JdbcInContext {
 	)
 	public List<AttributeInContext> getAttributesForPrimaryKey()
     {
-		return this.sqlCRUDRequests.getAttributesForPrimaryKey();
+		return this.requests.getAttributesForPrimaryKey();
     }
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
@@ -189,7 +192,7 @@ public class JdbcInContext {
 	)
 	public List<AttributeInContext> getAttributesForSelect()
     {
-		return this.sqlCRUDRequests.getAttributesForSelect();
+		return this.requests.getAttributesForSelect();
     }
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
@@ -204,7 +207,7 @@ public class JdbcInContext {
 		)
 		public List<AttributeInContext> getAttributesForInsert()
 	    {
-			return this.sqlCRUDRequests.getAttributesForInsert();
+			return this.requests.getAttributesForInsert();
 	    }
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
@@ -219,7 +222,7 @@ public class JdbcInContext {
 		)
 		public List<AttributeInContext> getAttributesForUpdate()
 	    {
-			return this.sqlCRUDRequests.getAttributesForUpdate();
+			return this.requests.getAttributesForUpdate();
 	    }
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------

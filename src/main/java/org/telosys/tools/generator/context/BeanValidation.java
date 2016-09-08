@@ -41,7 +41,7 @@ public class BeanValidation {
 			"Returns the 'Bean Validation' JSR-303 annotations for the given field (with a left margin)"
 			},
 		example={ 
-			"$beanValidation.fieldAnnotations( 4, $attribute )" },
+			"$beanValidation.annotations( 4, $attribute )" },
 		parameters = { 
 			"leftMargin : the left margin (number of blanks) ",
 			"attribute : the attribute to be annotated "
@@ -55,4 +55,25 @@ public class BeanValidation {
     }
 
 	//-------------------------------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the 'Bean Validation' JSR-303 annotations for the given field (with a left margin)",
+			"The wrapper type is used (instead of the actual field type) to determined the annotations",
+			"e.g. considering the wrapper type, the '@NotNull' annotation is used",
+			"even if the actual field type is a primitive type "
+			},
+		example={ 
+			"$beanValidation.annotationsForWrapperType( 4, $attribute )" },
+		parameters = { 
+			"leftMargin : the left margin (number of blanks) ",
+			"attribute : the attribute to be annotated "
+			},
+		since = "3.0.0"
+	)
+	public String annotationsForWrapperType(int iLeftMargin, AttributeInContext attribute )
+    {
+		AnnotationsForBeanValidation annotations = new AnnotationsForBeanValidation(attribute);
+		return annotations.getValidationAnnotationsForWrapperType(iLeftMargin );
+    }
+
 }

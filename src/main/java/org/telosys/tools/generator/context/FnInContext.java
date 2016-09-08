@@ -207,6 +207,35 @@ public class FnInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
+			"Returns a string containing a list of fields (wrapper type and name) separated by a comma"
+			},
+		example={ 
+			"$fn.argumentsListWithWrapperType( $entity.attributes )",
+			"Returns : 'Integer id, String firstName, String lastName, Integer age' "},
+		parameters = { "fields : list of fields to be added in the arguments list" },
+		since = "3.0.0"
+			)
+	public String argumentsListWithWrapperType( List<AttributeInContext> fieldsList )  {
+		if ( fieldsList != null ) {
+			StringBuilder sb = new StringBuilder();
+			int n = 0 ;
+			for ( AttributeInContext field : fieldsList ) {
+				if ( n > 0 ) sb.append(", ");
+				sb.append( field.getWrapperType() ) ; // Wrapper type 
+				sb.append( " " ) ;
+				sb.append( field.getName() ) ; // Name
+				n++;
+			}
+			return sb.toString();
+		} 
+		else {
+			return "null" ;
+		}
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
 			"Returns a string containing a list of fields getters separated by a comma"
 			},
 		example={ 

@@ -38,7 +38,9 @@ public class JdbcRequests {
     //--- SQL
     private final String table  ;
     private final String sqlSelect ;
-    private final String sqlExists ;
+    private final String sqlSelectWherePK ;
+    private final String sqlSelectCount ;
+    private final String sqlSelectCountWherePK ;
     private final String sqlInsert ;
     private final String sqlUpdate ;
     private final String sqlDelete ;
@@ -58,9 +60,12 @@ public class JdbcRequests {
 		this.attributesForInsert = buildAttributesForInsert();
 		this.attributesForUpdate = buildAttributesForUpdate();
 				
-        //--- Build the 4 SQL Request
-		this.sqlSelect = buildSqlSelect();
-		this.sqlExists = buildSqlSelectCount();
+        //--- Build the Select requests
+		this.sqlSelect             = buildSqlSelect();
+		this.sqlSelectWherePK      = buildSqlSelectWherePK();
+		this.sqlSelectCount        = buildSqlSelectCount();
+		this.sqlSelectCountWherePK = buildSqlSelectCountWherePK();
+        //--- Build the Insert/Update/Delete requests
 		this.sqlInsert = buildSqlInsert();
 		this.sqlUpdate = buildSqlUpdate();
 		this.sqlDelete = buildSqlDelete();
@@ -96,11 +101,17 @@ public class JdbcRequests {
 		return sqlSelect;
 	}
 
-
-	public String getSqlExists() {
-		return sqlExists;
+	public String getSqlSelectWherePK() {
+		return sqlSelectWherePK;
 	}
 
+	public String getSqlSelectCount() {
+		return sqlSelectCount ;
+	}
+
+	public String getSqlSelectCountWherePK() {
+		return sqlSelectCountWherePK ;
+	}
 
 	public String getSqlInsert() {
 		return sqlInsert;
@@ -250,26 +261,48 @@ public class JdbcRequests {
         return sb.toString();
     }
 
-    
+    //------------------------------------------------------------------------------------
+    // SELECT 
+    //------------------------------------------------------------------------------------
     /**
-     * Build the SQL SELECT request
+     * Build the SQL SELECT request without WHERE CLAUSE
      * @return
      */
     private String buildSqlSelect() {
+        return "select " + buildColumnsList(this.attributesForSelect, false) 
+        		+ " from " + this.table ;
+    }
+
+    /**
+     * Build the SQL SELECT request with WHERE CLAUSE for PRIMARY KEY
+     * @return
+     */
+    private String buildSqlSelectWherePK() {
         return "select " + buildColumnsList(this.attributesForSelect, false) 
         		+ " from " + this.table 
         		+ " where " + whereCriteria(this.attributesForPrimaryKey, false);
     }
 
     /**
-     * Build the SQL COUNT request
+     * Build the SQL COUNT request without WHERE CLAUSE
      * @return
      */
     private String buildSqlSelectCount() {
+        return "select count(*) from " + this.table ;
+    }
+
+    /**
+     * Build the SQL COUNT request with WHERE CLAUSE for PRIMARY KEY
+     * @return
+     */
+    private String buildSqlSelectCountWherePK() {
         return "select count(*) from " + this.table 
         		+ " where " + whereCriteria(this.attributesForPrimaryKey, false);
     }
 
+    //------------------------------------------------------------------------------------
+    // INSERT / UPDATE / DELETE 
+    //------------------------------------------------------------------------------------
     /**
      * Build the SQL INSERT request
      * @return
