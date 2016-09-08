@@ -65,7 +65,8 @@ public class ContextInfoTest  extends TestCase {
 		print("Predefined names", names);
 		
 		//assertTrue ( names.length == 6 );
-		assertTrue ( names.length == 10 ); // ver 2.1.0
+		//assertTrue ( names.length == 10 ); // ver 2.1.0
+		assertTrue ( names.length == 13 ); // ver 3.0.0
 	}
 	
 	//------------------------------------------------------------------------------------------

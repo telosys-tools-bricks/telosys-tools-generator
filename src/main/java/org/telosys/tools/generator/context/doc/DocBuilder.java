@@ -48,6 +48,7 @@ import org.telosys.tools.generator.context.ModelInContext;
 import org.telosys.tools.generator.context.ProjectInContext;
 import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generator.context.Today;
+import org.telosys.tools.generator.context.ValuesInContext;
 
 public class DocBuilder {
 
@@ -248,7 +249,9 @@ public class DocBuilder {
 		JdbcInContext.class, // ver 2.1.1
 		JdbcFactoryInContext.class, // ver 2.1.1
 		H2InContext.class, // ver 2.1.1
-		HtmlInContext.class // v 3.0.0
+		
+		HtmlInContext.class, // v 3.0.0
+		ValuesInContext.class // v 3.0.0
 	};
 	
 	public Map<String,ClassInfo> getVelocityClassesInfo() {

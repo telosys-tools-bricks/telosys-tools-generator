@@ -85,6 +85,9 @@ public class ContextName {
 	public final static String  DATABASE          = "database" ; // ver 2.1.0
 	public final static String  DATABASES         = "databases" ; // ver 2.1.0
 	
+	public final static String  VALUES            = "values" ; // ver 3.0.0
+	public final static String  KEY_VALUES        = "keyValues" ; // ver 3.0.0
+	public final static String  DATA_VALUES       = "dataValues" ; // ver 3.0.0
 	//---  
 //	public final static String  CLASS             = "class" ;
 	

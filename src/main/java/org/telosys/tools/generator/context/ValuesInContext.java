@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.telosys.tools.commons.StrUtil;
+import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
+import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.types.LanguageType;
 import org.telosys.tools.generic.model.types.LiteralValuesProvider;
 
@@ -36,12 +38,22 @@ import org.telosys.tools.generic.model.types.LiteralValuesProvider;
  */
 //-------------------------------------------------------------------------------------
 @VelocityObject(
-		contextName = "no_name_in_context" ,
+		contextName = ContextName.VALUES,
+		otherContextNames= { ContextName.KEY_VALUES, ContextName.DATA_VALUES },		
 		text = { 
-				"xxxx",
+				"This object provides a set literal values",
+				"Each literal value is associated with an attribute's name and can be assigned to this attribute",
 				""
 		},
-		since = "2.0.0"
+		since = "3.0.0",
+		example= {
+				"",
+				"#set( $values = $fn.buildValues($entity.attributes, 1) )",
+				"count = $values.size()",
+				"#foreach( $attribute in $entity.attributes )",
+				"  Value for attribute \"${attribute.name}\" = $values.getValue($attribute.name) ",
+				"#end"
+		}		
  )
 //-------------------------------------------------------------------------------------
 public class ValuesInContext {
@@ -81,25 +93,31 @@ public class ValuesInContext {
 	}
 	
 	//----------------------------------------------------------------------------------------
-	/**
-	 * Returns the size of the values list
-	 * @return
-	 */
+	@VelocityMethod(
+		text={	
+			"Returns the size of the values list (the number of values)"
+			},
+		since = "3.0.0"
+	)
 	public int size() {
 		return values.size();
 	}
 	
 	//----------------------------------------------------------------------------------------
-	/**
-	 * Returns a string containing the literal value for the given attribute's name <br>
-	 * e.g. : '"AAAA"' or '(short)10' or 'true' etc... <br>
-	 * <br>
-	 * Usage example in Velocity template : <br>
-	 *   $values.getValue($attribute.name) <br>
-	 *   
-	 * @param attributeName
-	 * @return
-	 */
+	@VelocityMethod(
+		text={	
+			"Returns a string containing the literal value for the given attribute's name ",
+			"e.g. for Java : '\"AAAA\"' or '(short)10' or 'true' etc...  ",
+			" ",
+			"Usage example in Velocity template :",
+			" $values.getValue($attribute.name) ",
+			" "
+			},
+		parameters = { 
+			"attributeName : the name of the attribute  " 
+			},
+		since = "3.0.0"
+	)
 	public String getValue(String attributeName) {
 		String value = values.get(attributeName) ;
 		if ( value != null ) {
@@ -111,17 +129,19 @@ public class ValuesInContext {
 	}
 	
 	//----------------------------------------------------------------------------------------
-	/**
-	 * Returns a string containing all the literal values separated by a comma. <br>
-	 * e.g. : ' "AAAA", (short)10, true ' <br>
-	 * <br>
-	 * Usage example in Velocity template : <br>
-	 *   $values.allValues <br>
-	 *   or <br>
-	 *   $values.getAllValues()  <br>
-	 *   
-	 * @return
-	 */
+	@VelocityMethod(
+		text={	
+			"Returns a string containing all the literal values separated by a comma. ",
+			"e.g. for Java : ' \"AAAA\", (short)10, true '  ",
+			" ",
+			"Usage example in Velocity template :",
+			" $values.allValues  ",
+			" or  ",
+			" $values.getAllValues()  ",
+			" "
+			},
+		since = "3.0.0"
+	)
 	public String getAllValues() {
 		StringBuilder sb = new StringBuilder();
 		int n = 0 ;
@@ -135,8 +155,24 @@ public class ValuesInContext {
 		return sb.toString();
 	}
 	
-	
 	//----------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a comparison statement between the attribute's current value and its associated literal value ",
+			"Example of strings returned for Java language :  ",
+			"  book.getId() == 100 ",
+			"  book.getFirstName().equals(\"abcd\") ",
+			" ",
+			"Usage example in Velocity template :",
+			"  $values.comparisonStatement(\"book\", $attribute)   ",
+			" "
+			},
+		parameters = { 
+				"entityVariableName : the variable name used before the 'getter' ",
+				"attribute : the attribute instance (used to retrieve the 'getter' and the 'literal value')"
+			},
+		since = "3.0.0"
+	)
 	/**
 	 * Returns a comparison statement between the attribute's current value and its associated literal value <br>
 	 * Example of strings returned for Java language : <br>
