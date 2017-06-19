@@ -15,8 +15,9 @@
  */
 package org.telosys.tools.generator.context;
 
+import java.util.HashMap;
+
 import org.telosys.tools.commons.FileUtil;
-import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.commons.variables.VariablesManager;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
@@ -45,7 +46,7 @@ import org.telosys.tools.generic.model.Entity;
 //-------------------------------------------------------------------------------------
 public class Target 
 {
-	private final static String BEANNAME = "BEANNAME" ;
+	//private final static String BEANNAME = "BEANNAME" ;
 	
 	private final String    targetName ;
 	
@@ -74,10 +75,12 @@ public class Target
 
 		//--- Replace the "$" variables in _sFile and _sFolder
 		VariablesManager variablesManager = new VariablesManager( variables ); 
-		this.file   = replaceVariables( targetDefinition.getFile(),   this.entityClassName, variablesManager );
+		//this.file   = replaceVariables( targetDefinition.getFile(),   this.entityClassName, variablesManager );
+		this.file   = replaceVariables( targetDefinition.getFile(), variablesManager );
 		
 		variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
-		this.folder = replaceVariables( targetDefinition.getFolder(), this.entityClassName, variablesManager );
+		//this.folder = replaceVariables( targetDefinition.getFolder(), this.entityClassName, variablesManager );
+		this.folder = replaceVariables( targetDefinition.getFolder(), variablesManager );
 	}
 
 	/**
@@ -96,10 +99,12 @@ public class Target
 
 		//--- Replace the "$" variables in _sFile and _sFolder
 		VariablesManager variablesManager = new VariablesManager( variables ); 		
-		this.file   = replaceVariables( targetDefinition.getFile(),   "", variablesManager );
+		//this.file   = replaceVariables( targetDefinition.getFile(),   "", variablesManager );
+		this.file   = replaceVariables( targetDefinition.getFile(), variablesManager );
 		
 		variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
-		this.folder = replaceVariables( targetDefinition.getFolder(), "", variablesManager );
+		//this.folder = replaceVariables( targetDefinition.getFolder(), "", variablesManager );
+		this.folder = replaceVariables( targetDefinition.getFolder(), variablesManager );
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -222,11 +227,50 @@ public class Target
 		return s2 ;
 	}
 	
-	//-----------------------------------------------------------------------
-	private String replaceVariables( String originalString, String sBeanClass, VariablesManager varmanager ) {
-		//--- Replace the generic name "${BEANNAME}" if any
-//		String s1 = replace(originalString, ConfigDefaults.BEANNAME, sBeanClass);
-		String s1 = replace(originalString, BEANNAME, sBeanClass);
+//	//-----------------------------------------------------------------------
+//	private String replaceVariables( String originalString, String sBeanClass, VariablesManager varmanager ) {
+//		//--- Replace the generic name "${BEANNAME}" if any
+////		String s1 = replace(originalString, ConfigDefaults.BEANNAME, sBeanClass);
+//		String s1 = replace(originalString, BEANNAME, sBeanClass);
+//
+//		//--- Replace the global project variables if any
+//		if ( varmanager != null ) {
+//			return varmanager.replaceVariables(s1);
+//		}
+//		else {
+//			return s1 ;
+//		}
+//	}
+//	
+//	//-----------------------------------------------------------------------
+//    private String replace(String sOriginal, String sSymbolicVar, String sValue) 
+//    {
+//    	String s   = "${" + sSymbolicVar + "}" ;
+//    	String sUC = "${" + sSymbolicVar + "_UC}" ;
+//    	String sLC = "${" + sSymbolicVar + "_LC}" ;
+//    	
+//		if ( sOriginal.indexOf(s) >= 0 )
+//		{
+//			return StrUtil.replaceVar(sOriginal, s, sValue);
+//		}
+//		else if ( sOriginal.indexOf(sUC) >= 0 )
+//		{
+//			return StrUtil.replaceVar(sOriginal, sUC, sValue.toUpperCase());
+//		}
+//		else if ( sOriginal.indexOf(sLC) >= 0 )
+//		{
+//			return StrUtil.replaceVar(sOriginal, sLC, sValue.toLowerCase());
+//		}
+//		return sOriginal ;
+//    }
+
+	private String replaceVariables( String originalString, VariablesManager varmanager ) {
+		
+		String s1 = originalString;
+		if ( this.entityClassName != null && this.entityClassName.length() > 0 ) {
+			//--- Replace the generic name "${BEANNAME}" if any
+			s1 = replaceBEANNAME(originalString);
+		}
 
 		//--- Replace the global project variables if any
 		if ( varmanager != null ) {
@@ -236,29 +280,19 @@ public class Target
 			return s1 ;
 		}
 	}
-	
-	//-----------------------------------------------------------------------
-    private String replace(String sOriginal, String sSymbolicVar, String sValue) 
-    {
-    	String s   = "${" + sSymbolicVar + "}" ;
-    	String sUC = "${" + sSymbolicVar + "_UC}" ;
-    	String sLC = "${" + sSymbolicVar + "_LC}" ;
-    	
-		if ( sOriginal.indexOf(s) >= 0 )
-		{
-			return StrUtil.replaceVar(sOriginal, s, sValue);
-		}
-		else if ( sOriginal.indexOf(sUC) >= 0 )
-		{
-			return StrUtil.replaceVar(sOriginal, sUC, sValue.toUpperCase());
-		}
-		else if ( sOriginal.indexOf(sLC) >= 0 )
-		{
-			return StrUtil.replaceVar(sOriginal, sLC, sValue.toLowerCase());
-		}
-		return sOriginal ;
+    private String replaceBEANNAME(String originalString) {
+    	// entityClassName is not defined => nothing to do
+    	if ( this.entityClassName == null ) return originalString ;
+    	if ( this.entityClassName.length() == 0 ) return originalString ;
+    	// replace "${BEANNAME}" if any
+    	HashMap<String,String> hm = new HashMap<String,String>();
+    	hm.put("${BEANNAME}",    this.entityClassName );		
+    	hm.put("${BEANNAME_LC}", this.entityClassName.toLowerCase() );
+    	hm.put("${BEANNAME_UC}", this.entityClassName.toUpperCase() );
+    	VariablesManager variablesManager = new VariablesManager(hm) ;
+    	return variablesManager.replaceVariables(originalString);
     }
-    
+
 	/**
 	 * Returns the full path of the of the generated file in the project<br>
 	 * by combining the folder and the basic file name
