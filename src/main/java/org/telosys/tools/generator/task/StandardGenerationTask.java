@@ -20,9 +20,9 @@ import java.util.List;
 
 import org.telosys.tools.commons.TelosysToolsException;
 import org.telosys.tools.commons.TelosysToolsLogger;
+import org.telosys.tools.commons.bundles.TargetDefinition;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.generator.context.Target;
-import org.telosys.tools.generator.target.TargetDefinition;
 import org.telosys.tools.generic.model.Model;
 
 

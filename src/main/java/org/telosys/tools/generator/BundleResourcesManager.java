@@ -21,14 +21,13 @@ import java.util.List;
 
 import org.telosys.tools.commons.FileUtil;
 import org.telosys.tools.commons.TelosysToolsLogger;
+import org.telosys.tools.commons.bundles.TargetDefinition;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.io.CopyHandler;
 import org.telosys.tools.commons.io.OverwriteChooser;
 import org.telosys.tools.commons.io.ResourcesCopier;
 import org.telosys.tools.commons.variables.Variable;
-import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.Target;
-import org.telosys.tools.generator.target.TargetDefinition;
 
 
 public class BundleResourcesManager {

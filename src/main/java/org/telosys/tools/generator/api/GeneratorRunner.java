@@ -19,12 +19,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.telosys.tools.commons.TelosysToolsLogger;
+import org.telosys.tools.commons.bundles.TargetDefinition;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generator.Generator;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.Target;
-import org.telosys.tools.generator.target.TargetDefinition;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.Model;
 

@@ -18,13 +18,13 @@ package org.telosys.tools.generator.context;
 import java.util.HashMap;
 
 import org.telosys.tools.commons.FileUtil;
+import org.telosys.tools.commons.bundles.TargetDefinition;
 import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.commons.variables.VariablesManager;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityNoDoc;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.generator.target.TargetDefinition;
 import org.telosys.tools.generic.model.Entity;
 
 /**

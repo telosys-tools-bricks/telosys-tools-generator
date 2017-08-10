@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.telosys.tools.commons.TelosysToolsException;
 import org.telosys.tools.commons.TelosysToolsLogger;
+import org.telosys.tools.commons.bundles.TargetDefinition;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.io.CopyHandler;
 import org.telosys.tools.commons.io.OverwriteChooser;
@@ -29,7 +30,6 @@ import org.telosys.tools.generator.BundleResourcesManager;
 import org.telosys.tools.generator.Generator;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.Target;
-import org.telosys.tools.generator.target.TargetDefinition;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.Model;
 

@@ -8,8 +8,8 @@ import junit.env.telosys.tools.generator.TestsProject;
 import org.telosys.tools.commons.ConsoleLogger;
 import org.telosys.tools.commons.TelosysToolsException;
 import org.telosys.tools.commons.TelosysToolsLogger;
+import org.telosys.tools.commons.bundles.TargetDefinition;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
-import org.telosys.tools.generator.target.TargetDefinition;
 import org.telosys.tools.generic.model.Model;
 
 public class GenerationMain {
