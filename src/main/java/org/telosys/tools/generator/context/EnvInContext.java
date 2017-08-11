@@ -20,10 +20,16 @@ import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.types.LiteralValuesProvider;
+import org.telosys.tools.generic.model.types.LiteralValuesProviderForCSharp;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForJava;
+import org.telosys.tools.generic.model.types.LiteralValuesProviderForJavaScript;
+import org.telosys.tools.generic.model.types.LiteralValuesProviderForPython;
+import org.telosys.tools.generic.model.types.LiteralValuesProviderForTypeScript;
 import org.telosys.tools.generic.model.types.TypeConverter;
 import org.telosys.tools.generic.model.types.TypeConverterForCSharp;
 import org.telosys.tools.generic.model.types.TypeConverterForJava;
+import org.telosys.tools.generic.model.types.TypeConverterForJavaScript;
+import org.telosys.tools.generic.model.types.TypeConverterForPython;
 import org.telosys.tools.generic.model.types.TypeConverterForTypeScript;
 
 //-------------------------------------------------------------------------------------
@@ -41,6 +47,8 @@ public class EnvInContext {
 	private final static String JAVA       = "JAVA" ;
 	private final static String CSHARP     = "C#" ;
 	private final static String TYPESCRIPT = "TYPESCRIPT" ;
+	private final static String JAVASCRIPT = "JAVASCRIPT" ;
+	private final static String PYTHON     = "PYTHON" ;
 	
 	private String _entityClassNamePrefix = "" ;
 	private String _entityClassNameSuffix = "" ;
@@ -124,7 +132,7 @@ public class EnvInContext {
 	@VelocityMethod(
 		text={	
 			"Set the language for the current code generation",
-			"Supported languages are 'Java', 'C#' and 'TypeScript' ",
+			"Supported languages are 'Java', 'C#', 'Python', 'JavaScript', 'TypeScript',  ",
 			"( the default language is 'Java' )",
 			"This information is used dermine language peculiarities like types and literal values"
 			},
@@ -163,6 +171,8 @@ public class EnvInContext {
 		if ( JAVA.equals(languageUC) ) return ;
 		if ( CSHARP.equals(languageUC) ) return ;
 		if ( TYPESCRIPT.equals(languageUC) ) return ;
+		if ( JAVASCRIPT.equals(languageUC) ) return ;
+		if ( PYTHON.equals(languageUC) ) return ;
 		// Unknown language
 		throw new GeneratorException("Unknown language '" + language + "'");
 	}
@@ -183,6 +193,12 @@ public class EnvInContext {
 		else if ( TYPESCRIPT.equals(languageUC) ) {
 			return new TypeConverterForTypeScript() ;
 		}
+		else if ( JAVASCRIPT.equals(languageUC) ) {
+			return new TypeConverterForJavaScript() ;
+		}
+		else if ( PYTHON.equals(languageUC) ) {
+			return new TypeConverterForPython() ;
+		}
 		else {
 			// By default : Java  ( not supposed to happen ) 
 			return new TypeConverterForJava() ;
@@ -200,10 +216,16 @@ public class EnvInContext {
 			return new LiteralValuesProviderForJava() ;
 		}
 		else if ( CSHARP.equals(languageUC) ) {
-			return new LiteralValuesProviderForJava() ; // TODO
+			return new LiteralValuesProviderForCSharp() ;
+		}
+		else if ( JAVASCRIPT.equals(languageUC) ) {
+			return new LiteralValuesProviderForJavaScript() ;
 		}
 		else if ( TYPESCRIPT.equals(languageUC) ) {
-			return new LiteralValuesProviderForJava() ; // TODO
+			return new LiteralValuesProviderForTypeScript() ;
+		}
+		else if ( PYTHON.equals(languageUC) ) {
+			return new LiteralValuesProviderForPython();
 		}
 		else {
 			// By default : Java  ( not supposed to happen ) 
