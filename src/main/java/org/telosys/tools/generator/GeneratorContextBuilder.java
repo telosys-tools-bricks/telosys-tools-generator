@@ -122,6 +122,9 @@ public class GeneratorContextBuilder {
 		generatorContext.put(ContextName.LBRACE,  "{"  ); // left brace
 		generatorContext.put(ContextName.RBRACE,  "}"  ); // right brace
 		
+		generatorContext.put(ContextName.NEWLINE, "\n"  ); // #LGU 2017-08-16
+		generatorContext.put(ContextName.TAB,     "\t"  ); // #LGU 2017-08-16
+		
 		//--- Get all the project variables and put them in the context	
 		//Variable[] projectVariables = projectConfiguration.getAllVariables();
 //		Variable[] projectVariables = generatorConfig.getTelosysToolsCfg().getAllVariables();

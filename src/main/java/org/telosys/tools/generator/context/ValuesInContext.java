@@ -158,6 +158,79 @@ public class ValuesInContext {
 	//----------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
+			"Returns a string containing ALL the literal values in JSON format. ",
+			"NB : this method is usable only with 'JAVASCRIPT values'.",
+			"e.g. : '{\"id\":1, \"name\":\"AAAA\"} ",
+			" ",
+			"Usage examples in Velocity template :",
+			" $values.toJSON()  ",
+			" $values.toJSON(\"\n\")  ",
+			" "
+			},
+		parameters = { 
+			"separator : a separator to be put before each value (optional) "
+			},
+		since = "3.0.0"
+	)
+	public String toJSON() {
+		return buildJSON(attributeNames, null);
+	}
+	public String toJSON(String separator) {
+		return buildJSON(attributeNames, separator);
+	}
+
+	//----------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing the literal values in JSON format for the given list of attributes. ",
+			"NB : this method is usable only with 'JAVASCRIPT values'.",
+			"e.g. : '{\"id\":1, \"name\":\"AAAA\"} ",
+			" ",
+			"Usage example in Velocity template :",
+			" $values.toJSON($entity.attributes) ",
+			" $values.toJSON($entity.attributes, \"\n\t\") ",
+			" "
+			},
+		parameters = { 
+			"attributes : list of attributes to be put in the JSON string ",
+			"separator : separator to be put before each value (optional) "
+			},
+		since = "3.0.0"
+	)
+	public String toJSON(List<AttributeInContext> attributes ) {
+		return toJSON(attributes, null);
+	}
+	public String toJSON(List<AttributeInContext> attributes, String separator) {
+		List<String> names = new LinkedList<String>() ;
+		for ( AttributeInContext attrib : attributes ) {
+			names.add(attrib.getName());
+		}
+		return buildJSON(names, separator);
+	}
+
+	public String buildJSON(List<String> names, String separator) {
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		sb.append("{");
+		for ( String name : names ) {
+			if ( n > 0 ) {
+				sb.append(", ");
+			}
+			if ( separator != null ) {
+				sb.append(separator);
+			}
+			sb.append("\"" + name + "\"" );
+			sb.append(":");
+			sb.append(getValue(name));
+			n++ ;
+		}
+		sb.append("}");
+		return sb.toString();
+	}
+	
+	//----------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
 			"Returns a comparison statement between the attribute's current value and its associated literal value ",
 			"Example of strings returned for Java language :  ",
 			"  book.getId() == 100 ",

@@ -24,29 +24,17 @@ package org.telosys.tools.generator.context.names;
 public class ContextName {
 
 	//--- Special characters 
-	public final static String  DOLLAR = "DOLLAR" ;
-	public final static String  SHARP  = "SHARP" ;
-	public final static String  AMP    = "AMP";     // ampersand 
-	public final static String  QUOT   = "QUOT" ;   // double quotation mark
-	public final static String  LT     = "LT" ;     // less-than sign
-	public final static String  GT     = "GT" ;     // greater-than sign
-	public final static String  LBRACE = "LBRACE" ; // left brace
-	public final static String  RBRACE = "RBRACE" ; // right brace
-	
-// REPLACED BY VariablestNames.XXXX ( v 2.1.0 )	
-//	//--- PACKAGES predefined variables names ( v 2.0.6 )		
-//	public final static String  ROOT_PKG    = "ROOT_PKG" ;
-//	public final static String  ENTITY_PKG  = "ENTITY_PKG" ;
-//	
-//	//--- FOLDERS predefined variables names ( v 2.0.3 )		
-//	public final static String  SRC      = "SRC" ;
-//	public final static String  RES      = "RES" ;
-//	public final static String  WEB      = "WEB" ;
-//	public final static String  TEST_SRC = "TEST_SRC" ;
-//	public final static String  TEST_RES = "TEST_RES" ;
-//	public final static String  DOC      = "DOC" ;
-//	public final static String  TMP      = "TMP" ;
-	
+	public final static String  DOLLAR  = "DOLLAR" ;
+	public final static String  SHARP   = "SHARP" ;
+	public final static String  AMP     = "AMP";     // ampersand 
+	public final static String  QUOT    = "QUOT" ;   // double quotation mark
+	public final static String  LT      = "LT" ;     // less-than sign
+	public final static String  GT      = "GT" ;     // greater-than sign
+	public final static String  LBRACE  = "LBRACE" ; // left brace
+	public final static String  RBRACE  = "RBRACE" ; // right brace
+	public final static String  NEWLINE = "NEWLINE" ; // new line character ( '\n' in Java ) #LGU 2017-08-16
+	public final static String  TAB     = "TAB" ;     // tabulation character ( '\t' in Java ) #LGU 2017-08-16
+		
 	//--- Standard objects names always in context
 	public final static String  GENERATOR         = "generator" ;
 	public final static String  TODAY             = "today" ;
@@ -89,6 +77,5 @@ public class ContextName {
 	public final static String  KEY_VALUES        = "keyValues" ; // ver 3.0.0
 	public final static String  DATA_VALUES       = "dataValues" ; // ver 3.0.0
 	//---  
-//	public final static String  CLASS             = "class" ;
 	
 }

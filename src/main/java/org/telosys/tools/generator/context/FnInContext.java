@@ -113,6 +113,29 @@ public class FnInContext {
 		return "\"" + s + "\"" ;
 	}
 
+	/**
+	 * Returns the given string with a backslash before each given char
+	 * @param s
+	 * @return
+	 */
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Protects each occurrence of the given char with a backslash in the given string "
+			},
+		parameters = { 
+			"s : the string to be processed",
+			"c : the character to be protected with a backslash" }
+			)
+	public String backslash(String s, String c) {
+		if ( c.length() != 1 ) {
+			throw new IllegalArgumentException("Single character expected (c='" + c +"')");
+		}
+		char c2 = c.charAt(0);
+		return StrUtil.backslash(s, c2);
+	}
+
+	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(text={	
 			"Returns the XML string for the given string",
