@@ -164,19 +164,24 @@ public class ValuesInContext {
 			" ",
 			"Usage examples in Velocity template :",
 			" $values.toJSON()  ",
-			" $values.toJSON(\"\n\")  ",
+			" $values.toJSON(\"${NEWLINE}\")  ",
+			" $values.toJSON(\"${NEWLINE}${TAB}\", \"${NEWLINE}\")  ",
 			" "
 			},
 		parameters = { 
-			"separator : a separator to be put before each value (optional) "
+			"separator1 : the separator to be put before each value (optional) ",
+			"separator2 : the separator to be put before the ending '}' (optional) "
 			},
 		since = "3.0.0"
 	)
 	public String toJSON() {
-		return buildJSON(attributeNames, null);
+		return buildJSON(attributeNames, null, null);
 	}
-	public String toJSON(String separator) {
-		return buildJSON(attributeNames, separator);
+	public String toJSON(String separator1) {
+		return buildJSON(attributeNames, separator1, null);
+	}
+	public String toJSON(String separator1, String separator2) {
+		return buildJSON(attributeNames, separator1, separator2);
 	}
 
 	//----------------------------------------------------------------------------------------
@@ -188,27 +193,35 @@ public class ValuesInContext {
 			" ",
 			"Usage example in Velocity template :",
 			" $values.toJSON($entity.attributes) ",
-			" $values.toJSON($entity.attributes, \"\n\t\") ",
+			" $values.toJSON($entity.attributes, \"${NEWLINE}\")  ",
+			" $values.toJSON($entity.attributes, \"${NEWLINE}${TAB}\", \"${NEWLINE}\")  ",
 			" "
 			},
 		parameters = { 
 			"attributes : list of attributes to be put in the JSON string ",
-			"separator : separator to be put before each value (optional) "
+			"separator1 : the separator to be put before each value (optional) ",
+			"separator2 : the separator to be put before the ending '}' (optional) "
 			},
 		since = "3.0.0"
 	)
 	public String toJSON(List<AttributeInContext> attributes ) {
-		return toJSON(attributes, null);
+		return buildJSON(buildNames(attributes), null, null);
 	}
-	public String toJSON(List<AttributeInContext> attributes, String separator) {
+	public String toJSON(List<AttributeInContext> attributes, String separator1) {
+		return buildJSON(buildNames(attributes), separator1, null);
+	}
+	public String toJSON(List<AttributeInContext> attributes, String separator1, String separator2) {
+		return buildJSON(buildNames(attributes), separator1, separator2);
+	}
+
+	private List<String> buildNames(List<AttributeInContext> attributes) {
 		List<String> names = new LinkedList<String>() ;
 		for ( AttributeInContext attrib : attributes ) {
 			names.add(attrib.getName());
 		}
-		return buildJSON(names, separator);
+		return names;
 	}
-
-	public String buildJSON(List<String> names, String separator) {
+	private String buildJSON(List<String> names, String separator1, String separator2) {
 		StringBuilder sb = new StringBuilder();
 		int n = 0 ;
 		sb.append("{");
@@ -216,13 +229,16 @@ public class ValuesInContext {
 			if ( n > 0 ) {
 				sb.append(", ");
 			}
-			if ( separator != null ) {
-				sb.append(separator);
+			if ( separator1 != null ) {
+				sb.append(separator1);
 			}
 			sb.append("\"" + name + "\"" );
 			sb.append(":");
 			sb.append(getValue(name));
 			n++ ;
+		}
+		if ( separator2 != null ) {
+			sb.append(separator2);
 		}
 		sb.append("}");
 		return sb.toString();
