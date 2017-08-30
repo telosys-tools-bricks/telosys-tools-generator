@@ -33,14 +33,17 @@ public class TargetTest extends TestCase {
 		//Target target = new Target( targetDef, "AUTHOR", "Author", getVariables() ); 
 		Target target = new Target( targetDef, buildEntity("AUTHOR", "Author"), getVariables() );  // v 3.0.0
 		
-		String file   = target.getFile();
-		String folder = target.getFolder();
-		System.out.println(" . file   = " + file );
-		System.out.println(" . folder = " + folder );
+		print(target);		
+		assertEquals("${BEANNAME}.java", target.getOriginalFileDefinition());
+		assertEquals("Author.java", target.getFile());
+		assertEquals("/src/org/demo/foo/bar/persistence/services", target.getFolder());
 		
-		assertEquals("Author.java", file);
-		assertEquals("/src/org/demo/foo/bar/persistence/services", folder);
+		target.forceEntityName("AuthorFoo");
 		
+		print(target);		
+		assertEquals("${BEANNAME}.java", target.getOriginalFileDefinition());
+		assertEquals("AuthorFoo.java", target.getFile());
+		assertEquals("/src/org/demo/foo/bar/persistence/services", target.getFolder());
 	}
 
 	public void testTargetCreation2() {
@@ -55,16 +58,21 @@ public class TargetTest extends TestCase {
 		//Target target = new Target( targetDef, "AUTHOR", "Author", getVariables() ); 
 		Target target = new Target( targetDef, buildEntity("AUTHOR", "Author"), getVariables() ); // v 3.0.0
 		
-		String file   = target.getFile();
-		String folder = target.getFolder();
-		System.out.println(" . file   = " + file );
-		System.out.println(" . folder = " + folder );
+		print(target);
 		
-		assertEquals("Author.java", file);
-		assertEquals("/src/org/demo/foo/bar/bean", folder);
+		assertEquals("Author.java", target.getFile());
+		assertEquals("/src/org/demo/foo/bar/bean", target.getFolder());
 		
 	}
 
+	private void print(Target target) {
+		System.out.println("Target : " );
+		System.out.println(" . originalFileDefinition = " + target.getOriginalFileDefinition() );
+		System.out.println(" . file     = " + target.getFile() );
+		System.out.println(" . folder   = " + target.getFolder() );
+		System.out.println(" . template = " + target.getTemplate() );
+	}
+	
 	private Entity buildEntity(String tableName, String className) { // v 3.0.0
 		EntityInFakeModel entity = new EntityInFakeModel();
 		entity.setDatabaseTable(tableName);

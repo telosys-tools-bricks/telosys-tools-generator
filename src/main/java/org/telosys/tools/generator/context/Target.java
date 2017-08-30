@@ -48,16 +48,21 @@ public class Target
 {
 	//private final static String BEANNAME = "BEANNAME" ;
 	
+	private final VariablesManager variablesManager ;
+	
 	private final String    targetName ;
 	
-	private final String    file ;
+	//private final String    file ;
+	private final String    originalFileDefinition ;
 	
 	private final String    folder ;
 	
 	private final String    template ;
 
-	private final String    entityClassName ;
+	private final String    entityName ;
 
+	private String forcedEntityName = null ;
+	
 	/**
 	 * Constructor for a generation with an entity and a template
 	 * @param targetDefinition
@@ -71,15 +76,16 @@ public class Target
 		this.template = targetDefinition.getTemplate();
 		
 		//--- Specialization for the given entity
-		this.entityClassName = entity.getClassName() ;
+		this.entityName = entity.getClassName() ;
+		this.forcedEntityName = null ;
 
 		//--- Replace the "$" variables in _sFile and _sFolder
-		VariablesManager variablesManager = new VariablesManager( variables ); 
-		//this.file   = replaceVariables( targetDefinition.getFile(),   this.entityClassName, variablesManager );
-		this.file   = replaceVariables( targetDefinition.getFile(), variablesManager );
+		//VariablesManager variablesManager = new VariablesManager( variables ); 
+		this.variablesManager = new VariablesManager( variables ); 
+		//this.file   = replaceVariables( targetDefinition.getFile(), variablesManager );
+		this.originalFileDefinition = targetDefinition.getFile() ;
 		
-		variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
-		//this.folder = replaceVariables( targetDefinition.getFolder(), this.entityClassName, variablesManager );
+		this.variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
 		this.folder = replaceVariables( targetDefinition.getFolder(), variablesManager );
 	}
 
@@ -95,15 +101,15 @@ public class Target
 		this.template = targetDefinition.getTemplate();
 		
 		//--- No current entity 
-		this.entityClassName = "" ;
+		this.entityName = "" ;
 
 		//--- Replace the "$" variables in _sFile and _sFolder
-		VariablesManager variablesManager = new VariablesManager( variables ); 		
-		//this.file   = replaceVariables( targetDefinition.getFile(),   "", variablesManager );
-		this.file   = replaceVariables( targetDefinition.getFile(), variablesManager );
+		//VariablesManager variablesManager = new VariablesManager( variables ); 		
+		this.variablesManager = new VariablesManager( variables ); 
+		//this.file   = replaceVariables( targetDefinition.getFile(), variablesManager );
+		this.originalFileDefinition = targetDefinition.getFile() ;
 		
-		variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
-		//this.folder = replaceVariables( targetDefinition.getFolder(), "", variablesManager );
+		this.variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
 		this.folder = replaceVariables( targetDefinition.getFolder(), variablesManager );
 	}
 
@@ -120,11 +126,23 @@ public class Target
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
+			"Returns the original file definition for the generation in progress ",
+			"(the file as defined in the bundle, before variables substitution) "
+			}
+	)
+	public String getOriginalFileDefinition() {
+		return originalFileDefinition ;
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
 			"Returns the output file name for the generation in progress "
 			}
 	)
 	public String getFile() {
-		return file;
+		//return file;
+		return replaceVariables( originalFileDefinition, variablesManager );
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -153,10 +171,31 @@ public class Target
 			"Returns the entity name for the generation in progress (entity class name : Book, Author, ...)"
 			}
 	)
-	public String getEntityName()
-	{
-		return entityClassName ;
+	public String getEntityName() {
+		return entityName ;
 	}
+	
+	@VelocityMethod(
+			text={	
+				"Forces the entity name (to change dynamically the entity name)",
+				"If a forced name has been defined it will be used as the 'BEANNAME' to build the target file name",
+				"Returns a void string (so that it can be used easily in the template)"
+				}
+		)
+	public String forceEntityName(String forcedName) {
+		this.forcedEntityName = forcedName ;
+		return "" ;
+	}
+
+	@VelocityMethod(
+			text={	
+				"Returns the 'forced entity name' (or '' if none)"
+				}
+		)
+	public String getForcedEntityName() {
+		return forcedEntityName != null ? forcedEntityName : "" ;
+	}
+		
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -267,7 +306,7 @@ public class Target
 	private String replaceVariables( String originalString, VariablesManager varmanager ) {
 		
 		String s1 = originalString;
-		if ( this.entityClassName != null && this.entityClassName.length() > 0 ) {
+		if ( this.entityName != null && this.entityName.length() > 0 ) {
 			//--- Replace the generic name "${BEANNAME}" if any
 			s1 = replaceBEANNAME(originalString);
 		}
@@ -281,14 +320,31 @@ public class Target
 		}
 	}
     private String replaceBEANNAME(String originalString) {
-    	// entityClassName is not defined => nothing to do
-    	if ( this.entityClassName == null ) return originalString ;
-    	if ( this.entityClassName.length() == 0 ) return originalString ;
-    	// replace "${BEANNAME}" if any
+    	
+    	// Set the BEANNAME value (using entityName or forcedEntityName if any)
+    	String beannameValue = this.entityName ;
+    	if ( this.forcedEntityName != null ) {
+    		beannameValue = this.forcedEntityName ;
+    	}
+    	
+//    	// entityClassName is not defined => nothing to do
+//    	if ( this.entityName == null ) return originalString ;
+//    	if ( this.entityName.length() == 0 ) return originalString ;
+//    	// replace "${BEANNAME}" if any
+//    	HashMap<String,String> hm = new HashMap<String,String>();
+//    	hm.put("${BEANNAME}",    this.entityName );		
+//    	hm.put("${BEANNAME_LC}", this.entityName.toLowerCase() );
+//    	hm.put("${BEANNAME_UC}", this.entityName.toUpperCase() );
+
+    	// beannameValue is not defined => nothing to do
+    	if ( beannameValue == null ) return originalString ;
+    	if ( beannameValue.length() == 0 ) return originalString ;
+    	// beannameValue is defined => replace "${BEANNAME}" 
     	HashMap<String,String> hm = new HashMap<String,String>();
-    	hm.put("${BEANNAME}",    this.entityClassName );		
-    	hm.put("${BEANNAME_LC}", this.entityClassName.toLowerCase() );
-    	hm.put("${BEANNAME_UC}", this.entityClassName.toUpperCase() );
+    	hm.put("${BEANNAME}",    beannameValue );		
+    	hm.put("${BEANNAME_LC}", beannameValue.toLowerCase() );
+    	hm.put("${BEANNAME_UC}", beannameValue.toUpperCase() );
+
     	VariablesManager variablesManager = new VariablesManager(hm) ;
     	return variablesManager.replaceVariables(originalString);
     }
@@ -303,16 +359,15 @@ public class Target
 	public String getOutputFileNameInProject()
 	{
 		String s = null ;
-		if ( folder.endsWith("/") || folder.endsWith("\\") )
-		{
-			s = folder + file ;
+		if ( folder.endsWith("/") || folder.endsWith("\\") ) {
+			//s = folder + file ;
+			s = folder + getFile() ;
 		}
-		else
-		{
-			s = folder + "/" + file ;
+		else {
+			//s = folder + "/" + file ;
+			s = folder + "/" + getFile() ;
 		}
-		if ( s.startsWith("/") || s.startsWith("\\") )
-		{
+		if ( s.startsWith("/") || s.startsWith("\\") ) {
 			return s.substring(1);
 		}
 		return s ;
@@ -329,49 +384,18 @@ public class Target
 	public String getOutputFileNameInFileSystem(String destinationFolderFullPath)
 	{
 		String fileNameInProject = getOutputFileNameInProject() ;
-//		return buildFullPath(projectLocation, fileNameInProject ) ;
 		return FileUtil.buildFilePath(destinationFolderFullPath, fileNameInProject) ; // v 3.0.0
 	}
-	
-// removed in v 3.0.0	
-//	/**
-//	 * Returns the absolute full path of the folder in the file system <br>
-//	 * where to generate the target (using the given project location)
-//	 * ie : "C:/tmp/project/src/org/demo"
-//	 * @param projectLocation the project location ( ie "C:/tmp/project" )
-//	 * @return
-//	 * @since 2.0.7
-//	 */
-//	@VelocityNoDoc
-//	public String getOutputFolderInFileSystem(String projectLocation)
-//	{
-//		String folderInProject = getFolder() ;
-////		return buildFullPath(projectLocation, folderInProject ) ;
-//		return FileUtil.buildFilePath(projectLocation, folderInProject) ; // v 3.0.0
-//	}
-
-//	private String buildFullPath(String projectLocation, String fileOrFolder)
-//	{
-//		if ( projectLocation != null )
-//		{
-//			if ( projectLocation.endsWith("/") || projectLocation.endsWith("\\") )
-//			{
-//				return projectLocation + fileOrFolder ;
-//			}
-//			else
-//			{
-//				return projectLocation + "/" + fileOrFolder ;
-//			}
-//		}
-//		return "/" + fileOrFolder ;
-//	}
 	
 	@VelocityNoDoc
 	@Override
 	public String toString() {
-		return "Target [targetName=" + targetName + ", file=" + file
+//		return "Target [targetName=" + targetName + ", file=" + file
+//				+ ", folder=" + folder + ", template=" + template
+//				+ ", entityName=" + entityName + "]";
+		return "Target [targetName=" + targetName + ", file=" + getFile()
 				+ ", folder=" + folder + ", template=" + template
-				+ ", entityName=" + entityClassName + "]";
+				+ ", entityName=" + entityName + "]";
 	}
 	
 	
