@@ -113,6 +113,20 @@ public class FnInContext {
 		return "\"" + s + "\"" ;
 	}
 
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Removes the double quote character at the beginning and at the end of the given string (if any)",
+			"If the string is not quoted it is returned as is",
+			"If there's a quote character only at the beginning or at the end the string is returned as is",
+			""
+			},
+		parameters = { "s : the string to be unquoted" }
+			)
+	public String unquote(String s) {
+		return StrUtil.removeQuotes(s, '"') ;
+	}
+
 	/**
 	 * Returns the given string with a backslash before each given char
 	 * @param s
