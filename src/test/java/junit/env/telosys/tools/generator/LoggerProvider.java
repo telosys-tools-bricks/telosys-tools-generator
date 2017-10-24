@@ -1,7 +1,7 @@
 package junit.env.telosys.tools.generator;
 
-import org.telosys.tools.commons.ConsoleLogger;
 import org.telosys.tools.commons.TelosysToolsLogger;
+import org.telosys.tools.commons.logger.ConsoleLogger;
 
 public class LoggerProvider {
 

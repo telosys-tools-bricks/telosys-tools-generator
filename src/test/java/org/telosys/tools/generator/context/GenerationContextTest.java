@@ -6,11 +6,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import junit.env.telosys.tools.generator.LoggerProvider;
 import junit.env.telosys.tools.generator.TestsEnv;
 import junit.env.telosys.tools.generator.TestsProject;
 
 import org.junit.Test;
-import org.telosys.tools.commons.ConsoleLogger;
 import org.telosys.tools.commons.TelosysToolsLogger;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.dbcfg.DatabasesConfigurations;
@@ -22,18 +22,6 @@ import org.telosys.tools.generator.task.TelosysProject;
 import org.telosys.tools.generic.model.Model;
 
 public class GenerationContextTest {
-
-//	private GeneratorContextBuilder getGeneratorContextBuilder() throws Exception {
-//		TelosysProject telosysProject = TestsProject.initProjectEnv("myproject", TestsProject.BUNDLE_NAME) ;
-//		
-//		//---------- Required files loading
-//		System.out.println("loading TelosysToolsCfg...");
-//		TelosysToolsCfg telosysToolsCfg = telosysProject.loadTelosysToolsCfg();
-//		
-//		TelosysToolsLogger logger = new ConsoleLogger();
-//		
-//		return new GeneratorContextBuilder(telosysToolsCfg, logger);
-//	}
 
 	private GeneratorContext buildGeneratorContext(String projectName, String modelFile, String bundleName) throws Exception {
 		
@@ -52,10 +40,10 @@ public class GenerationContextTest {
 		Model model = telosysProject.loadModelFromDbRep(modelFile);
 		assertNotNull(model);
 		
-		TelosysToolsLogger logger = new ConsoleLogger();
+		//TelosysToolsLogger logger = new ConsoleLogger();
+		TelosysToolsLogger logger = LoggerProvider.getLogger();
 		
 		GeneratorContextBuilder generatorContextBuilder = new GeneratorContextBuilder(telosysToolsCfg, logger);
-		//GeneratorContextBuilder generatorContextBuilder = getGeneratorContextBuilder();
 		
 		DatabasesConfigurations databasesConfigurations = new DatabasesConfigurations();
 		return generatorContextBuilder.initBasicContext(model, databasesConfigurations, bundleName);

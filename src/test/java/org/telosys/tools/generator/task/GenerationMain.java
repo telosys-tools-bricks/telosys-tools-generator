@@ -3,14 +3,14 @@ package org.telosys.tools.generator.task;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.env.telosys.tools.generator.TestsProject;
-
-import org.telosys.tools.commons.ConsoleLogger;
 import org.telosys.tools.commons.TelosysToolsException;
 import org.telosys.tools.commons.TelosysToolsLogger;
 import org.telosys.tools.commons.bundles.TargetDefinition;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.generic.model.Model;
+
+import junit.env.telosys.tools.generator.LoggerProvider;
+import junit.env.telosys.tools.generator.TestsProject;
 
 public class GenerationMain {
 	
@@ -34,7 +34,9 @@ public class GenerationMain {
 		
 		List<TargetDefinition> resourcesTargets = null;
 		
-		TelosysToolsLogger logger = new ConsoleLogger() ;
+		//TelosysToolsLogger logger = new ConsoleLogger() ;
+		TelosysToolsLogger logger = LoggerProvider.getLogger();
+
 		
 		GenerationTask generationTask = new StandardGenerationTask(
 				model, selectedEntities, 
