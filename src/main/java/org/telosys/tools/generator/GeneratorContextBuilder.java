@@ -84,17 +84,6 @@ public class GeneratorContextBuilder {
 		return generatorContext ;		
 	}
 
-//	protected GeneratorContext createContext(Model model, DatabasesConfigurations databasesConfigurations) {
-//		//--- Create a context
-//		log("GeneratorContextBuilder : createContext() ...");
-//		GeneratorContext generatorContext = new GeneratorContext(); 		
-//		
-//		initContext(generatorContext, model, databasesConfigurations); 
-//		
-//
-//		return generatorContext ;
-//	}
-	
 	/**
 	 * Initializes a "basic generator context" with the given model <br>
 	 * without embedded generator, targets and selected entities <br>
@@ -104,10 +93,6 @@ public class GeneratorContextBuilder {
 	 * @param bundleName
 	 */
 	public GeneratorContext initBasicContext( Model model, DatabasesConfigurations databasesConfigurations, String bundleName ) {
-		
-//		//--- Create a context
-//		log("GeneratorContextBuilder : createContext() ...");
-//		GeneratorContext generatorContext = new GeneratorContext(); 		
 		
 		log("GeneratorContextBuilder : initContext() ...");
 
@@ -126,8 +111,6 @@ public class GeneratorContextBuilder {
 		generatorContext.put(ContextName.TAB,     "\t"  ); // #LGU 2017-08-16
 		
 		//--- Get all the project variables and put them in the context	
-		//Variable[] projectVariables = projectConfiguration.getAllVariables();
-//		Variable[] projectVariables = generatorConfig.getTelosysToolsCfg().getAllVariables();
 		Variable[] projectVariables = _telosysToolsCfg.getAllVariables(); // v 3.0.0
 		log("initContext() : Project variables count = " + ( projectVariables != null ? projectVariables.length : 0 ) );
 		//--- Set the project variables in the context ( if any )
@@ -155,22 +138,13 @@ public class GeneratorContextBuilder {
 		generatorContext.put(ContextName.H2,              new H2InContext());  // JDBC factory ( ver 2.1.1 )
 		generatorContext.put(ContextName.HTML,            new HtmlInContext());  // HTML utilities ( ver 3.0.0 )
 
-//		generatorContext.put(ContextName.DATABASES,
-//							new DatabasesInContext( generatorConfig.getDatabasesConfigurations() ) ); // ver 2.1.0
 		generatorContext.put(ContextName.DATABASES,	new DatabasesInContext(databasesConfigurations) ); // ver 3.0.0
 				
-		//_velocityContext.put(ContextName.CLASS, null);
-		
 		//--- Set the dynamic class loader 
-		//Loader loader = new Loader(projectConfiguration, _velocityContext);
-//		Loader loader = new Loader( generatorConfig.getTemplatesFolderFullPath() ); // ver 2.1.0
-		Loader loader = new Loader( _telosysToolsCfg.getTemplatesFolderAbsolutePath(bundleName) ); // ver 3.0.0
+		Loader loader = new Loader( _telosysToolsCfg.getTemplatesFolderAbsolutePath(bundleName) ); 
 		generatorContext.put(ContextName.LOADER, loader);
 		
 		//--- Set the "$project" variable in the context
-//		ProjectConfiguration projectConfiguration = generatorConfig.getProjectConfiguration();
-//		_velocityContext.put(ContextName.PROJECT, projectConfiguration);
-//		generatorContext.put(ContextName.PROJECT, new ProjectInContext(generatorConfig)); // ver 2.1.0
 		generatorContext.put(ContextName.PROJECT, new ProjectInContext(_telosysToolsCfg)); // ver 3.0.0
 
 // removed in v 3.0.0
@@ -179,8 +153,7 @@ public class GeneratorContextBuilder {
 		
 		//--- Set "$model" object : full model with  all the entities (v 2.0.7)
 		this.model = model ;
-//		ModelInContext modelInContext = new ModelInContext(model, entitiesManager );
-		this.modelInContext = new ModelInContext(model, _telosysToolsCfg.getEntityPackage(), env ); // v 3.0.0
+		this.modelInContext = new ModelInContext(model, _telosysToolsCfg.getEntityPackage(), env ); 
 		generatorContext.put(ContextName.MODEL, modelInContext); 
 		
 		return generatorContext ;
@@ -215,8 +188,7 @@ public class GeneratorContextBuilder {
 	//-------------------------------------------------------------------------------------------------------
 	private void setSelectedEntities(List<String> selectedEntitiesNames) throws GeneratorException {
 		//--- Set "$selectedEntities" ( list of all the selected entities )
-//		List<EntityInContext> selectedEntities = entitiesManager.getEntities( selectedEntitiesNames );
-		List<EntityInContext> selectedEntities = modelInContext.getEntities(selectedEntitiesNames); // v 3.0.0
+		List<EntityInContext> selectedEntities = modelInContext.getEntities(selectedEntitiesNames); 
 		generatorContext.put(ContextName.SELECTED_ENTITIES, selectedEntities);
 	}
 	
@@ -227,11 +199,9 @@ public class GeneratorContextBuilder {
 		
 		//--- Set "$entity" object in the context ( if the target is "for N entities" )
 		EntityInContext entity = null ;
-		//if ( target.getEntityName().trim().length() > 0 ) {
-		if ( ! StrUtil.nullOrVoid( target.getEntityName() ) ) { // v 3.0.0
+		if ( ! StrUtil.nullOrVoid( target.getEntityName() ) ) { 
 			//--- Target with entity ( classical target )
-			//entity = entitiesManager.getEntity(target.getEntityName() );
-			entity = modelInContext.getEntityByClassName( target.getEntityName() ); // v 3.0.0
+			entity = modelInContext.getEntityByClassName( target.getEntityName() );
 		}
 		else {
 			//--- Target without entity ( e.g. "once" target )
@@ -243,14 +213,8 @@ public class GeneratorContextBuilder {
 	//-------------------------------------------------------------------------------------------------------
 	private void setEmbeddedGenerator(List<String> selectedEntitiesNames, String bundleName, List<Target> generatedTargets) {
 		//--- Set the "$generator"  in the context ( "real" embedded generator )
-//		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator(
-//				model, _generatorConfig, _logger, selectedEntitiesNames, generatedTargets );
-//		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator(
-//				model, _telosysToolsCfg, _logger, selectedEntitiesNames, generatedTargets ); // v 3.0.0
 		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator( _telosysToolsCfg, bundleName, _logger,
-				this.model, selectedEntitiesNames, generatedTargets ); // v 3.0.0
+				this.model, selectedEntitiesNames, generatedTargets );
 		generatorContext.put(ContextName.GENERATOR, embeddedGenerator );
 	}		
-		
-
 }

@@ -39,18 +39,6 @@ import org.telosys.tools.generic.model.Model;
 
 /**
  * This class is a Velocity generator ready to use. <br>
- * It is not supposed to be used directly by the application ( visibility "package" ) <br>
- * It is designed to be used only by the GenerationManager <br>
- * 
- * It holds : <br>
- * . the template file to use <br>
- * . the Velocity Engine <br>
- * . the Velocity Context  <br>
- * <br> 
- * After creation, each instance of this class has a Velocity Context initialized with <br>
- * . the generator variables : $generator, $today <br>
- * . the project variables <br>
- * . etc
  * 
  * @author Laurent Guerin
  *  
@@ -166,19 +154,19 @@ public class Generator {
 		return file ;
 	}
 	
-	private String generate( GeneratorTemplate generatorTemplate, GeneratorContext generatorContext)
-			throws Exception {
-		log("generate(generatorTemplate, generatorContext)...");
-		GeneratorEngine generatorEngine = new GeneratorEngine();
-		return generatorEngine.generate(generatorTemplate, generatorContext );
-	}
+//	private String generate( GeneratorTemplate generatorTemplate, GeneratorContext generatorContext)
+//			throws Exception {
+//		log("generate(generatorTemplate, generatorContext)...");
+//		GeneratorEngine generatorEngine = new GeneratorEngine();
+//		return generatorEngine.generate(generatorTemplate, generatorContext );
+//	}
 
 	/**
 	 * Generates in memory and returns the InputStream on the generation result
 	 * @return
 	 * @throws GeneratorException
 	 */
-	private InputStream generateInMemory(Target target, GeneratorContext generatorContext) throws Exception // GeneratorException 
+	private InputStream generateInMemory(Target target, GeneratorContext generatorContext) throws Exception
 	{
 		log("generateInMemory()...");
 		
@@ -192,9 +180,13 @@ public class Generator {
 		try {
 			//------------------------------------------------------------------
 			//--- Load the TEMPLATE for the given TARGET
-			GeneratorTemplate template = loadTemplate(target) ;
-			//--- Call the GENERATOR ENGINE
-			result = generate(template, generatorContext);
+			GeneratorTemplate generatorTemplate = loadTemplate(target) ;
+//			//--- Call the GENERATOR ENGINE
+//			result = generate(generatorTemplate, generatorContext);
+			//--- Create a new GENERATOR ENGINE
+			GeneratorEngine generatorEngine = new GeneratorEngine();
+			//--- GENERATION 
+			result = generatorEngine.generate(generatorTemplate, generatorContext );
 			//------------------------------------------------------------------
 		}
 		finally {
