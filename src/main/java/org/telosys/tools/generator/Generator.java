@@ -26,11 +26,8 @@ import java.util.List;
 import org.telosys.tools.commons.DirUtil;
 import org.telosys.tools.commons.FileUtil;
 import org.telosys.tools.commons.StrUtil;
-import org.telosys.tools.commons.TelosysToolsException;
 import org.telosys.tools.commons.TelosysToolsLogger;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
-import org.telosys.tools.commons.dbcfg.DatabasesConfigurations;
-import org.telosys.tools.commons.dbcfg.DbConfigManager;
 import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generator.engine.GeneratorContext;
 import org.telosys.tools.generator.engine.GeneratorEngine;
@@ -51,7 +48,7 @@ public class Generator {
 	private final TelosysToolsCfg          _telosysToolsCfg ; // v 3.0.0
 	private final String                   _bundleName ; // v 3.0.0
 
-	private final DatabasesConfigurations  _databasesConfigurations ; // v 3.0.0
+	//private final DatabasesConfigurations  _databasesConfigurations ; // v 3.0.0
 	
 	private final TelosysToolsLogger       _logger ;
 
@@ -73,7 +70,7 @@ public class Generator {
 		}
 		_bundleName = bundleName ; // v 3.0.0
 		
-		_databasesConfigurations = loadDatabasesConfigurations(_telosysToolsCfg); // v 3.0.0
+		//_databasesConfigurations = loadDatabasesConfigurations(_telosysToolsCfg); // v 3.0.0
 	}
 	
 	private void log(String s) {
@@ -82,28 +79,28 @@ public class Generator {
 		}
 	}
 	
-	/**
-	 * Loads the databases configurations if any
-	 * @return
-	 */
-	private DatabasesConfigurations loadDatabasesConfigurations( TelosysToolsCfg telosysToolsCfg )  // v 3.0.0
-	{
-		DatabasesConfigurations databasesConfigurations = null ;
-		String dbcfgFileName = telosysToolsCfg.getDatabasesDbCfgFileAbsolutePath();
-		File dbcfgFile = new File(dbcfgFileName);
-		if ( dbcfgFile.exists() ) {
-			try {
-				DbConfigManager dbConfigManager = new DbConfigManager( dbcfgFile );
-				databasesConfigurations = dbConfigManager.load() ;
-			} catch (TelosysToolsException e) {
-				databasesConfigurations = new DatabasesConfigurations() ; // Void
-			}
-			return databasesConfigurations ;
-		}
-		else {
-			return new DatabasesConfigurations() ; // Void
-		}
-	}
+//	/**
+//	 * Loads the databases configurations if any
+//	 * @return
+//	 */
+//	private DatabasesConfigurations loadDatabasesConfigurations( TelosysToolsCfg telosysToolsCfg )  // v 3.0.0
+//	{
+//		DatabasesConfigurations databasesConfigurations = null ;
+//		String dbcfgFileName = telosysToolsCfg.getDatabasesDbCfgFileAbsolutePath();
+//		File dbcfgFile = new File(dbcfgFileName);
+//		if ( dbcfgFile.exists() ) {
+//			try {
+//				DbConfigManager dbConfigManager = new DbConfigManager( dbcfgFile );
+//				databasesConfigurations = dbConfigManager.load() ;
+//			} catch (TelosysToolsException e) {
+//				databasesConfigurations = new DatabasesConfigurations() ; // Void
+//			}
+//			return databasesConfigurations ;
+//		}
+//		else {
+//			return new DatabasesConfigurations() ; // Void
+//		}
+//	}
 
 	//========================================================================
 	// TEMPLATE MANAGEMENT
@@ -220,7 +217,7 @@ public class Generator {
 		GeneratorContextBuilder generatorContextBuilder = new GeneratorContextBuilder(_telosysToolsCfg, _logger);
 		GeneratorContext generatorContext = generatorContextBuilder.initFullContext(
 				model, 
-				_databasesConfigurations, 
+				//_databasesConfigurations, 
 				_bundleName,
 				selectedEntitiesNames, 
 				target, 

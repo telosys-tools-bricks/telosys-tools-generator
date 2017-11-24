@@ -6,20 +6,19 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import junit.env.telosys.tools.generator.LoggerProvider;
-import junit.env.telosys.tools.generator.TestsEnv;
-import junit.env.telosys.tools.generator.TestsProject;
-
 import org.junit.Test;
 import org.telosys.tools.commons.TelosysToolsLogger;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
-import org.telosys.tools.commons.dbcfg.DatabasesConfigurations;
 import org.telosys.tools.generator.GeneratorContextBuilder;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.engine.GeneratorContext;
 import org.telosys.tools.generator.task.TelosysProject;
 import org.telosys.tools.generic.model.Model;
+
+import junit.env.telosys.tools.generator.LoggerProvider;
+import junit.env.telosys.tools.generator.TestsEnv;
+import junit.env.telosys.tools.generator.TestsProject;
 
 public class GenerationContextTest {
 
@@ -45,8 +44,9 @@ public class GenerationContextTest {
 		
 		GeneratorContextBuilder generatorContextBuilder = new GeneratorContextBuilder(telosysToolsCfg, logger);
 		
-		DatabasesConfigurations databasesConfigurations = new DatabasesConfigurations();
-		return generatorContextBuilder.initBasicContext(model, databasesConfigurations, bundleName);
+//		DatabasesConfigurations databasesConfigurations = new DatabasesConfigurations();
+//		return generatorContextBuilder.initBasicContext(model, databasesConfigurations, bundleName);
+		return generatorContextBuilder.initBasicContext(model, bundleName);
 	}
 	
 	private final static String DBREP_FILE = "BookStore-with-JC.dbrep" ;

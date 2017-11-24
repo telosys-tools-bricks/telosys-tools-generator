@@ -18,9 +18,11 @@ package org.telosys.tools.generator;
 import java.util.List;
 
 import org.telosys.tools.commons.StrUtil;
+import org.telosys.tools.commons.TelosysToolsException;
 import org.telosys.tools.commons.TelosysToolsLogger;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.dbcfg.DatabasesConfigurations;
+import org.telosys.tools.commons.dbcfg.DbConfigManager;
 import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generator.context.BeanValidation;
 import org.telosys.tools.generator.context.Const;
@@ -87,12 +89,11 @@ public class GeneratorContextBuilder {
 	/**
 	 * Initializes a "basic generator context" with the given model <br>
 	 * without embedded generator, targets and selected entities <br>
-	 * 
 	 * @param model
-	 * @param databasesConfigurations
 	 * @param bundleName
+	 * @return
 	 */
-	public GeneratorContext initBasicContext( Model model, DatabasesConfigurations databasesConfigurations, String bundleName ) {
+	public GeneratorContext initBasicContext( Model model, String bundleName ) { // databasesConfigurations removed in V 3.0.0 #LGU
 		
 		log("GeneratorContextBuilder : initContext() ...");
 
@@ -138,7 +139,8 @@ public class GeneratorContextBuilder {
 		generatorContext.put(ContextName.H2,              new H2InContext());  // JDBC factory ( ver 2.1.1 )
 		generatorContext.put(ContextName.HTML,            new HtmlInContext());  // HTML utilities ( ver 3.0.0 )
 
-		generatorContext.put(ContextName.DATABASES,	new DatabasesInContext(databasesConfigurations) ); // ver 3.0.0
+		// generatorContext.put(ContextName.DATABASES,	new DatabasesInContext(databasesConfigurations) );
+		generatorContext.put(ContextName.DATABASES,	buildDatabasesInContext(_telosysToolsCfg) );
 				
 		//--- Set the dynamic class loader 
 		Loader loader = new Loader( _telosysToolsCfg.getTemplatesFolderAbsolutePath(bundleName) ); 
@@ -161,9 +163,7 @@ public class GeneratorContextBuilder {
 	
 	/**
 	 * Initializes a "full generator context" usable by the generator <br>
-	 * 
 	 * @param model
-	 * @param databasesConfigurations
 	 * @param bundleName
 	 * @param selectedEntitiesNames
 	 * @param target
@@ -171,11 +171,11 @@ public class GeneratorContextBuilder {
 	 * @return
 	 * @throws GeneratorException
 	 */
-	public GeneratorContext initFullContext( Model model, DatabasesConfigurations databasesConfigurations, String bundleName,
+	public GeneratorContext initFullContext( Model model, String bundleName,
 			List<String> selectedEntitiesNames, Target target, List<Target> generatedTargets ) throws GeneratorException {
 		
 		//--- Initialize a basic context
-		initBasicContext(model, databasesConfigurations, bundleName);
+		initBasicContext(model, bundleName); // databasesConfigurations removed in V 3.0.0 #LGU
 		
 		//--- Add further elements
 		setEmbeddedGenerator(selectedEntitiesNames, bundleName, generatedTargets);
@@ -183,6 +183,30 @@ public class GeneratorContextBuilder {
 		setTargetAndCurrentEntity(target);
 
 		return generatorContext ;
+	}
+	
+	/**
+	 * Creates a DatabasesInContext instance for the given project configuration
+	 * @param telosysToolsCfg
+	 * @return
+	 */
+	private DatabasesInContext buildDatabasesInContext( TelosysToolsCfg telosysToolsCfg ) {
+		return new DatabasesInContext( loadDatabasesConfigurations(telosysToolsCfg));
+	}
+	
+	/**
+	 * Loads DatabasesConfigurations if any for the given project configuration
+	 * @param telosysToolsCfg
+	 * @return
+	 */
+	private DatabasesConfigurations loadDatabasesConfigurations( TelosysToolsCfg telosysToolsCfg ) {
+		try {
+			// Try to load the DatabasesConfigurations
+			return new DbConfigManager(telosysToolsCfg).load();
+		} catch (TelosysToolsException e) {
+			// If the DatabasesConfigurations cannot be loaded just return a void set of configurations
+			return new DatabasesConfigurations() ; // Void
+		}
 	}
 
 	//-------------------------------------------------------------------------------------------------------
