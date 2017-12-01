@@ -27,7 +27,7 @@ import org.apache.velocity.runtime.parser.ParseException;
 import org.apache.velocity.runtime.parser.TemplateParseException;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.GeneratorException;
-import org.telosys.tools.generator.engine.GeneratorContextException;
+import org.telosys.tools.generator.context.GeneratorContextException;
 import org.telosys.tools.generator.engine.directive.DirectiveException;
 
 

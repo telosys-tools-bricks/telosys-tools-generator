@@ -29,7 +29,10 @@
 	 	</dependency>
  	 	<dependency>
 			<groupId>${project.parent.groupId}</groupId>
+			<!-- 
 		  	<artifactId>telosys-tools-generator-engine</artifactId>
+			 -->
+		  	<artifactId>telosys-tools-generator-engine-velocity17</artifactId>
 			<version>${project.parent.version}</version>
 	 	</dependency>
 		

@@ -110,9 +110,15 @@ public class Generator {
 		String templateFileName  = target.getTemplate();
 		String templateDirectory = _telosysToolsCfg.getTemplatesFolderAbsolutePath(); // v 3.0.0
 
-		File file = checkTemplate( templateDirectory, templateFileName);
+		//File file = checkTemplate( templateDirectory, templateFileName);
+		checkTemplate( templateDirectory, templateFileName);
 		
-		return new GeneratorTemplate(file) ;
+		String bundleFolderAbsolutePath = _telosysToolsCfg.getTemplatesFolderAbsolutePath(_bundleName) ; 
+		// Examples : 
+		//  "/foo/bar/TelosysTools/templates/basic-templates", "myfile.vm"
+		//  "/foo/bar/TelosysTools/templates/basic-templates", "subdir/myfile.vm"
+		//  "/foo/bar/TelosysTools/templates/basic-templates", "/subdir/myfile.vm"
+		return new GeneratorTemplate(bundleFolderAbsolutePath, templateFileName) ;
 	}
 	
 	private File checkTemplate(String sTemplateDirectory, String sTemplateFileName) throws GeneratorException {
