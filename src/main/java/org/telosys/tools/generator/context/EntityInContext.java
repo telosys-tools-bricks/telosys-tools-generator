@@ -561,33 +561,74 @@ public class EntityInContext
 	}
 	
 	//-------------------------------------------------------------------------------------
+	// All attributes names as string
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns all the attributes names as a string.",
+			"The attributes names are separated by the given separator"
+		},
+		parameters = {
+			"separator : the separator to be put between each attribute name"
+		},
+		example= {
+			"$entity.attributesNamesAsString('/') "
+		},
+		since="3.0.0"
+		)
+    public String attributesNamesAsString(String separator) {
+		return buildAttributesNamesAsString(this.getAttributes(), separator, "", "");
+    }
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns all the attributes names as a string.",
+			"The attributes names are separated by the given separator",
+			"with a prefix/suffix for each attribute name"
+		},
+		parameters = {
+			"separator : the separator to be put between each attribute name",
+			"prefix : the prefix to be put before each attribute name",
+			"suffix : the prefix to be put after each attribute name"
+		},
+		example= {
+			"$entity.attributesNamesAsString('/', '{{', '}}') "
+		},
+		since="3.0.0"
+	)
+    public String attributesNamesAsString(String separator, String prefix, String suffix) {
+   		return buildAttributesNamesAsString(this.getAttributes(), separator, prefix, suffix);
+    }
+
+	//-------------------------------------------------------------------------------------
+	// Key attributes names as string
+	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
 			"Returns the key attributes names as a string.",
 			"The attributes names are separated by the given separator",
 			"with a prefix/suffix for each attribute name"
-			},
-			parameters = {
-					"separator : the separator to be put between each attribute name"
-			},
-			example= {
-				"$entity.keyAttributesNamesAsString('/') "
-			},
-			since="2.1.0"
+		},
+		parameters = {
+			"separator : the separator to be put between each attribute name"
+		},
+		example= {
+			"$entity.keyAttributesNamesAsString('/') "
+		},
+		since="2.1.0"
 		)
     public String keyAttributesNamesAsString(String separator) {
-    	return keyAttributesNamesAsString(separator, "", "");
+    	return buildAttributesNamesAsString(this.getKeyAttributes(), separator, "", "");
     }
     
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
-		"Returns the key attributes names as a string.",
-		"The attributes names are separated by the given separator",
-		"with a prefix/suffix for each attribute name"
+			"Returns the key attributes names as a string.",
+			"The attributes names are separated by the given separator",
+			"with a prefix/suffix for each attribute name"
 		},
 		parameters = {
-				"separator : the separator to be put between each attribute name",
-				"prefix : the prefix to be put before each attribute name",
-				"suffix : the prefix to be put after each attribute name"
+			"separator : the separator to be put between each attribute name",
+			"prefix : the prefix to be put before each attribute name",
+			"suffix : the prefix to be put after each attribute name"
 		},
 		example= {
 			"$entity.keyAttributesNamesAsString('/', '{{', '}}') "
@@ -595,20 +636,69 @@ public class EntityInContext
 		since="2.1.0"
 	)
     public String keyAttributesNamesAsString(String separator, String prefix, String suffix) {
-    	if( this.hasPrimaryKey() ) {
-               StringBuilder sb = new StringBuilder();
-               int n = 0 ;
-               for ( AttributeInContext attribute : this.getKeyAttributes() ) {
-                      n++ ;
-                      if ( n > 1 ) sb.append(separator);
-                      sb.append(prefix);
-                      sb.append(attribute.getName());
-                      sb.append(suffix);
-               }
-               return sb.toString();
-        } else {
-               return "no_primary_key_for_entity_" + this.getName() + "" ;
-        }
+		return buildAttributesNamesAsString(this.getKeyAttributes(), separator, prefix, suffix);
+    }
+
+	//-------------------------------------------------------------------------------------
+	// "Non key" attributes names as string
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns the 'non key' attributes names as a string.",
+			"The attributes names are separated by the given separator"
+		},
+		parameters = {
+			"separator : the separator to be put between each attribute name"
+		},
+		example= {
+			"$entity.nonKeyAttributesNamesAsString('/') "
+		},
+		since="3.0.0"
+		)
+    public String nonKeyAttributesNamesAsString(String separator) {
+		return buildAttributesNamesAsString(this.getNonKeyAttributes(), separator, "", "");
+    }
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns the 'non key' attributes names as a string.",
+			"The attributes names are separated by the given separator",
+			"with a prefix/suffix for each attribute name"
+		},
+		parameters = {
+			"separator : the separator to be put between each attribute name",
+			"prefix : the prefix to be put before each attribute name",
+			"suffix : the prefix to be put after each attribute name"
+		},
+		example= {
+			"$entity.nonKeyAttributesNamesAsString('/', '{{', '}}') "
+		},
+		since="3.0.0"
+	)
+    public String nonKeyAttributesNamesAsString(String separator, String prefix, String suffix) {
+   		return buildAttributesNamesAsString(this.getNonKeyAttributes(), separator, prefix, suffix);
+    }
+
+	//-------------------------------------------------------------------------------------
+	/**
+	 * Builds a string containing the given list of attibutes <br>
+	 * with the given separator and optionally the given prefix and suffix. <br>
+	 * @param attributes
+	 * @param separator
+	 * @param prefix
+	 * @param suffix
+	 * @return
+	 */
+	private String buildAttributesNamesAsString(List<AttributeInContext> attributes, String separator, String prefix, String suffix) {
+       StringBuilder sb = new StringBuilder();
+       int n = 0 ;
+       for ( AttributeInContext attribute : attributes ) {
+              n++ ;
+              if ( n > 1 ) sb.append(separator);
+              sb.append(prefix);
+              sb.append(attribute.getName());
+              sb.append(suffix);
+       }
+       return sb.toString();
     }
 
 	//-------------------------------------------------------------------------------------
