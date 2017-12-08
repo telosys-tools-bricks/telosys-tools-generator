@@ -96,59 +96,39 @@ public class EntityInContext
 	 * @throws GeneratorException
 	 */
 	public EntityInContext( final Entity entity, final String entityPackage, 
-//							final EntitiesManager entitiesManager,  // removed in v 3.0.0
 							final ModelInContext modelInContext, // v 3.0.0
-							final EnvInContext env ) // throws GeneratorException
+							final EnvInContext env ) 
 	{
-		//_sName = entity.getBeanJavaClass() ;
 		_sClassName = entity.getClassName();  // v 3.0.0
 		
 		_sPackage = StrUtil.notNull(entityPackage);
 		
-		// _entitiesManager = entitiesManager ; // removed in v 3.0.0
 		_modelInContext = modelInContext ; // v 3.0.0
 		_env = env ;
 		
 		_sDatabaseTable   = StrUtil.notNull(entity.getDatabaseTable());
-		//_sDatabaseCatalog = entity.getCatalog();
 		_sDatabaseCatalog = StrUtil.notNull(entity.getDatabaseCatalog()); // v 3.0.0
 		
-		//_sDatabaseSchema  = entity.getSchema();
 		_sDatabaseSchema  = StrUtil.notNull(entity.getDatabaseSchema()); // v 3.0.0
 		
 		_sDatabaseType    = StrUtil.notNull(entity.getDatabaseType()); // ver 2.0.7
 		
 		//--- Initialize all the ATTRIBUTES for the current entity
-		_attributes = new LinkedList<AttributeInContext>();
-//		Collection<Column> entityColumns = entity.getColumnsCollection() ;
-//		for ( Column column : entityColumns ) {
-//			AttributeInContext attribute = new AttributeInContext(this, column);
-//			_attributes.add(attribute);
-//		}
+		_attributes = new LinkedList<>();
 		for ( Attribute attribute : entity.getAttributes() ) { // v 3.0.0
 			AttributeInContext attributeInContext = new AttributeInContext(this, attribute, _modelInContext, _env);
 			_attributes.add(attributeInContext);
 		}
 
 		//--- Initialize all the LINKS for the current entity
-		_links = new LinkedList<LinkInContext>();
-//		Collection<Link> entityLinks = entity.getLinksCollection() ;
-//		for ( Link link : entityLinks ) {
-//			LinkInContext linkInCtx = new LinkInContext(this, link, _entitiesManager );
-//			_links.add(linkInCtx);
-//		}
+		_links = new LinkedList<>();
 		for ( Link link : entity.getLinks() ) { // v 3.0.0
-//			LinkInContext linkInContext = new LinkInContext(this, link, _entitiesManager );
 			LinkInContext linkInContext = new LinkInContext(this, link, _modelInContext ); // v 3.0.0
 			_links.add(linkInContext);
 		}
 		
 		//--- Init all the DATABASE FOREIGN KEYS  ( v 2.0.7 )
-		_foreignKeys = new LinkedList<ForeignKeyInContext>();
-//		Collection<ForeignKey> foreignKeys = entity.getForeignKeysCollection();
-//		for ( ForeignKey fk : foreignKeys ) {
-//			_foreignKeys.add( new ForeignKeyInContext(fk ) );
-//		}
+		_foreignKeys = new LinkedList<>();
 		for ( ForeignKey fk : entity.getDatabaseForeignKeys() ) {
 			_foreignKeys.add( new ForeignKeyInContext(fk ) );
 		}
@@ -195,20 +175,6 @@ public class EntityInContext
         return _sPackage ;
     }
 	
-//	/**
-//	 * Returns the super class of this Java class 
-//	 * @return
-//	 */
-//	@VelocityMethod ( text= { 
-//			"Returns the super class for the entity's class (or void if none)"
-//		},
-//		example="$entity.superClass"
-//	)
-//	public String getSuperClass()
-//    {
-//        return _sSuperClass ;
-//    }
-
 	/**
 	 * Returns the Java class full name ( ie : "my.package.MyClass" )
 	 * @return
@@ -223,21 +189,6 @@ public class EntityInContext
 		return _sPackage + "." + getName();
     }
 	
-//    /**
-//     * Returns the Java line instruction for the toString() method
-//     * @return
-//     */
-//    public String getToStringInstruction()
-//    {
-//    	return "\"JavaClass : '" + getName() + "' \"";
-//    }
-    
-//    public String toStringMethodCodeLines( int iLeftMargin )
-//    {
-//    	String leftMargin = GeneratorUtil.blanks(iLeftMargin);
-//    	return leftMargin + "return \"JavaClass : '" + getName() + "' \" ; \n";
-//    }
-    
 	/* (non-Javadoc)
 	 * Same as getName() 
 	 * @see java.lang.Object#toString()
@@ -370,7 +321,7 @@ public class EntityInContext
 	@VelocityNoDoc
 	public List<AttributeInContext> getAttributesByCriteria( int c1  ) 
 	{
-		ContextLogger.log("getAttributesByCriteria(" + c1 + ")" );
+		logDebug("getAttributesByCriteria(" + c1 + ")" );
 		checkCriterion(c1);
 		return getAttributesByAddedCriteria(c1);
 	}
@@ -378,7 +329,7 @@ public class EntityInContext
 	@VelocityNoDoc
 	public List<AttributeInContext> getAttributesByCriteria( int c1, int c2 ) 
 	{
-		ContextLogger.log("getAttributesByCriteria(" + c1 + "," + c2 + ")" );
+		logDebug("getAttributesByCriteria(" + c1 + "," + c2 + ")" );
 		checkCriterion(c1);
 		checkCriterion(c2);
 		return getAttributesByAddedCriteria(c1 + c2);
@@ -387,7 +338,7 @@ public class EntityInContext
 	@VelocityNoDoc
 	public List<AttributeInContext> getAttributesByCriteria( int c1, int c2, int c3 ) 
 	{
-		ContextLogger.log("getAttributesByCriteria(" + c1 + "," + c2 + "," + c3 + ")" );
+		logDebug("getAttributesByCriteria(" + c1 + "," + c2 + "," + c3 + ")" );
 		checkCriterion(c1);
 		checkCriterion(c2);
 		checkCriterion(c3);
@@ -414,7 +365,7 @@ public class EntityInContext
 	@VelocityReturnType("List of 'attribute' objects")
 	public List<AttributeInContext> getAttributesByCriteria( int c1, int c2, int c3, int c4 ) 
 	{
-		ContextLogger.log("getAttributesByCriteria(" + c1 + "," + c2 + "," + c3 + "," + c4 + ")" );
+		logDebug("getAttributesByCriteria(" + c1 + "," + c2 + "," + c3 + "," + c4 + ")" );
 		checkCriterion(c1);
 		checkCriterion(c2);
 		checkCriterion(c3);
@@ -425,11 +376,9 @@ public class EntityInContext
 	//-------------------------------------------------------------------------------------
 	private List<AttributeInContext> getAttributesByAddedCriteria( int criteria ) 
 	{
-		ContextLogger.log("getAttributesByAddedCriteria(" + criteria + ")" );
-//		List<LinkInContext> allLinks = getLinks() ;
-//		List<LinkInContext> selectedLinks = getSelectedLinks() ;
+		logDebug("getAttributesByAddedCriteria(" + criteria + ")" );
 		
-		LinkedList<AttributeInContext> selectedAttributes = new LinkedList<AttributeInContext>();
+		LinkedList<AttributeInContext> selectedAttributes = new LinkedList<>();
 		
 		for ( AttributeInContext attribute : _attributes ) {
 			Boolean selectedByKey  = null ;
@@ -455,21 +404,17 @@ public class EntityInContext
 			
 			//--- IS IN LINK ?
 			if ( ( criteria & Const.IN_LINKS ) != 0 ) {
-				//selectedByLink = attribute.isUsedInLinkJoinColumn( allLinks ) ;
 				selectedByLink = attribute.isUsedInLinks();
 			}
 			if ( ( criteria & Const.NOT_IN_LINKS ) != 0 ) {
-				//selectedByLink = ! attribute.isUsedInLinkJoinColumn( allLinks ) ;
 				selectedByLink = ! attribute.isUsedInLinks();
 			}
 			
 			//--- IS IN SELECTED LINK ?
 			if ( ( criteria & Const.IN_SELECTED_LINKS ) != 0 ) {
-				//selectedBySelectedLink = attribute.isUsedInLinkJoinColumn( selectedLinks ) ;
 				selectedBySelectedLink = attribute.isUsedInSelectedLinks() ;
 			}			
 			if ( ( criteria & Const.NOT_IN_SELECTED_LINKS ) != 0 ) {
-				//selectedBySelectedLink = ! attribute.isUsedInLinkJoinColumn( selectedLinks ) ;
 				selectedBySelectedLink = ! attribute.isUsedInSelectedLinks() ;
 			}
 			
@@ -492,7 +437,7 @@ public class EntityInContext
 				if ( selectedBySelectedLink ) selected++ ;
 			}
 
-			ContextLogger.log("getAttributesByAddedCriteria(" + criteria + ") : " + attribute.getName() + " : " + criteriaCount + " :: " + selected );
+			logDebug("getAttributesByAddedCriteria(" + criteria + ") : " + attribute.getName() + " : " + criteriaCount + " :: " + selected );
 			
 			if ( ( criteriaCount > 0 ) && ( selected == criteriaCount ) ) {	
 				// All criteria verified ( "AND" ) => keep this attribute
@@ -881,46 +826,6 @@ public class EntityInContext
 		return false;
 	}
 	
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod ( text= { 
-//			"Returns a String containing all the columns of the Primary Key",
-//			"The returned column names are separated by a comma and have quotes characters",
-//			"i.e. : '\"code\", \"type\"' "
-//		},
-//		example={	
-//			"String KEY_COLUMNS[] = { $entity.sqlKeyColumns };"
-//		}
-//	)
-//	public String getSqlKeyColumns() 
-//	{
-////		if ( _sSqlKeyColumns == null ) // list not yet built
-////		{
-////			_sSqlKeyColumns = buildDbColumnsList( true ); 
-////		}
-////		return _sSqlKeyColumns ;
-//		return buildDbColumnsList( true ); 
-//	}
-	
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod ( text= { 
-//			"Returns a String containing all the columns not used in the Primary Key ",
-//			"The returned column names are separated by a comma and have quotes characters",
-//			"i.e. : '\"code\", \"type\"' "
-//		},
-//		example={	
-//			"String DATA_COLUMNS[] = { $entity.sqlNonKeyColumns };"
-//		}
-//	)
-//	public String getSqlNonKeyColumns() 
-//	{
-////		if ( _sSqlNonKeyColumns == null ) // list not yet built
-////		{
-////			_sSqlNonKeyColumns = buildDbColumnsList( false ); 
-////		}
-////		return _sSqlNonKeyColumns ;
-//		return buildDbColumnsList( false ); 
-//	}
-
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
 			"Returns the attributes NOT tagged as 'long text' for this entity",
@@ -935,14 +840,6 @@ public class EntityInContext
 	@VelocityReturnType("List of 'attribute' objects")
 	public List<AttributeInContext> getNonTextAttributes() 
 	{
-//		if ( _nonTextAttributes == null ) // list not yet built
-//		{
-//			_nonTextAttributes = buildTextAttributesList ( false ); // NOT LONG TEXT
-//			if ( _nonTextAttributes != null ) {
-//				return _nonTextAttributes ;
-//			}
-//		}
-//		return VOID_ATTRIBUTES_LIST ;
 		return buildTextAttributesList ( false ); // NOT LONG TEXT
 	}
 
@@ -960,14 +857,6 @@ public class EntityInContext
 	@VelocityReturnType("List of 'attribute' objects")
 	public List<AttributeInContext> getTextAttributes() 
 	{
-//		if ( _textAttributes == null ) // list not yet built
-//		{
-//			_textAttributes = buildTextAttributesList ( true ); // Special "LONG TEXT"
-//			if ( _textAttributes != null ) {
-//				return _textAttributes ;
-//			}
-//		}
-//		return VOID_ATTRIBUTES_LIST ;
 		return buildTextAttributesList ( true ); // Special "LONG TEXT"
 	}
 
@@ -988,7 +877,7 @@ public class EntityInContext
     		int n = _attributes.size();
         	for ( int i = 0 ; i < n ; i++ )        		
         	{
-        		AttributeInContext attribute = (AttributeInContext) _attributes.get(i);
+        		AttributeInContext attribute = _attributes.get(i);
                 if ( attribute.isLongText() ) 
                 {
                 	return true ;
@@ -1111,17 +1000,6 @@ public class EntityInContext
 		for ( AttributeInContext attribute : attributes ) {
 			//--- Is this attribute involved in a link ?
 			for( LinkInContext link : this.getLinks()  ) {
-//				if( link.isOwningSide() && link.hasJoinColumns() ) {
-//					for( String joinColumn : link.getJoinColumns() ) {
-//						if( joinColumn.equals(attribute.getDatabaseName() ) ) {						
-//							String referencedEntityType = link.getTargetEntitySimpleType() ;
-//							if ( referencedEntityTypes.contains(referencedEntityType) == false ) {
-//								//--- Not already in the list => add it
-//								referencedEntityTypes.add( link.getTargetEntitySimpleType() );
-//							}
-//						}
-//					}
-//				}
 				if( link.isOwningSide() ) {
 					//--- Only if the link uses one of the given attributes
 					if ( link.usesAttribute(attribute) ) {
@@ -1149,7 +1027,7 @@ public class EntityInContext
 		since="2.1.0"
 	)
     public List<String> referencedEntityTypes() throws GeneratorException {
-		List<String> referencedEntityTypes = new LinkedList<String>();
+		List<String> referencedEntityTypes = new LinkedList<>();
 		//--- Search all the referenced entities (from all the "owning side" links)
 		for( LinkInContext link : this.getLinks()  ) {
 			if ( link.isOwningSide() ) {
@@ -1168,7 +1046,7 @@ public class EntityInContext
 	//-------------------------------------------------------------------------------------------------
 	private LinkedList<AttributeInContext> buildAttributesList ( boolean bKeyAttribute ) 
 	{
-		LinkedList<AttributeInContext> attributesList = new LinkedList<AttributeInContext>();
+		LinkedList<AttributeInContext> attributesList = new LinkedList<>();
     	if ( _attributes != null )
     	{
     		int n = _attributes.size();
@@ -1194,8 +1072,7 @@ public class EntityInContext
 	 * and managed the imports list and attributes declarations types to avoid imports error
 	 *  
 	 */
-	private void endOfAttributesDefinition() // throws GeneratorException // v 2.1.0
-	{
+	private void endOfAttributesDefinition() {
 		if ( _attributes == null ) return ;
 		
 		//--- Build the list of the "KEY" attributes
@@ -1216,31 +1093,6 @@ public class EntityInContext
 		}
 	}
 	
-//	private String buildDbColumnsList ( boolean bKeyAttribute ) 
-//	{
-//    	if ( _attributes != null )
-//    	{
-//            StringBuffer sb = new StringBuffer();
-//            int iCount = 0 ;
-//    		int n = _attributes.size();
-//        	for ( int i = 0 ; i < n ; i++ )        		
-//        	{
-//        		AttributeInContext attribute = (AttributeInContext) _attributes.get(i);
-//                if ( attribute.isKeyElement() == bKeyAttribute ) 
-//                {
-//                	if ( iCount > 0 ) // Not the first one
-//                	{
-//                        sb.append( ", " ) ;
-//                	}
-//                    sb.append( "\"" + attribute.getDatabaseName().trim() + "\"" ) ;
-//                    iCount++ ;
-//                }        		
-//        	}
-//    		return sb.toString() ;
-//    	}
-//    	return "" ;
-//	}
-
 	/**
 	 * "Text" or "non Text" attributes
 	 * @param bLongText
@@ -1250,7 +1102,7 @@ public class EntityInContext
 	{
     	if ( _attributes != null )
     	{
-			LinkedList<AttributeInContext> list = new LinkedList<AttributeInContext>();
+			LinkedList<AttributeInContext> list = new LinkedList<>();
     		int n = _attributes.size();
         	for ( int i = 0 ; i < n ; i++ )        		
         	{
@@ -1265,4 +1117,7 @@ public class EntityInContext
     	return null ;
 	}
 
+	private final void logDebug(String s) {
+		// Log here if necessary
+	}
 }
