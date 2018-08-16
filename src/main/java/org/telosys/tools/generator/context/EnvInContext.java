@@ -21,12 +21,14 @@ import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.types.LiteralValuesProvider;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForCSharp;
+import org.telosys.tools.generic.model.types.LiteralValuesProviderForGo;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForJava;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForJavaScript;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForPython;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForTypeScript;
 import org.telosys.tools.generic.model.types.TypeConverter;
 import org.telosys.tools.generic.model.types.TypeConverterForCSharp;
+import org.telosys.tools.generic.model.types.TypeConverterForGo;
 import org.telosys.tools.generic.model.types.TypeConverterForJava;
 import org.telosys.tools.generic.model.types.TypeConverterForJavaScript;
 import org.telosys.tools.generic.model.types.TypeConverterForPython;
@@ -44,16 +46,18 @@ import org.telosys.tools.generic.model.types.TypeConverterForTypeScript;
 //-------------------------------------------------------------------------------------
 public class EnvInContext {
 	
-	private final static String JAVA       = "JAVA" ;
-	private final static String CSHARP     = "C#" ;
-	private final static String TYPESCRIPT = "TYPESCRIPT" ;
-	private final static String JAVASCRIPT = "JAVASCRIPT" ;
-	private final static String PYTHON     = "PYTHON" ;
+	private static final String JAVA       = "JAVA" ;
+	private static final String CSHARP     = "C#" ;
+	private static final String GO         = "GO" ;
 	
-	private String _entityClassNamePrefix = "" ;
-	private String _entityClassNameSuffix = "" ;
+	private static final String TYPESCRIPT = "TYPESCRIPT" ;
+	private static final String JAVASCRIPT = "JAVASCRIPT" ;
+	private static final String PYTHON     = "PYTHON" ;
 	
-	private String _language = "Java" ; // v 3.0.0
+	private String entityClassNamePrefix = "" ;
+	private String entityClassNameSuffix = "" ;
+	
+	private String language = "Java" ; // v 3.0.0
 	
 	//-------------------------------------------------------------------------------------
 	// CONSTRUCTOR
@@ -77,7 +81,7 @@ public class EnvInContext {
 		since = "2.1.0"
 			)
 	public void setEntityClassNamePrefix( String prefix ) {
-		_entityClassNamePrefix = prefix ;
+		this.entityClassNamePrefix = prefix ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -92,7 +96,7 @@ public class EnvInContext {
 		since = "2.1.0"
 			)
 	public String getEntityClassNamePrefix() {
-		return _entityClassNamePrefix;
+		return this.entityClassNamePrefix;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -110,7 +114,7 @@ public class EnvInContext {
 		since = "2.1.0"
 			)
 	public void setEntityClassNameSuffix( String suffix ) {
-		_entityClassNameSuffix = suffix ;
+		this.entityClassNameSuffix = suffix ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -125,14 +129,14 @@ public class EnvInContext {
 		since = "2.1.0"
 			)
 	public String getEntityClassNameSuffix() {
-		return _entityClassNameSuffix;
+		return this.entityClassNameSuffix;
 	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Set the language for the current code generation",
-			"Supported languages are 'Java', 'C#', 'Python', 'JavaScript', 'TypeScript',  ",
+			"Supported languages are 'Java', 'C#', 'Go', 'Python', 'JavaScript', 'TypeScript',  ",
 			"( the default language is 'Java' )",
 			"This information is used dermine language peculiarities like types and literal values"
 			},
@@ -147,7 +151,7 @@ public class EnvInContext {
 			)
 	public void setLanguage( String language ) throws GeneratorException {
 		checkLanguageValidity(language);
-		_language = language ;
+		this.language = language ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -162,7 +166,7 @@ public class EnvInContext {
 		since = "3.0.0"
 			)
 	public String getLanguage() {
-		return _language;
+		return language;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -170,6 +174,7 @@ public class EnvInContext {
 		String languageUC = language.toUpperCase() ;
 		if ( JAVA.equals(languageUC) ) return ;
 		if ( CSHARP.equals(languageUC) ) return ;
+		if ( GO.equals(languageUC) ) return ;
 		if ( TYPESCRIPT.equals(languageUC) ) return ;
 		if ( JAVASCRIPT.equals(languageUC) ) return ;
 		if ( PYTHON.equals(languageUC) ) return ;
@@ -183,12 +188,15 @@ public class EnvInContext {
 	 * @since ver 3.0.0
 	 */
 	protected TypeConverter getTypeConverter()  {
-		String languageUC = this._language.toUpperCase() ;
+		String languageUC = this.language.toUpperCase() ;
 		if ( JAVA.equals(languageUC) ) {
 			return new TypeConverterForJava() ;
 		}
 		else if ( CSHARP.equals(languageUC) ) {
 			return new TypeConverterForCSharp() ; 
+		}
+		else if ( GO.equals(languageUC) ) {
+			return new TypeConverterForGo() ; 
 		}
 		else if ( TYPESCRIPT.equals(languageUC) ) {
 			return new TypeConverterForTypeScript() ;
@@ -211,12 +219,15 @@ public class EnvInContext {
 	 * @since ver 3.0.0
 	 */
 	protected LiteralValuesProvider getLiteralValuesProvider()  {
-		String languageUC = this._language.toUpperCase() ;
+		String languageUC = this.language.toUpperCase() ;
 		if ( JAVA.equals(languageUC) ) {
 			return new LiteralValuesProviderForJava() ;
 		}
 		else if ( CSHARP.equals(languageUC) ) {
 			return new LiteralValuesProviderForCSharp() ;
+		}
+		else if ( GO.equals(languageUC) ) {
+			return new LiteralValuesProviderForGo() ;
 		}
 		else if ( JAVASCRIPT.equals(languageUC) ) {
 			return new LiteralValuesProviderForJavaScript() ;
