@@ -1,4 +1,0 @@
-
-System.out.println( byte.class.getCanonicalName() );
-System.out.println( Byte.class.getCanonicalName() );
-System.out.println( byte[].class.getCanonicalName() );
