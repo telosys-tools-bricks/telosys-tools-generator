@@ -46,15 +46,8 @@ import org.telosys.tools.generator.engine.GeneratorContext;
 //-------------------------------------------------------------------------------------
 public class FnInContext {
 
-//	private final VelocityContext _velocityContext ;
 	private final GeneratorContext _generatorContext ;
 	private final EnvInContext     _env ;
-	
-	
-//	public Fn(VelocityContext velocityContext) {
-//		super();
-//		this._velocityContext = velocityContext;
-//	}
 	
 	/**
 	 * Constructor
@@ -178,7 +171,7 @@ public class FnInContext {
 			parameters = { "n : the number of tabulations to be returned" }
 			)
 	public String tab(int n) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for ( int i = 0 ; i < n ; i++ ) {
 			sb.append("\t");
 		}
@@ -208,7 +201,7 @@ public class FnInContext {
 			return sb.toString();
 		} 
 		else {
-			return "null" ;
+			return "" ;
 		}
 	}
 	
@@ -219,26 +212,63 @@ public class FnInContext {
 			},
 		example={ 
 			"$fn.argumentsListWithType( $entity.attributes )",
-			"Returns : 'int id, String firstName, String lastName, int age' "},
+			"Result example for Java language : 'int id, String firstName, String lastName, int age' ",
+			"Result example for Go language : 'id int32, firstName string, lastName string, age uint' "},
 		parameters = { "fields : list of fields to be added in the arguments list" },
 		since = "2.0.5"
 			)
 	public String argumentsListWithType( List<AttributeInContext> fieldsList )  {
 		if ( fieldsList != null ) {
-			StringBuilder sb = new StringBuilder();
-			int n = 0 ;
-			for ( AttributeInContext field : fieldsList ) {
-				if ( n > 0 ) sb.append(", ");
-				sb.append( field.getType() ) ;
-				sb.append( " " ) ;
-				sb.append( field.getName() ) ;
-				n++;
+			if ( _env.languageIsGo() ) {
+				// Specific order for Go : "name type"
+				return argumentsListWithTypeAfterArg(fieldsList);
 			}
-			return sb.toString();
+			else {
+				// Standard order for other languages : "type name"
+				return argumentsListWithTypeBeforeArg(fieldsList);
+			}
 		} 
 		else {
-			return "null" ;
+			return "" ;
 		}
+	}
+
+	/**
+	 * Returns a list of arguments with the type BEFORE the argument name<br>
+	 * Standard syntax for most languages
+	 * @param fieldsList
+	 * @return
+	 */
+	private String argumentsListWithTypeBeforeArg( List<AttributeInContext> fieldsList )  {
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext field : fieldsList ) {
+			if ( n > 0 ) sb.append(", ");
+			sb.append( field.getType() ) ;
+			sb.append( " " ) ;
+			sb.append( field.getName() ) ;
+			n++;
+		}
+		return sb.toString();
+	}
+	
+	/**
+	 * Returns a list of arguments with the type AFTER the argument name<br>
+	 * Typically for GoLang
+	 * @param fieldsList
+	 * @return
+	 */
+	private String argumentsListWithTypeAfterArg( List<AttributeInContext> fieldsList )  {
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext field : fieldsList ) {
+			if ( n > 0 ) sb.append(", ");
+			sb.append( field.getName() ) ;
+			sb.append( " " ) ;
+			sb.append( field.getType() ) ;
+			n++;
+		}
+		return sb.toString();
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -252,21 +282,29 @@ public class FnInContext {
 		parameters = { "fields : list of fields to be added in the arguments list" },
 		since = "3.0.0"
 			)
-	public String argumentsListWithWrapperType( List<AttributeInContext> fieldsList )  {
-		if ( fieldsList != null ) {
-			StringBuilder sb = new StringBuilder();
-			int n = 0 ;
-			for ( AttributeInContext field : fieldsList ) {
-				if ( n > 0 ) sb.append(", ");
-				sb.append( field.getWrapperType() ) ; // Wrapper type 
-				sb.append( " " ) ;
-				sb.append( field.getName() ) ; // Name
-				n++;
+	public String argumentsListWithWrapperType( List<AttributeInContext> attributesList )  {
+		if ( attributesList != null ) {
+			if ( _env.languageIsGo() ) {
+				// Specific order for Go : "name type"
+				// No wrapper type for go : reuse function for standard types
+				return argumentsListWithTypeAfterArg(attributesList);
 			}
-			return sb.toString();
+			else {
+				// Standard order for other languages : "wrapper_type name"
+				StringBuilder sb = new StringBuilder();
+				int n = 0 ;
+				for ( AttributeInContext attribute : attributesList ) {
+					if ( n > 0 ) sb.append(", ");
+					sb.append( attribute.getWrapperType() ) ; // attribute wrapper type 
+					sb.append( " " ) ;
+					sb.append( attribute.getName() ) ; // attribute name
+					n++;
+				}
+				return sb.toString();
+			}
 		} 
 		else {
-			return "null" ;
+			return "" ;
 		}
 	}
 	
@@ -298,7 +336,7 @@ public class FnInContext {
 			return sb.toString();
 		} 
 		else {
-			return "null" ;
+			return "" ;
 		}
 	}
 	
@@ -403,7 +441,7 @@ public class FnInContext {
 			since = "2.0.7"
 				)
 	public List<?> concatLists(List<?> list1, List<?> list2)  {
-		List<Object> finalList = new LinkedList<Object>();
+		List<Object> finalList = new LinkedList<>();
 		finalList.addAll(list1);
 		finalList.addAll(list2);
 		return finalList ;
@@ -462,7 +500,6 @@ public class FnInContext {
 			since = "2.1.0"
 			)
 	public boolean isDefined(String objectName) {
-//		Object o = _velocityContext.get(objectName);
 		Object o = _generatorContext.get(objectName);
 		return ( o != null );
 	}
@@ -481,7 +518,6 @@ public class FnInContext {
 			)
 	@VelocityReturnType("Any kind of object ")
 	public Object get(String objectName, Object defaultValue) {
-//		Object o = _velocityContext.get(objectName);
 		Object o = _generatorContext.get(objectName);
 		return ( o != null ? o : defaultValue );
 	}
@@ -556,8 +592,6 @@ public class FnInContext {
 			since = "2.1.1"
 			)
 	public ValuesInContext buildValues(final List<AttributeInContext> attributes, final int step) {
-		// TODO : change the "values builder" according with the current targeted language ( $ENV )
-		// return new ValuesInContextForJava( attributes, step ) ;
 		return new ValuesInContext( attributes, step, _env ) ;
 	}	
 	
@@ -599,7 +633,7 @@ public class FnInContext {
 			since = "3.0.0"
 			)
 	public List<Integer> buildIntValues(final int n, final int firstValue) {
-		List<Integer> values = new ArrayList<Integer>();
+		List<Integer> values = new ArrayList<>();
 		int currentValue = firstValue ;
 		for ( int i = 0 ; i < n ; i++ ) {
 			values.add( Integer.valueOf(currentValue) );

@@ -181,6 +181,22 @@ public class EnvInContext {
 		// Unknown language
 		throw new GeneratorException("Unknown language '" + language + "'");
 	}
+	
+	/**
+	 * Returns TRUE if the current language is Java
+	 * @return
+	 */
+	protected boolean languageIsJava() {
+		return JAVA.equalsIgnoreCase(this.language) ;
+	}
+	/**
+	 * Returns TRUE if the current language is GoLang
+	 * @return
+	 */
+	protected boolean languageIsGo() {
+		return GO.equalsIgnoreCase(this.language) ;
+	}
+	
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Returns the TypeConverter corresponding to the current language
