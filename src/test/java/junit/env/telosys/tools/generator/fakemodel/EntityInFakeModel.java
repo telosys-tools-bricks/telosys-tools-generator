@@ -42,13 +42,6 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 {
 	private static final long serialVersionUID = 1L;
 
-	private String databaseTable ;
-	
-	private String databaseCatalog ; 
-	
-	private String databaseSchema ;  // v 3.0.0
-
-	private String databaseType ; // v 2.0.7 #LGU
 	
 	private String className ; // v 3.0.0
 	
@@ -58,6 +51,11 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 
 	private Hashtable<String,Link>       links       = new Hashtable<String,Link>() ;
 
+	private String databaseTable ;
+	private String databaseCatalog ; 
+	private String databaseSchema ;  // v 3.0.0
+	private String databaseType ; // v 2.0.7 #LGU
+	private String databaseComment = "" ; // v 3.0.3
 	
 	/**
 	 * Default constructor 
@@ -113,17 +111,6 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 
 	//--------------------------------------------------------------------------
 	
-//	/**
-//	 * Returns the name of the entity ( i.e. the database table name )
-//	 * @return
-//	 */
-//	public String getName() {
-//		return name;
-//	}
-//	public void setName(String name) {
-//		this.name = name;
-//	}
-	
 	@Override
 	public String getDatabaseTable() {
 		return this.databaseTable;
@@ -133,24 +120,6 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 	}
 	
 	//--------------------------------------------------------------------------
-	
-//	/**
-//	 * Returns the database schema of the entity 
-//	 * @return
-//	 * @since 1.0
-//	 */
-//	public String getSchema() {
-//		return schema;
-//	}
-//	/**
-//	 * Set the database schema of the entity 
-//	 * @param s
-//	 * @since 1.0
-//	 */
-//	public void setSchema(String s) {
-//		this.schema = s;
-//	}
-
 	@Override
 	public String getDatabaseSchema() {
 		return this.databaseSchema ;
@@ -162,10 +131,8 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 	public void setDatabaseSchema(String s) {
 		this.databaseSchema = s;
 	}
-
 	
 	//--------------------------------------------------------------------------
-	
 	/**
 	 * Returns the database type of the entity ( "TABLE", "VIEW", ... )
 	 * @return
@@ -174,7 +141,6 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 	public String getDatabaseType() {
 		return databaseType;
 	}
-
 	/**
 	 * Set the database type of the entity ( "TABLE", "VIEW", ... )
 	 * @param s
@@ -201,27 +167,10 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 	}
 	
 	//--------------------------------------------------------------------------
-	
-//	/**
-//	 * Returns the database catalog of the entity 
-//	 * @return
-//	 */
-//	public String getCatalog() {
-//		return catalog ;
-//	}
-//	/**
-//	 * Set the database catalog of the entity 
-//	 * @param s
-//	 */
-//	public void setCatalog(String s) {
-//		this.catalog = s;
-//	}
-	
 	@Override
 	public String getDatabaseCatalog() {
 		return this.databaseCatalog;
 	}
-
 	/**
 	 * Set the database catalog 
 	 * @param s
@@ -229,23 +178,14 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 	public void setDatabaseCatalog(String s) {
 		this.databaseCatalog = s;
 	}
-
+	
+	//--------------------------------------------------------------------------
+	@Override
+	public String getDatabaseComment() {
+		return databaseComment;
+	}
 
 	//--------------------------------------------------------------------------
-	
-//	/**
-//	 * Returns the short name of the VO bean Java Class ( without the package ) 
-//	 * Example : "Book" or "BookVO"
-//	 * @return
-//	 */
-//	public String getBeanJavaClass() {
-//		return beanJavaClass;
-//	}
-//
-//	public void setBeanJavaClass(String beanJavaClass) {
-//		this.beanJavaClass = beanJavaClass;
-//	}
-	
 	@Override
 	public String getClassName() {
 		return this.className;
@@ -344,19 +284,6 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 		return array ;
 	}
 	
-//	/**
-//	 * Returns a collection of all the foreign keys of the entity (table).<br>
-//	 * The foreign keys are sorted by name.
-//	 * @return
-//	 */
-//	public Collection<ForeignKey> getForeignKeysCollection()
-//	{
-//		//return foreignKeys.values() ;
-//		ForeignKey[] array = getForeignKeys();
-//		return Arrays.asList(array);
-//		
-//	}
-	
 	public void storeForeignKey(ForeignKey foreignKey)
 	{
 		foreignKeys.put(foreignKey.getName(), foreignKey);
@@ -425,15 +352,6 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 		return selectedLinks;
 	}
 	
-//	/**
-//	 * Returns all the links of the entity
-//	 * @return
-//	 */
-//	public Collection<Link> getLinksCollection()
-//	{
-//		return links.values() ;
-//	}
-//	
 	/**
 	 * Store (add or update the given link)
 	 * @param link
@@ -497,15 +415,6 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 
 	@Override
 	public String toString() {
-//		return  name 
-//				+ "|"  + catalog 
-//				+ "|"   + schema 
-//				+ "|" + databaseType
-//				+ "|" + beanJavaClass 
-//				+ "|columns=" + columns.size()
-//				+ "|foreignKeys=" + foreignKeys.size() 
-//				+ "|links=" + links.size() 
-//				;
 		return  className 
 				+ "|" + databaseTable
 				+ "|" + databaseCatalog 
@@ -516,6 +425,5 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 				+ "|links=" + links.size() 
 				;
 	}
-
 
 }

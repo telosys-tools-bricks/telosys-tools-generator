@@ -28,15 +28,21 @@ public class FakeEntity implements Entity {
 
 	private String className;
 	private String packageName;
+	
 	private List<Attribute> attributes = new ArrayList<Attribute>();
-	private String databaseCatalog;
+	
 	private List<ForeignKey> databaseForeignKeys = new ArrayList<ForeignKey>();
-	private String databaseSchema;
+	
 	private String databaseTable;
+	private String databaseCatalog;
+	private String databaseSchema;
 	private String databaseType;
+	private String databaseComment = "";
+	
+	
 	private String fullName;
 	private List<Link> links = new ArrayList<Link>();
-	private String _package;
+//	private String _package;
 	private Boolean tableType;
 	private Boolean viewType;
 
@@ -94,6 +100,12 @@ public class FakeEntity implements Entity {
 	public void setDatabaseType(String databaseType) {
 		this.databaseType = databaseType;
 	}
+	//--------------------------------------------------------------------------
+	@Override
+	public String getDatabaseComment() {
+		return this.databaseComment;
+	}
+	
 	public String getFullName() {
 		return fullName;
 	}
@@ -106,12 +118,12 @@ public class FakeEntity implements Entity {
 	public void setLinks(List<Link> links) {
 		this.links = links;
 	}
-	public String getPackage() {
-		return _package;
-	}
-	public void setPackage(String _package) {
-		this._package = _package;
-	}
+//	public String getPackage() {
+//		return _package;
+//	}
+//	public void setPackage(String _package) {
+//		this._package = _package;
+//	}
 	public Boolean isTableType() {
 		return tableType;
 	}
