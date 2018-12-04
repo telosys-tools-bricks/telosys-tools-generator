@@ -89,6 +89,9 @@ public class GenerationContextTest {
 		EntityInContext book = model.getEntityByClassName("Book");
 		assertNotNull(book);
 		assertEquals("BOOK", book.getDatabaseTable() );
+		assertEquals("", book.getDatabaseComment() );
+		assertEquals("", book.getDatabaseCatalog() );
+		
 		assertEquals(10, book.getAttributesCount() );
 		book.getKeyAttributesCount() ;
 		book.getNonKeyAttributesCount();
