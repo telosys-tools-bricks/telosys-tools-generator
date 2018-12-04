@@ -60,9 +60,9 @@ import org.telosys.tools.generic.model.Link;
 public class EntityInContext 
 {
 	//--- Static void lists
-	private final static List<AttributeInContext>  VOID_ATTRIBUTES_LIST    = new LinkedList<AttributeInContext>();
-	private final static List<ForeignKeyInContext> VOID_FOREIGN_KEYS_LIST  = new LinkedList<ForeignKeyInContext>();
-	private final static List<LinkInContext>       VOID_LINKS_LIST         = new LinkedList<LinkInContext>();
+	private static final List<AttributeInContext>  VOID_ATTRIBUTES_LIST    = new LinkedList<>();
+	private static final List<ForeignKeyInContext> VOID_FOREIGN_KEYS_LIST  = new LinkedList<>();
+	private static final List<LinkInContext>       VOID_LINKS_LIST         = new LinkedList<>();
 	
 	private final String     _sClassName ;
 	private final String     _sPackage ;
@@ -71,6 +71,7 @@ public class EntityInContext
     private final String     _sDatabaseCatalog  ; // The table's catalog 
     private final String     _sDatabaseSchema   ; // The table's schema 
     private final String     _sDatabaseType     ; // The table's type "table" or "view" 
+    private final String     _sDatabaseComment  ; // The table's database comment  (since ver 3.1.0 )
     
 	private final LinkedList<AttributeInContext> _attributes ; // The attributes for this class ( ALL ATTRIBUTES )
 	private LinkedList<AttributeInContext>  _keyAttributes     = null ; // The KEY attributes for this class
@@ -112,6 +113,8 @@ public class EntityInContext
 		_sDatabaseSchema  = StrUtil.notNull(entity.getDatabaseSchema()); // v 3.0.0
 		
 		_sDatabaseType    = StrUtil.notNull(entity.getDatabaseType()); // ver 2.0.7
+
+		_sDatabaseComment   = StrUtil.notNull(entity.getDatabaseComment()); // v 3.1.0
 		
 		//--- Initialize all the ATTRIBUTES for the current entity
 		_attributes = new LinkedList<>();
@@ -828,6 +831,19 @@ public class EntityInContext
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
+			"Returns the database comment of the table mapped with this entity <br>",
+			""
+		},
+		example="$entity.databaseComment",
+		since="3.1.0"
+	)
+	public String getDatabaseComment() 
+	{
+		return _sDatabaseComment ;
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
 			"Returns the attributes NOT tagged as 'long text' for this entity",
 			"( 'standard attributes' )"
 		},
@@ -996,7 +1012,7 @@ public class EntityInContext
 		since="2.1.0"
 	)
     public List<String> referencedEntityTypes(List<AttributeInContext> attributes) throws GeneratorException {
-		List<String> referencedEntityTypes = new LinkedList<String>();
+		List<String> referencedEntityTypes = new LinkedList<>();
 		for ( AttributeInContext attribute : attributes ) {
 			//--- Is this attribute involved in a link ?
 			for( LinkInContext link : this.getLinks()  ) {
