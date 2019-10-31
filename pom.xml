@@ -3,17 +3,17 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
+	<!-- REFERENCE TO PARENT POM.XML -->
     <parent>
         <groupId>org.telosys</groupId>
         <artifactId>telosys-tools-parent</artifactId>
-		<!-- <version>3.0.0-SNAPSHOT</version> -->
-        <version>3.x.x</version>
-        <relativePath>../telosys-tools-parent/pom.xml</relativePath>
+		<version>3.x.x</version>   <!-- parent version is "3.x.x"-->   
+		<relativePath>../telosys-tools-parent/pom.xml</relativePath>
     </parent>
 
 	<name>telosys-tools-generator</name>
 	<artifactId>telosys-tools-generator</artifactId>
-	<version>${telosys-tools-generator.version}</version>	
+	<version>${telosys-tools-generator.version}</version>	<!-- VERSION DEFINED IN PARENT POM.XML --> 
 	<packaging>jar</packaging>
 
 	<dependencies>

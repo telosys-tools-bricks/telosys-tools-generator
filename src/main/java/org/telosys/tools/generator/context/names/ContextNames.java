@@ -70,7 +70,7 @@ public class ContextNames {
 		GENERATOR_OBJECTS_LIST.add( ContextName.JAVA ); // ver 2.0.7
 		GENERATOR_OBJECTS_LIST.add( ContextName.JPA ); // ver 2.0.7
 		GENERATOR_OBJECTS_LIST.add( ContextName.BEAN_VALIDATION ); // ver 2.0.7
-		GENERATOR_OBJECTS_LIST.add( ContextName.GENERATION );  // ver 2.1.0
+//		GENERATOR_OBJECTS_LIST.add( ContextName.GENERATION );  // ver 2.1.0  - REMOVED in ver 3.0.0
 		GENERATOR_OBJECTS_LIST.add( ContextName.GENERATOR ); 
 		GENERATOR_OBJECTS_LIST.add( ContextName.LOADER );
 		GENERATOR_OBJECTS_LIST.add( ContextName.PROJECT );
