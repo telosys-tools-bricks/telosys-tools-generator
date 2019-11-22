@@ -35,11 +35,17 @@ public class HtmlInContext {
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
-			text={	
-				"Returns the HTML5 'type' attribute for 'input' tag ",
-				"The 'type' is determinded from the 'input type' if any or computed from the model type ",
-				"e.g : type='text', type='number', type='date', type='time', etc "
-				}
+		text={	
+			"Returns the HTML5 'type' attribute for 'input' tag ",
+			"The 'type' is determinded from the 'input type' if any or computed from the model type ",
+			"e.g : type='text', type='number', type='date', type='time', etc "
+			},
+		parameters = { 
+				"attribute : the attribute holding the 'type' information "
+			},
+		example = {
+				"$html.type($attribute) " 
+			}
 		)
     public String type( AttributeInContext attribute ) {
 		String type = attribute.getInputType() ; // by default
@@ -87,11 +93,17 @@ public class HtmlInContext {
     
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
-			text={	
-				"Returns the HTML5 'maxlength' attribute if any or if computable from type",
-				"(else returns a void string)",
-				"e.g : maxlength='20' "
-				}
+		text={	
+			"Returns the HTML5 'maxlength' attribute if any or if computable from type",
+			"(else returns a void string)",
+			"e.g : maxlength='20' "
+			},
+		parameters = { 
+				"attribute : the attribute holding the 'maxlength' information "
+			},
+		example = {
+				"$html.maxlength($attribute) " 
+			}
 		)
     public String maxlength( AttributeInContext attribute ) {
 		String maxlengthValue = attribute.getMaxLength();
@@ -125,6 +137,12 @@ public class HtmlInContext {
 		text={	
 			"Returns the HTML5 'min' attribute for minimum values (or void if none)",
 			"e.g : min='10' "
+			},
+		parameters = { 
+				"attribute : the attribute holding the 'min' information "
+			},
+		example = {
+				"$html.min($attribute) " 
 			}
 	)
     public String min( AttributeInContext attribute ) {
@@ -140,6 +158,12 @@ public class HtmlInContext {
 		text={	
 			"Returns the HTML5 'max' attribute for maximum values (or void if none)",
 			"e.g : max='10' "
+			},
+		parameters = { 
+				"attribute : the attribute holding the 'max' information "
+			},
+		example = {
+				"$html.max($attribute) " 
 			}
 	)
     public String max( AttributeInContext attribute ) {

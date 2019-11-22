@@ -159,57 +159,112 @@ public class ValuesInContext {
 	@VelocityMethod(
 		text={	
 			"Returns a string containing ALL the literal values in JSON format. ",
-			"NB : this method is usable only with 'JAVASCRIPT values'.",
+//			"NB : this method is usable only with 'JAVASCRIPT values'.",
 			"e.g. : '{\"id\":1, \"name\":\"AAAA\"} ",
-			" ",
-			"Usage examples in Velocity template :",
-			" $values.toJSON()  ",
-			" $values.toJSON(\"${NEWLINE}\")  ",
-			" $values.toJSON(\"${NEWLINE}${TAB}\", \"${NEWLINE}\")  ",
 			" "
-			},
-		parameters = { 
-			"separator1 : the separator to be put before each value (optional) ",
-			"separator2 : the separator to be put before the ending '}' (optional) "
-			},
+		},
+		example = {
+			"$values.toJSON() " 
+		},
 		since = "3.0.0"
 	)
 	public String toJSON() {
 		return buildJSON(attributeNames, null, null);
 	}
+
+	//----------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing ALL the literal values in JSON format. "
+		},
+		parameters = { 
+			"separator : the separator to be put before each value "
+		},
+		example = {
+			"$values.toJSON( \"${NEWLINE}${TAB}\" ) " 
+		},
+		since = "3.0.0"
+	)
 	public String toJSON(String separator1) {
 		return buildJSON(attributeNames, separator1, null);
 	}
+
+	//----------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing ALL the literal values in JSON format. "
+		},
+		parameters = { 
+			"separator1 : the separator to be put before each value ",
+			"separator2 : the separator to be put before the ending '}' "
+		},
+		example = {
+			"$values.toJSON( \"${NEWLINE}${TAB}\", \"${NEWLINE}\" ) " 
+		},
+		since = "3.0.0"
+	)
 	public String toJSON(String separator1, String separator2) {
 		return buildJSON(attributeNames, separator1, separator2);
 	}
 
 	//----------------------------------------------------------------------------------------
 	@VelocityMethod(
-		text={	
+		text = {	
 			"Returns a string containing the literal values in JSON format for the given list of attributes. ",
-			"NB : this method is usable only with 'JAVASCRIPT values'.",
+//			"NB : this method is usable only with 'JAVASCRIPT values'.",
 			"e.g. : '{\"id\":1, \"name\":\"AAAA\"} ",
-			" ",
-			"Usage example in Velocity template :",
-			" $values.toJSON($entity.attributes) ",
-			" $values.toJSON($entity.attributes, \"${NEWLINE}\")  ",
-			" $values.toJSON($entity.attributes, \"${NEWLINE}${TAB}\", \"${NEWLINE}\")  ",
-			" "
-			},
+//			" ",
+//			"Usage example in Velocity template :",
+//			" $values.toJSON($entity.attributes) ",
+//			" $values.toJSON($entity.attributes, \"${NEWLINE}\")  ",
+//			" $values.toJSON($entity.attributes, \"${NEWLINE}${TAB}\", \"${NEWLINE}\")  ",
+//			" "
+		},
 		parameters = { 
-			"attributes : list of attributes to be put in the JSON string ",
-			"separator1 : the separator to be put before each value (optional) ",
-			"separator2 : the separator to be put before the ending '}' (optional) "
-			},
+			"attributes : list of attributes to be put in the JSON string "
+		},
+		example = {
+			"$values.toJSON( $entity.attributes ) " 
+		},
 		since = "3.0.0"
 	)
 	public String toJSON(List<AttributeInContext> attributes ) {
 		return buildJSON(buildNames(attributes), null, null);
 	}
+	
+	//----------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing the literal values in JSON format for the given list of attributes. ",
+		},
+		parameters = { 
+			"attributes : list of attributes to be put in the JSON string ",
+			"separator  : the separator to be put before each value "
+		},
+		example = {
+			"$values.toJSON( $entity.attributes, \"${NEWLINE}${TAB}\" ) " 
+		},
+		since = "3.0.0"
+	)
 	public String toJSON(List<AttributeInContext> attributes, String separator1) {
 		return buildJSON(buildNames(attributes), separator1, null);
 	}
+
+	//----------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing the literal values in JSON format for the given list of attributes. ",
+		},
+		parameters = { 
+			"attributes : list of attributes to be put in the JSON string ",
+			"separator1 : the separator to be put before each value ",
+			"separator2 : the separator to be put before the ending '}' "
+		},
+		example = {
+			"$values.toJSON( $entity.attributes, \"${NEWLINE}${TAB}\", \"${NEWLINE}\" ) " 
+		},
+		since = "3.0.0"
+	)
 	public String toJSON(List<AttributeInContext> attributes, String separator1, String separator2) {
 		return buildJSON(buildNames(attributes), separator1, separator2);
 	}

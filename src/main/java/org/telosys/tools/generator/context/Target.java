@@ -176,22 +176,25 @@ public class Target
 	}
 	
 	@VelocityMethod(
-			text={	
-				"Forces the entity name (to change dynamically the entity name)",
-				"If a forced name has been defined it will be used as the 'BEANNAME' to build the target file name",
-				"Returns a void string (so that it can be used easily in the template)"
-				}
-		)
+		text = {
+			"Forces the entity name (to change dynamically the entity name)",
+			"If a forced name has been defined it will be used as the 'BEANNAME' to build the target file name",
+			"Returns a void string (so that it can be used easily in the template)"
+		},
+		parameters = {
+			"forcedName : the new entity name"
+		}
+	)
 	public String forceEntityName(String forcedName) {
 		this.forcedEntityName = forcedName ;
 		return "" ;
 	}
 
 	@VelocityMethod(
-			text={	
-				"Returns the 'forced entity name' (or '' if none)"
-				}
-		)
+		text={	
+			"Returns the 'forced entity name' (or '' if none)"
+			}
+	)
 	public String getForcedEntityName() {
 		return forcedEntityName != null ? forcedEntityName : "" ;
 	}
@@ -199,11 +202,11 @@ public class Target
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
-		text={	
+		text = {	
 			"Returns the Java package corresponding to the file path after removing the given source folder "
-			},
+		},
 		parameters = {
-				"srcFolder : the source folder (the beginning of path to be removed to get the package folder)"
+			"srcFolder : the source folder (the beginning of path to be removed to get the package folder)"
 		},
 		example = {
 			"package ${target.javaPackageFromFolder($SRC)};"
