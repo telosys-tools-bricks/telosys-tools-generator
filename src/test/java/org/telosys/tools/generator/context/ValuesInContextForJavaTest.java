@@ -243,8 +243,8 @@ public class ValuesInContextForJavaTest {
 		checkCompareValue(values, "book", num2,        "book.getNum2().equals(Double.valueOf(1000.66D))"); 
 		
 		assertEquals("decimal", dec.getNeutralType() );
-		checkValue(values, "dec",      "java.math.BigDecimal.valueOf(10000)") ;
-		checkCompareValue(values, "book", dec,        "book.getDec().equals(java.math.BigDecimal.valueOf(10000))"); 
+		checkValue(values, "dec",      "java.math.BigDecimal.valueOf(10000.77)") ;
+		checkCompareValue(values, "book", dec,        "book.getDec().equals(java.math.BigDecimal.valueOf(10000.77))"); 
 		BigDecimal foo = new BigDecimal(2.3);
 		assertTrue ( foo.equals((new BigDecimal(2.3))) ) ;
 		

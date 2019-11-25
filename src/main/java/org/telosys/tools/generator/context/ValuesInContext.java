@@ -25,6 +25,7 @@ import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.types.LanguageType;
+import org.telosys.tools.generic.model.types.LiteralValue;
 import org.telosys.tools.generic.model.types.LiteralValuesProvider;
 
 /**
@@ -60,7 +61,9 @@ public class ValuesInContext {
 	
 	private final LiteralValuesProvider  literalValuesProvider ;
 	private final LinkedList<String>     attributeNames ; // to keep the original list order
-	private final Map<String, String>    values ; // attribute name --> java literal value
+//	private final Map<String, String>    values ; // attribute name --> java literal value
+	private final Map<String, LiteralValue> values ; // attribute name --> literal value
+	
 	private final String                 nullLiteral ;
 	
 	//----------------------------------------------------------------------------------------
@@ -72,23 +75,21 @@ public class ValuesInContext {
 	 */
 	protected ValuesInContext( List<AttributeInContext> attributes, int step, EnvInContext env ) {
 		
-		// this.literalValuesProvider = new LiteralValuesProviderForJava() ; 
 		this.literalValuesProvider = env.getLiteralValuesProvider() ; 
 		
-		values = new HashMap<String, String>();
-		attributeNames = new LinkedList<String>();
+		values = new HashMap<>();
+		attributeNames = new LinkedList<>();
 		
 		for ( AttributeInContext attrib : attributes ) {
 			// Generates and stores the literal value
-			//_values.put ( attrib.getName() , generateLiteralValue(attrib, step)  ) ;
 			LanguageType languageType = attrib.getLanguageType() ;
 			int maxLength = StrUtil.getInt(attrib.getMaxLength(), 1) ;
-			String literalValue = literalValuesProvider.generateLiteralValue(languageType, maxLength, step);
+			//String literalValue = literalValuesProvider.generateLiteralValue(languageType, maxLength, step);
+			LiteralValue literalValue = literalValuesProvider.generateLiteralValue(languageType, maxLength, step);
 			values.put ( attrib.getName(), literalValue ) ;
 			// Keep the attribute name
 			attributeNames.add( attrib.getName() );
 		}
-		//this.nullLiteral = nullLiteral ;
 		this.nullLiteral = literalValuesProvider.getLiteralNull() ;
 	}
 	
@@ -119,9 +120,16 @@ public class ValuesInContext {
 		since = "3.0.0"
 	)
 	public String getValue(String attributeName) {
-		String value = values.get(attributeName) ;
-		if ( value != null ) {
-			return value;
+//		String value = values.get(attributeName) ;
+//		if ( value != null ) {
+//			return value;
+//		}
+//		else {
+//			return nullLiteral ;
+//		}
+		LiteralValue literalValue = values.get(attributeName) ;
+		if ( literalValue != null ) {
+			return literalValue.getCurrentLanguageValue();
 		}
 		else {
 			return nullLiteral ;
@@ -270,7 +278,7 @@ public class ValuesInContext {
 	}
 
 	private List<String> buildNames(List<AttributeInContext> attributes) {
-		List<String> names = new LinkedList<String>() ;
+		List<String> names = new LinkedList<>() ;
 		for ( AttributeInContext attrib : attributes ) {
 			names.add(attrib.getName());
 		}
@@ -337,8 +345,10 @@ public class ValuesInContext {
 		sb.append( attribute.getGetter() ) ;
 		sb.append( "()" ) ;
 		
-		String value = values.get( attribute.getName() ) ; // Value for the given attribute
-
+//		String value = values.get( attribute.getName() ) ; // Value for the given attribute		
+		LiteralValue literalValue = values.get( attribute.getName() ) ; // Value for the given attribute
+		String value = literalValue.getCurrentLanguageValue();
+		
 		String equalsStatement = literalValuesProvider.getEqualsStatement(value, attribute.getLanguageType() );
 		
 		sb.append( equalsStatement ) ;
