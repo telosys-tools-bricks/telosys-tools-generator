@@ -59,6 +59,9 @@ import org.telosys.tools.generic.model.types.LiteralValuesProvider;
 //-------------------------------------------------------------------------------------
 public class ValuesInContext {
 	
+	private static final String JSON_SEPARATOR1 = "\n  " ;
+	private static final String JSON_SEPARATOR2 = "\n" ;
+			
 	private final LiteralValuesProvider  literalValuesProvider ;
 	private final LinkedList<String>     attributeNames ; // to keep the original list order
 //	private final Map<String, String>    values ; // attribute name --> java literal value
@@ -166,8 +169,49 @@ public class ValuesInContext {
 	//----------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns a string containing ALL the literal values in JSON format. ",
-//			"NB : this method is usable only with 'JAVASCRIPT values'.",
+			"Returns a string containing all the values in URI format (with '/' separator) ",
+			"e.g. : '/12/ABC",
+			" "
+		},
+		example = {
+			"$values.toURI() " 
+		},
+		since = "3.0.0"
+	)
+	public String toURI() {
+		return buildURI(attributeNames);
+	}
+	
+	//----------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing the given attributes values in URI format (with '/' separator) ",
+			"e.g. : '/12/ABC",
+			" "
+		},
+		example = {
+			"$values.toURI( $entity.keyAttributes ) " 
+		},
+		since = "3.0.0"
+	)
+	public String toURI(List<AttributeInContext> attributes) {
+		return buildURI(buildNames(attributes));
+	}
+	
+	//----------------------------------------------------------------------------------------
+	private String buildURI(List<String> names) {
+		StringBuilder sb = new StringBuilder();
+		for ( String name : names ) {
+			sb.append("/");
+			sb.append(getJSONValue(name));
+		}
+		return sb.toString();
+	}
+
+	//----------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a JSON string containing all the attributes with their literal values. ",
 			"e.g. : '{\"id\":1, \"name\":\"AAAA\"} ",
 			" "
 		},
@@ -178,6 +222,22 @@ public class ValuesInContext {
 	)
 	public String toJSON() {
 		return buildJSON(attributeNames, null, null);
+	}
+
+	//----------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a JSON string containing all the attributes with their literal values. ",
+			"The resulting JSON is formatted (one line for each attribute) ",
+			" "
+		},
+		example = {
+			"$values.toFormattedJSON() " 
+		},
+		since = "3.0.0"
+	)
+	public String toFormattedJSON() {
+		return buildJSON(attributeNames, JSON_SEPARATOR1 , JSON_SEPARATOR2);
 	}
 
 	//----------------------------------------------------------------------------------------
@@ -218,26 +278,39 @@ public class ValuesInContext {
 	//----------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text = {	
-			"Returns a string containing the literal values in JSON format for the given list of attributes. ",
-//			"NB : this method is usable only with 'JAVASCRIPT values'.",
+			"Returns a JSON string containing the given attributes with their literal values. ",
 			"e.g. : '{\"id\":1, \"name\":\"AAAA\"} ",
-//			" ",
-//			"Usage example in Velocity template :",
-//			" $values.toJSON($entity.attributes) ",
-//			" $values.toJSON($entity.attributes, \"${NEWLINE}\")  ",
-//			" $values.toJSON($entity.attributes, \"${NEWLINE}${TAB}\", \"${NEWLINE}\")  ",
-//			" "
+			" "
 		},
 		parameters = { 
 			"attributes : list of attributes to be put in the JSON string "
 		},
 		example = {
-			"$values.toJSON( $entity.attributes ) " 
+			"$values.toJSON( $entity.keyAttributes ) " 
 		},
 		since = "3.0.0"
 	)
 	public String toJSON(List<AttributeInContext> attributes ) {
 		return buildJSON(buildNames(attributes), null, null);
+	}
+	
+	//----------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a JSON string containing the given attributes with their literal values. ",
+			"The resulting JSON is formatted (one line for each attribute) ",
+			" "
+		},
+		parameters = { 
+			"attributes : list of attributes to be put in the JSON string "
+		},
+		example = {
+			"$values.toFormattedJSON( $entity.keyAttributes ) " 
+		},
+		since = "3.0.0"
+	)
+	public String toFormattedJSON(List<AttributeInContext> attributes ) {
+		return buildJSON(buildNames(attributes), JSON_SEPARATOR1 , JSON_SEPARATOR2);
 	}
 	
 	//----------------------------------------------------------------------------------------
@@ -250,7 +323,7 @@ public class ValuesInContext {
 			"separator  : the separator to be put before each value "
 		},
 		example = {
-			"$values.toJSON( $entity.attributes, \"${NEWLINE}${TAB}\" ) " 
+			"$values.toJSON( $entity.nonKeyAttributes, \"${NEWLINE}${TAB}\" ) " 
 		},
 		since = "3.0.0"
 	)
@@ -269,7 +342,7 @@ public class ValuesInContext {
 			"separator2 : the separator to be put before the ending '}' "
 		},
 		example = {
-			"$values.toJSON( $entity.attributes, \"${NEWLINE}${TAB}\", \"${NEWLINE}\" ) " 
+			"$values.toJSON( $entity.nonKeyAttributes, \"${NEWLINE}${TAB}\", \"${NEWLINE}\" ) " 
 		},
 		since = "3.0.0"
 	)
@@ -297,7 +370,7 @@ public class ValuesInContext {
 			}
 			sb.append("\"" + name + "\"" );
 			sb.append(":");
-			sb.append(getValue(name));
+			sb.append(getJSONValue(name));
 			n++ ;
 		}
 		if ( separator2 != null ) {
@@ -306,7 +379,25 @@ public class ValuesInContext {
 		sb.append("}");
 		return sb.toString();
 	}
-	
+	private String getJSONValue(String attributeName) {
+		LiteralValue literalValue = values.get(attributeName) ;
+		if ( literalValue != null ) {
+			Object value = literalValue.getBasicValue();
+			if ( value != null ) {
+				if ( value instanceof String ) {
+					return "\"" + value.toString() + "\"";
+				}
+				else if ( value instanceof java.util.Date ) {
+					return "null" ;
+				}
+				else {
+					return value.toString() ;
+				}
+			}
+		}
+		return "null" ;
+	}
+
 	//----------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	

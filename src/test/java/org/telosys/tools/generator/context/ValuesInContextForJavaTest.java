@@ -13,9 +13,11 @@ import junit.env.telosys.tools.generator.fakemodel.AttributeInFakeModel;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.telosys.tools.fake.generic.model.FakeAttribute;
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.context.ValuesInContext;
 import org.telosys.tools.generic.model.Attribute;
+import org.telosys.tools.generic.model.DateType;
 
 public class ValuesInContextForJavaTest {
 	
@@ -249,6 +251,14 @@ public class ValuesInContextForJavaTest {
 		assertTrue ( foo.equals((new BigDecimal(2.3))) ) ;
 		
 		checkValue(values, "inex",      "null") ;
+
+		System.out.println("---> values.toJSON() : \n" + values.toJSON());
+		System.out.println("---> values.toFormattedJSON() : \n" + values.toFormattedJSON());
+		System.out.println("---> values.toJSON(attributes) : \n" + values.toJSON(attributes));
+		System.out.println("---> values.toFormattedJSON(attributes) : \n" + values.toFormattedJSON(attributes));
+		System.out.println("---> values.toURI() : \n" + values.toURI());
+		System.out.println("---> values.toURI(attributes) : \n" + values.toURI(attributes));
+		System.out.println("----------" );
 	}
 
 	@Test
@@ -275,13 +285,26 @@ public class ValuesInContextForJavaTest {
 		attributes.add( buildAttributeInContext("age",       "short"     ) );
 		attributes.add( buildAttributeInContext("date1",     "date"      ) );
 		attributes.add( buildAttributeInContext("date2",     "date"      ) );
-
+		attributes.add( buildAttributeInContext("date2",     "date"      ) );
+		attributes.add( buildAttributeInContext("time1",     "time"      ) );
+		
+		FakeAttribute attrib = new FakeAttribute("time3", "time");
+		attrib.setDateType(DateType.TIME_ONLY);
+		attrib.setSqlTypeExpected(true);
+//		AttributeInContext attrib = buildAttributeInContext("time2",     "time"      ) ;
+		attributes.add( buildAttributeInContext(attrib) );
 		
 		ValuesInContext values = new ValuesInContext( attributes, 2, env );
 		
 		checkValue(values, "id",        "Integer.valueOf(200)") ;
 		checkValue(values, "firstName", buildString('B', 3)) ;
 		checkValue(values, "age",       "Short.valueOf((short)2)") ;
+
+		System.out.println("---> values.toJSON() : \n" + values.toJSON());
+		System.out.println("---> values.toFormattedJSON() : \n" + values.toFormattedJSON());
+		System.out.println("---> values.toJSON(attributes) : \n" + values.toJSON(attributes));
+		System.out.println("---> values.toFormattedJSON(attributes) : \n" + values.toFormattedJSON(attributes));
+		System.out.println("----------" );
 	}
 	
 	@Test
@@ -318,6 +341,12 @@ public class ValuesInContextForJavaTest {
 		checkValue(values, "flag1",     "Boolean.valueOf(true)") ;
 		checkValue(values, "flag2",     "Boolean.valueOf(true)") ;
 		checkValue(values, "byteVal",   "Byte.valueOf((byte)3)") ;
+
+		System.out.println("---> values.toJSON() : \n" + values.toJSON());
+		System.out.println("---> values.toFormattedJSON() : \n" + values.toFormattedJSON());
+		System.out.println("---> values.toJSON(attributes) : \n" + values.toJSON(attributes));
+		System.out.println("---> values.toFormattedJSON(attributes) : \n" + values.toFormattedJSON(attributes));
+		System.out.println("----------" );
 	}
 	
 	private void checkValue(ValuesInContext values, String attributeName, String expectedValue) {
@@ -336,6 +365,10 @@ public class ValuesInContextForJavaTest {
 	}
 	
 	//------------------------
+	private AttributeInContext buildAttributeInContext(Attribute attribute)  {
+		EnvInContext envInContext = getEnvInContext();
+		return new AttributeInContext(null, attribute, null, envInContext);
+	}
 	private AttributeInContext buildAttributeInContext(String attributeName, String neutralType)  {
 		EnvInContext envInContext = getEnvInContext();
 		Attribute attribute = buildAttribute(attributeName, neutralType);
