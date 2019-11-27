@@ -203,9 +203,19 @@ public class ValuesInContext {
 		StringBuilder sb = new StringBuilder();
 		for ( String name : names ) {
 			sb.append("/");
-			sb.append(getJSONValue(name));
+			sb.append(getBasicValue(name));
 		}
 		return sb.toString();
+	}
+	private String getBasicValue(String attributeName) {
+		LiteralValue literalValue = values.get(attributeName) ;
+		if ( literalValue != null ) {
+			Object value = literalValue.getBasicValue();
+			if ( value != null ) {
+				return value.toString() ;
+			}
+		}
+		return "null" ;
 	}
 
 	//----------------------------------------------------------------------------------------
