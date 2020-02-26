@@ -31,9 +31,8 @@ import org.telosys.tools.generic.model.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 import org.telosys.tools.generic.model.types.TypeConverter;
 
-
 /**
- * Context class for a BEAN ATTRIBUTE ( with or without database mapping )
+ * Context class for an ATTRIBUTE ( with or without database mapping )
  *  
  * @author Laurent GUERIN
  */
@@ -56,33 +55,20 @@ import org.telosys.tools.generic.model.types.TypeConverter;
 		
  )
 //-------------------------------------------------------------------------------------
-public class AttributeInContext 
-{
-//    public final static int NO_DATE_TYPE   = 0 ;
-//    public final static int DATE_ONLY      = 1 ;
-//    public final static int TIME_ONLY      = 2 ;
-//    public final static int DATE_AND_TIME  = 3 ;
-    
-    private final static String VOID_STRING  = "" ;
-    
-//    private final static String TYPE_INT  = "int" ;
-//    private final static String TYPE_NUM  = "num" ;
-//    private final static String TYPE_DATE = "date" ;
-//    private final static String TYPE_TIME = "time" ;
+public class AttributeInContext {
+	
+    private static final String VOID_STRING  = "" ;
     
 	private final EnvInContext     _env ; // ver 3.0.0
 
-	//--- 
     private final EntityInContext  _entity ; // The entity 
     
 	private final ModelInContext   _modelInContext ;  // v 3.0.0
 
     
-	//--- Basic minimal attribute info -------------------------------------------------
+	//--- Basic minimal attribute info ---------------------------------
 	private final String  _sName ;  // attribute name 
 	
-//	private final String  _sSimpleType ;  // Short java type without package, without blank, eg : "int", "BigDecimal", "Date"
-//	private final String  _sFullType ;    // Full java type with package, : "java.math.BigDecimal", "java.util.Date"
 	private final String  _sNeutralType ;    //v 3.0.0
 	private final AttributeTypeInfo attributeTypeInfo ; // v 3.0.0
 	
@@ -97,22 +83,22 @@ public class AttributeInContext
 	//--- Database info -------------------------------------------------
     private final boolean _bKeyElement      ;  // True if primary key
     
-    // Removed in  v 3.0.0
-    // private final boolean _bUsedInForeignKey    ;
     private final boolean _bForeignKey          ; // v 3.0.0
     private final boolean _bForeignKeySimple    ; // v 3.0.0
     private final boolean _bForeignKeyComposite ; // v 3.0.0
     private final String  _sReferencedEntityClassName ; // v 3.0.0
     
-    private final boolean _bAutoIncremented  ;  // True if auto-incremented by the database
-    private final String  _sDataBaseName     ;  // Column name in the DB table
-    private final String  _sDataBaseType      ;  // Column type in the DB table
-    private final int     _iJdbcTypeCode    ;     // JDBC type code for this column
-    private final String  _sJdbcTypeName    ;  // JDBC type name : added in ver 2.0.7
-    private final int     _iDatabaseSize   ;     // Size of this column (if Varchar ) etc..
-    private final String  _sDatabaseComment ;     // Comment of this column ( v 2.1.1 - #LCH )
-    private final String  _sDatabaseDefaultValue ; // keep null (do not initialize to "" )  
-    private final boolean _bDatabaseNotNull ;  // True if "not null" in the database
+    
+    private final String  dataBaseName     ;  // Column name in the DB table
+    private final String  dataBaseType      ;  // Column type in the DB table
+    private final String  databaseSize   ;     // Size of this column (if Varchar ) etc..
+    private final String  databaseComment ;     // Comment of this column 
+    private final String  databaseDefaultValue ; // keep null (do not initialize to "" )  
+    private final boolean databaseNotNull ;  // True if "not null" in the database
+    private final boolean autoIncremented  ;  // True if auto-incremented by the database
+
+    private final int     jdbcTypeCode    ;  // JDBC type code for this column
+    private final String  jdbcTypeName    ;  // JDBC type name 
     
     //--- Further info for ALL ---------------------------------------
     private final boolean _bNotNull   ;
@@ -182,87 +168,55 @@ public class AttributeInContext
 
 		_entity = entity ;
 		
-		//_sName   = column.getJavaName();
 		_sName   = attribute.getName(); // v 3.0.0
 		
-//		//_sFullType   = StrUtil.removeAllBlanks( column.getJavaType() );
-//		_sFullType   = StrUtil.removeAllBlanks( attribute.getFullType() ); // v 3.0.0
-//		_sSimpleType = JavaClassUtil.shortName( _sFullType );    // v 2.0.7
 		_sNeutralType     = attribute.getNeutralType() ; // v 3.0.0
 		this.attributeTypeInfo = new AttributeTypeInfo(attribute) ; // v 3.0.0
 				
-		//_bSelected        = column.getSelected(); // v 2.1.1 #LGU
 		_bSelected        = attribute.isSelected(); // v 3.0.0
 		
-		//_sInitialValue    = null ; //  column.getJavaInitialValue()  ???
 		_sInitialValue    = StrUtil.notNull( attribute.getInitialValue() ); // v 3.0.0
-		//_sDefaultValue    = column.getJavaDefaultValue();
 		_sDefaultValue    = StrUtil.notNull( attribute.getDefaultValue() ); // v 3.0.0
 		
-		_sDataBaseName     = StrUtil.notNull( attribute.getDatabaseName() ) ;
-        //_sDataBaseType     = column.getDatabaseTypeName() ;
-        _sDataBaseType     = StrUtil.notNull( attribute.getDatabaseType() ) ; // v 3.0.0
-        _iJdbcTypeCode     = attribute.getJdbcTypeCode() != null ? attribute.getJdbcTypeCode() : 0 ; // v 3.0.0
-        _sJdbcTypeName     = StrUtil.notNull( attribute.getJdbcTypeName() );
-        //_bKeyElement       = column.isPrimaryKey() ;
+		dataBaseName     = StrUtil.notNull( attribute.getDatabaseName() ) ;
+        dataBaseType     = StrUtil.notNull( attribute.getDatabaseType() ) ; // v 3.0.0
+        jdbcTypeCode     = attribute.getJdbcTypeCode() != null ? attribute.getJdbcTypeCode() : 0 ; // v 3.0.0
+        jdbcTypeName     = StrUtil.notNull( attribute.getJdbcTypeName() );
         _bKeyElement       = attribute.isKeyElement(); // v 3.0.0
-        //_bUsedInForeignKey = column.isForeignKey(); 
         
-        //_bUsedInForeignKey = attribute.isUsedInForeignKey() ; // v 3.0.0
         _bForeignKey          = attribute.isFK() ; // v 3.0.0
         _bForeignKeySimple    = attribute.isFKSimple() ; // v 3.0.0
         _bForeignKeyComposite = attribute.isFKComposite() ; // v 3.0.0
         _sReferencedEntityClassName = attribute.getReferencedEntityClassName() ;  // v 3.0.0
 
-        _bAutoIncremented  = attribute.isAutoIncremented();
-        _iDatabaseSize     = attribute.getDatabaseSize() != null ? attribute.getDatabaseSize() : 0 ;
-        _sDatabaseComment  = StrUtil.notNull( attribute.getDatabaseComment() ) ; // Added in v 2.1.1 - #LCH
-        _sDatabaseDefaultValue = StrUtil.notNull( attribute.getDatabaseDefaultValue() ) ; 
-        _bDatabaseNotNull  = attribute.isDatabaseNotNull();
+        autoIncremented  = attribute.isAutoIncremented();
+        databaseSize     = attribute.getDatabaseSize() != null ? attribute.getDatabaseSize() : "" ;
+        databaseComment  = StrUtil.notNull( attribute.getDatabaseComment() ) ; // Added in v 2.1.1 - #LCH
+        databaseDefaultValue = StrUtil.notNull( attribute.getDatabaseDefaultValue() ) ; 
+        databaseNotNull  = attribute.isDatabaseNotNull();
         
 		//--- Further info for ALL
-        //_bNotNull   = column.getJavaNotNull();
         _bNotNull   = attribute.isNotNull();  // v 3.0.0
         _sLabel     = StrUtil.notNull( attribute.getLabel() ) ;
         _sInputType = StrUtil.notNull( attribute.getInputType() );
         
 		//--- Further info for BOOLEAN 
-//        _sBooleanTrueValue   = column.getBooleanTrueValue().trim() ;
-//		_sBooleanFalseValue  = column.getBooleanFalseValue().trim() ;
         _sBooleanTrueValue   = Util.trim(attribute.getBooleanTrueValue(), VOID_STRING) ; 
 		_sBooleanFalseValue  = Util.trim(attribute.getBooleanFalseValue(), VOID_STRING) ;
 		
 		//--- Further info for NUMBER 
-	    //_sMinValue = Util.numberToString(attribute.getMinValue(), VOID_STRING ) ; // v 3.0.0
 	    _sMinValue = Util.bigDecimalToString(attribute.getMinValue(), VOID_STRING ) ; // v 3.0.0
-	    //_sMaxValue = Util.numberToString(attribute.getMaxValue(), VOID_STRING ) ; // v 3.0.0 
 	    _sMaxValue = Util.bigDecimalToString(attribute.getMaxValue(), VOID_STRING ) ; // v 3.0.0 
 
 		//--- Further info for STRING 
-        //_bLongText  = column.getLongText() ;
         _bLongText  = attribute.isLongText() ; // v 3.0.0
-        //_bNotEmpty  = column.getNotEmpty();
         _bNotEmpty  = attribute.isNotEmpty(); // v 3.0.0
-        //_bNotBlank  = column.getNotBlank();
         _bNotBlank  = attribute.isNotBlank(); // v 3.0.0
-        //_sMaxLength = column.getMaxLength();
-        //_sMaxLength = Util.numberToString(attribute.getMaxLength(), VOID_STRING); // v 3.0.0
         _sMaxLength = Util.integerToString(attribute.getMaxLength(), VOID_STRING); // v 3.0.0
-        //_sMinLength = column.getMinLength();
-        //_sMinLength = Util.numberToString(attribute.getMinLength(), VOID_STRING); // v 3.0.0
         _sMinLength = Util.integerToString(attribute.getMinLength(), VOID_STRING); // v 3.0.0
         _sPattern   = StrUtil.notNull( attribute.getPattern() );
         
 		//--- Further info for DATE/TIME 
-//		if ( RepositoryConst.SPECIAL_DATE_ONLY.equalsIgnoreCase(column.getDateType()) ) {
-//			_iDateType = DATE_ONLY;
-//		} else if ( RepositoryConst.SPECIAL_TIME_ONLY.equalsIgnoreCase(column.getDateType()) )  {
-//			_iDateType = TIME_ONLY;
-//		} else if ( RepositoryConst.SPECIAL_DATE_AND_TIME.equalsIgnoreCase(column.getDateType()) )  {
-//			_iDateType = DATE_AND_TIME;
-//		} else {
-//			_iDateType =  -1  ; // Default : UNKNOWN
-//		}
 		_dateType = ( attribute.getDateType() != null ?  attribute.getDateType() : DateType.UNDEFINED ); // v 3.0.0
 		
         _bDatePast   = attribute.isDatePast();
@@ -279,12 +233,9 @@ public class AttributeInContext
 			_sGeneratedValueGenerator = VOID_STRING ;
         } 
         else {
-			//if (column.getGeneratedValue() != null) {
         	if (attribute.isGeneratedValue() ) { // v 3.0.0
 			    _bGeneratedValue = true ;
-				//_sGeneratedValueStrategy  = column.getGeneratedValue().getStrategy();
 				_sGeneratedValueStrategy  = StrUtil.notNull( attribute.getGeneratedValueStrategy() ); // v 3.0.0
-				//_sGeneratedValueGenerator = column.getGeneratedValue().getGenerator();
 				_sGeneratedValueGenerator = StrUtil.notNull( attribute.getGeneratedValueGenerator() ); // v 3.0.0
 			}
 			else {
@@ -675,7 +626,7 @@ public class AttributeInContext
 	)
     public String getDatabaseName()
     {
-        return _sDataBaseName;
+        return dataBaseName;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -687,7 +638,7 @@ public class AttributeInContext
 	)
     public String getDatabaseType()
     {
-        return _sDataBaseType;
+        return dataBaseType;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -700,7 +651,7 @@ public class AttributeInContext
 	)
     public String getDatabaseTypeWithSize()
     {
-        return DatabaseUtil.getNativeTypeWithSize(_sDataBaseType, _iDatabaseSize, _iJdbcTypeCode);
+        return DatabaseUtil.getNativeTypeWithSize(dataBaseType, databaseSize, jdbcTypeCode);
     }
 
 	//-------------------------------------------------------------------------------------
@@ -709,9 +660,9 @@ public class AttributeInContext
 			"Returns the database size for the attribute"
 			}
 	)
-    public int getDatabaseSize()
+    public String getDatabaseSize()
     {
-        return _iDatabaseSize ;
+        return databaseSize ;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -723,7 +674,7 @@ public class AttributeInContext
 	)
     public String getDatabaseComment()
     {
-        return _sDatabaseComment;
+        return databaseComment;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -734,10 +685,10 @@ public class AttributeInContext
 	)
     public boolean hasDatabaseDefaultValue()
     {
-    	if ( _bAutoIncremented ) return false ; // No default value for auto-incremented fields
-        if ( _sDatabaseDefaultValue != null )
+    	if ( autoIncremented ) return false ; // No default value for auto-incremented fields
+        if ( databaseDefaultValue != null )
         {
-        	if ( _sDatabaseDefaultValue.length() > 0 ) return true ;
+        	if ( databaseDefaultValue.length() > 0 ) return true ;
         }
         return false ;
     }
@@ -750,7 +701,7 @@ public class AttributeInContext
 	)
     public String getDatabaseDefaultValue()
     {
-    	if ( hasDatabaseDefaultValue() ) return _sDatabaseDefaultValue ;
+    	if ( hasDatabaseDefaultValue() ) return databaseDefaultValue ;
         return "" ;
     }
     
@@ -762,7 +713,7 @@ public class AttributeInContext
 	)
     public boolean isDatabaseNotNull()
     {
-        return _bDatabaseNotNull;
+        return databaseNotNull;
     }
     
 	//----------------------------------------------------------------------
@@ -773,7 +724,7 @@ public class AttributeInContext
 		)
     public int getJdbcTypeCode()
     {
-        return _iJdbcTypeCode ;
+        return jdbcTypeCode ;
     }
 
 	//----------------------------------------------------------------------
@@ -785,7 +736,7 @@ public class AttributeInContext
 		)
     public String getJdbcTypeName()
     {
-        return _sJdbcTypeName ;
+        return jdbcTypeName ;
     }
 
 	//----------------------------------------------------------------------
@@ -801,7 +752,7 @@ public class AttributeInContext
     public String getJdbcRecommendedJavaType()
     {
     	JdbcTypes types = JdbcTypesManager.getJdbcTypes();
-    	return types.getJavaTypeForCode(_iJdbcTypeCode, _bDatabaseNotNull );
+    	return types.getJavaTypeForCode(jdbcTypeCode, databaseNotNull );
     }
 
 	//----------------------------------------------------------------------
@@ -935,7 +886,7 @@ public class AttributeInContext
 	)
     public boolean isAutoIncremented()
     {
-        return _bAutoIncremented;
+        return autoIncremented;
     }
 
 	//----------------------------------------------------------------------

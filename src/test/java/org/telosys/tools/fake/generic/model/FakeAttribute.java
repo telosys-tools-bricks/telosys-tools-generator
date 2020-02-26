@@ -31,7 +31,7 @@ public class FakeAttribute implements Attribute {
 	private String databaseComment;
 	private String databaseDefaultValue;
 	private String databaseName;
-	private Integer databaseSize;
+	private String databaseSize;
 	private String databaseType;
 	private String dateAfterValue;
 	private String dateBeforeValue;
@@ -156,10 +156,10 @@ public class FakeAttribute implements Attribute {
 	}
 
 	@Override
-	public Integer getDatabaseSize() {
+	public String getDatabaseSize() {
 		return databaseSize;
 	}
-	public void setDatabaseSize(Integer databaseSize) {
+	public void setDatabaseSize(String databaseSize) {
 		this.databaseSize = databaseSize;
 	}
 

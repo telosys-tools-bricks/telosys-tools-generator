@@ -42,7 +42,7 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 
 	private String  _sDatabaseTypeName = null ;  // dbTypeName="INTEGER" - dbTypeName="VARCHAR"
 	
-	private int     _iDatabaseSize     = 0 ;     // dbSize=""
+	private String   databaseSize     = null ;     // dbSize=""
 	
 	private boolean _bDatabaseNotNull  = false ; // dbNotNull="true|false" ( false by default )
 	
@@ -243,12 +243,12 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 //	}
 
 	//-----------------------------------------------------------------------------
-	public void setDatabaseSize(int size) {
-		_iDatabaseSize = size ;
+	public void setDatabaseSize(String size) {
+		databaseSize = size ;
 	}
 	@Override
-	public Integer getDatabaseSize() {
-		return _iDatabaseSize ;
+	public String getDatabaseSize() {
+		return databaseSize ;
 	}
 
 //	//-----------------------------------------------------------------------------
