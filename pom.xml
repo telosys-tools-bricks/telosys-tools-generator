@@ -4,46 +4,43 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<!-- REFERENCE TO PARENT POM.XML -->
-    <parent>
-        <groupId>org.telosys</groupId>
-        <artifactId>telosys-tools-parent</artifactId>
-		<version>3.x.x</version>   <!-- parent version is "3.x.x"-->   
+	<parent>
+		<groupId>org.telosys</groupId>
+		<artifactId>telosys-tools-parent</artifactId>
+		<version>3.x.x</version>   <!-- parent version is always "3.x.x" -->
 		<relativePath>../telosys-tools-parent/pom.xml</relativePath>
-    </parent>
+	</parent>
 
 	<name>telosys-tools-generator</name>
 	<artifactId>telosys-tools-generator</artifactId>
-	<version>${telosys-tools-generator.version}</version>	<!-- VERSION DEFINED IN PARENT POM.XML --> 
+	<version>3.1.2</version> <!-- also update version in GeneratorVersion.java  -->
 	<packaging>jar</packaging>
 
 	<dependencies>
-		<!-- TELOSYS-TOOLS DEPENDENCIES -->
+		<!-- DEPENDENCIES / COMPILE -->
 		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
+			<groupId>org.telosys</groupId>
 			<artifactId>telosys-tools-commons</artifactId>
-			<version>${telosys-tools-commons.version}</version>
 		</dependency>
-	 	<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-		  	<artifactId>telosys-tools-generic-model</artifactId>
-			<version>${telosys-tools-generic-model.version}</version>
-	 	</dependency>
- 	 	<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<!-- 
-		  	<artifactId>telosys-tools-generator-engine</artifactId>
-			 -->
-		  	<artifactId>telosys-tools-generator-engine-velocity17</artifactId>
-			<version>${telosys-tools-generator-engine-velocity17.version}</version>
-	 	</dependency>
-		
-		<!-- TELOSYS-TOOLS DEPENDENCIES FOR TESTS -->
-	 	<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-		  	<artifactId>telosys-tools-repository</artifactId>
-			<version>${telosys-tools-repository.version}</version>
+		<dependency>
+			<groupId>org.telosys</groupId>
+			<artifactId>telosys-tools-generic-model</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.telosys</groupId>
+			<artifactId>telosys-tools-generator-engine-velocity17</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+		</dependency>
+
+		<!-- DEPENDENCIES / TESTS -->
+		<dependency>
+			<groupId>org.telosys</groupId>
+			<artifactId>telosys-tools-repository</artifactId> <!-- Used by GenerationTaskTest -->
 			<scope>test</scope>
-	 	</dependency>
+		</dependency>
 
 	</dependencies>
 
