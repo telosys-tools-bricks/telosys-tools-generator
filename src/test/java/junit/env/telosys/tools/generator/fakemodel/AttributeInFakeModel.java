@@ -1068,5 +1068,17 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		return false;
 	}
 
+	@Override
+	public String getTagValue(String arg0) {
+		// TODO Auto-generated method stub
+		return "";
+	}
+
+	@Override
+	public boolean hasTag(String arg0) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	//---------------------------------------------------------------------------------------------------
 }

@@ -620,4 +620,14 @@ public class FakeAttribute implements Attribute {
 		// Then all links are considered as "selected" => same as "isUsedInLinks()"
 		return isUsedInLinks();
 	}
+
+	@Override
+	public String getTagValue(String arg0) {
+		return "";
+	}
+
+	@Override
+	public boolean hasTag(String arg0) {
+		return false;
+	}
 }
