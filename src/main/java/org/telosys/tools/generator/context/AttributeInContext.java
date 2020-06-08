@@ -15,6 +15,8 @@
  */
 package org.telosys.tools.generator.context;
 
+import java.util.Map;
+
 import org.telosys.tools.commons.DatabaseUtil;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.jdbctypes.JdbcTypes;
@@ -42,7 +44,7 @@ import org.telosys.tools.generic.model.types.TypeConverter;
 		otherContextNames= { ContextName.ATTRIB, ContextName.FIELD },		
 		text = {
 				"This object provides all information about an entity attribute",
-				"Each attribute is retrieved from the entity class ",
+				"Each attribute is obtained from its entity class ",
 				""
 		},
 		since = "",
@@ -52,83 +54,77 @@ import org.telosys.tools.generic.model.types.TypeConverter;
 				"    $attribute.name : $attribute.type",
 				"#end"
 		}
-		
  )
 //-------------------------------------------------------------------------------------
 public class AttributeInContext {
 	
     private static final String VOID_STRING  = "" ;
     
-	private final EnvInContext     _env ; // ver 3.0.0
+	private final EnvInContext     envInContext ; // ver 3.0.0
 
-    private final EntityInContext  _entity ; // The entity 
+    private final EntityInContext  entityInContext ; // The entity 
     
-	private final ModelInContext   _modelInContext ;  // v 3.0.0
+	private final ModelInContext   modelInContext ;  // v 3.0.0
 
+	private boolean       mustUseFullType = false ; 
+
+	private final boolean selected ; // v 2.1.1 #LGU
     
 	//--- Basic minimal attribute info ---------------------------------
-	private final String  _sName ;  // attribute name 
-	
-	private final String  _sNeutralType ;    //v 3.0.0
+	private final String  name ;  // attribute name 
+	private final String  neutralType ;  // attribute neutral type v 3.0.0
 	private final AttributeTypeInfo attributeTypeInfo ; // v 3.0.0
-	
-	
-	private boolean       _bUseFullType = false ;
-	
-	private final String  _sInitialValue ; // can be null 
-	
-	private final String  _sDefaultValue ; // can be null 
-	private final boolean _bSelected ; // v 2.1.1 #LGU
-	
+	private final String  initialValue ; 
+	private final String  defaultValue ; 
+
+	//--- Further info for ALL ---------------------------------------
+	private final boolean isNotNull ;
+	private final String  label ;
+	private final String  inputType ;
+
+    //--- Further info for STRING ------------------------------------
+    private final boolean isLongText ;  // True if must be stored as a separate tag in the XML flow
+    private final boolean isNotEmpty ;
+    private final boolean isNotBlank ;
+    private final String  minLength ;
+    private final String  maxLength ;
+    private final String  pattern ;
+    
+    //--- Further info for NUMBER ------------------------------------
+    private final String  minValue ;
+    private final String  maxValue ;
+
+    //--- Further info for DATE and TIME ---------------------------------
+    private final DateType dateType       ;  // By default only DATE
+    private final boolean  isDateInThePast ;
+    private final boolean  isDateInTheFuture ;
+    // private final boolean  _bDateBefore      ; // Removed in v 3.3.0
+    private final String   dateBeforeValue  ;
+    // private final boolean  _bDateAfter       ;  // Removed in v 3.3.0
+    private final String   dateAfterValue   ;
+
 	//--- Database info -------------------------------------------------
-    private final boolean _bKeyElement      ;  // True if primary key
+    private final boolean isKeyElement      ;  // True if primary key
     
-    private final boolean _bForeignKey          ; // v 3.0.0
-    private final boolean _bForeignKeySimple    ; // v 3.0.0
-    private final boolean _bForeignKeyComposite ; // v 3.0.0
-    private final String  _sReferencedEntityClassName ; // v 3.0.0
-    
-    
+    private final boolean isForeignKey          ; // v 3.0.0
+    private final boolean isForeignKeySimple    ; // v 3.0.0
+    private final boolean isForeignKeyComposite ; // v 3.0.0
+    private final String  referencedEntityClassName ; // v 3.0.0
+
     private final String  dataBaseName     ;  // Column name in the DB table
     private final String  dataBaseType      ;  // Column type in the DB table
     private final String  databaseSize   ;     // Size of this column (if Varchar ) etc..
     private final String  databaseComment ;     // Comment of this column 
-    private final String  databaseDefaultValue ; // keep null (do not initialize to "" )  
-    private final boolean databaseNotNull ;  // True if "not null" in the database
-    private final boolean autoIncremented  ;  // True if auto-incremented by the database
+    private final String  databaseDefaultValue ;   
+    private final boolean isDatabaseNotNull ;  // True if "not null" in the database
+    private final boolean isAutoIncremented  ;  // True if auto-incremented by the database
 
     private final int     jdbcTypeCode    ;  // JDBC type code for this column
     private final String  jdbcTypeName    ;  // JDBC type name 
     
-    //--- Further info for ALL ---------------------------------------
-    private final boolean _bNotNull   ;
-    private final String  _sLabel     ; // v 2.0.3
-    private final String  _sInputType ; // v 2.0.3
-
     //--- Further info for BOOLEAN -----------------------------------
     private final String  _sBooleanTrueValue  ; // eg "1", ""Yes"", ""true""
     private final String  _sBooleanFalseValue ; // eg "0", ""No"",  ""false""
-    
-    //--- Further info for DATE/TIME ---------------------------------
-    private final DateType _dateType       ;  // By default only DATE
-    private final boolean  _bDatePast        ;
-    private final boolean  _bDateFuture     ;
-    private final boolean  _bDateBefore      ;
-    private final String   _sDateBeforeValue  ;
-    private final boolean  _bDateAfter       ;
-    private final String   _sDateAfterValue   ;
-
-    //--- Further info for NUMBER ------------------------------------
-    private final String  _sMinValue ; 
-    private final String  _sMaxValue ; 
-
-    //--- Further info for STRING ------------------------------------
-    private final boolean _bLongText   ;  // True if must be stored as a separate tag in the XML flow
-    private final boolean _bNotEmpty   ;
-    private final boolean _bNotBlank   ;
-    private final String  _sMinLength  ; 
-    private final String  _sMaxLength  ; 
-    private final String  _sPattern    ; 
     
 	//--- JPA KEY Generation infos -------------------------------------------------
     private final boolean _bGeneratedValue ;  // True if GeneratedValue ( annotation "@GeneratedValue" )
@@ -150,12 +146,15 @@ public class AttributeInContext {
 	private final boolean _bIsUsedInLinks ; // v 3.0.0 #LGU
 	private final boolean _bIsUsedInSelectedLinks ; // v 3.0.0 #LGU
 	
+	//--- TAGS (added in v 3.3.0)
+	private final Map<String, String> tagsMap ; // All tags defined for the attribute (0..N) 
+
 	//-----------------------------------------------------------------------------------------------
-	//public AttributeInContext(final EntityInContext entity, final Column column) 
 	/**
 	 * Constructor to create an ATTRIBUTE in the generator context
 	 * @param entity
 	 * @param attribute
+	 * @param modelInContext
 	 * @param env
 	 */
 	public AttributeInContext(final EntityInContext entity, 
@@ -163,68 +162,68 @@ public class AttributeInContext {
 			final ModelInContext modelInContext, // v 3.0.0
 			final EnvInContext env) // v 3.0.0
 	{
-		_env = env ; // v 3.0.0
-		_modelInContext = modelInContext ; // v 3.0.0
-
-		_entity = entity ;
+		this.envInContext = env ; // v 3.0.0
+		this.modelInContext = modelInContext ; // v 3.0.0
+		this.entityInContext = entity ;
+		//--------------------------------------------------
+		this.selected        = attribute.isSelected(); // v 3.0.0
+		//--------------------------------------------------
 		
-		_sName   = attribute.getName(); // v 3.0.0
-		
-		_sNeutralType     = attribute.getNeutralType() ; // v 3.0.0
+		this.name   = attribute.getName(); // v 3.0.0		
+		this.neutralType     = attribute.getNeutralType() ; // v 3.0.0
 		this.attributeTypeInfo = new AttributeTypeInfo(attribute) ; // v 3.0.0
-				
-		_bSelected        = attribute.isSelected(); // v 3.0.0
+		this.initialValue    = StrUtil.notNull( attribute.getInitialValue() ); // v 3.0.0
+		this.defaultValue    = StrUtil.notNull( attribute.getDefaultValue() ); // v 3.0.0
 		
-		_sInitialValue    = StrUtil.notNull( attribute.getInitialValue() ); // v 3.0.0
-		_sDefaultValue    = StrUtil.notNull( attribute.getDefaultValue() ); // v 3.0.0
-		
-		dataBaseName     = StrUtil.notNull( attribute.getDatabaseName() ) ;
-        dataBaseType     = StrUtil.notNull( attribute.getDatabaseType() ) ; // v 3.0.0
-        jdbcTypeCode     = attribute.getJdbcTypeCode() != null ? attribute.getJdbcTypeCode() : 0 ; // v 3.0.0
-        jdbcTypeName     = StrUtil.notNull( attribute.getJdbcTypeName() );
-        _bKeyElement       = attribute.isKeyElement(); // v 3.0.0
-        
-        _bForeignKey          = attribute.isFK() ; // v 3.0.0
-        _bForeignKeySimple    = attribute.isFKSimple() ; // v 3.0.0
-        _bForeignKeyComposite = attribute.isFKComposite() ; // v 3.0.0
-        _sReferencedEntityClassName = attribute.getReferencedEntityClassName() ;  // v 3.0.0
-
-        autoIncremented  = attribute.isAutoIncremented();
-        databaseSize     = attribute.getDatabaseSize() != null ? attribute.getDatabaseSize() : "" ;
-        databaseComment  = StrUtil.notNull( attribute.getDatabaseComment() ) ; // Added in v 2.1.1 - #LCH
-        databaseDefaultValue = StrUtil.notNull( attribute.getDatabaseDefaultValue() ) ; 
-        databaseNotNull  = attribute.isDatabaseNotNull();
-        
 		//--- Further info for ALL
-        _bNotNull   = attribute.isNotNull();  // v 3.0.0
-        _sLabel     = StrUtil.notNull( attribute.getLabel() ) ;
-        _sInputType = StrUtil.notNull( attribute.getInputType() );
+        this.isNotNull   = attribute.isNotNull();  // v 3.0.0
+        this.label     = StrUtil.notNull( attribute.getLabel() ) ;
+        this.inputType = StrUtil.notNull( attribute.getInputType() );
+        
+		//--- Further info for STRING 
+	    this.isLongText  = attribute.isLongText() ; // v 3.0.0
+	    this.isNotEmpty  = attribute.isNotEmpty(); // v 3.0.0
+	    this.isNotBlank  = attribute.isNotBlank(); // v 3.0.0
+	    this.maxLength = Util.integerToString(attribute.getMaxLength(), VOID_STRING); // v 3.0.0
+	    this.minLength = Util.integerToString(attribute.getMinLength(), VOID_STRING); // v 3.0.0
+	    this.pattern   = StrUtil.notNull( attribute.getPattern() );
+	    
+		//--- Further info for NUMBER 
+		this.minValue = Util.bigDecimalToString(attribute.getMinValue(), VOID_STRING ) ; // v 3.0.0
+	    this.maxValue = Util.bigDecimalToString(attribute.getMaxValue(), VOID_STRING ) ; // v 3.0.0 
+	    
+		//--- Further info for DATE/TIME 
+	    this.dateType = ( attribute.getDateType() != null ?  attribute.getDateType() : DateType.UNDEFINED ); // v 3.0.0
+	    this.isDateInThePast   = attribute.isDatePast();
+	    this.isDateInTheFuture = attribute.isDateFuture();
+	    // this._bDateBefore = attribute.isDateBefore();  // Removed in v 3.3.0
+	    this.dateBeforeValue = StrUtil.notNull( attribute.getDateBeforeValue() );
+	    // this._bDateAfter  = attribute.isDateAfter();  // Removed in v 3.3.0
+	    this.dateAfterValue  = StrUtil.notNull( attribute.getDateAfterValue() );
+        
+		//--- Database info
+		this.dataBaseName     = StrUtil.notNull( attribute.getDatabaseName() ) ;
+        this.dataBaseType     = StrUtil.notNull( attribute.getDatabaseType() ) ; // v 3.0.0
+        this.jdbcTypeCode     = attribute.getJdbcTypeCode() != null ? attribute.getJdbcTypeCode() : 0 ; // v 3.0.0
+        this.jdbcTypeName     = StrUtil.notNull( attribute.getJdbcTypeName() );
+        this.isKeyElement     = attribute.isKeyElement(); // v 3.0.0
+        
+        this.isForeignKey          = attribute.isFK() ; // v 3.0.0
+        this.isForeignKeySimple    = attribute.isFKSimple() ; // v 3.0.0
+        this.isForeignKeyComposite = attribute.isFKComposite() ; // v 3.0.0
+        this.referencedEntityClassName = attribute.getReferencedEntityClassName() ;  // v 3.0.0
+
+        this.isAutoIncremented  = attribute.isAutoIncremented();
+        //this.databaseSize     = attribute.getDatabaseSize() != null ? attribute.getDatabaseSize() : "" ;
+        this.databaseSize     = StrUtil.notNull( attribute.getDatabaseSize() ) ; 
+        this.databaseComment  = StrUtil.notNull( attribute.getDatabaseComment() ) ; 
+        this.databaseDefaultValue = StrUtil.notNull( attribute.getDatabaseDefaultValue() ) ; 
+        this.isDatabaseNotNull  = attribute.isDatabaseNotNull();
         
 		//--- Further info for BOOLEAN 
         _sBooleanTrueValue   = Util.trim(attribute.getBooleanTrueValue(), VOID_STRING) ; 
 		_sBooleanFalseValue  = Util.trim(attribute.getBooleanFalseValue(), VOID_STRING) ;
 		
-		//--- Further info for NUMBER 
-	    _sMinValue = Util.bigDecimalToString(attribute.getMinValue(), VOID_STRING ) ; // v 3.0.0
-	    _sMaxValue = Util.bigDecimalToString(attribute.getMaxValue(), VOID_STRING ) ; // v 3.0.0 
-
-		//--- Further info for STRING 
-        _bLongText  = attribute.isLongText() ; // v 3.0.0
-        _bNotEmpty  = attribute.isNotEmpty(); // v 3.0.0
-        _bNotBlank  = attribute.isNotBlank(); // v 3.0.0
-        _sMaxLength = Util.integerToString(attribute.getMaxLength(), VOID_STRING); // v 3.0.0
-        _sMinLength = Util.integerToString(attribute.getMinLength(), VOID_STRING); // v 3.0.0
-        _sPattern   = StrUtil.notNull( attribute.getPattern() );
-        
-		//--- Further info for DATE/TIME 
-		_dateType = ( attribute.getDateType() != null ?  attribute.getDateType() : DateType.UNDEFINED ); // v 3.0.0
-		
-        _bDatePast   = attribute.isDatePast();
-        _bDateFuture = attribute.isDateFuture();
-        _bDateBefore = attribute.isDateBefore();
-        _sDateBeforeValue = StrUtil.notNull( attribute.getDateBeforeValue() );
-        _bDateAfter  = attribute.isDateAfter();
-        _sDateAfterValue  = StrUtil.notNull( attribute.getDateAfterValue() );
         
 		//--- Further info for JPA         
         if ( attribute.isAutoIncremented() ) {
@@ -275,26 +274,27 @@ public class AttributeInContext {
 			_iSequenceGeneratorAllocationSize = -1;
 		}
 		
-		
 		_bIsUsedInLinks         = attribute.isUsedInLinks(); // v 3.0.0 #LGU
 		_bIsUsedInSelectedLinks = attribute.isUsedInSelectedLinks(); // v 3.0.0 #LGU
+		
+		this.tagsMap = attribute.getTagsMap();
 	}
 	
 	protected final LanguageType getLanguageType() {
-		TypeConverter typeConverter =_env.getTypeConverter();
+		TypeConverter typeConverter = envInContext.getTypeConverter();
 		LanguageType languageType = typeConverter.getType(this.attributeTypeInfo);
 		if ( languageType != null ) {
 			return languageType ;
 		}
 		else {
-			throw new IllegalStateException("Cannot get language type for '" + this._sNeutralType + "'");
+			throw new IllegalStateException("Cannot get language type for '" + this.neutralType + "'");
 		}
 	}
 	
 	//-----------------------------------------------------------------------------------------------
-	/* package */ void useFullType ()
+	/* package */ void useFullType()
 	{
-		_bUseFullType = true ;
+		mustUseFullType = true ;
 	}
 	
 	@VelocityMethod(
@@ -303,7 +303,7 @@ public class AttributeInContext {
 				}
 		)
 	public String getName() {
-		return _sName;
+		return name;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -313,7 +313,7 @@ public class AttributeInContext {
 				}
 		)
 	public EntityInContext getEntity() {
-		return _entity;
+		return entityInContext;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -343,7 +343,7 @@ public class AttributeInContext {
 			}
 	)
 	public String getNeutralType() {
-		return _sNeutralType ;
+		return neutralType ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -364,7 +364,7 @@ public class AttributeInContext {
 	public String getType() {
 		// v 3.0.0
 		LanguageType type = getLanguageType();
-		if ( _bUseFullType ) {
+		if ( mustUseFullType ) {
 			return type.getFullType() ;
 		}
 		else {
@@ -457,17 +457,17 @@ public class AttributeInContext {
 			}
 	)
 	public int getDateType() {
-		return _dateType.getValue(); // returns the enum value
+		return dateType.getValue(); // returns the enum value
 	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns TRUE if there's an initial value for the attribute"
+			"Returns TRUE if there's an initial value for the attribute (not void)"
 			}
 	)
 	public boolean hasInitialValue() {
-		return ! StrUtil.nullOrVoid(_sInitialValue); // v 3.0.0
+		return ! StrUtil.nullOrVoid(initialValue);
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -476,7 +476,7 @@ public class AttributeInContext {
 			}
 	)
 	public String getInitialValue() {
-		return _sInitialValue;
+		return initialValue;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -487,7 +487,7 @@ public class AttributeInContext {
 					}
 	)
 	public String getGetter() {
-		return Util.buildGetter(_sName, this.getType() );
+		return Util.buildGetter(name, this.getType() );
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -498,7 +498,7 @@ public class AttributeInContext {
 					}
 	)
 	public String getGetterWithGetPrefix() {
-		return Util.buildGetter(_sName); 
+		return Util.buildGetter(name); 
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -509,7 +509,7 @@ public class AttributeInContext {
 				}
 	)
 	public String getSetter() {
-		return Util.buildSetter(_sName);
+		return Util.buildSetter(name);
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -518,7 +518,7 @@ public class AttributeInContext {
 			"Returns the value to use for a boolean when is TRUE (eg to be stored in a database) "
 			}
 	)
-	public String getBooleanTrueValue() {
+	public String getBooleanTrueValue() { // TODO : rename "DatabaseTrueValue" ???
 		return _sBooleanTrueValue;
 	}
 	
@@ -528,7 +528,7 @@ public class AttributeInContext {
 			"Returns the value to use for a boolean when is FALSE (eg to be stored in a database) "
 			}
 	)
-	public String getBooleanFalseValue() {
+	public String getBooleanFalseValue() { // TODO : rename "DatabaseFalseValue" ???
 		return _sBooleanFalseValue ;
 	}
 	
@@ -582,7 +582,17 @@ public class AttributeInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the database comment for the attribute"
+			"Returns TRUE if the attribute has a database comment (not null and not void)"
+		},
+		since="3.3.0"
+	)
+	public boolean hasDatabaseComment() {
+		return ! StrUtil.nullOrVoid(databaseComment);
+    }
+	    
+	@VelocityMethod(
+		text={	
+			"Returns the database comment for the attribute (or a void string if none)"
 			},
 		since="2.1.1"
 	)
@@ -593,16 +603,18 @@ public class AttributeInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns TRUE if the attribute has a database default value"
+			"Returns TRUE if the attribute has a database default value (not null and not void)",
+			"If the attribute is auto-incremented then always returns false"
 			}
 	)
     public boolean hasDatabaseDefaultValue() {
-    	if ( autoIncremented ) return false ; // No default value for auto-incremented fields
-        if ( databaseDefaultValue != null )
-        {
-        	if ( databaseDefaultValue.length() > 0 ) return true ;
-        }
-        return false ;
+    	if ( isAutoIncremented ) return false ; // No default value for auto-incremented fields
+//        if ( databaseDefaultValue != null )
+//        {
+//        	if ( databaseDefaultValue.length() > 0 ) return true ;
+//        }
+//        return false ;
+		return ! StrUtil.nullOrVoid(databaseDefaultValue);
     }
     
 	//-------------------------------------------------------------------------------------
@@ -612,8 +624,9 @@ public class AttributeInContext {
 		}
 	)
     public String getDatabaseDefaultValue() {
-    	if ( hasDatabaseDefaultValue() ) return databaseDefaultValue ;
-        return "" ;
+//    	if ( hasDatabaseDefaultValue() ) return databaseDefaultValue ;
+//        return "" ;
+        return databaseDefaultValue ; 
     }
     
 	//----------------------------------------------------------------------
@@ -623,7 +636,7 @@ public class AttributeInContext {
 		}
 	)
     public boolean isDatabaseNotNull() {
-        return databaseNotNull;
+        return isDatabaseNotNull;
     }
     
 	//----------------------------------------------------------------------
@@ -660,7 +673,7 @@ public class AttributeInContext {
     public String getJdbcRecommendedJavaType()
     {
     	JdbcTypes types = JdbcTypesManager.getJdbcTypes();
-    	return types.getJavaTypeForCode(jdbcTypeCode, databaseNotNull );
+    	return types.getJavaTypeForCode(jdbcTypeCode, isDatabaseNotNull );
     }
 
 	//----------------------------------------------------------------------
@@ -674,7 +687,7 @@ public class AttributeInContext {
 		}
 	)
     public boolean isKeyElement() {
-        return _bKeyElement;
+        return isKeyElement;
     }
 
 	//----------------------------------------------------------------------
@@ -684,7 +697,7 @@ public class AttributeInContext {
 	since="3.0.0"
 	)
     public boolean isFK() { // v 3.0.0
-        return _bForeignKey ;
+        return isForeignKey ;
     }
 
 	//----------------------------------------------------------------------
@@ -694,7 +707,7 @@ public class AttributeInContext {
 	since="3.0.0"
 	)
     public boolean isFKSimple() { // v 3.0.0
-        return _bForeignKeySimple ;
+        return isForeignKeySimple ;
     }
 
 	//----------------------------------------------------------------------
@@ -704,7 +717,7 @@ public class AttributeInContext {
 	since="3.0.0"
 	)
     public boolean isFKComposite() { // v 3.0.0
-        return _bForeignKeyComposite ;
+        return isForeignKeyComposite ;
     }
 
 	//----------------------------------------------------------------------
@@ -727,7 +740,7 @@ public class AttributeInContext {
 		}
 	)
     public boolean isAutoIncremented() {
-        return autoIncremented;
+        return isAutoIncremented;
     }
 
 	//----------------------------------------------------------------------
@@ -740,33 +753,41 @@ public class AttributeInContext {
 		"Returns TRUE if the attribute has a 'Not Null' validation rule "
 		}
 	)
-    public boolean isNotNull()
-    {
-        return _bNotNull;
+    public boolean isNotNull() {
+        return isNotNull;
     }
 
 	//----------------------------------------------------------------------
-    /**
-     * Returns the label defined for the attribute 
-     * @since v 2.0.3
-     * @return
-     */
+	@VelocityMethod(
+		text={	
+			"Returns TRUE if there's an 'label' defined for the attribute (not void)"
+			},
+		since="3.3.0"
+	)
+	public boolean hasLabel() {
+		return ! StrUtil.nullOrVoid(label);
+	}
+		
 	@VelocityMethod(
 		text={	
 			"Returns the label for the attribute "
 			}
 	)
-    public String getLabel()
-    {
-        return _sLabel ;
+    public String getLabel() {
+        return label ;
     }
     
-	//----------------------------------------------------------------------
-    /**
-     * Returns the "input type" defined for this attribute 
-     * @since v 2.0.3
-     * @return
-     */
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns TRUE if there's an 'input type' defined for the attribute (not void)"
+			},
+		since="3.3.0"
+	)
+	public boolean hasInputType() {
+		return ! StrUtil.nullOrVoid(inputType);
+	}
+	
 	@VelocityMethod(
 		text={	
 			"Returns the 'input type' defined for the attribute",
@@ -774,9 +795,8 @@ public class AttributeInContext {
 			},
 		since="2.0.3"
 	)
-    public String getInputType()
-    {
-        return _sInputType ;
+    public String getInputType() {
+        return inputType ;
     }
     
 	//-------------------------------------------------------------------------------------
@@ -791,7 +811,7 @@ public class AttributeInContext {
 				}
 		)
     public String getMaxLength() {
-    	return voidIfNull(_sMaxLength) ;
+    	return voidIfNull(maxLength) ;
     }
     /**
      * Returns the "minimum" length if any, else returns "" 
@@ -803,7 +823,7 @@ public class AttributeInContext {
 				}
 		)
     public String getMinLength() {
-    	return voidIfNull(_sMinLength) ;
+    	return voidIfNull(minLength) ;
     }
     
     //-------------------------------------------------------------------------------------------
@@ -816,9 +836,8 @@ public class AttributeInContext {
 				"Returns the Reg Exp pattern defined for the attribute (if any, else returns void) "
 				}
 		)
-    public String getPattern() 
-    {
-    	return voidIfNull(_sPattern) ;
+    public String getPattern() {
+    	return voidIfNull(pattern) ;
     }
     
     //-------------------------------------------------------------------------------------------
@@ -831,9 +850,8 @@ public class AttributeInContext {
 				"Returns the minimum value for the attribute (if any, else returns void) "
 				}
 		)
-    public String getMinValue() 
-    {
-    	return voidIfNull(_sMinValue) ;
+    public String getMinValue() {
+    	return voidIfNull(minValue) ;
     }
     
     //-------------------------------------------------------------------------------------------
@@ -846,9 +864,8 @@ public class AttributeInContext {
 				"Returns the maximum value for the attribute (if any, else returns void) "
 				}
 		)
-    public String getMaxValue() 
-    {
-    	return voidIfNull(_sMaxValue) ;
+    public String getMaxValue() {
+    	return voidIfNull(maxValue) ;
     }
     
 	//-------------------------------------------------------------------------------------
@@ -858,7 +875,7 @@ public class AttributeInContext {
 			}
 	)
 	public boolean hasDatePastValidation() {
-		return _bDatePast;
+		return isDateInThePast;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -868,47 +885,47 @@ public class AttributeInContext {
 			}
 	)
 	public boolean hasDateFutureValidation() {
-		return _bDateFuture;
+		return isDateInTheFuture;
 	}
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns TRUE if the attribute must be validated as a date before a given date value"
+			"Returns TRUE if the attribute must be validated as a date BEFORE a given date value"
 			}
 	)
 	public boolean hasDateBeforeValidation() {
-		return _bDateBefore;
+		//return _bDateBefore;
+		return ! StrUtil.nullOrVoid(dateBeforeValue); // v 3.3.0
 	}
 	
-	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Returns the 'date before' value (for date validation)"
 			}
 	)
 	public String getDateBeforeValue() {
-		return _sDateBeforeValue;
+		return dateBeforeValue;
 	}
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns TRUE if the attribute must be validated as a date after a given date value"
+			"Returns TRUE if the attribute must be validated as a date AFTER a given date value"
 			}
 	)
 	public boolean hasDateAfterValidation() {
-		return _bDateAfter;
+//		return _bDateAfter;
+		return ! StrUtil.nullOrVoid(dateAfterValue); // v 3.3.0
 	}
 	
-	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Returns the 'date after' value (for date validation)"
 			}
 	)
 	public String getDateAfterValue() {
-		return _sDateAfterValue;
+		return dateAfterValue;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -925,7 +942,7 @@ public class AttributeInContext {
 		}
 	)
     public boolean isLongText() {
-        return _bLongText;
+        return isLongText;
     }
 
 	@VelocityMethod(
@@ -934,7 +951,7 @@ public class AttributeInContext {
 		}
 	)
     public boolean isNotEmpty() {
-        return _bNotEmpty;
+        return isNotEmpty;
     }
     
 	@VelocityMethod(
@@ -943,17 +960,18 @@ public class AttributeInContext {
 		}
 	)
     public boolean isNotBlank() {
-        return _bNotBlank;
+        return isNotBlank;
     }
     
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns TRUE if there's a default value for the attribute"
+			"Returns TRUE if there's a default value for the attribute (not void)"
 			}
 	)
     public boolean hasDefaultValue() {
-    	return ( _sDefaultValue != null ) ;
+    	//return ( defaultValue != null ) ;
+		return ! StrUtil.nullOrVoid(defaultValue);
     }
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -962,13 +980,13 @@ public class AttributeInContext {
 			}
 	)
     public String getDefaultValue() {
-    	return _sDefaultValue ;
+    	return defaultValue ;
     }
 
 	public String toString() 
 	{
-		String s =  _sInitialValue != null ? " = " + _sInitialValue : "" ;
-		return this.getType() + " " + _sName + s ; 
+		String s =  initialValue != null ? " = " + initialValue : "" ;
+		return this.getType() + " " + name + s ; 
 	}
 
 	private String voidIfNull ( String s ) {
@@ -982,7 +1000,7 @@ public class AttributeInContext {
 			}
 	)
 	public boolean isSelected() {
-		return _bSelected;
+		return selected;
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -1005,9 +1023,7 @@ public class AttributeInContext {
 	since="2.0.7"
 	)
 	public boolean isBooleanType() {
-//    	if ( NeutralType.BOOLEAN.equals(this._sNeutralType ) ) return true ; // v 3.0.0
-//    	return false ;
-    	return NeutralType.BOOLEAN.equals(this._sNeutralType ) ; 
+    	return NeutralType.BOOLEAN.equals(this.neutralType ) ; 
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -1018,9 +1034,7 @@ public class AttributeInContext {
 	since="2.0.7"
 	)
 	public boolean isByteType() {
-//    	if ( NeutralType.BYTE.equals(this._sNeutralType ) ) return true ; // v 3.0.0
-//    	return false ;
-    	return NeutralType.BYTE.equals(this._sNeutralType ) ;
+    	return NeutralType.BYTE.equals(this.neutralType ) ;
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -1031,9 +1045,7 @@ public class AttributeInContext {
 	since="2.0.7"
 	)
 	public boolean isShortType() {
-//    	if ( NeutralType.SHORT.equals(this._sNeutralType ) ) return true ; // v 3.0.0
-//    	return false ;
-    	return NeutralType.SHORT.equals(this._sNeutralType ) ; 
+    	return NeutralType.SHORT.equals(this.neutralType ) ; 
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -1044,9 +1056,7 @@ public class AttributeInContext {
 	since="2.0.7"
 	)
 	public boolean isIntegerType() {
-//    	if ( NeutralType.INTEGER.equals(this._sNeutralType ) ) return true ; // v 3.0.0
-//    	return false ;
-    	return NeutralType.INTEGER.equals(this._sNeutralType ) ; 
+    	return NeutralType.INTEGER.equals(this.neutralType ) ; 
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -1057,9 +1067,7 @@ public class AttributeInContext {
 	since="2.0.7"
 	)
 	public boolean isLongType() {
-//    	if ( NeutralType.LONG.equals(this._sNeutralType ) ) return true ; // v 3.0.0
-//    	return false ;
-    	return NeutralType.LONG.equals(this._sNeutralType ) ; 
+    	return NeutralType.LONG.equals(this.neutralType ) ; 
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -1070,9 +1078,7 @@ public class AttributeInContext {
 	since="2.0.7"
 	)
 	public boolean isFloatType() {
-//    	if ( NeutralType.FLOAT.equals(this._sNeutralType ) ) return true ; // v 3.0.0
-//    	return false ;
-    	return NeutralType.FLOAT.equals(this._sNeutralType ) ;
+    	return NeutralType.FLOAT.equals(this.neutralType ) ;
 	}
 	
 	//------------------------------------------------------------------------------------------
@@ -1083,9 +1089,7 @@ public class AttributeInContext {
 	since="2.0.7"
 	)
 	public boolean isDoubleType() {
-//    	if ( NeutralType.DOUBLE.equals(this._sNeutralType ) ) return true ; // v 3.0.0
-//    	return false ;
-    	return NeutralType.DOUBLE.equals(this._sNeutralType ) ;
+    	return NeutralType.DOUBLE.equals(this.neutralType ) ;
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -1096,11 +1100,8 @@ public class AttributeInContext {
 	since="3.0.0"
 	)
 	public boolean isDecimalType() {
-//    	if ( NeutralType.DECIMAL.equals(this._sNeutralType ) ) return true ; // v 3.0.0
-//    	return false ;
-    	return NeutralType.DECIMAL.equals(this._sNeutralType ) ;
+    	return NeutralType.DECIMAL.equals(this.neutralType ) ;
 	}
-
 
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -1125,9 +1126,7 @@ public class AttributeInContext {
 	since="2.0.7"
 	)
 	public boolean isStringType() {
-//    	if ( NeutralType.STRING.equals(this._sNeutralType ) ) return true ; // v 3.0.0
-//    	return false ;
-    	return NeutralType.STRING.equals(this._sNeutralType ) ;
+    	return NeutralType.STRING.equals(this.neutralType ) ;
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -1138,7 +1137,7 @@ public class AttributeInContext {
 	since="3.0.0"
 	)
 	public boolean isDateType() {
-		return NeutralType.DATE.equals(this._sNeutralType ) ; // v 3.0.0
+		return NeutralType.DATE.equals(this.neutralType ) ; // v 3.0.0
 	}
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -1148,7 +1147,7 @@ public class AttributeInContext {
 	since="3.0.0"
 	)
 	public boolean isTimeType() {
-		return NeutralType.TIME.equals(this._sNeutralType ) ; // v 3.0.0
+		return NeutralType.TIME.equals(this.neutralType ) ; // v 3.0.0
 	}
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -1158,7 +1157,7 @@ public class AttributeInContext {
 	since="3.0.0"
 	)
 	public boolean isTimestampType() {
-		return NeutralType.TIMESTAMP.equals(this._sNeutralType ) ; // v 3.0.0
+		return NeutralType.TIMESTAMP.equals(this.neutralType ) ; // v 3.0.0
 	}
 	
 	//------------------------------------------------------------------------------------------
@@ -1182,7 +1181,7 @@ public class AttributeInContext {
 	since="3.0.0"
 	)
 	public boolean isBinaryType() {
-		return NeutralType.BINARY.equals(this._sNeutralType )  ; // v 3.0.0
+		return NeutralType.BINARY.equals(this.neutralType )  ; // v 3.0.0
 	}
 
 	//-----------------------------------------------------------------------------------------
@@ -1373,17 +1372,17 @@ public class AttributeInContext {
 	since="3.0.0"
 	)
 	public EntityInContext getReferencedEntity() throws GeneratorException {
-		if ( ! StrUtil.nullOrVoid(_sReferencedEntityClassName) ) {
-			EntityInContext entity = this._modelInContext.getEntityByClassName(_sReferencedEntityClassName);
+		if ( ! StrUtil.nullOrVoid(referencedEntityClassName) ) {
+			EntityInContext entity = this.modelInContext.getEntityByClassName(referencedEntityClassName);
 			if ( entity != null ) {
 				return entity ;
 			}
 			else {
-				throw new IllegalStateException("getReferencedEntityType() : Cannot get Entity for '" + _sReferencedEntityClassName + "'");				
+				throw new IllegalStateException("getReferencedEntityType() : Cannot get Entity for '" + referencedEntityClassName + "'");				
 			}
 		}
 		else {
-			throw new GeneratorException("No entity referenced by this attribute (" + _sName + ")");
+			throw new GeneratorException("No entity referenced by this attribute (" + name + ")");
 		}
 	}
 
@@ -1400,4 +1399,43 @@ public class AttributeInContext {
 		return getReferencedEntity().getName();
 	}
 
+	//------------------------------------------------------------------------------------------
+	// TAGS since ver 3.3.0
+	//------------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns TRUE if the attribute has a tag with the given name"
+		},
+		since="3.3.0"
+	)
+	public boolean hasTag(String tagName) {
+		if ( this.tagsMap != null ) {
+			return this.tagsMap.containsKey(tagName);
+		}
+		return false; 
+	}
+
+	/**
+	 * Returns the value held by the tag
+     * @param tagName
+	 * @return
+	 * @since v 3.3.0
+	 */
+	@VelocityMethod(
+		text={	
+			"Returns the value held by the given tag name",
+			"If the tag is not defined the returned value is a void string"
+		},
+		example= {
+			"$attrib.tagValue('mytag') "
+		},
+		since="3.3.0"
+	)
+	public String tagValue(String tagName) {
+		if ( this.tagsMap != null ) {
+			String v = this.tagsMap.get(tagName);
+			return ( v != null ? v : VOID_STRING );
+		}
+		return VOID_STRING;
+	}
 }

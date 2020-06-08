@@ -17,6 +17,7 @@ package junit.env.telosys.tools.generator.fakemodel;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Map;
 
 import org.telosys.tools.commons.jdbctypes.JdbcTypesManager;
 import org.telosys.tools.generic.model.Attribute;
@@ -1069,16 +1070,8 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 	}
 
 	@Override
-	public String getTagValue(String arg0) {
-		// TODO Auto-generated method stub
-		return "";
+	public Map<String, String> getTagsMap() {
+		return null;
 	}
 
-	@Override
-	public boolean hasTag(String arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	//---------------------------------------------------------------------------------------------------
 }

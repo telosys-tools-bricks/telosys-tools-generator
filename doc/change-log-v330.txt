@@ -1,0 +1,13 @@
+Generator change log / v 3.3.0
+
+AttributeInContext :
+
+ - TagsMap added
+   + hasTag(String tagName)
+   + tagValue(String tagName)
+
+ - Other new functions for templates 
+   + hasDatabaseComment()
+   + hasLabel()
+   + hasInputType()
+   

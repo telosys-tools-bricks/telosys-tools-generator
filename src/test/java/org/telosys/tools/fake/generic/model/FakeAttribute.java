@@ -16,6 +16,7 @@
 package org.telosys.tools.fake.generic.model;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.DateType;
@@ -622,12 +623,7 @@ public class FakeAttribute implements Attribute {
 	}
 
 	@Override
-	public String getTagValue(String arg0) {
-		return "";
-	}
-
-	@Override
-	public boolean hasTag(String arg0) {
-		return false;
+	public Map<String, String> getTagsMap() {
+		return null;
 	}
 }
