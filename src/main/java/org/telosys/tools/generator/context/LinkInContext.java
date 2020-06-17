@@ -18,7 +18,6 @@ package org.telosys.tools.generator.context;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.telosys.tools.commons.JavaClassUtil;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.GeneratorUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
@@ -59,8 +58,6 @@ public class LinkInContext {
 	
     private final EntityInContext  _entity ; // The entity the link belongs to
 
-	//private final Link             _link; // removed in ver 3.0.0
-	//private final EntitiesManager  _entitiesManager; // removed in ver 3.0.0
 	private final ModelInContext   _modelInContext ;  // v 3.0.0 (replaces EntitiesManager)
 
 	private final List<JoinColumnInContext> _joinColumns ; 
@@ -69,7 +66,7 @@ public class LinkInContext {
 	//--- Added in ver 3.0.0 (to replace reference / Link )
 	private final String       _id ;
 	private final String       _fieldName ;
-	private final String       _fieldType ;
+	// private final String       _fieldType ;
 	private final String       _targetTableName ;
 	private final String       _mappedBy ;
 	private final boolean      _selected ;
@@ -83,25 +80,18 @@ public class LinkInContext {
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Constructor
-	 * @param link link in the repository 
-	 * @param targetEntity targeted entity in the repository 
+	 * @param entity
+	 * @param link
+	 * @param modelInContext
 	 */
-//	public LinkInContext(final EntityInContext entity, final Link link, final EntitiesManager entitiesManager ) 
 	public LinkInContext(final EntityInContext entity, final Link link, final ModelInContext modelInContext ) 
 	{
 		this._entity = entity ;
-		//this._link = link; // removed in ver 3.0.0
-		//this._entitiesManager  = entitiesManager; // removed in ver 3.0.0
 		this._modelInContext = modelInContext ; // v 3.0.0
 		
 		//--- Build the list of "join columns"
-		_joinColumns = new LinkedList<JoinColumnInContext>();
+		_joinColumns = new LinkedList<>();
 		if ( link.getJoinColumns() != null ) {
-//			JoinColumn[] joinColumns = _link.getJoinColumns().getAll();
-//			for ( JoinColumn col : joinColumns ) {
-//				_joinColumns.add( new JoinColumnInContext(col) ) ;
-//			}
-			// ver 3.0.0
 			for ( JoinColumn joinColumn : link.getJoinColumns() ) {
 				_joinColumns.add( new JoinColumnInContext(joinColumn) ) ;
 			}
@@ -118,7 +108,7 @@ public class LinkInContext {
 		//--- Init link information (ver 3.0.0)
 		_id = link.getId() ;
 		_fieldName = link.getFieldName() ;
-		_fieldType = link.getFieldType();
+		// _fieldType = link.getFieldType(); // removed in v 3.3.0
 		_targetTableName = link.getTargetTableName();
 		_selected = link.isSelected();
 		_mappedBy = link.getMappedBy();
@@ -130,14 +120,27 @@ public class LinkInContext {
 		_cascadeOptions = link.getCascadeOptions();
 	}
 	
-//	//-------------------------------------------------------------------------------------
-//	protected Link getLink() {
-//		return this._link ;
-//	}
-	//-------------------------------------------------------------------------------------
-//	protected Entity getTargetEntity() {
-//		return this._targetEntity ;
-//	}
+	/**
+	 * Returns the default collection full type <br>
+	 * (for the time being the type is always a Java List)
+	 * @return
+	 */
+	private String getCollectionFullType() {
+		// TODO : get it from current target language ?
+		return "java.util.List" ; 
+	}
+
+	/**
+	 * Returns the default collection simple type <br>
+	 * (for the time being the type is always a Java List)
+	 * @return
+	 */
+	private String getCollectionSimpleType() {
+		// TODO : get it from current target language ?
+		return "List" ; 
+	}
+	
+
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -169,9 +172,7 @@ public class LinkInContext {
 			"n : the number of blanks to be added at the end of the name" 
 			}
 	)
-	public String formattedFieldName(int iSize)
-    {
-        //String s = this.getJavaName() ;
+	public String formattedFieldName(int iSize) {
         String s = this.getFieldName();
         String sTrailingBlanks = "";
         int iDelta = iSize - s.length();
@@ -189,7 +190,6 @@ public class LinkInContext {
 			}
 	)
 	public String getGetter() throws GeneratorException  {
-		//return _sGetter;
 		return Util.buildGetter(this.getFieldName(), this.getFieldType());
 	}
 
@@ -200,7 +200,6 @@ public class LinkInContext {
 			}
 	)
 	public String getSetter() {
-		//return _sSetter;
 		return Util.buildSetter(this.getFieldName());
 	}
 
@@ -211,7 +210,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean hasJoinTable() {
-		//return _link.getJoinTable() != null ;
 		return _joinTable != null ;
 	}
 	
@@ -222,15 +220,6 @@ public class LinkInContext {
 			"NB : can be null if the link doesn't have a 'join table'"
 			}
 	)
-//	public String getJoinTable() {
-//		JoinTable joinTable = _link.getJoinTable();
-//		if ( joinTable != null ) {
-//			return joinTable.getName();
-//		}
-//		else {
-//			throw new GeneratorContextException("No 'Join Table' for this link");
-//		}
-//	}
 	public String getJoinTableName() {
 		if ( _joinTable != null ) {
 			return _joinTable.getName();
@@ -290,26 +279,6 @@ public class LinkInContext {
 			"Returns the 'join columns' for the link "
 			}
 	)
-//	public String[] getJoinColumns() {
-//		JoinColumns joinColumns = _link.getJoinColumns() ;
-//		if ( joinColumns != null ) {
-//			JoinColumn[] columns = joinColumns.getAll();
-//			String[] colNames = new String[columns.length] ;
-//			for ( int i = 0 ; i < columns.length ; i++ ) {
-//				JoinColumn col = columns[i] ;
-//				if ( col != null ) {
-//					colNames[i] = columns[i].getName();
-//				}
-//				else {
-//					throw new GeneratorContextException("Invalid link : null 'Join Column' in 'Join Columns' collection");
-//				}
-//			}
-//			return colNames ;
-//		}
-//		else {
-//			throw new GeneratorContextException("No 'Join Columns' for this link");
-//		}
-//	}
 	public List<JoinColumnInContext> getJoinColumns() {
 		return _joinColumns ;
 	}
@@ -321,10 +290,8 @@ public class LinkInContext {
 		example="$link.attributesCount",
 		since="2.1.0"
 	)
-	public int getAttributesCount() 
-	{
-		if ( _joinColumns != null )
-		{
+	public int getAttributesCount() {
+		if ( _joinColumns != null ) {
 			return _joinColumns.size() ;
 		}
 		return 0 ;
@@ -340,7 +307,7 @@ public class LinkInContext {
 	)
 	@VelocityReturnType("List of '$linkAttribute' (origin-target association) ")	
 	public List<LinkAttributesPairInContext> getAttributes() throws GeneratorException {
-		List<LinkAttributesPairInContext> list = new LinkedList<LinkAttributesPairInContext>();
+		List<LinkAttributesPairInContext> list = new LinkedList<>();
 		if ( _joinColumns != null ) {
 			for ( JoinColumnInContext jc : _joinColumns ) {
 				//--- ORIGIN attribute
@@ -383,7 +350,6 @@ public class LinkInContext {
 			}
 	)
 	public String getId() {
-		//return _link.getId();
 		return _id ;
 	}
 
@@ -394,7 +360,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isSelected() {
-		//return _link.isUsed();
 		return _selected ;
 	}
 
@@ -405,7 +370,6 @@ public class LinkInContext {
 			}
 	)
 	public String getTargetTableName() {
-		//return _link.getTargetTableName();
 		return _targetTableName ;
 	}
 
@@ -416,7 +380,6 @@ public class LinkInContext {
 			}
 	)
 	public String getFieldName() {
-		//return _link.getJavaFieldName();
 		return _fieldName ;
 	}
 
@@ -429,11 +392,10 @@ public class LinkInContext {
 			}
 	)
 	public String getFieldFullType() throws GeneratorException {
-		//return _link.getJavaFieldType();
 		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
 			// Link referencing a collection : the link provides the full type ( java.util.List, java.util.Set, ... )
-			//return _link.getJavaFieldType();
-			return _fieldType ; // use the type as is 
+			// return _fieldType ; // use the type as is 
+			return getCollectionFullType();
 		} else {
 			// Link referencing an entity : the link provides the simple type ( Person, Customer, Book, ... )
 			return this.getTargetEntityFullType() ; // get the 'full type' from the referenced entity // v 2.1.0
@@ -449,11 +411,10 @@ public class LinkInContext {
 			}
 	)
 	public String getFieldSimpleType() throws GeneratorException {
-		//return JavaClassUtil.shortName(_link.getJavaFieldType());
 		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
 			// Link referencing a collection : the link provides the full type ( java.util.List, java.util.Set, ... )
-			//return JavaClassUtil.shortName( _link.getJavaFieldType() );
-			return JavaClassUtil.shortName( _fieldType ); // return only the 'simple name' ( 'List', 'Set', ... )
+			// return JavaClassUtil.shortName( _fieldType ); // return only the 'simple name' ( 'List', 'Set', ... )
+			return getCollectionSimpleType();
 		} else {
 			// Link referencing an entity : the link provides the simple type ( Person, Customer, Book, ... )
 			return this.getTargetEntitySimpleType() ; // get the 'simple type' from the referenced entity // v 2.1.0
@@ -489,7 +450,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isOwningSide() {
-		//return _link.isOwningSide();
 		return _owningSide ;
 	}
 
@@ -501,7 +461,6 @@ public class LinkInContext {
 			}
 	)
 	public String getMappedBy() {
-		//return _link.getMappedBy();
 		return _mappedBy;
 	}
 
@@ -514,9 +473,6 @@ public class LinkInContext {
 		since = "2.1.0"
 	)
 	public EntityInContext getTargetEntity() throws GeneratorException {
-		// return _entitiesManager.getEntity( getTargetTableName() );
-		// return _entitiesManager.getEntityByTableName( getTargetTableName() ); // v 3.0.0
-		
 		String targetTableName = getTargetTableName();
 		if ( targetTableName == null ) {
 			throw new GeneratorException("Cannot get target entity. No target table name for link '" + getId() + "'" );
@@ -561,8 +517,7 @@ public class LinkInContext {
 			"eg : 'OneToMany', 'ManyToOne', 'OneToOne', 'ManyToMany'"
 			}
 	)
-	public String getCardinality() { // v 2.0.5
-		//return _link.getCardinality();
+	public String getCardinality() { 
 		return _cardinality.getText();
 	}
 
@@ -573,7 +528,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCardinalityOneToOne() {
-		//return _link.isTypeOneToOne();
 		return _cardinality == Cardinality.ONE_TO_ONE ;
 	}
 
@@ -584,7 +538,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCardinalityOneToMany() {
-		//return _link.isTypeOneToMany();
 		return _cardinality == Cardinality.ONE_TO_MANY ;
 	}
 
@@ -595,7 +548,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCardinalityManyToOne() {
-		//return _link.isTypeManyToOne();
 		return _cardinality == Cardinality.MANY_TO_ONE ;
 	}
 
@@ -606,7 +558,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCardinalityManyToMany() {
-		//return _link.isTypeManyToMany();
 		return _cardinality == Cardinality.MANY_TO_MANY ;
 	}
 
@@ -628,7 +579,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCascadeALL() {
-		//return _link.isCascadeALL();
 		return _cascadeOptions.isCascadeAll();
 	}
 
@@ -639,7 +589,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCascadeMERGE() {
-		//return _link.isCascadeMERGE();
 		return _cascadeOptions.isCascadeMerge();
 	}
 
@@ -650,7 +599,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCascadePERSIST() {
-		//return _link.isCascadePERSIST();
 		return _cascadeOptions.isCascadePersist();
 	}
 
@@ -661,7 +609,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCascadeREFRESH() {
-		//return _link.isCascadeREFRESH();
 		return _cascadeOptions.isCascadeRefresh();
 	}
 
@@ -672,7 +619,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCascadeREMOVE() {
-		//return _link.isCascadeREMOVE();
 		return _cascadeOptions.isCascadeRemove();
 	}
 
@@ -684,7 +630,6 @@ public class LinkInContext {
 			}
 	)
 	public String getFetch() {
-		//return _link.getFetch();
 		return _fetchType.getText();
 	}
 
@@ -695,7 +640,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isFetchDEFAULT() {
-		//return _link.isFetchDEFAULT();
 		return _fetchType == FetchType.DEFAULT ;
 	}
 
@@ -706,7 +650,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isFetchEAGER() {
-		//return _link.isFetchEAGER();
 		return _fetchType == FetchType.EAGER ;
 	}
 
@@ -717,11 +660,9 @@ public class LinkInContext {
 			}
 	)
 	public boolean isFetchLAZY() {
-		//return _link.isFetchLAZY();
 		return _fetchType == FetchType.LAZY ;
 	}
 
-	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -730,7 +671,6 @@ public class LinkInContext {
 			}
 	)
 	public String getOptional() {
-		//return _link.getOptional();
 		return _optional.getText();
 	}
 
@@ -741,7 +681,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isOptionalUndefined() {
-		//return _link.isOptionalUndefined();
 		return _optional == Optional.UNDEFINED ;
 	}
 
@@ -752,7 +691,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isOptionalFalse() {
-		//return _link.isOptionalFalse();
 		return _optional == Optional.FALSE ;
 	}
 
@@ -763,7 +701,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isOptionalTrue() {
-		//return _link.isOptionalTrue();
 		return _optional == Optional.TRUE ;
 	}
 

@@ -15,7 +15,7 @@
  */
 package org.telosys.tools.generator.task;
 
-import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.telosys.tools.commons.TelosysToolsException;
@@ -27,15 +27,16 @@ import org.telosys.tools.generic.model.Model;
 
 
 /**
- * Runnable task with a progress bar (Eclipse like)
- * for code generation 
+ * Runnable task for code generation  <br>
+ * Implementation for CLI code generation (Eclipse like) <br>
+ * Eclipse plugin has its own implementation (also based on 'AbstractGenerationTask' and 'GenerationTask' )
  *  
  * @author Laurent Guerin
  *
  */
-public class StandardGenerationTask extends AbstractGenerationTask implements GenerationTask // implements IRunnableWithProgress 
+public class StandardGenerationTask extends AbstractGenerationTask implements GenerationTask 
 {
-	private boolean _continueIfError = true ;
+	private boolean continueIfError = true ;
 	
 	/**
 	 * Constructor
@@ -54,56 +55,43 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 			String                 bundleName, // v 3.0.0
 			List<TargetDefinition> selectedTargets,
 			List<TargetDefinition> resourcesTargets,
-			// GeneratorConfig generatorConfig, 
 			TelosysToolsCfg        telosysToolsCfg, // v 3.0.0			
 			TelosysToolsLogger     logger)
 			throws TelosysToolsException 
 	{
 		// Just call the super class constructor
-		//super(repositoryModel, selectedEntities, selectedTargets, resourcesTargets,	generatorConfig, logger);
 		super(model, selectedEntities, bundleName, selectedTargets, resourcesTargets, telosysToolsCfg, logger); // v 3.0.0
 	}
 	
+	/**
+	 * @param continueIfError
+	 */
 	public void setContinueIfError(boolean continueIfError) {
-		_continueIfError = continueIfError ;
+		this.continueIfError = continueIfError ;
 	}
 	
 //	/**
 //	 * Eclipse like 'MsgBox.error' 
-//	 * @param messageTitle
-//	 * @param messageBody
+//	 * @param message
 //	 * @param exception
 //	 */
-//	private void msgBoxError(String messageTitle, String messageBody, Throwable exception) {
+//	private void msgBoxError(String message, Throwable exception) {
 //		System.out.println("ERROR");
-//		System.out.println(" title   : " + messageTitle );
-//		System.out.println(" message : " + messageBody );
+//		System.out.println(" message : " + message );
 //		if ( exception != null ) {
 //			System.out.println(" exception : " + exception.getMessage() );
 //		}
 //	}
 
-	/**
-	 * Eclipse like 'MsgBox.error' 
-	 * @param message
-	 * @param exception
-	 */
-	private void msgBoxError(String message, Throwable exception) {
-		System.out.println("ERROR");
-		System.out.println(" message : " + message );
-		if ( exception != null ) {
-			System.out.println(" exception : " + exception.getMessage() );
-		}
-	}
-
-	/**
-	 * Eclipse like 'MsgBox.info' 
-	 * @param message
-	 */
-	private void msgBoxInfo(String message) {
-		System.out.println("INFORMATION");
-		System.out.println(" message : " + message );
-	}
+	
+//	/**
+//	 * Eclipse like 'MsgBox.info' 
+//	 * @param message
+//	 */
+//	private void msgBoxInfo(String message) {
+//		System.out.println("INFORMATION");
+//		System.out.println(" message : " + message );
+//	}
 	
 	//--------------------------------------------------------------------------------------
 	// Methods implementation for super class 'AbstractGenerationTask'
@@ -111,16 +99,14 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 
 	@Override  // Implementation for AbstractGenerationTask
 	protected boolean onError(ErrorReport errorReport) {
-//		msgBoxError(errorReport.getMessageTitle(), errorReport.getMessageBody(), errorReport.getException() );
-		msgBoxError(errorReport.getMessage(), errorReport.getException() );
-		return _continueIfError ; // continue the task or stop ?
+		//msgBoxError(errorReport.getMessage(), errorReport.getException() );
+		MsgBox.error(errorReport);
+		return continueIfError ; // continue the task or stop ?
 	}
 	
 	@Override  // Implementation for AbstractGenerationTask
 	protected void afterFileGeneration(Target target, String fullFileName) {
 		log("afterFileGeneration : " + target.getTemplate() + " --> " + fullFileName + "");
-		// Refresh the Eclipse Workspace 
-		//EclipseWksUtil.refresh( new File(fullFileName) );	
 	}
 	
 	@Override  // Implementation for GenerationTask
@@ -131,9 +117,9 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 		// BULK GENERATION ENTRY POINT 
 		// Creates a 'ProgressMonitor (Eclipse object)' and use it to run this task instance
 		//-----------------------------------------------------------------------------------
+		String title = "(no title)";
 		
 		//--- Run the generation task via the progress monitor 
-		//ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog( Util.getActiveWindowShell() ) ;
 		try {
 			log("Run generation task ..."  );
 			
@@ -145,33 +131,47 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 			
 			log("End of generation task."  );
 			
-			GenerationTaskResult generationTaskResult = super.getResult() ;
+//			GenerationTaskResult generationTaskResult = super.getResult() ;
 			
-			msgBoxInfo("END OF GENERATION" 
-					+ "\n\n" + generationTaskResult.getNumberOfResourcesCopied() + " resources(s) copied."
-					+ "\n\n" + generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated."
-					+ "\n\n" + generationTaskResult.getNumberOfGenerationErrors() + " generation error(s).");
+//			MsgBox.info(
+//					"END OF GENERATION" 
+//					+ "\n\n" + generationTaskResult.getNumberOfResourcesCopied() + " resources(s) copied."
+//					+ "\n\n" + generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated."
+//					+ "\n\n" + generationTaskResult.getNumberOfGenerationErrors() + " generation error(s).");
 			
-		} catch (InvocationTargetException invocationTargetException) {
-			ErrorReport errorReport = buildErrorReport(invocationTargetException);
-			onError( errorReport ) ;
+			title = "END OF GENERATION" ;
+		// throws InvocationTargetException : removed in v 3.3.0 
+//		} catch (InvocationTargetException invocationTargetException) {
+//			ErrorReport errorReport = buildErrorReport(invocationTargetException);
+//			onError( errorReport ) ;
 			
 		} catch (InterruptedException interruptedException) {
+//			GenerationTaskResult generationTaskResult = super.getResult() ;
+			//msgBoxInfo(
+//			MsgBox.info(
+//					"GENERATION CANCELED" 
+//					+ "\n\n" + generationTaskResult.getNumberOfResourcesCopied() + " resources(s) copied."
+//					+ "\n\n" + generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated."
+//					+ "\n\n" + generationTaskResult.getNumberOfGenerationErrors() + " generation error(s).");
+			title = "GENERATION CANCELED" ;
+		} finally {
 			GenerationTaskResult generationTaskResult = super.getResult() ;
-			msgBoxInfo("GENERATION CANCELED" 
-					+ "\n\n" + generationTaskResult.getNumberOfResourcesCopied() + " resources(s) copied."
-					+ "\n\n" + generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated."
-					+ "\n\n" + generationTaskResult.getNumberOfGenerationErrors() + " generation error(s).");
+			List<String> lines = new ArrayList<>();
+			lines.add(generationTaskResult.getNumberOfResourcesCopied() + " resources(s) copied.");
+			lines.add(generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated.");
+			lines.add(generationTaskResult.getNumberOfGenerationErrors() + " generation error(s).");
+			
+			MsgBox.info(title, lines );
 		}
 		
     	return super.getResult();		
 	}
 	
 	//--------------------------------------------------------------------------------------
-	// Methods implementation for Eclipse interface 'IRunnableWithProgress'
+	// Methods for Eclipse like behavior (like Eclipse interface 'IRunnableWithProgress')
 	//--------------------------------------------------------------------------------------
-//	@Override
-	private void run() throws InvocationTargetException, // just for Eclipse like behavior
+	// throws InvocationTargetException : removed in v 3.3.0 
+	private void run() throws // InvocationTargetException, 
 							InterruptedException {
 		log("run");
 

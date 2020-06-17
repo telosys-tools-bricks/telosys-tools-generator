@@ -127,8 +127,8 @@ public class GenerationTaskTest {
 		assertEquals(1, generationTaskResult.getErrors().size() );
 		for ( ErrorReport error : generationTaskResult.getErrors() ) {
             System.out.println( " . ERROR : \n "
-            		+ "  Error Type    : " + error.getErrorType() + "\n"
-            		+ "  Error Message : " + error.getMessage() );
+            		//+ "  Error Type    : " + error.getErrorType() + "\n"
+            		+ "  Error Message : " + error.getErrorMessage() );
 		}
 
 	}
@@ -155,8 +155,8 @@ public class GenerationTaskTest {
 		assertEquals(2, generationTaskResult.getErrors().size() );
 		for ( ErrorReport error : generationTaskResult.getErrors() ) {
             System.out.println( " . ERROR : \n "
-            		+ "  Error Type    : " + error.getErrorType() + "\n"
-            		+ "  Error Message : " + error.getMessage() );
+            		//+ "  Error Type    : " + error.getErrorType() + "\n"
+            		+ "  Error Message : " + error.getErrorMessage() );
 		}
 
 	}

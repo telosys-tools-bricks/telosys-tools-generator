@@ -20,11 +20,16 @@ public class ErrorProcessorTest {
 		assertTrue(e instanceof ParseException);
 		assertTrue(e instanceof ExtendedParseException);
 		
-		ErrorReport errorReport = ErrorProcessor.buildErrorReport(e, "Car", "foo.vm");
+		//ErrorReport errorReport = ErrorProcessor.buildErrorReport(e, "Car", "foo.vm");
+		ErrorReport errorReport = new ErrorReport(e, "my-test-template.vm", "MyTestEntity");
+		
 		System.out.println("ErrorReport ----------------------------- " );
-		System.out.println("Error type = " + errorReport.getErrorType() );
-		System.out.println("Message    = " + errorReport.getMessage() );
-		System.out.println("Exception  = " + errorReport.getException() );
+		System.out.println("Message    = '" + errorReport.getErrorMessage() +"'");
+		System.out.println("Exception  = '" + errorReport.getException() +"'");
+		System.out.println("Error details : "  );
+		for ( String s : errorReport.getErrorDetails() ) {
+			System.out.println(" -> " + s);
+		}
 	}
 
 }

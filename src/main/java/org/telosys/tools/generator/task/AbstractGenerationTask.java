@@ -50,7 +50,6 @@ public abstract class AbstractGenerationTask
 	private final List<TargetDefinition>  _selectedTargets ;
 	private final List<TargetDefinition>  _resourcesTargets ;
 	private final Model                   _model ;
-	//private final GeneratorConfig         _generatorConfig ; // removed in v 3.0.0
 	private final TelosysToolsCfg         _telosysToolsCfg ; // v 3.0.0
 	private final String                  _bundleName ;
 	private final TelosysToolsLogger      _logger ;
@@ -77,7 +76,6 @@ public abstract class AbstractGenerationTask
 			String                    bundleName, // v 3.0.0
 			List<TargetDefinition>    selectedTargets,
 			List<TargetDefinition>    resourcesTargets,
-			// GeneratorConfig           generatorConfig,  // removed in v 3.0.0
 			TelosysToolsCfg           telosysToolsCfg, // v 3.0.0
 			TelosysToolsLogger        logger
 			) throws TelosysToolsException
@@ -89,7 +87,6 @@ public abstract class AbstractGenerationTask
 		if ( bundleName  == null ) throw new TelosysToolsException("bundle name param is null ");
 		if ( selectedTargets  == null ) throw new TelosysToolsException("selectedTargets param is null ");
 		// resourcesTargets : can be null
-		//if ( generatorConfig  == null ) throw new TelosysToolsException("generatorConfig param is null ");
 		if ( telosysToolsCfg  == null ) throw new TelosysToolsException("TelosysToolsCfg param is null ");
 		if ( logger  == null )  throw new TelosysToolsException("logger param is null ");
 
@@ -97,9 +94,7 @@ public abstract class AbstractGenerationTask
 		_selectedEntities = selectedEntities ;
 		_selectedTargets  = selectedTargets ;
 		_resourcesTargets = resourcesTargets ; // can be null
-		//_generatorConfig  = generatorConfig ;
 		_telosysToolsCfg  = telosysToolsCfg ; // v 3.0.0
-		//_bundleName       = generatorConfig.getBundleName() ; 
 		_bundleName       = bundleName ;  // v 3.0.0
 		_logger           = logger ;
 		
@@ -133,7 +128,6 @@ public abstract class AbstractGenerationTask
 	}
 	
 	private Variable[] getAllProjectVariables() {
-//		return _generatorConfig.getTelosysToolsCfg().getAllVariables() ;
 		return _telosysToolsCfg.getAllVariables() ;
 	}
 	
@@ -166,8 +160,6 @@ public abstract class AbstractGenerationTask
 	private void copyResourcesIfAny(OverwriteChooser overwriteChooser, CopyHandler copyHandler) 
 			throws InterruptedException { 
 
-//		boolean continueTask = true ; 
-
 		List<TargetDefinition> resourcesTargetsDefinitions = this._resourcesTargets ;
 		if ( resourcesTargetsDefinitions != null ) {
 			_logger.log(this, "run : copy resources " );
@@ -178,10 +170,8 @@ public abstract class AbstractGenerationTask
 				numberOfResourcesCopied = resourcesManager.copyTargetsResourcesInProject(
 						resourcesTargetsDefinitions, overwriteChooser, copyHandler);
 			} catch (Exception e) {
-//				ErrorReport errorReport = new ErrorReport("Resources copy error", 
-//						buildMessageForException(e), e);
-				ErrorReport errorReport = ErrorProcessor.buildErrorReport("Resources copy error", e); // v 3.0.0
-				//continueTask = onError(errorReport);
+				//ErrorReport errorReport = ErrorProcessor.buildErrorReport("Resources copy error", e); // v 3.0.0
+				ErrorReport errorReport = new ErrorReport(e, null, null); // v 3.3.0
 				manageError(errorReport); // throws InterruptedException if 'canceled'
 			}
 			_result.setNumberOfResourcesCopied(numberOfResourcesCopied);
@@ -189,11 +179,6 @@ public abstract class AbstractGenerationTask
 		else {
 			_logger.log(this, "run : no resources to be copied" );
 		}
-		
-//		if ( continueTask == false ) // An error has occurred and the user choose "Cancel"
-//		{
-//			throw new InterruptedException("The generation task was cancelled");
-//		}
 	}
 	
 	//--------------------------------------------------------------------------------------------------
@@ -207,8 +192,8 @@ public abstract class AbstractGenerationTask
 	private void generateSelectedTargets( ITaskMonitor progressMonitor, Variable[] variables ) throws InterruptedException
 	{
 		//--- Separate targets in 2 list : "ONCE" and "ENTITY"
-		List<TargetDefinition> onceTargets   = new LinkedList<TargetDefinition>() ; 
-		List<TargetDefinition> entityTargets = new LinkedList<TargetDefinition>() ; 
+		List<TargetDefinition> onceTargets   = new LinkedList<>() ; 
+		List<TargetDefinition> entityTargets = new LinkedList<>() ; 
 		for ( TargetDefinition targetDefinition : _selectedTargets ) {
 			if ( targetDefinition.isOnce() ) {
 				onceTargets.add(targetDefinition); 
@@ -223,7 +208,6 @@ public abstract class AbstractGenerationTask
 
 		progressMonitor.beginTask("Generation in progress", totalWorkTasks ); 
 				
-		//boolean continueTask = true ; 
 		//--- For each entity
 		for ( String entityName : _selectedEntities ) {
 			
@@ -236,15 +220,15 @@ public abstract class AbstractGenerationTask
 					//--- Get a specialized target for the current entity
 					Target target = new Target( targetDefinition, entity, variables ); // v 3.0.0
 					
-					//continueTask = generateTarget(progressMonitor, target, _selectedEntities); 
 					generateTarget(progressMonitor, target, _selectedEntities); // throws InterruptedException if error + 'cancel'
 				}
 				//--- One TARGET done 
 			}
 			else {
-				ErrorReport errorReport = new ErrorReport("Generation error", 
-						"Entity '" + entityName + "' not found in the repository", null);
-				//continueTask = onError(errorReport);
+				//ErrorReport errorReport = new ErrorReport("Generation error", 
+				//		"Entity '" + entityName + "' not found in the repository");
+				String msg = "Generation error : entity '" + entityName + "' not found in the repository";
+				ErrorReport errorReport = new ErrorReport(msg);
 				_logger.error("Entity '" + entityName + "' not found in the repository") ;
 				manageError(errorReport); // throws InterruptedException if 'canceled'
 			}
@@ -255,18 +239,12 @@ public abstract class AbstractGenerationTask
 		for ( TargetDefinition targetDefinition : onceTargets ) {
 			//--- Target without current entity
 			Target target = new Target( targetDefinition, variables ); // v 3.0.0
-			//continueTask = generateTarget(progressMonitor, target, _selectedEntities); 
 			generateTarget(progressMonitor, target, _selectedEntities);  // throws InterruptedException if error + 'cancel'
 		}
 		
 		//--- Notifies that the work is done; that is, either the main task is completed or the user canceled it.
 		progressMonitor.done();
 		
-//		if ( 	progressMonitor.isCanceled() // Cancellation of current operation has been requested
-//			|| 	continueTask == false ) // An error has occurred and the user choose "Cancel"
-//		{
-//			throw new InterruptedException("The generation task was cancelled");
-//		}
 		if ( progressMonitor.isCanceled() ) { // Cancellation of current operation has been requested
 			throw new InterruptedException("The generation task was cancelled");
 		}
@@ -284,8 +262,6 @@ public abstract class AbstractGenerationTask
 	private void generateTarget(ITaskMonitor progressMonitor, Target target, List<String> selectedEntitiesNames) 
 			throws InterruptedException
 	{
-		//boolean continueTask = true ;
-		
 		_logger.log(this, "Generate TARGET : entity name '" + target.getEntityName() + "' - target file '" + target.getFile() + "' ");
 		
 		_currentTarget = target ;
@@ -300,7 +276,6 @@ public abstract class AbstractGenerationTask
 			generator.generateTarget(target, _model, selectedEntitiesNames, generatedTargets);
 		} catch (GeneratorException e) {
 			_result.addGenerationError(target);
-			//continueTask = onError(buildErrorReportForGeneratorException(e));
 			ErrorReport errorReport = buildErrorReportForGeneratorException(e);
 			manageError(errorReport); // throws InterruptedException if 'canceled'
 		}
@@ -323,7 +298,6 @@ public abstract class AbstractGenerationTask
 		// Note that this amount represents an installment, as opposed to a cumulative amount of work done to date.
 		progressMonitor.worked(1); // One unit done (not cumulative)
 		
-		//return continueTask ;
 	}
 	
 	//--------------------------------------------------------------------------------------------------
@@ -383,18 +357,17 @@ public abstract class AbstractGenerationTask
 	}
 	//--------------------------------------------------------------------------------------------------
 	/**
-	 * Build a new ErrorReport from the given exception and add it in the TaskResult
+	 * Build a new ErrorReport from the given exception and add it in the TaskResult <br>
+	 * NB : used by Eclipse Plugin in 'GenerationTaskWithProgress' 
+	 * TODO : move in Eclipse Plugin 
 	 * @param exception
 	 * @return
 	 */
 	protected ErrorReport buildErrorReport(InvocationTargetException exception ) {
-//		String msg = buildMessageForException(exception)
-//					+ buildMessageForExceptionCause(exception);
-//
-//		ErrorReport errorReport = new ErrorReport( "InvocationTargetException", msg, exception);
 		String entityName = this.getCurrentEntityName();
 		String templateName = this.getCurrentTemplateName();	
-		ErrorReport errorReport = ErrorProcessor.buildErrorReport(exception, entityName, templateName); // v 3.0.0
+		//ErrorReport errorReport = ErrorProcessor.buildErrorReport(exception, entityName, templateName); // v 3.0.0
+		ErrorReport errorReport = new ErrorReport(exception, templateName, entityName); // v 3.3.0
 		_result.addError(errorReport);
 		return errorReport ;
 	}
@@ -404,158 +377,12 @@ public abstract class AbstractGenerationTask
 		String templateName = this.getCurrentTemplateName();	
 		Throwable generatorExceptionCause = generatorException.getCause() ;
 		if ( generatorExceptionCause != null ) {
-//			String templateName = this.getCurrentTemplateName() ;
-//			String entityName = this.getCurrentEntityName() ;
-			//return buildErrorReportForGeneratorExceptionCause(generatorExceptionCause, entityName, templateName);
-			return ErrorProcessor.buildErrorReport(generatorExceptionCause, entityName, templateName); // v 3.0.0
+			//return ErrorProcessor.buildErrorReport(generatorExceptionCause, entityName, templateName); // v 3.0.0
+			return new ErrorReport(generatorExceptionCause, templateName, entityName); // v 3.3.0
 		}
 		else {
-//			String msg = 
-//					  buildMessageForTemplateAndEntity( this.getCurrentTemplateName(), 0, this.getCurrentEntityName())
-//					+ buildMessageForException(generatorException);
-//
-//			return new ErrorReport( "Generator error (no cause)", msg, generatorException);
-			return ErrorProcessor.buildErrorReport(generatorException, entityName, templateName); // v 3.0.0
+			//return ErrorProcessor.buildErrorReport(generatorException, entityName, templateName); // v 3.0.0
+			return new ErrorReport(generatorException, templateName, entityName); // v 3.3.0
 		}
 	}
-	//--------------------------------------------------------------------------------------------------
-	// Velocity 1.7 Exceptions 
-	// org.apache.velocity.exception.VelocityException ( Runtime Exceptions ) :
-	//  - org.apache.velocity.exception.MacroOverflowException
-	//  - org.apache.velocity.exception.MathException
-	//  - org.apache.velocity.exception.MethodInvocationException
-	//  - org.apache.velocity.exception.ParseErrorException
-	//  - org.apache.velocity.exception.ResourceNotFoundException
-	//  - org.apache.velocity.exception.TemplateInitException
-	// org.apache.velocity.runtime.parser.ParseException ( Checked Exceptions ) :
-	//  - org.apache.velocity.runtime.directive.MacroParseException
-	//  - org.apache.velocity.runtime.parser.TemplateParseException
-	//    
-	//--------------------------------------------------------------------------------------------------
-//	private ErrorReport buildErrorReportForGeneratorExceptionCause(Throwable generatorExceptionCause, String entityName, String templateName ) {
-//		
-//		if ( generatorExceptionCause instanceof DirectiveException ) {
-//			//--- DIRECTIVE ERROR ( Telosys Tools exception )
-//			// eg : #using ( "varNotDefined" )
-//			DirectiveException directiveException = (DirectiveException) generatorExceptionCause ;
-//			String msg = 
-//				  buildMessageForTemplateAndEntity( directiveException.getTemplateName(), directiveException.getLineNumber(), entityName)
-//				+ buildMessageForException(directiveException)
-//				+ "Directive  #" + directiveException.getDirectiveName() + " \n\n" 
-//				+ directiveException.getMessage() ;
-//
-//			return new ErrorReport( "Directive error", msg, directiveException);
-//		}
-//		else if ( generatorExceptionCause instanceof ParseErrorException ) {
-//			//--- TEMPLATE PARSING ERROR ( Velocity exception )
-//			// eg : #set(zzz)
-//			ParseErrorException parseErrorException = (ParseErrorException) generatorExceptionCause ;
-//			String msg = 
-//				  buildMessageForTemplateAndEntity( parseErrorException.getTemplateName(), parseErrorException.getLineNumber(), entityName)
-//				+ buildMessageForException(parseErrorException);
-//			return new ErrorReport( "Template parsing error", msg, parseErrorException );
-//		}
-//		else if ( generatorExceptionCause instanceof MethodInvocationException ) {
-//			//--- METHOD INVOCATION ( Velocity exception )
-//			// eg : $fn.isNotVoid("") : collection argument expected 
-//			MethodInvocationException methodInvocationException = (MethodInvocationException) generatorExceptionCause ;
-//			String msg = 
-//				  buildMessageForTemplateAndEntity( methodInvocationException.getTemplateName(), methodInvocationException.getLineNumber(), entityName)
-//				+ buildMessageForException(methodInvocationException)
-//				+ "Reference name : '" + methodInvocationException.getReferenceName() + "'"
-//				+ "\n" 
-//				+ "Method name : '" + methodInvocationException.getMethodName() + "'"
-//				+ "\n\n" 
-//				+ buildMessageForExceptionCause(generatorExceptionCause) 
-//				;
-//			return new ErrorReport( "Method invocation error", msg, methodInvocationException );
-//		}			
-//		else if ( generatorExceptionCause instanceof ResourceNotFoundException ) {
-//			//--- RESOURCE NOT FOUND ( Velocity exception )
-//			ResourceNotFoundException resourceNotFoundException = (ResourceNotFoundException) generatorExceptionCause ;
-//			String msg = 
-//				  buildMessageForTemplateAndEntity( templateName, 0, entityName )
-//				+ buildMessageForException(resourceNotFoundException); 
-//			return new ErrorReport( "Resource not found", msg, resourceNotFoundException );
-//		}			
-//		else if ( generatorExceptionCause instanceof GeneratorContextException ) {
-//			//--- CONTEXT ERROR ( Telosys Tools exception )
-//			// Reflection error encapsulation
-//			// eg : $entity.tototo / $entity.getTTTTTTTTT() / $entity.name.toAAAAA()
-//			// or errors due to invalid model 
-//			GeneratorContextException generatorContextException = (GeneratorContextException) generatorExceptionCause ;
-//			// generatorContextException.getTemplateName() not always know the template => use templateName arg
-//			String msg = 
-//				  buildMessageForTemplateAndEntity( templateName, generatorContextException.getLineNumber(), entityName)
-//				+ buildMessageForException(generatorContextException) ;
-//			return new ErrorReport( "Context error", msg, generatorContextException );
-//		}
-//		else if ( generatorExceptionCause instanceof VelocityException ) {
-//			//--- Generic Velocity exception (eg "OutOfBoud" )
-//			VelocityException velocityException = (VelocityException) generatorExceptionCause ;
-//			String msg = 
-//				  buildMessageForTemplateAndEntity( templateName, 0, entityName)
-//				+ buildMessageForException(velocityException) 
-//				+ buildMessageForExceptionCause(velocityException);
-//			return new ErrorReport( "Velocity error", msg, velocityException);
-//		}
-//		else {
-//			String msg = 
-//				  buildMessageForTemplateAndEntity( templateName, 0, entityName)
-//				+ buildMessageForException(generatorExceptionCause) ;
-//			return new ErrorReport("Unknown error", msg, generatorExceptionCause );
-//		}
-//	}
-//	
-//	//-------------------------------------------------------------------------------------------------------------
-//	private String buildMessageForTemplateAndEntity(String template, int line, String entity ) {
-//		String lineMsg = "" ;
-//		if ( line > 0 ) {
-//			lineMsg = "  ( line " + line + " )" ;
-//		}
-//		return "Template \"" + template + "\"" + lineMsg + "  -  Entity : \"" 
-//				+ entity + "\" \n\n" ;
-//	}
-//	//-------------------------------------------------------------------------------------------------------------
-//	private String buildMessageForException( Throwable exception ) {
-//		String s = exception.getClass().getSimpleName() + " : \n" 
-//					+ exception.getMessage() + "\n"
-//					+ "\n" ;
-//		return s ;
-//	}
-//	//-------------------------------------------------------------------------------------------------------------
-//	private String buildMessageForExceptionCause(Throwable exception) {
-//		Throwable cause = exception.getCause();
-//		if ( cause != null ) {
-//			StringBuilder sb = new StringBuilder() ;
-//			int n = 0 ;
-//			while ( cause != null ) {
-//				n++ ;
-//				sb.append( "Cause #" + n + " : " );
-//				sb.append( cause.getClass().getSimpleName() );
-//				sb.append( " - " );
-//				sb.append( cause.getMessage()  );
-//				sb.append( "\n" );
-//				StackTraceElement[] stackTrace = cause.getStackTrace() ;
-//				if ( stackTrace != null ) {
-//					for ( int i = 0 ; ( i < stackTrace.length ) && ( i < 5 ) ; i++ ) {
-//						StackTraceElement e = stackTrace[i];
-//						sb.append( e.getFileName() ) ;
-//						sb.append( " - " ) ;
-//						sb.append( e.getMethodName() ) ;
-//						sb.append( " - line " ) ;
-//						sb.append( e.getLineNumber() ) ;
-//						sb.append( "\n" );
-//					}
-//				}
-//				sb.append( "\n" );
-//				sb.append( "\n" );
-//				cause = cause.getCause() ;
-//			}
-//			return sb.toString();
-//		}
-//		else {
-//			return "No cause.\n" ;
-//		}
-//	}
 }
