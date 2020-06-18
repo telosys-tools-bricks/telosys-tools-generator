@@ -70,36 +70,12 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 		this.continueIfError = continueIfError ;
 	}
 	
-//	/**
-//	 * Eclipse like 'MsgBox.error' 
-//	 * @param message
-//	 * @param exception
-//	 */
-//	private void msgBoxError(String message, Throwable exception) {
-//		System.out.println("ERROR");
-//		System.out.println(" message : " + message );
-//		if ( exception != null ) {
-//			System.out.println(" exception : " + exception.getMessage() );
-//		}
-//	}
-
-	
-//	/**
-//	 * Eclipse like 'MsgBox.info' 
-//	 * @param message
-//	 */
-//	private void msgBoxInfo(String message) {
-//		System.out.println("INFORMATION");
-//		System.out.println(" message : " + message );
-//	}
-	
 	//--------------------------------------------------------------------------------------
 	// Methods implementation for super class 'AbstractGenerationTask'
 	//--------------------------------------------------------------------------------------
 
 	@Override  // Implementation for AbstractGenerationTask
 	protected boolean onError(ErrorReport errorReport) {
-		//msgBoxError(errorReport.getMessage(), errorReport.getException() );
 		MsgBox.error(errorReport);
 		return continueIfError ; // continue the task or stop ?
 	}
@@ -122,23 +98,12 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 		//--- Run the generation task via the progress monitor 
 		try {
 			log("Run generation task ..."  );
-			
 			//--- RUN THE TASK ( 'this' task ) 
 			// the 'run' method must be conformed to Eclipse 'IRunnableWithProgress' implementation			
-			run(); // 
+			run();
 			// NB :
 			// All the exceptions are wrapped in a 'InvocationTargetException'
-			
 			log("End of generation task."  );
-			
-//			GenerationTaskResult generationTaskResult = super.getResult() ;
-			
-//			MsgBox.info(
-//					"END OF GENERATION" 
-//					+ "\n\n" + generationTaskResult.getNumberOfResourcesCopied() + " resources(s) copied."
-//					+ "\n\n" + generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated."
-//					+ "\n\n" + generationTaskResult.getNumberOfGenerationErrors() + " generation error(s).");
-			
 			title = "END OF GENERATION" ;
 		// throws InvocationTargetException : removed in v 3.3.0 
 //		} catch (InvocationTargetException invocationTargetException) {
@@ -146,13 +111,6 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 //			onError( errorReport ) ;
 			
 		} catch (InterruptedException interruptedException) {
-//			GenerationTaskResult generationTaskResult = super.getResult() ;
-			//msgBoxInfo(
-//			MsgBox.info(
-//					"GENERATION CANCELED" 
-//					+ "\n\n" + generationTaskResult.getNumberOfResourcesCopied() + " resources(s) copied."
-//					+ "\n\n" + generationTaskResult.getNumberOfFilesGenerated() + " file(s) generated."
-//					+ "\n\n" + generationTaskResult.getNumberOfGenerationErrors() + " generation error(s).");
 			title = "GENERATION CANCELED" ;
 		} finally {
 			GenerationTaskResult generationTaskResult = super.getResult() ;

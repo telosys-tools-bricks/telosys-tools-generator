@@ -47,9 +47,6 @@ public class Generator {
 	
 	private final TelosysToolsCfg          _telosysToolsCfg ; // v 3.0.0
 	private final String                   _bundleName ; // v 3.0.0
-
-	//private final DatabasesConfigurations  _databasesConfigurations ; // v 3.0.0
-	
 	private final TelosysToolsLogger       _logger ;
 
 	/**
@@ -69,8 +66,6 @@ public class Generator {
 			throw new IllegalArgumentException("Bundle name parameter is null");
 		}
 		_bundleName = bundleName ; // v 3.0.0
-		
-		//_databasesConfigurations = loadDatabasesConfigurations(_telosysToolsCfg); // v 3.0.0
 	}
 	
 	private void log(String s) {
@@ -79,29 +74,6 @@ public class Generator {
 		}
 	}
 	
-//	/**
-//	 * Loads the databases configurations if any
-//	 * @return
-//	 */
-//	private DatabasesConfigurations loadDatabasesConfigurations( TelosysToolsCfg telosysToolsCfg )  // v 3.0.0
-//	{
-//		DatabasesConfigurations databasesConfigurations = null ;
-//		String dbcfgFileName = telosysToolsCfg.getDatabasesDbCfgFileAbsolutePath();
-//		File dbcfgFile = new File(dbcfgFileName);
-//		if ( dbcfgFile.exists() ) {
-//			try {
-//				DbConfigManager dbConfigManager = new DbConfigManager( dbcfgFile );
-//				databasesConfigurations = dbConfigManager.load() ;
-//			} catch (TelosysToolsException e) {
-//				databasesConfigurations = new DatabasesConfigurations() ; // Void
-//			}
-//			return databasesConfigurations ;
-//		}
-//		else {
-//			return new DatabasesConfigurations() ; // Void
-//		}
-//	}
-
 	//========================================================================
 	// TEMPLATE MANAGEMENT
 	//========================================================================
@@ -110,7 +82,6 @@ public class Generator {
 		String templateFileName  = target.getTemplate();
 		String templateDirectory = _telosysToolsCfg.getTemplatesFolderAbsolutePath(); // v 3.0.0
 
-		//File file = checkTemplate( templateDirectory, templateFileName);
 		checkTemplate( templateDirectory, templateFileName);
 		
 		String bundleFolderAbsolutePath = _telosysToolsCfg.getTemplatesFolderAbsolutePath(_bundleName) ; 
@@ -157,13 +128,6 @@ public class Generator {
 		return file ;
 	}
 	
-//	private String generate( GeneratorTemplate generatorTemplate, GeneratorContext generatorContext)
-//			throws Exception {
-//		log("generate(generatorTemplate, generatorContext)...");
-//		GeneratorEngine generatorEngine = new GeneratorEngine();
-//		return generatorEngine.generate(generatorTemplate, generatorContext );
-//	}
-
 	/**
 	 * Generates in memory and returns the InputStream on the generation result
 	 * @return
@@ -184,8 +148,6 @@ public class Generator {
 			//------------------------------------------------------------------
 			//--- Load the TEMPLATE for the given TARGET
 			GeneratorTemplate generatorTemplate = loadTemplate(target) ;
-//			//--- Call the GENERATOR ENGINE
-//			result = generate(generatorTemplate, generatorContext);
 			//--- Create a new GENERATOR ENGINE
 			GeneratorEngine generatorEngine = new GeneratorEngine();
 			//--- GENERATION 
@@ -217,7 +179,12 @@ public class Generator {
 			List<String> selectedEntitiesNames,
 			List<Target> generatedTargets) throws GeneratorException
 	{
-		_logger.info("Generation in progress : target = " + target.getTargetName() + " / entity = " + target.getEntityName() );
+		String entityName = target.getEntityName() ;
+		if ( StrUtil.nullOrVoid(entityName) ) {
+			entityName = "(no entity)" ;
+		}
+		
+		_logger.info("Gen : " + target.getTemplate() + " : " +  entityName  );
 		
 		//--- Creation of a full context for the generator
 		GeneratorContextBuilder generatorContextBuilder = new GeneratorContextBuilder(_telosysToolsCfg, _logger);
@@ -240,13 +207,13 @@ public class Generator {
 			_logger.error(e.getMessage());
 			throw new GeneratorException(msg + " : " + e.getMessage(), e);
 		} // Generate the target in memory
-		_logger.info("Generation done.");
+		_logger.log("Generation OK.");
 
 		//---------- Save the result in the file
 		String outputFileName = target.getOutputFileNameInFileSystem( _telosysToolsCfg.getDestinationFolderAbsolutePath() ); // v 3.0.0
-		_logger.info("Saving target file : " + outputFileName );
+		_logger.log("Saving target file : " + outputFileName );
 		saveStreamInFile(is, outputFileName, true );
-		_logger.info("Target file saved." );
+		_logger.info("OK :  " + target.getOutputFileNameInProject() );
 		
 		//---------- Add the generated target in the list if any
 		if ( generatedTargets != null ) {

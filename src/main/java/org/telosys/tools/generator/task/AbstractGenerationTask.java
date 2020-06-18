@@ -159,7 +159,7 @@ public abstract class AbstractGenerationTask
 	 */
 	private void copyResourcesIfAny(OverwriteChooser overwriteChooser, CopyHandler copyHandler) 
 			throws InterruptedException { 
-
+		_logger.info("----- Copy static resources if any " );
 		List<TargetDefinition> resourcesTargetsDefinitions = this._resourcesTargets ;
 		if ( resourcesTargetsDefinitions != null ) {
 			_logger.log(this, "run : copy resources " );
@@ -175,9 +175,11 @@ public abstract class AbstractGenerationTask
 				manageError(errorReport); // throws InterruptedException if 'canceled'
 			}
 			_result.setNumberOfResourcesCopied(numberOfResourcesCopied);
+			_logger.info(numberOfResourcesCopied + " resource(s) copied" );
 		}
 		else {
-			_logger.log(this, "run : no resources to be copied" );
+			_logger.log(this, "run : no resources to copy" );
+			_logger.info("No resources to copy" );
 		}
 	}
 	
@@ -211,7 +213,8 @@ public abstract class AbstractGenerationTask
 		//--- For each entity
 		for ( String entityName : _selectedEntities ) {
 			
-			_logger.log(this, "run : entity " + entityName );
+			//_logger.log(this, "run : entity " + entityName );
+			_logger.info("----- Generation for entity " + entityName );
 			Entity entity = _model.getEntityByClassName(entityName);
 			if ( entity != null ) {
 				//--- For each "entity target" 
@@ -225,8 +228,6 @@ public abstract class AbstractGenerationTask
 				//--- One TARGET done 
 			}
 			else {
-				//ErrorReport errorReport = new ErrorReport("Generation error", 
-				//		"Entity '" + entityName + "' not found in the repository");
 				String msg = "Generation error : entity '" + entityName + "' not found in the repository";
 				ErrorReport errorReport = new ErrorReport(msg);
 				_logger.error("Entity '" + entityName + "' not found in the repository") ;
@@ -236,6 +237,7 @@ public abstract class AbstractGenerationTask
 		} // end of "For each entity"
 		
 		//--- Finally, generate the "ONCE" targets ( NEW in version 2.0.3 / Feb 2013 )
+		_logger.info("----- Generation without entity" );
 		for ( TargetDefinition targetDefinition : onceTargets ) {
 			//--- Target without current entity
 			Target target = new Target( targetDefinition, variables ); // v 3.0.0
@@ -359,7 +361,7 @@ public abstract class AbstractGenerationTask
 	/**
 	 * Build a new ErrorReport from the given exception and add it in the TaskResult <br>
 	 * NB : used by Eclipse Plugin in 'GenerationTaskWithProgress' 
-	 * TODO : move in Eclipse Plugin 
+	 * TODO : move in Eclipse Plugin ??
 	 * @param exception
 	 * @return
 	 */
