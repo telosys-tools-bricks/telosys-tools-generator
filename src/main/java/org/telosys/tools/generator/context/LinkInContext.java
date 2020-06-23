@@ -121,23 +121,14 @@ public class LinkInContext {
 	}
 	
 	/**
-	 * Returns the default collection full type <br>
-	 * (for the time being the type is always a Java List)
-	 * @return
-	 */
-	private String getCollectionFullType() {
-		// TODO : get it from current target language ?
-		return "java.util.List" ; 
-	}
-
-	/**
 	 * Returns the default collection simple type <br>
 	 * (for the time being the type is always a Java List)
+	 * @param className
 	 * @return
 	 */
-	private String getCollectionSimpleType() {
+	private String buildCollectionType(String className) {
 		// TODO : get it from current target language ?
-		return "List" ; 
+		return "List<" + className + ">" ; 
 	}
 	
 
@@ -189,8 +180,10 @@ public class LinkInContext {
 			"Returns the Java getter for the link e.g. 'getPerson' for link 'person' "
 			}
 	)
-	public String getGetter() throws GeneratorException  {
-		return Util.buildGetter(this.getFieldName(), this.getFieldType());
+	public String getGetter() { // throws GeneratorException  {
+		//return Util.buildGetter(this.getFieldName(), this.getFieldType());
+		// false : a link is never a "boolean"
+		return Util.buildGetter(this.getFieldName(), false); // v 3.3.0
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -384,63 +377,72 @@ public class LinkInContext {
 	}
 
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the field 'full type' for the link ( eg 'java.util.List' ) ",
-			"for OneToMany/ManyToMany : the collection full type ( 'java.util.List', ...)",
-			"for ManyToOne/OneToOne : the targeted entity full type ( 'my.package.Person', 'my.package.Customer', ... ) "
-			}
-	)
-	public String getFieldFullType() throws GeneratorException {
-		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
-			// Link referencing a collection : the link provides the full type ( java.util.List, java.util.Set, ... )
-			// return _fieldType ; // use the type as is 
-			return getCollectionFullType();
-		} else {
-			// Link referencing an entity : the link provides the simple type ( Person, Customer, Book, ... )
-			return this.getTargetEntityFullType() ; // get the 'full type' from the referenced entity // v 2.1.0
-		}		
-	}
+// REMOVED in v 3.3.0
+//	@VelocityMethod(
+//		text={	
+//			"Returns the field 'full type' for the link ( eg 'java.util.List' ) ",
+//			"for OneToMany/ManyToMany : the collection full type ( 'java.util.List', ...)",
+//			"for ManyToOne/OneToOne : the targeted entity full type ( 'my.package.Person', 'my.package.Customer', ... ) "
+//			}
+//	)
+//	public String getFieldFullType() throws GeneratorException {
+//		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
+//			// Link referencing a collection : the link provides the full type ( java.util.List, java.util.Set, ... )
+//			// return _fieldType ; // use the type as is 
+//			return getCollectionFullType();
+//		} else {
+//			// Link referencing an entity : the link provides the simple type ( Person, Customer, Book, ... )
+//			return this.getTargetEntityFullType() ; // get the 'full type' from the referenced entity // v 2.1.0
+//		}		
+//	}
 
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the field 'simple type' for the link ",
-			"for OneToMany/ManyToMany : the collection short type ( 'List', ...)",
-			"for ManyToOne/OneToOne : the targeted entity short type ( 'Person', 'Customer', ... ) "
-			}
-	)
-	public String getFieldSimpleType() throws GeneratorException {
-		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
-			// Link referencing a collection : the link provides the full type ( java.util.List, java.util.Set, ... )
-			// return JavaClassUtil.shortName( _fieldType ); // return only the 'simple name' ( 'List', 'Set', ... )
-			return getCollectionSimpleType();
-		} else {
-			// Link referencing an entity : the link provides the simple type ( Person, Customer, Book, ... )
-			return this.getTargetEntitySimpleType() ; // get the 'simple type' from the referenced entity // v 2.1.0
-		}		
-	}
+// REMOVED in v 3.3.0
+//	@VelocityMethod(
+//		text={	
+//			"Returns the field 'simple type' for the link ",
+//			"for OneToMany/ManyToMany : the collection short type ( 'List', ...)",
+//			"for ManyToOne/OneToOne : the targeted entity short type ( 'Person', 'Customer', ... ) "
+//			}
+//	)
+//	public String getFieldSimpleType() throws GeneratorException {
+//		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
+//			// Link referencing a collection : the link provides the full type ( java.util.List, java.util.Set, ... )
+//			// return JavaClassUtil.shortName( _fieldType ); // return only the 'simple name' ( 'List', 'Set', ... )
+//			return getCollectionSimpleType();
+//		} else {
+//			// Link referencing an entity : the link provides the simple type ( Person, Customer, Book, ... )
+//			return this.getTargetEntitySimpleType() ; // get the 'simple type' from the referenced entity // v 2.1.0
+//		}		
+//	}
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Returns the type of the link ",
-			"eg : List, List<Person>, Person, ..."
+			"eg : Person, List<Person>,  ..."
 			}
 	)
 	public String getFieldType() throws GeneratorException {
-		String type = "";
 		String targetEntityClassName = this.getTargetEntitySimpleType() ; // v 2.1.0
-		String simpleType = this.getFieldSimpleType();
+//		String type = "";
+//		String simpleType = this.getFieldSimpleType();
+//		
+//		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
+//			// List<Xxx>, Set<Xxxx>, ....
+//			type = simpleType + "<" + targetEntityClassName + ">";
+//		} else {
+//			// Xxx
+//			type = targetEntityClassName ;
+//		}
+//		return type;
 		
+		// NEW in v 3.3.0
 		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
-			// List<Xxx>, Set<Xxxx>, ....
-			type = simpleType + "<" + targetEntityClassName + ">";
+			return buildCollectionType(targetEntityClassName);
 		} else {
-			// Xxx
-			type = targetEntityClassName ;
+			return targetEntityClassName ;
 		}
-		return type;
 	}	
 	
 	//-------------------------------------------------------------------------------------

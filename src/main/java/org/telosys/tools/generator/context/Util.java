@@ -57,22 +57,36 @@ public class Util {
 		}
 	}
 	
+//    /**
+//     * Returns 'getFoo' for 'foo'(or 'isFoo' if foo is boolean )
+//     * @param attributeName
+//     * @param sLongType
+//     * @return
+//     */
+//    public static String buildGetter(String attributeName, String sLongType) {
+//		//String s = attName.substring(0, 1).toUpperCase()+attName.substring(1, attName.length());
+//		if ( "boolean".equals(sLongType) )
+//		{
+//			//return "is" + s;
+//			return "is" + transformAttributeName(attributeName) ;
+//		}
+//		else
+//		{
+//			//return "get" + s;
+//			return "get" + transformAttributeName(attributeName) ;
+//		}
+//	}
     /**
      * Returns 'getFoo' for 'foo'(or 'isFoo' if foo is boolean )
      * @param attributeName
-     * @param sLongType
+     * @param isBooleanGetter
      * @return
      */
-    public static String buildGetter(String attributeName, String sLongType) {
-		//String s = attName.substring(0, 1).toUpperCase()+attName.substring(1, attName.length());
-		if ( "boolean".equals(sLongType) )
-		{
-			//return "is" + s;
+    public static String buildGetter(String attributeName, boolean isBooleanGetter) {
+		if ( isBooleanGetter ) {
 			return "is" + transformAttributeName(attributeName) ;
 		}
-		else
-		{
-			//return "get" + s;
+		else {
 			return "get" + transformAttributeName(attributeName) ;
 		}
 	}

@@ -292,8 +292,21 @@ public class Java {
 			//--- All the links 
 			for ( LinkInContext link : entity.getLinks() ) {
 				if ( link.isCardinalityOneToMany() || link.isCardinalityManyToMany() ) {
-					// "java.util.List", "java.util.Set", ... 
-					imports.declareType( link.getFieldFullType() ); 
+					// collection types used in your JPA 
+					// "java.util.List", "java.util.Set", "java.util.Collection" 
+//					imports.declareType( link.getFieldFullType() ); 
+					// NEW in v 3.3.0
+					String type = link.getFieldType();
+					if ( type.contains("Set<") && type.contains(">") ) {
+						imports.declareType("java.util.Set");
+					} 
+					else if ( type.contains("Collection<") && type.contains(">") ) {
+						imports.declareType("java.util.Collection");
+					} 
+					else {
+						// by default "List" 
+						imports.declareType("java.util.List");
+					}
 				}
 				else {
 					// ManyToOne or OneToOne => bean ( "Book", "Person", ... )
@@ -301,9 +314,6 @@ public class Java {
 				}
 			}
 			//--- Resulting list of imports
-//			List<String> resultList = imports.getList();
-//			java.util.Collections.sort(resultList);
-//			return resultList ;
 			return imports.getFinalImportsList();
 		}
 		return VOID_STRINGS_LIST ;

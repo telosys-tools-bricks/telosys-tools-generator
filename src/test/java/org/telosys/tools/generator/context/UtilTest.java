@@ -22,12 +22,12 @@ public class UtilTest extends TestCase {
 	public void testBuildGetter2() {
 		String s ;
 		
-		s = Util.buildGetter("foo", "String");
-		System.out.println("Getter : " + s);
+		//s = Util.buildGetter("foo", "String");
+		s = Util.buildGetter("foo", false);
 		assertEquals("getFoo", s);
 
-		s = Util.buildGetter("foo", "boolean");
-		System.out.println("Getter : " + s);
+		//s = Util.buildGetter("foo", "boolean");
+		s = Util.buildGetter("foo", true);
 		assertEquals("isFoo", s);
 	}
 

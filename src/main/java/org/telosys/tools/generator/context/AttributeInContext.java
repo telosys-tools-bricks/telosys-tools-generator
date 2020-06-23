@@ -487,7 +487,8 @@ public class AttributeInContext {
 					}
 	)
 	public String getGetter() {
-		return Util.buildGetter(name, this.getType() );
+		//return Util.buildGetter(name, this.getType() );
+		return Util.buildGetter(name, this.isBooleanType() && this.isPrimitiveType() ); // v 3.3.0
 	}
 
 	//-------------------------------------------------------------------------------------
