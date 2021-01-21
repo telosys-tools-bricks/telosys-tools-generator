@@ -15,8 +15,6 @@
  */
 package org.telosys.tools.generator.context.tools;
 
-import java.sql.Types;
-
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generic.model.DateType;
@@ -237,17 +235,24 @@ public class AnnotationsForJPA
 		s = s + "name=\"" + _attribute.getDatabaseName() + "\"" ;
 		
 		//--- Nullable : (Optional) Whether the database column is nullable.
-		if ( _attribute.isDatabaseNotNull() ) {
+		if ( _attribute.isDatabaseNotNull() || _attribute.isNotNull() ) {
 			s = s + ", nullable=false" ;
 		}
 		
 		//--- Length : (Optional) The column length. 
-		// implemented only for "VARCHAR" and "CHAR" JDBC types
-		int jdbcType = _attribute.getJdbcTypeCode();
-		if ( jdbcType == Types.VARCHAR || jdbcType == Types.CHAR ) {
-			s = s + ", length=" + _attribute.getDatabaseSize() + "" ;
+//		// implemented only for "VARCHAR" and "CHAR" JDBC types
+//		int jdbcType = _attribute.getJdbcTypeCode();
+//		if ( jdbcType == Types.VARCHAR || jdbcType == Types.CHAR ) {
+//			s = s + ", length=" + _attribute.getDatabaseSize() + "" ;
+//		}
+		if ( _attribute.isStringType() ) { // v 3.3.0
+			if ( ! StrUtil.nullOrVoid(_attribute.getDatabaseSize()) ) {
+				s = s + ", length=" + _attribute.getDatabaseSize() + "" ;
+			}
+			else if ( ! StrUtil.nullOrVoid(_attribute.getMaxLength()) ) {
+				s = s + ", length=" + _attribute.getMaxLength() + "" ;
+			}
 		}
-		
 		s = s + ")" ;
 		
 		//--- Other elements for "@Column" ( from JavaDoc / Java EE 6 )

@@ -16,11 +16,14 @@
 package org.telosys.tools.fake.generic.model;
 
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.DateType;
 import org.telosys.tools.generic.model.Entity;
+import org.telosys.tools.generic.model.ForeignKeyPart;
 
 public class FakeAttribute implements Attribute {
 	
@@ -625,5 +628,15 @@ public class FakeAttribute implements Attribute {
 	@Override
 	public Map<String, String> getTagsMap() {
 		return null;
+	}
+
+	@Override
+	public List<ForeignKeyPart> getFKParts() {
+		return new LinkedList<>();
+	}
+
+	@Override
+	public boolean hasFKParts() {
+		return false;
 	}
 }

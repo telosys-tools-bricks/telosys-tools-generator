@@ -17,11 +17,14 @@ package junit.env.telosys.tools.generator.fakemodel;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.telosys.tools.commons.jdbctypes.JdbcTypesManager;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.DateType;
+import org.telosys.tools.generic.model.ForeignKeyPart;
 
 /**
  * Column of a table/entity in the Repository Model <br>
@@ -1072,6 +1075,20 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 	@Override
 	public Map<String, String> getTagsMap() {
 		return null;
+	}
+
+	//----------------------------------------------------------------
+	// ver 3.3.0
+	private List<ForeignKeyPart> fkParts = new LinkedList<>();
+
+	@Override
+	public List<ForeignKeyPart> getFKParts() {
+		return fkParts;
+	}
+
+	@Override
+	public boolean hasFKParts() {
+		return false;
 	}
 
 }

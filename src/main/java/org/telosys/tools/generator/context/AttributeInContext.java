@@ -15,6 +15,8 @@
  */
 package org.telosys.tools.generator.context;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.telosys.tools.commons.DatabaseUtil;
@@ -25,9 +27,11 @@ import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.GeneratorUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
+import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.DateType;
+import org.telosys.tools.generic.model.ForeignKeyPart;
 import org.telosys.tools.generic.model.types.AttributeTypeInfo;
 import org.telosys.tools.generic.model.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
@@ -106,11 +110,6 @@ public class AttributeInContext {
 	//--- Database info -------------------------------------------------
     private final boolean isKeyElement      ;  // True if primary key
     
-    private final boolean isForeignKey          ; // v 3.0.0
-    private final boolean isForeignKeySimple    ; // v 3.0.0
-    private final boolean isForeignKeyComposite ; // v 3.0.0
-    private final String  referencedEntityClassName ; // v 3.0.0
-
     private final String  dataBaseName     ;  // Column name in the DB table
     private final String  dataBaseType      ;  // Column type in the DB table
     private final String  databaseSize   ;     // Size of this column (if Varchar ) etc..
@@ -122,6 +121,13 @@ public class AttributeInContext {
     private final int     jdbcTypeCode    ;  // JDBC type code for this column
     private final String  jdbcTypeName    ;  // JDBC type name 
     
+	//--- FOREIGN KEYS  -------------------------------------------------
+    private final boolean isForeignKey          ; // v 3.0.0
+    private final boolean isForeignKeySimple    ; // v 3.0.0
+    private final boolean isForeignKeyComposite ; // v 3.0.0
+    private final String  referencedEntityClassName ; // v 3.0.0 (NOT RELIABLE!)
+    private final List<ForeignKeyPartInContext> fkParts = new LinkedList<>(); // v 3.3.0
+
     //--- Further info for BOOLEAN -----------------------------------
     private final String  _sBooleanTrueValue  ; // eg "1", ""Yes"", ""true""
     private final String  _sBooleanFalseValue ; // eg "0", ""No"",  ""false""
@@ -208,10 +214,15 @@ public class AttributeInContext {
         this.jdbcTypeName     = StrUtil.notNull( attribute.getJdbcTypeName() );
         this.isKeyElement     = attribute.isKeyElement(); // v 3.0.0
         
+		//--- Foreign Keys / references
         this.isForeignKey          = attribute.isFK() ; // v 3.0.0
         this.isForeignKeySimple    = attribute.isFKSimple() ; // v 3.0.0
         this.isForeignKeyComposite = attribute.isFKComposite() ; // v 3.0.0
         this.referencedEntityClassName = attribute.getReferencedEntityClassName() ;  // v 3.0.0
+        // Build "Foreign Key Parts" if any ( v 3.3.0 )
+        for ( ForeignKeyPart fkPart : attribute.getFKParts() ) {
+        	this.fkParts.add(new ForeignKeyPartInContext(fkPart)); // v 3.3.0
+        }
 
         this.isAutoIncremented  = attribute.isAutoIncremented();
         //this.databaseSize     = attribute.getDatabaseSize() != null ? attribute.getDatabaseSize() : "" ;
@@ -279,7 +290,7 @@ public class AttributeInContext {
 		
 		this.tagsMap = attribute.getTagsMap();
 	}
-	
+
 	protected final LanguageType getLanguageType() {
 		TypeConverter typeConverter = envInContext.getTypeConverter();
 		LanguageType languageType = typeConverter.getType(this.attributeTypeInfo);
@@ -727,6 +738,25 @@ public class AttributeInContext {
 	}
 	public boolean isUsedInSelectedLinks() { // v 3.0.0 #LGU
 		return _bIsUsedInSelectedLinks ;
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+	text= { 
+		"Returns the parts of Foreign Keys for which the attribute is implied. ",
+		"Each 'FK part' provides the referenced entity and attribute (with table and colunm)",
+		"An empty list is returned if the attribute does not participate in any FK."
+	},
+	example={	
+		"#foreach( $fkPart in $attrib.fkParts )",
+		"...",
+		"#end" 
+	},
+	since="3.3.0"
+	)
+	@VelocityReturnType("List of 'fkPart' objects")
+	public List<ForeignKeyPartInContext> getFkParts() {
+		return fkParts ;
 	}
 	
 	//-------------------------------------------------------------------------------------

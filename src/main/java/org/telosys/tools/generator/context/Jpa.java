@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.GeneratorException;
+import org.telosys.tools.generator.GeneratorUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
@@ -172,20 +173,20 @@ public class Jpa {
 				//   @OneToOne 
 			    //   @JoinColumn(name="BADGE_NUMBER", referencedColumnName="BADGE_NUMBER")
 
-				annotations.addLine(getOwningSideCardinalityAnnotation( entityLink, "OneToOne", null ) ); 
+				annotations.addLine(getCardinalityAnnotationForOwningSide( entityLink, "OneToOne", null ) ); 
 				processJoinColumns(annotations, entityLink, entityLink.getJoinColumns(), alreadyMappedFields );
 			} 
 			else if ( entityLink.isCardinalityManyToOne() ) {
-				annotations.addLine(getOwningSideCardinalityAnnotation( entityLink, "ManyToOne", null ) ); 
+				annotations.addLine(getCardinalityAnnotationForOwningSide( entityLink, "ManyToOne", null ) ); 
 				processJoinColumns(annotations, entityLink, entityLink.getJoinColumns(), alreadyMappedFields );
 			} 
 			else if ( entityLink.isCardinalityManyToMany() ) {
-				annotations.addLine(getOwningSideCardinalityAnnotation( entityLink, "ManyToMany", targetEntityClassName ) ); 
+				annotations.addLine(getCardinalityAnnotationForOwningSide( entityLink, "ManyToMany", targetEntityClassName ) ); 
 				processJoinTable(annotations, entityLink) ;
 			}
 			else if ( entityLink.isCardinalityOneToMany() ) {
 				//--- Possible for unidirectional "OneToMany" relationship ( whithout inverse side )
-				annotations.addLine(getOwningSideCardinalityAnnotation( entityLink, "OneToMany", targetEntityClassName ) ); 
+				annotations.addLine(getCardinalityAnnotationForOwningSide( entityLink, "OneToMany", targetEntityClassName ) ); 
 				processJoinTable(annotations, entityLink) ;				
 			} 
 			else {
@@ -195,21 +196,73 @@ public class Jpa {
 		else {
 			//--- INVERSE SIDE
 			if (entityLink.isCardinalityOneToOne()) {
-				annotations.addLine(getInverseSideCardinalityAnnotation( entityLink, "OneToOne" ) ); 
+				annotations.addLine(getCardinalityAnnotationForInverseSide( entityLink, "OneToOne" ) ); 
 			} 
 			else if (entityLink.isCardinalityOneToMany()) {
-				annotations.addLine(getInverseSideCardinalityAnnotation( entityLink, "OneToMany" ) ); 
+				annotations.addLine(getCardinalityAnnotationForInverseSide( entityLink, "OneToMany" ) ); 
 			} 
 			else if (entityLink.isCardinalityManyToMany()) {
-				annotations.addLine(getInverseSideCardinalityAnnotation( entityLink, "ManyToMany" ) ); 
+				annotations.addLine(getCardinalityAnnotationForInverseSide( entityLink, "ManyToMany" ) ); 
 			} 
 			else if (entityLink.isCardinalityManyToOne()) {
 				// Not supposed to occur for an INVERSE SIDE !
-				annotations.addLine(getInverseSideCardinalityAnnotation( entityLink, "ManyToOne" ) ); 
+				annotations.addLine(getCardinalityAnnotationForInverseSide( entityLink, "ManyToOne" ) ); 
 			} 
 			else {
 				// Error 
 			}
+		}
+		return annotations.getAnnotations();
+	}
+	
+	public String linkCardinalityAnnotation(int leftMargin, LinkInContext entityLink )
+			throws GeneratorException {
+		String annotation = "" ;
+		String targetEntityClassName = entityLink.getTargetEntity().getName();
+		if ( entityLink.isOwningSide() ) {
+			if ( entityLink.isCardinalityOneToOne() ) {
+				annotation = getCardinalityAnnotationForOwningSide( entityLink, "OneToOne", null ) ; 
+			} 
+			else if ( entityLink.isCardinalityManyToOne() ) {
+				annotation = getCardinalityAnnotationForOwningSide( entityLink, "ManyToOne", null ) ; 
+			} 
+			else if ( entityLink.isCardinalityManyToMany() ) {
+				annotation = getCardinalityAnnotationForOwningSide( entityLink, "ManyToMany", targetEntityClassName ) ; 
+			}
+			else if ( entityLink.isCardinalityOneToMany() ) {
+				//--- Possible for unidirectional "OneToMany" relationship ( whithout inverse side )
+				annotation = getCardinalityAnnotationForOwningSide( entityLink, "OneToMany", targetEntityClassName ) ; 
+			} 
+		} 
+		else {
+			//--- INVERSE SIDE
+			if (entityLink.isCardinalityOneToOne()) {
+				annotation = getCardinalityAnnotationForInverseSide( entityLink, "OneToOne" ); 
+			} 
+			else if (entityLink.isCardinalityOneToMany()) {
+				annotation = getCardinalityAnnotationForInverseSide( entityLink, "OneToMany" ); 
+			} 
+			else if (entityLink.isCardinalityManyToMany()) {
+				annotation = getCardinalityAnnotationForInverseSide( entityLink, "ManyToMany" ); 
+			} 
+			else if (entityLink.isCardinalityManyToOne()) {
+				// Not supposed to occur for an INVERSE SIDE !
+				annotation = getCardinalityAnnotationForInverseSide( entityLink, "ManyToOne" ) ; 
+			} 
+		}
+		return GeneratorUtil.blanks(leftMargin) + annotation;
+	}
+	
+	public String linkJoinAnnotation(int leftMargin, LinkInContext entityLink, List<AttributeInContext> alreadyMappedFields ) {
+		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
+		if ( entityLink.isCardinalityManyToMany() ) {
+			processJoinTable(annotations, entityLink) ;
+		} 
+		else {
+		    // Example : @JoinColumn(name="BADGE_NUMBER", referencedColumnName="BADGE_NUMBER")
+			// used in owning side ManyToOne ( or OneToOne )
+			// can be used also for unidirectional OneToMany relationship (since JPA 2.x)
+			processJoinColumns(annotations, entityLink, entityLink.getJoinColumns(), alreadyMappedFields );
 		}
 		return annotations.getAnnotations();
 	}
@@ -222,7 +275,7 @@ public class Jpa {
 	 * @param targetEntityClassName the target entity ( or null if none ) 
 	 * @return
 	 */
-	private String getOwningSideCardinalityAnnotation( LinkInContext entityLink, String cardinality, String targetEntityClassName ) 
+	private String getCardinalityAnnotationForOwningSide( LinkInContext entityLink, String cardinality, String targetEntityClassName ) 
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append( "@" + cardinality ) ;
@@ -262,7 +315,7 @@ public class Jpa {
 	 * @return
 	 * @throws GeneratorException
 	 */
-	private String getInverseSideCardinalityAnnotation( LinkInContext entityLink, String cardinality ) 
+	private String getCardinalityAnnotationForInverseSide( LinkInContext entityLink, String cardinality ) 
 					throws GeneratorException  {
 		String targetEntityClassName = entityLink.getTargetEntity().getName();
 		
