@@ -15,6 +15,9 @@
  */
 package org.telosys.tools.generator.context;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -793,4 +796,91 @@ public class FnInContext {
 		}
 		return sb.toString();
 	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Tests whether the file or directory denoted by the given path exists"
+			},
+			parameters = { 
+				"filePath : the file path"
+			},
+			example = {
+				"#if ( $fn.fileExists($filePath) )  ",
+				"#end"
+			},
+			since = "3.3.0"
+			)
+	public boolean fileExists(String filePath) {
+		File file = new File(filePath) ;
+		return file.exists();
+	}
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Tests whether the file denoted by the given path is a directory"
+			},
+			parameters = { 
+				"filePath : the file path"
+			},
+			example = {
+				"#if ( $fn.isDirectory($filePath) )  ",
+				"#end"
+			},
+			since = "3.3.0"
+			)
+	public boolean isDirectory(String filePath) {
+		File file = new File(filePath) ;
+		return file.isDirectory();
+	}
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Tests whether the file denoted by the given path is a normal file"
+			},
+			parameters = { 
+				"filePath : the file path"
+			},
+			example = {
+				"#if ( $fn.isFile($filePath) )  ",
+				"#end"
+			},
+			since = "3.3.0"
+			)
+	public boolean isFile(String filePath) {
+		File file = new File(filePath) ;
+		return file.isFile();
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Includes the content of the given file at the current position",
+			"The file is supposed to be a text file",
+			"Bytes from the file are decoded into characters using the UTF-8 charset"
+			},
+			parameters = { 
+				"filePath : the file path"
+			},
+			example = {
+				"$fn.include($filePath) "
+			},
+			since = "3.3.0"
+			)
+	public String include (String filePath) {
+		StringBuilder sb = new StringBuilder();
+		File file = new File(filePath) ;
+		try {
+			// Read all lines from a file.  
+			// Bytes from the file are decoded into characters using the UTF-8 charset.
+			List<String> lines = Files.readAllLines(file.toPath());
+			for ( String s : lines ) {
+				sb.append(s);
+				sb.append("\n");
+			}
+			return sb.toString();
+		} catch (IOException e) {
+			sb.append("ERROR in $fn.include() \n");
+			sb.append(" IOException : '"); sb.append(e.getMessage()) ; sb.append("' \n");
+			sb.append(" file path = '"); sb.append(filePath) ; sb.append("' \n");
+			return sb.toString();
+		}
+	}
+	
 }
