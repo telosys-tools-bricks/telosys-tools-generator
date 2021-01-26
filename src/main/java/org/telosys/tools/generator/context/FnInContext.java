@@ -16,6 +16,7 @@
 package org.telosys.tools.generator.context;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -713,5 +714,83 @@ public class FnInContext {
 			)
 	public List<Integer> buildIntValues(final Collection<?> collection) {
 		return buildIntValues(collection.size(), 1);		
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Returns a list of strings from the given array of strings"
+			},
+			parameters = { 
+				"array : the array of strings ( String[] )"
+			},
+			example = {
+				"#set ( $mylist = $fn.toList( $mystring.split(\",\") ) ) "
+			},
+			since = "3.3.0"
+			)
+	public List<String> toList(String[] array) {
+		return Arrays.asList(array);
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Returns a string built by joining all the elements of the given collection",
+			"the 'separator' is added between each element"
+			},
+			parameters = { 
+				"collection : the collection (any kind of objects : Collection<?>)",
+				"separator  : the separator string (void string if no separator required) "
+			},
+			example = {
+				"#set ( $v = $fn.join( $myList, \",\" ) ) ",
+				"#set ( $v = $fn.join( $myList, \"\" ) ) "
+			},
+			since = "3.3.0"
+			)
+	public String join(Collection<?> collection, String separator) {
+		return joinWithPrefixSuffix(collection, separator, null, null);
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Returns a string built by joining all the elements of the given collection",
+			"the 'separator' is added between each element",
+			"the 'prefix' is added before each element",
+			"the 'suffix' is added after each element"
+			},
+			parameters = { 
+				"collection : the collection (any kind of objects : Collection<?>)",
+				"separator  : the separator string (or void) ",
+				"prefix     : the prefix string (or void) ",
+				"suffix     : the suffix string (or void) "
+			},
+			example = {
+				"#set ( $v = $fn.joinWithPrefixSuffix( $myList, \";\", \"[\", \"]\" ) ) ",
+				"#set ( $v = $fn.joinWithPrefixSuffix( $myList, \", \", \"\", \".class\" ) ) "
+			},
+			since = "3.3.0"
+			)
+	public String joinWithPrefixSuffix(Collection<?> collection, String separator, 
+			String prefix, String suffix) {
+		StringBuilder sb = new StringBuilder();
+		int i = 0;
+		if ( collection != null ) {
+			for ( Object o : collection ) {
+				if ( o != null ) {
+					i++;
+					if ( separator != null && i > 1) {
+						sb.append(separator);
+					}
+					if ( prefix != null ) {
+						sb.append(prefix);
+					}
+					sb.append(o.toString());
+					if ( suffix != null ) {
+						sb.append(suffix);
+					}
+				}
+			}
+		}
+		return sb.toString();
 	}
 }
