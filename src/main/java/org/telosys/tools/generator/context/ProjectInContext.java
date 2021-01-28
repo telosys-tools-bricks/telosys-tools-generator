@@ -21,9 +21,8 @@ import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 
-
 /**
- * The current project configuration ( variables, packages, ... )
+ * The current project (with variables, packages, ... )
  *  
  * @author Laurent GUERIN
  *
@@ -31,33 +30,28 @@ import org.telosys.tools.generator.context.names.ContextName;
 //-------------------------------------------------------------------------------------
 @VelocityObject(
 		contextName= ContextName.PROJECT ,
-		text = "Current project configuration parameters ( variables, folders, ... )",
+		text = "Current project with configuration parameters ( variables, folders, ... )",
 		since = ""
  )
 //-------------------------------------------------------------------------------------
 public class ProjectInContext
 {
-//	private final GeneratorConfig _generatorConfig ;
 	private final TelosysToolsCfg _telosysToolsCfg ; // v 3.0.0
 	
-//    //---------------------------------------------------------------------------
-//	public ProjectInContext(GeneratorConfig generatorConfig)
-//	{
-//		super();
-//		_generatorConfig = generatorConfig ;
-//	}
-//
-    //---------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * @param telosysToolsCfg
+	 */
 	public ProjectInContext(TelosysToolsCfg telosysToolsCfg) { // v 3.0.0
 		super();
 		_telosysToolsCfg = telosysToolsCfg ;
 	}
 
-	//--------------------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	@VelocityMethod (
 		text = { 
-				"Returns the full path of the current project's location",
-				"(just for information, not supposed to be used in generation)" },
+				"Returns the current project location ( full path )"
+			},
 		example = {
 				"$project.locationFullPath"
 			},
@@ -65,16 +59,14 @@ public class ProjectInContext
 	)
     public String getLocationFullPath()
     {
-//        return _generatorConfig.getProjectLocation() ;
-//        return _generatorConfig.getTelosysToolsCfg().getProjectAbsolutePath() ;
         return _telosysToolsCfg.getProjectAbsolutePath() ; // v 3.0.0
     }
 	
-	//--------------------------------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------------------------
 	@VelocityMethod (
 		text = { 
-				"Returns the full path of current templates folder ",
-				"(just for information, not supposed to be used in generation)" },
+				"Returns templates folder ( full path ) for the current project "
+			},
 		example = {
 				"$project.templatesFolderFullPath"
 			},
@@ -85,7 +77,22 @@ public class ProjectInContext
         return _telosysToolsCfg.getTemplatesFolderAbsolutePath() ; 
     }
 
-	//--------------------------------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------------------------
+	@VelocityMethod (
+		text = { 
+				"Returns models folder ( full path ) for the current project "
+			},
+		example = {
+				"$project.modelsFolderFullPath"
+			},
+		since = "3.3.0"
+	)
+    public String getModelsFolderFullPath() // v 3.3.0
+    {
+        return _telosysToolsCfg.getModelsFolderAbsolutePath();
+    }
+
+	//---------------------------------------------------------------------------------------------------
 	@VelocityMethod (
 		text = { 
 				"Returns the specific variables defined for the current project",
@@ -99,10 +106,10 @@ public class ProjectInContext
 	)
     public Variable[] getSpecificVariables()
     {
-//		return _generatorConfig.getTelosysToolsCfg().getSpecificVariables();
 		return _telosysToolsCfg.getSpecificVariables(); // v 3.0.0
     }
-	//--------------------------------------------------------------------------------------------------------------
+
+	//---------------------------------------------------------------------------------------------------
 	@VelocityMethod (
 		text = { 
 				"Returns all the variables available for the current project",
@@ -116,7 +123,6 @@ public class ProjectInContext
 	)
     public Variable[] getAllVariables()
     {
-//		return _generatorConfig.getTelosysToolsCfg().getAllVariables();
 		return _telosysToolsCfg.getAllVariables(); // v 3.0.0
     }
 }

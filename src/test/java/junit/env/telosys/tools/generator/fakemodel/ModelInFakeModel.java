@@ -45,6 +45,14 @@ public class ModelInFakeModel implements Model
 	
 	private Hashtable<String,EntityInFakeModel> htEntities = new Hashtable<String,EntityInFakeModel>() ; 
 
+	
+	/**
+	 * Constructor
+	 */
+	public ModelInFakeModel() {
+		super();
+	}
+
 	//--------------------------------------------------------------------------------------
 	@Override
 	public ModelType getType() {
@@ -71,6 +79,16 @@ public class ModelInFakeModel implements Model
 	
 	public void setName( String name) {
 		this.name = name;
+	}
+	
+	@Override
+	public String getFolderName() {
+		return "";
+	}
+
+	@Override
+	public String getTitle() {
+		return "";
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -403,5 +421,6 @@ public class ModelInFakeModel implements Model
 		}
 		return null ;
 	}
+
 
 }

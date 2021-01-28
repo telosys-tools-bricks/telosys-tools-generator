@@ -25,6 +25,7 @@ import org.telosys.tools.commons.dbcfg.DatabasesConfigurations;
 import org.telosys.tools.commons.dbcfg.DbConfigManager;
 import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generator.context.BeanValidation;
+import org.telosys.tools.generator.context.BundleInContext;
 import org.telosys.tools.generator.context.Const;
 import org.telosys.tools.generator.context.DatabasesInContext;
 import org.telosys.tools.generator.context.EmbeddedGenerator;
@@ -155,8 +156,13 @@ public class GeneratorContextBuilder {
 		
 		//--- Set "$model" object : full model with  all the entities (v 2.0.7)
 		this.model = model ;
-		this.modelInContext = new ModelInContext(model, _telosysToolsCfg.getEntityPackage(), env ); 
+		//this.modelInContext = new ModelInContext(model, _telosysToolsCfg.getEntityPackage(), env ); 
+		this.modelInContext = new ModelInContext(model, _telosysToolsCfg, env ); // v 3.3.0
 		generatorContext.put(ContextName.MODEL, modelInContext); 
+		
+		//--- Set "$bundle" object ( new in v 3.3.0 ) 
+		BundleInContext bundle = new BundleInContext(bundleName); // v 3.3.0
+		generatorContext.put(ContextName.BUNDLE, bundle); // v 3.0.0
 		
 		return generatorContext ;
 	}

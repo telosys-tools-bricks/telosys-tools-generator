@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.telosys.tools.commons.FileUtil;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.XmlUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
@@ -798,11 +799,14 @@ public class FnInContext {
 	}
 
 	//-------------------------------------------------------------------------------------
+	// File management ( v 3.3.0 )
+	//-------------------------------------------------------------------------------------
 	@VelocityMethod(text={	
 			"Tests whether the file or directory denoted by the given path exists"
 			},
 			parameters = { 
-				"filePath : the file path"
+				"filePath : the file path (relative or absolute)",
+				"if the file path is relative the project location is used as root path "
 			},
 			example = {
 				"#if ( $fn.fileExists($filePath) )  ",
@@ -810,8 +814,8 @@ public class FnInContext {
 			},
 			since = "3.3.0"
 			)
-	public boolean fileExists(String filePath) {
-		File file = new File(filePath) ;
+	public boolean fileExists(String filePath) throws Exception {
+		File file = getFileFromPath(filePath) ;
 		return file.exists();
 	}
 	//-------------------------------------------------------------------------------------
@@ -819,7 +823,8 @@ public class FnInContext {
 			"Tests whether the file denoted by the given path is a directory"
 			},
 			parameters = { 
-				"filePath : the file path"
+				"filePath : the file path (relative or absolute)",
+				"if the file path is relative the project location is used as root path "
 			},
 			example = {
 				"#if ( $fn.isDirectory($filePath) )  ",
@@ -827,8 +832,8 @@ public class FnInContext {
 			},
 			since = "3.3.0"
 			)
-	public boolean isDirectory(String filePath) {
-		File file = new File(filePath) ;
+	public boolean isDirectory(String filePath) throws Exception {
+		File file = getFileFromPath(filePath) ;
 		return file.isDirectory();
 	}
 	//-------------------------------------------------------------------------------------
@@ -836,7 +841,8 @@ public class FnInContext {
 			"Tests whether the file denoted by the given path is a normal file"
 			},
 			parameters = { 
-				"filePath : the file path"
+				"filePath : the file path (relative or absolute)",
+				"if the file path is relative the project location is used as root path "
 			},
 			example = {
 				"#if ( $fn.isFile($filePath) )  ",
@@ -844,29 +850,166 @@ public class FnInContext {
 			},
 			since = "3.3.0"
 			)
-	public boolean isFile(String filePath) {
-		File file = new File(filePath) ;
+	public boolean isFile(String filePath) throws Exception {
+		File file = getFileFromPath(filePath) ;
 		return file.isFile();
 	}
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(text={	
-			"Includes the content of the given file at the current position",
+			"Loads the contents of a file and returns it in a string",
 			"The file is supposed to be a text file",
 			"Bytes from the file are decoded into characters using the UTF-8 charset"
 			},
 			parameters = { 
-				"filePath : the file path"
+				"filePath : the file path (relative or absolute)",
+				"if the file path is relative the project location is used as root path "
 			},
 			example = {
-				"$fn.include($filePath) "
+				"## insert the file content at the current position : ",
+				"$fn.loadFile($filePath) ",
+				"## set the file content in a variable : ",
+				"#set( $json = $fn.loadFile($jsonFile) ) "
 			},
 			since = "3.3.0"
 			)
-	public String include (String filePath) {
-		StringBuilder sb = new StringBuilder();
+	public String loadFile (String filePath) throws Exception {
+		File file = getFileFromPath(filePath) ;
+		return loadFileContent(file);
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Loads the contents of a file from the current bundle and returns it in a string",
+			"The file is supposed to be a text file",
+			"Bytes from the file are decoded into characters using the UTF-8 charset"
+			},
+			parameters = { 
+				"filePath : the file path (relative path in current bundle directory)"
+			},
+			example = {
+				"## insert the file content at the current position : ",
+				"$fn.loadFileFromBundle('foo.txt') ",
+				"## set the file content in a variable : ",
+				"#set( $json = $fn.loadFileFromBundle($jsonFile) ) "
+			},
+			since = "3.3.0"
+			)
+	public String loadFileFromBundle(String filePath) throws Exception {
+		String dir = getBundleLocationFullPath();
+		String fullPath = FileUtil.buildFilePath(dir, filePath);
+		File file = new File(fullPath) ;
+		return loadFileContent(file);
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Loads the contents of a file from the current model folder and returns it in a string",
+			"The file is supposed to be a text file",
+			"Bytes from the file are decoded into characters using the UTF-8 charset"
+			},
+			parameters = { 
+				"filePath : the file path (relative path in current model directory)"
+			},
+			example = {
+				"## insert the file content at the current position : ",
+				"$fn.loadFileFromModel('foo.txt') ",
+				"## set the file content in a variable : ",
+				"#set( $json = $fn.loadFileFromModel($jsonFile) ) "
+			},
+			since = "3.3.0"
+			)
+	public String loadFileFromModel(String filePath) throws Exception {
+		String dir = getModelLocationFullPath();
+		String fullPath = FileUtil.buildFilePath(dir, filePath);
+		File file = new File(fullPath) ;
+		return loadFileContent(file);
+	}
+
+	//-------------------------------------------------------------------------------------
+	/**
+	 * Returns a File for the given path, if path is relative the project location is used as root path 
+	 * @param filePath
+	 * @return
+	 * @throws Exception
+	 */
+	private File getFileFromPath(String filePath) throws Exception {
 		File file = new File(filePath) ;
+		if ( file.isAbsolute()) {
+			return file;
+		}
+		else {
+			String dir = getProjectLocationFullPath();
+			String fullPath = FileUtil.buildFilePath(dir, filePath);
+			return new File(fullPath) ;
+		}
+	}
+	
+	private ProjectInContext getProjectFromGeneratorContext() throws Exception {
+		Object o = _generatorContext.get(ContextName.PROJECT);
+		if ( o != null ) {
+			return (ProjectInContext) o ;
+		}
+		else {
+			throw new Exception("Cannot found 'project' in generator context");
+		}
+	}
+	
+	private BundleInContext getBundleFromGeneratorContext() throws Exception {
+		Object o = _generatorContext.get(ContextName.BUNDLE);
+		if ( o != null ) {
+			return (BundleInContext) o ;
+		}
+		else {
+			throw new Exception("Cannot found 'bundle' in generator context");
+		}
+	}
+	
+	private ModelInContext getModelFromGeneratorContext() throws Exception {
+		Object o = _generatorContext.get(ContextName.MODEL);
+		if ( o != null ) {
+			return (ModelInContext) o ;
+		}
+		else {
+			throw new Exception("Cannot found 'model' in generator context");
+		}
+	}
+	
+	private String getProjectLocationFullPath() throws Exception {
+		ProjectInContext project = getProjectFromGeneratorContext() ;
+		return project.getLocationFullPath();
+	}
+	
+	private String getBundleLocationFullPath() throws Exception {
+		ProjectInContext project = getProjectFromGeneratorContext() ;
+		BundleInContext bundle = getBundleFromGeneratorContext() ;
+		return FileUtil.buildFilePath(project.getTemplatesFolderFullPath(), bundle.getName());
+	}
+	
+	private String getModelLocationFullPath() throws Exception {
+		ProjectInContext project = getProjectFromGeneratorContext() ;
+		String projectModelsFolderFullPath = project.getModelsFolderFullPath();
+		
+		ModelInContext model = getModelFromGeneratorContext() ;
+		String modelFolderName = model.getFolderName();
+		
+		if ( StrUtil.nullOrVoid(modelFolderName) ) {
+			return projectModelsFolderFullPath ;
+		}
+		else {
+			return FileUtil.buildFilePath(projectModelsFolderFullPath, modelFolderName);
+		}
+	}
+	
+	private String loadFileContent (File file) throws Exception {
+		if ( ! file.exists() ) {
+			throw new Exception("Load file error (file not found) : " + file.getAbsolutePath());
+		}
+		if ( ! file.isFile() ) {
+			throw new Exception("Load file error (not a file) : " + file.getAbsolutePath());
+		}
 		try {
+			StringBuilder sb = new StringBuilder();
 			// Read all lines from a file.  
 			// Bytes from the file are decoded into characters using the UTF-8 charset.
 			List<String> lines = Files.readAllLines(file.toPath());
@@ -876,11 +1019,7 @@ public class FnInContext {
 			}
 			return sb.toString();
 		} catch (IOException e) {
-			sb.append("ERROR in $fn.include() \n");
-			sb.append(" IOException : '"); sb.append(e.getMessage()) ; sb.append("' \n");
-			sb.append(" file path = '"); sb.append(filePath) ; sb.append("' \n");
-			return sb.toString();
+			throw new Exception("Load file error (IOException) : " + file.getAbsolutePath());
 		}
 	}
-	
 }

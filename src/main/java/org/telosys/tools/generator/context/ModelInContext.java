@@ -20,12 +20,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.Model;
+import org.telosys.tools.generic.model.ModelType;
 
 /**
  * This class give access to the entire repository model
@@ -36,36 +38,58 @@ import org.telosys.tools.generic.model.Model;
 //-------------------------------------------------------------------------------------
 @VelocityObject(
 		contextName= ContextName.MODEL ,
-		text = "Object giving access to the lightweight model ",
+		text = "Object giving access to the current model ",
 		since = ""
  )
 //-------------------------------------------------------------------------------------
 public class ModelInContext
 {
-	private final List<EntityInContext>       _allEntities ;
-	private final Map<String,EntityInContext> _entitiesByTableName ;
-	private final Map<String,EntityInContext> _entitiesByClassName ;
+	private final String    _modelName ;
+	private final String    _modelFolderName ;
+	private final String    _modelVersion ;
+	private final ModelType _modelType ;
+	
+	private final String   _modelTitle ;
+	private final String   _modelDescription ;
 	private final int      _databaseId ;
 	private final String   _databaseProductName ;
 	
+	private final List<EntityInContext>       _allEntities ;
+	private final Map<String,EntityInContext> _entitiesByTableName ;
+	private final Map<String,EntityInContext> _entitiesByClassName ;
+	
 	//-------------------------------------------------------------------------------------
 	/**
-	 * Constructor
 	 * @param model
-	 * @param entitiesManager
-	 * @throws GeneratorException
+	 * @param telosysToolsCfg
+	 * @param env
 	 */
-//	public ModelInContext( Model model, EntitiesManager entitiesManager ) throws GeneratorException  {
-	public ModelInContext( Model model, String entitiesPackage, EnvInContext env ) { // throws GeneratorException  {
+	// public ModelInContext( Model model, String entitiesPackage, EnvInContext env ) {
+	public ModelInContext( Model model, TelosysToolsCfg telosysToolsCfg, EnvInContext env ) { // v 3.3.0
 		super();
 		if ( model == null ) throw new IllegalArgumentException("Model is null");
-//		if ( entitiesManager == null ) throw new GeneratorException("EntitiesBuilder is null");
+		
+		_modelName = model.getName();  // MANDATORY
+		_modelFolderName = model.getFolderName();  // MANDATORY
+		_modelVersion = model.getVersion(); // MANDATORY
+		_modelType = model.getType(); // MANDATORY
+		// check validity 
+		if ( _modelName == null ) throw new IllegalArgumentException("Model name is null");
+		if ( _modelFolderName == null ) throw new IllegalArgumentException("Model folder name is null");
+		if ( _modelVersion == null ) throw new IllegalArgumentException("Model version is null");
+		if ( _modelType == null ) throw new IllegalArgumentException("Model type is null");
+		
+		_modelTitle = model.getTitle() != null ? model.getTitle() : "" ;
+		_modelDescription = model.getDescription() != null ? model.getDescription() : "" ;
 		
 		//--- All the entities (the original model order is kept)
-//		_allEntities = entitiesManager.getAllEntities();
 		_allEntities = new LinkedList<EntityInContext>(); // v 3.0.0
 		for ( Entity entity : model.getEntities() ) { // v 3.0.0
-			_allEntities.add( new EntityInContext(entity, entitiesPackage, this, env) );// v 3.0.0
+			//_allEntities.add( new EntityInContext(entity, entitiesPackage, this, env) );// v 3.0.0
+			_allEntities.add( 
+					new EntityInContext(entity, 
+							telosysToolsCfg.getEntityPackage(),  // v 3.3.0
+							this, env) );
 		}
 		
 		//--- Entities by TABLE NAME
@@ -99,6 +123,85 @@ public class ModelInContext
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
+			"Returns the model name as defined by file/folder in the project directory "
+			},
+		since="3.3.0"
+	)
+    public String getName()
+    {
+        return _modelName ;
+    }
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the name of the folder where entities are located "
+			},
+		since="3.3.0"
+	)
+    public String getFolderName()
+    {
+        return _modelFolderName ;
+    }
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the Telosys model version "
+			},
+		since="3.3.0"
+	)
+    public String getVersion()
+    {
+        return _modelVersion ;
+    }
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the Telosys model type (DSL-MODEL, DB-MODEL, etc) "
+			},
+		since="3.3.0"
+	)
+    public String getType()
+    {
+        switch ( _modelType ) {
+        case DOMAIN_SPECIFIC_LANGUAGE : 
+        	return "DSL-MODEL" ;
+        case DATABASE_SCHEMA : 
+        	return "DB-MODEL" ;
+        default:
+            return "UNKNOWN";
+        }
+    }
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the model title "
+			},
+		since="3.3.0"
+	)
+    public String getTitle()
+    {
+        return _modelTitle ;
+    }
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the model description "
+			},
+		since="3.3.0"
+	)
+    public String getDescription()
+    {
+        return _modelDescription ;
+    }
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
 			"Returns the number of entities defined in the model"
 			}
 	)
@@ -113,7 +216,6 @@ public class ModelInContext
 			"Returns a list containing all the entities defined in the model" 
 			}
 	)
-    //public List<JavaBeanClass> getAllEntites()
     public List<EntityInContext> getAllEntites()
     {
 		return _allEntities ;
@@ -153,7 +255,6 @@ public class ModelInContext
 			"name : the table name identifying the entity (the table name) "
 		}
 	)
-    //public JavaBeanClass getEntityByTableName( String name )
     public EntityInContext getEntityByTableName( String name )
     {
 		return _entitiesByTableName.get(name);
@@ -169,7 +270,6 @@ public class ModelInContext
 			"name : the class name identifying the entity (supposed to be unique) "
 		}
 	)
-    //public JavaBeanClass getEntityByClassName( String name )
     public EntityInContext getEntityByClassName( String entityClassName )
     {
 		return _entitiesByClassName.get(entityClassName);
