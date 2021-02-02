@@ -797,7 +797,74 @@ public class FnInContext {
 		}
 		return sb.toString();
 	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Replaces all occurrences of an element with another in the given list"
+			},
+			parameters = { 
+				"list : the list containing the elements",
+				"oldElement : the element to be replaced ",
+				"newElement : the new element replacing the original "
+			},
+			example = {
+				"#set($list = ['a', 'b', 'cc', 'b', 'dd']) ",
+				"$fn.replaceInList($list, 'b', 'BBB')##",
+				" result : [a, BBB, cc, BBB, dd]",
+				"",
+				"#set($foo = [1, 0, 3, 0, 4, 0]) ",
+				"$fn.replaceInList($foo, 0, 9)##",
+				" result : [1, 9, 3, 9, 4, 9]",
+				"",
+				"#set($foo = [1, 'aa', 3.2, 'zz', true, 5]) ",
+				"$fn.replaceInList($foo, 'zz', 99)##",
+				" result : [1, aa, 3.2, 99, true, 5] ",
+				""
+			},
+			since = "3.3.0"
+			)	
+	public <T> void replaceInList(List<T> list, T oldElement, T newElement) {
+		if ( list != null && oldElement != null && newElement != null) {
+			for ( int i = 0 ; i < list.size() ; i++) {
+				Object o = list.get(i);
+				if ( oldElement.equals(o) ) {
+					list.set(i, newElement);
+				}
+			}
+		}
+	}
 
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Trims all string occurrences in the given list"
+			},
+			parameters = { 
+				"list : the list containing the elements"
+			},
+			example = {
+				"#set($list = ['a', '  b', ' c c ', 'd  ']) ",
+				"$fn.trimAll($list)##",
+				" result : [a, b, c c, d ]",
+				"",
+				"#set($foo = [1, ' a ', 3.2, '  zz' ]) ",
+				"$fn.trimAll($foo)##",
+				" result : [1, a, 3.2, zz] ",
+				""
+			},
+			since = "3.3.0"
+			)	
+	@SuppressWarnings("unchecked")
+	public <T> void trimAll(List<T> list) {
+		if ( list != null ) {
+			for ( int i = 0 ; i < list.size() ; i++) {
+				Object o = list.get(i);
+				if ( o instanceof String ) {
+					String s = (String) o;
+					list.set(i, (T)s.trim());
+				}
+			}
+		}
+	}
 	//-------------------------------------------------------------------------------------
 	// File management ( v 3.3.0 )
 	//-------------------------------------------------------------------------------------
