@@ -333,6 +333,10 @@ public class Jpa {
 		if ( ! entityLink.isCardinalityManyToOne() ) { 
 			// try to get "mapped by" information
 			String mappedBy = entityLink.getMappedBy(); 
+			if ( mappedBy == null ) {
+				// No defined in link => try to infer 
+				mappedBy = inferMappedBy(entityLink);
+			}
 			if ( mappedBy != null ) {
 				annotation.append( "mappedBy=\"" + mappedBy + "\"" );
 				annotation.append( ", " ); 
@@ -345,6 +349,41 @@ public class Jpa {
 		return annotation.toString();
 	}
 	
+	/**
+	 * Try to infer the 'mappedBy' value by searching in the 'target entity' links 
+	 * @param link
+	 * @return
+	 */
+	private String inferMappedBy(LinkInContext link) {
+		String entityName = link.getEntity().getName(); // name of the entity holding the link
+		String mappedBy = null ;
+		int count = 0 ;
+		try {
+			EntityInContext targetEntity = link.getTargetEntity();
+			if ( targetEntity != null ) {
+				// search fields referencing the entity with "toOne" cardinality
+				for ( LinkInContext inverseSideLink : targetEntity.getLinks() ) {
+					String inverseSideLinkTargetEntityName = "";
+					if ( inverseSideLink.getTargetEntity() != null ) {
+						inverseSideLinkTargetEntityName = inverseSideLink.getTargetEntity().getName();
+					}
+					if (   inverseSideLink.isCardinalityManyToOne()
+						&& entityName.equals(inverseSideLinkTargetEntityName)) {
+						count++;
+						mappedBy = inverseSideLink.getFieldName(); 
+					}
+				}
+			}
+		} catch (GeneratorException e) {
+			return null ;
+		}
+		if ( count == 1 ) { // only one found => it's the right one
+			return mappedBy ;
+		}
+		else {
+			return null ;
+		}
+	}
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Return the further information for the cardinality annotation ( cascade, fetch, optional ) <br>

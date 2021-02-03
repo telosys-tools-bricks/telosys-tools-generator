@@ -47,7 +47,7 @@ import org.telosys.tools.generic.model.Optional;
 		since = "",
 		example= {
 				"",
-				"#foreach( $link in $entity.selectedLinks )",
+				"#foreach( $link in $entity.links )",
 				"    private $link.formattedFieldType(10) $link.formattedFieldName(12);",
 				"#end"				
 		}
@@ -56,7 +56,7 @@ import org.telosys.tools.generic.model.Optional;
 //-------------------------------------------------------------------------------------
 public class LinkInContext {
 	
-    private final EntityInContext  _entity ; // The entity the link belongs to
+    private final EntityInContext  _entity ; // the entity to which the link belongs
 
 	private final ModelInContext   _modelInContext ;  // v 3.0.0 (replaces EntitiesManager)
 
@@ -131,7 +131,18 @@ public class LinkInContext {
 		return "List<" + className + ">" ; 
 	}
 	
-
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the entity to which the link belongs ",
+			""
+			},
+		since = "3.3.0"
+	)
+	public EntityInContext getEntity() {
+		return _entity;
+	}
+	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
