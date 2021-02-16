@@ -2,8 +2,7 @@ package org.telosys.tools.generator.context.doc.tooling;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.telosys.tools.generator.context.BeanValidation;
 import org.telosys.tools.generator.context.Const;
 import org.telosys.tools.generator.context.EntityInContext;
@@ -13,8 +12,9 @@ import org.telosys.tools.generator.context.Jpa;
 import org.telosys.tools.generator.context.Today;
 import org.telosys.tools.generator.context.names.ContextName;
 
+import static org.junit.Assert.assertTrue;
 
-public class DocBuilderTest  extends TestCase {
+public class DocBuilderTest {
 
 	private void print(ClassInfo classInfo) {
 		System.out.println(classInfo);
@@ -49,6 +49,7 @@ public class DocBuilderTest  extends TestCase {
 		}
 	}
 	
+	@Test
 	public void testClassConst() {
 		DocBuilder docBuilder = new DocBuilder();
 		ClassInfo classInfo = docBuilder.getClassInfo(Const.class);
@@ -59,6 +60,7 @@ public class DocBuilderTest  extends TestCase {
 		assertTrue ( classInfo.getMethodsCount() == 12 );
 	}
 
+	@Test
 	public void testClassFn() {
 		DocBuilder docBuilder = new DocBuilder();
 		ClassInfo classInfo = docBuilder.getClassInfo(FnInContext.class);
@@ -69,6 +71,7 @@ public class DocBuilderTest  extends TestCase {
 		//assertTrue ( classInfo.getMethodsCount() == 12 );
 	}
 
+	@Test
 	public void testClassJava() {
 		DocBuilder docBuilder = new DocBuilder();
 		ClassInfo classInfo = docBuilder.getClassInfo(Java.class);
@@ -79,6 +82,7 @@ public class DocBuilderTest  extends TestCase {
 		assertTrue ( classInfo.getMethodsCount() >= 4 );
 	}
 
+	@Test
 	public void testClassJpa() {
 		DocBuilder docBuilder = new DocBuilder();
 		ClassInfo classInfo = docBuilder.getClassInfo(Jpa.class);
@@ -89,6 +93,7 @@ public class DocBuilderTest  extends TestCase {
 		//assertTrue ( classInfo.getMethodsCount() == 0 );
 	}
 
+	@Test
 	public void testClassBeanValidation() {
 		DocBuilder docBuilder = new DocBuilder();
 		ClassInfo classInfo = docBuilder.getClassInfo(BeanValidation.class);
@@ -99,6 +104,7 @@ public class DocBuilderTest  extends TestCase {
 		//assertTrue ( classInfo.getMethodsCount() == 0 );
 	}
 
+	@Test
 	public void testClassToday() {
 		DocBuilder docBuilder = new DocBuilder();
 		ClassInfo classInfo = docBuilder.getClassInfo(Today.class);
@@ -109,6 +115,7 @@ public class DocBuilderTest  extends TestCase {
 		assertTrue ( classInfo.getMethodsCount() == 4 );
 	}
 
+	@Test
 	public void testClassJavaBeanClass() {
 		DocBuilder docBuilder = new DocBuilder();
 		//ClassInfo classInfo = docBuilder.getClassInfo(JavaBeanClass.class);

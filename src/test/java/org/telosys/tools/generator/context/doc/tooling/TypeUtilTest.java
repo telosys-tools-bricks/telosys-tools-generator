@@ -3,9 +3,12 @@ package org.telosys.tools.generator.context.doc.tooling;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class TypeUtilTest  extends TestCase {
+import static org.junit.Assert.assertTrue;
+
+
+public class TypeUtilTest {
 
 	private String convert(Type type ) {
 		System.out.println("-----");
@@ -29,6 +32,7 @@ public class TypeUtilTest  extends TestCase {
 		}
 	}
 	
+	@Test
 	public void testWithMethods() {
 		Class<?> clazz = FakeClassForTypeUtil.class ;
 		String s ;

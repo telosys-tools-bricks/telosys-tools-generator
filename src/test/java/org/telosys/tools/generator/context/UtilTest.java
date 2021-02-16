@@ -1,12 +1,12 @@
 package org.telosys.tools.generator.context;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-import org.telosys.tools.generator.context.Util;
+import static org.junit.Assert.*;
 
+public class UtilTest  {
 
-public class UtilTest extends TestCase {
-
+	@Test
 	public void testBuildGetter1() {
 		String s ;
 		
@@ -19,6 +19,7 @@ public class UtilTest extends TestCase {
 		assertEquals("getFirstName", s);
 	}
 
+	@Test
 	public void testBuildGetter2() {
 		String s ;
 		
@@ -31,6 +32,7 @@ public class UtilTest extends TestCase {
 		assertEquals("isFoo", s);
 	}
 
+	@Test
 	public void testBuildSetter() {
 		String s ;
 		

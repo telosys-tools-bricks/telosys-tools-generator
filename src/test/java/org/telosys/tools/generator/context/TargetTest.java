@@ -1,16 +1,17 @@
 package org.telosys.tools.generator.context;
 
-import junit.env.telosys.tools.generator.fakemodel.EntityInFakeModel;
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.telosys.tools.commons.bundles.TargetDefinition;
 import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generic.model.Entity;
 
+import static org.junit.Assert.assertEquals;
 
-public class TargetTest extends TestCase {
+import junit.env.telosys.tools.generator.fakemodel.EntityInFakeModel;
 
-	public Variable[] getVariables() {
+public class TargetTest {
+
+	private Variable[] getVariables() {
 		Variable[] variables = new Variable[5] ;
 		int i = 0 ;
 		variables[i++] = new Variable("ROOT_PKG",   "org.demo.foo.bar");
@@ -21,6 +22,7 @@ public class TargetTest extends TestCase {
 		return variables ;
 	}
 	
+	@Test
 	public void testTargetCreation1() {
 		
 		TargetDefinition targetDef = new TargetDefinition(
@@ -46,6 +48,7 @@ public class TargetTest extends TestCase {
 		assertEquals("/src/org/demo/foo/bar/persistence/services", target.getFolder());
 	}
 
+	@Test
 	public void testTargetCreation2() {
 		
 		TargetDefinition targetDef = new TargetDefinition(

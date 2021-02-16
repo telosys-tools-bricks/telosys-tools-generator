@@ -2,13 +2,13 @@ package org.telosys.tools.generator.context.tools;
 
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-import org.telosys.tools.generator.context.tools.AmbiguousTypesDetector;
+import static org.junit.Assert.assertTrue;
 
+public class AmbiguousTypesDetectorTest  {
 
-public class AmbiguousTypesDetectorTest extends TestCase  {
-
+	@Test
 	public void test1() {		
 		AmbiguousTypesDetector detector = new AmbiguousTypesDetector();
 		detector.registerType("java.lang.Double");
@@ -17,6 +17,7 @@ public class AmbiguousTypesDetectorTest extends TestCase  {
 		report(detector, 3, 0);
 	}
 	
+	@Test
 	public void test2() {		
 		AmbiguousTypesDetector detector = new AmbiguousTypesDetector();
 		detector.registerType("java.lang.Double");
@@ -26,6 +27,7 @@ public class AmbiguousTypesDetectorTest extends TestCase  {
 		report(detector, 4, 2);
 	}
 	
+	@Test
 	public void test3() {		
 		AmbiguousTypesDetector detector = new AmbiguousTypesDetector();
 		detector.registerType("java.lang.Double");

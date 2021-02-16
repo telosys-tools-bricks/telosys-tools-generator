@@ -994,6 +994,27 @@ public class FnInContext {
 	}
 
 	//-------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------------
+	public FileInContext file (String filePath) throws Exception {
+		File file = getFileFromPath(filePath) ;
+		return new FileInContext(file);
+	}
+	
+	public FileInContext fileFromBundle(String filePath) throws Exception {
+		String dir = getBundleLocationFullPath();
+		String fullPath = FileUtil.buildFilePath(dir, filePath);
+		File file = new File(fullPath) ;
+		return new FileInContext(file);
+	}
+
+	public FileInContext fileFromModel(String filePath) throws Exception {
+		String dir = getModelLocationFullPath();
+		String fullPath = FileUtil.buildFilePath(dir, filePath);
+		File file = new File(fullPath) ;
+		return new FileInContext(file);
+	}
+
+	//-------------------------------------------------------------------------------------
 	/**
 	 * Returns a File for the given path, if path is relative the project location is used as root path 
 	 * @param filePath
