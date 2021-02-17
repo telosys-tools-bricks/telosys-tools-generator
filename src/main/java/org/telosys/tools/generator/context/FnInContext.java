@@ -16,8 +16,6 @@
 package org.telosys.tools.generator.context;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -868,6 +866,7 @@ public class FnInContext {
 	//-------------------------------------------------------------------------------------
 	// File management ( v 3.3.0 )
 	//-------------------------------------------------------------------------------------
+/***
 	@VelocityMethod(text={	
 			"Tests whether the file or directory denoted by the given path exists"
 			},
@@ -992,7 +991,7 @@ public class FnInContext {
 		File file = new File(fullPath) ;
 		return loadFileContent(file);
 	}
-
+***/
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	public FileInContext file (String filePath) throws Exception {
@@ -1088,7 +1087,8 @@ public class FnInContext {
 			return FileUtil.buildFilePath(projectModelsFolderFullPath, modelFolderName);
 		}
 	}
-	
+
+	/***
 	private String loadFileContent (File file) throws Exception {
 		if ( ! file.exists() ) {
 			throw new Exception("Load file error (file not found) : " + file.getAbsolutePath());
@@ -1110,4 +1110,5 @@ public class FnInContext {
 			throw new Exception("Load file error (IOException) : " + file.getAbsolutePath());
 		}
 	}
+	***/
 }

@@ -23,7 +23,34 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.telosys.tools.commons.StrUtil;
+import org.telosys.tools.generator.context.doc.VelocityMethod;
+import org.telosys.tools.generator.context.doc.VelocityObject;
+import org.telosys.tools.generator.context.names.ContextName;
 
+//-------------------------------------------------------------------------------------
+@VelocityObject(
+		contextName=ContextName.FILE,
+		text = { 
+				"This object allows to work with a file located on the filesystem ",
+				"Each file instance is created with $fn.file(..) or $fn.fileFromXxx(..) ",
+				"It can be any type of filesystem item (file or directory)",
+				""
+		},
+		since = "3.3.0",
+		example= {
+				"",
+				"#set( $file = $fn.fileFromBundle(\"foo.txt\") )",
+				"",
+				"#if( $file.exists() && $file.isFile() )",
+				"#set($content = $file.loadContent() )",
+				"#end",
+				"",
+				"#foreach ( $line in $file.loadLines() )",
+				" > $line",
+				"#end"
+		}		
+)
+//-------------------------------------------------------------------------------------
 public class FileInContext {
 
 	private final File file ;
@@ -36,63 +63,192 @@ public class FileInContext {
 		this.file = file ;
 	}
 
-	/**
-	 * Tests whether the file (or directory) exists
-	 * @return
-	 */
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Tests whether the file (or directory) exists"
+		},
+		example = {
+			"#if( $file.exists() ) ",
+			"...  ",
+			"#end"
+		},
+		since = "3.3.0"
+		)
 	public boolean exists() {
 		return file.exists();
 	}
 
-	/**
-	 * Tests whether the file is a directory. 
-	 * @return
-	 */
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Tests whether the file is a directory"
+		},
+		example = {
+			"#if( $file.isDirectory() ) ",
+			"...  ",
+			"#end"
+		},
+		since = "3.3.0"
+		)
 	public boolean isDirectory() {
 		return file.isDirectory();
 	}
 
-	/**
-	 * Tests whether the file is a 'normal file'.
-	 * @return
-	 */
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Tests whether the file is a 'normal file'"
+		},
+		example = {
+			"#if( $file.isFile() ) ",
+			"...  ",
+			"#end"
+		},
+		since = "3.3.0"
+		)
 	public boolean isFile() {
 		return file.isFile();
 	}
 
-	/**
-	 * Tests whether the file is a 'hidden file'. <br>
-	 * The exact definition of hidden is system-dependent.
-	 * @return
-	 */
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Tests whether the file is a 'hidden file'",
+		"The exact definition of 'hidden' is system-dependent"
+		},
+		example = {
+			"#if( $file.isHidden() ) ",
+			"...  ",
+			"#end"
+		},
+		since = "3.3.0"
+		)
 	public boolean isHidden() {
 		return file.isHidden();
 	}
 
-	/**
-	 * Returns the length of the file denoted by this abstract pathname. <br>
-	 * The return value is unspecified if this pathname denotes a directory. 
-	 * @return
-	 */
-	public long length() {
-		return file.length();
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Returns the length of the file ",
+		"The return value is 0 if the file is not a 'normal file' (eg directory)"
+		},
+		example = {
+			"#if( $file.length > 0 ) ",
+			"...  ",
+			"#end"
+		},
+		since = "3.3.0"
+		)
+	public long getLength() {
+		if ( file.isFile() ) {
+			return file.length();
+		}
+		else {
+			return 0;
+		}
 	}
 
-	/**
-	 * Loads all the lines of the current file 
-	 * @return
-	 * @throws Exception
-	 */
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Returns the name of the file or directory.",
+		"This is just the last name in the absolute pathname."
+		},
+		example = {
+			"$file.name"
+		},
+		since = "3.3.0"
+		)
+	public String getName() {
+		return file.getName();
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Returns the path for the file or directory."
+		},
+		example = {
+			"$file.path"
+		},
+		since = "3.3.0"
+		)
+	public String getPath() {
+		return file.getPath();
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Returns the pathname string for the file's parent",
+		"(or a void string if none)"
+		},
+		example = {
+			"$file.parent"
+		},
+		since = "3.3.0"
+		)
+	public String getParent() {
+		String parent = file.getParent(); // NB: can be null
+		return parent != null ? parent : "" ;
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Returns the absolute pathname string."
+		},
+		example = {
+			"$file.absolutePath"
+		},
+		since = "3.3.0"
+		)
+	public String getAbsolutePath() {
+		return file.getAbsolutePath();
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Returns the canonical pathname string.",
+		"A canonical pathname is both absolute and unique.",
+		"The precise definition of canonical form is system-dependent"
+		},
+		example = {
+			"$file.canonicalPath"
+		},
+		since = "3.3.0"
+		)
+	public String getCanonicalPath() throws Exception {
+		try {
+			return file.getCanonicalPath();
+		} catch (IOException e) {
+			// IOException possible because the construction of the canonical pathname 
+			// may require filesystem queries
+			throw e;
+		}
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Loads all the lines of the file ",
+		"Returns a list of strings"
+		},
+		example = {
+				"#foreach ( $line in $file.loadLines() )",
+				" > $line",
+				"#end"		
+		},
+		since = "3.3.0"
+		)
 	public List<String> loadLines() throws Exception {
 		return readAllLines();
 	}
 	
-	/**
-	 * Loads all the lines of the current file except the first N lines
-	 * @param numberOfLinesToIgnore
-	 * @return
-	 * @throws Exception
-	 */
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Same as loadLines() but ignore the first N lines"
+		},
+		parameters = { "n : number of lines to ignore (at the beginning of the file)" },			
+		example = {
+				"#foreach ( $line in $file.loadLines(2) )",
+				" > $line",
+				"#end"		
+		},
+		since = "3.3.0"
+		)
 	public List<String> loadLines(int numberOfLinesToIgnore) throws Exception {
 		List<String> allLines = readAllLines();
 		List<String> lines = new LinkedList<>();
@@ -106,31 +262,56 @@ public class FileInContext {
 		return lines;
 	}
 	
-	/**
-	 * Loads all the content of the current file 
-	 * @return
-	 * @throws Exception
-	 */
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Loads all the lines of the file ",
+		"Returns a single string containing all the lines"
+		},
+		example = {
+				"$file.loadContent()",
+				"#set($content = $file.loadContent() )",
+				""		
+		},
+		since = "3.3.0"
+		)
 	public String loadContent() throws Exception {
 		return linesToString(loadLines());
 	}
 	
-	/**
-	 * Loads all the content of the current file except the first N lines
-	 * @param numberOfLinesToIgnore
-	 * @return
-	 * @throws Exception
-	 */
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Same as loadContent() but ignore the first N lines"
+		},
+		parameters = { "n : number of lines to ignore (at the beginning of the file)" },			
+		example = {
+				"$file.loadContent(1)",
+				"#set($content = $file.loadContent(3) )",
+				""		
+		},
+		since = "3.3.0"
+		)
 	public String loadContent(int numberOfLinesToIgnore) throws Exception {
 		return linesToString(loadLines(numberOfLinesToIgnore));
 	}
 	
-	/**
-	 * Loads all the values of the current file 
-	 * @param separator character to be used as values separator
-	 * @return
-	 * @throws Exception
-	 */
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Loads values (split lines) from the file ",
+		"Values are the result after splitting each line according a given separator",
+		"Returns a list of values for each line (list of lists)"
+		},
+		parameters = { 
+				"separator : character to use as separator" },			
+		example = {
+				"#set( $csv = $file.loadValues(\";\") )",
+				"#foreach ( $line in $csv )",
+				" > #foreach ( $v in $line ) [$v] #end",
+				"",
+				"#end",
+				""		
+		},
+		since = "3.3.0"
+		)
 	public List<List<String>> loadValues(String separator) throws Exception {
 		List<String> lines = loadLines();
 		return splitLines(lines, separator);
@@ -143,35 +324,42 @@ public class FileInContext {
 	 * @return
 	 * @throws Exception
 	 */
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Same as loadValues(separator) but ignore the first N lines"
+		},
+		parameters = { 
+				"separator : character to use as separator",
+				"n : number of lines to ignore (at the beginning of the file)" },			
+		example = {
+				"$file.loadValues(\";\", 2) )",
+				""		
+		},
+		since = "3.3.0"
+		)
 	public List<List<String>> loadValues(String separator, int numberOfLinesToIgnore) throws Exception {
 		List<String> lines = loadLines(numberOfLinesToIgnore);
 		return splitLines(lines, separator);
 	}
 	
 	//----------------------------------------------------------------------------------------
+	// private methods
+	//----------------------------------------------------------------------------------------
 	
-//	private void checkFile() throws Exception {
-//		if ( ! file.exists() ) {
-//			throw new Exception("Load file error (file not found) : " + file.getAbsolutePath());
-//		}
-//		if ( ! file.isFile() ) {
-//			throw new Exception("Load file error (not a file) : " + file.getAbsolutePath());
-//		}
-//	}
-
 	private List<String> readAllLines() throws Exception {
 		if ( ! file.exists() ) {
-			throw new Exception("Load file error (file not found) : " + file.getAbsolutePath());
+			throw new Exception("Read file error (file not found) : " + file.getName());
 		}
 		if ( ! file.isFile() ) {
-			throw new Exception("Load file error (not a file) : " + file.getAbsolutePath());
+			throw new Exception("Read file error (not a file) : " + file.getName());
 		}
 		try {
 			// Read all lines from a file.  
 			// Bytes from the file are decoded into characters using the UTF-8 charset.
 			return Files.readAllLines(file.toPath());
 		} catch (IOException e) {
-			throw new Exception("Load file error (IOException) : " + file.getAbsolutePath());
+			throw new Exception("Read file error (IOException) : " 
+					+ e.getMessage() + " : " + file.getName());
 		}
 	}
 	

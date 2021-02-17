@@ -23,7 +23,7 @@ public class FileInContextTest {
 		assertTrue(file.exists());
 		assertTrue(file.isFile());
 		assertFalse(file.isDirectory());
-		assertTrue(file.length() > 0 );
+		assertTrue(file.getLength() > 0 );
 		
 		String content = file.loadContent();
 		assertTrue(content.startsWith("aa"));
@@ -49,7 +49,9 @@ public class FileInContextTest {
 		assertTrue(file.exists());
 		assertTrue(file.isFile());
 		assertFalse(file.isDirectory());
-		assertTrue(file.length() > 0 );
+		assertTrue(file.getLength() > 0 );
+		assertEquals("foo-csv.txt", file.getName());
+		assertTrue(file.getAbsolutePath().endsWith("foo-csv.txt"));
 		
 		String content = file.loadContent();
 		assertTrue(content.startsWith("a1;a2"));
