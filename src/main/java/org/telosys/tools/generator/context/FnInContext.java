@@ -994,11 +994,40 @@ public class FnInContext {
 ***/
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={	
+			"Returns a file object for the given file path"
+		},
+		parameters = { 
+			"filePath : the file path (relative or absolute)",
+			"if the file path is relative the current project folder is used as root path "
+			},
+		example = {
+			"## relative path : for a file located in the current project : ",
+			"#set( $file = $fn.file('myfile.csv') )",
+			"#set( $file = $fn.file('dir/foo.txt') )",
+			"## absolute path : for a file located anywhere : ",
+			"#set( $file = $fn.file('C:\\Temp\\values.csv') )",
+			"#set( $file = $fn.file('/tmp/values.csv') )"
+		},
+		since = "3.3.0"
+		)
 	public FileInContext file (String filePath) throws Exception {
 		File file = getFileFromPath(filePath) ;
 		return new FileInContext(file);
 	}
 	
+	@VelocityMethod(text={
+			"Returns a file object for the given file path located in the current bundle folder"
+		},
+		parameters = { 
+			"filePath : the file path (in the current bundle folder)"
+			},
+		example = {
+			"#set( $file = $fn.file('myfile.csv') )",
+			"#set( $file = $fn.file('dir/foo.txt') )"
+		},
+		since = "3.3.0"
+		)
 	public FileInContext fileFromBundle(String filePath) throws Exception {
 		String dir = getBundleLocationFullPath();
 		String fullPath = FileUtil.buildFilePath(dir, filePath);
@@ -1006,6 +1035,18 @@ public class FnInContext {
 		return new FileInContext(file);
 	}
 
+	@VelocityMethod(text={
+			"Returns a file object for the given file path located in the current model folder"
+		},
+		parameters = { 
+			"filePath : the file path (in the current model folder)"
+			},
+		example = {
+			"#set( $file = $fn.file('myfile.csv') )",
+			"#set( $file = $fn.file('dir/foo.txt') )"
+		},
+		since = "3.3.0"
+		)
 	public FileInContext fileFromModel(String filePath) throws Exception {
 		String dir = getModelLocationFullPath();
 		String fullPath = FileUtil.buildFilePath(dir, filePath);
@@ -1013,6 +1054,7 @@ public class FnInContext {
 		return new FileInContext(file);
 	}
 
+	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Returns a File for the given path, if path is relative the project location is used as root path 
