@@ -17,15 +17,34 @@ package org.telosys.tools.generator.context;
 
 import java.util.LinkedList;
 
+import org.telosys.tools.generator.context.doc.VelocityMethod;
+import org.telosys.tools.generator.context.doc.VelocityObject;
+import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.JoinColumn;
 import org.telosys.tools.generic.model.JoinTable;
-
 
 /**
  * "JoinTable" description <br>
  *
  * @author Laurent GUERIN
  */
+//-------------------------------------------------------------------------------------
+@VelocityObject(
+		contextName = ContextName.JOIN_TABLE ,
+		text = {
+				"This object provides the description of a 'join table' ",
+				""
+		},
+		since = "2.1.0",
+		example= {
+				"",
+				"#if ( $link.hasJoinTable() )",
+				"#set($joinTable = $link.joinTable)",
+				" name   : $joinTable.name",
+				" schema : $joinTable.schema",
+				"#end"				
+		}
+)
 public class JoinTableInContext
 {
 
@@ -48,11 +67,6 @@ public class JoinTableInContext
 		
 		//--- Build the list of "join columns"
 		_joinColumns = new LinkedList<JoinColumnInContext>();
-//		JoinColumns joinColumns = joinTable.getJoinColumns() ;
-//		for ( JoinColumn jc : joinColumns ) {
-//			_joinColumns.add( new JoinColumnInContext(jc) ) ;
-//		}
-		// ver 3.0.0
 		if ( joinTable.getJoinColumns() != null ) {
 			for ( JoinColumn jc : joinTable.getJoinColumns() ) {
 				_joinColumns.add( new JoinColumnInContext(jc) ) ;
@@ -61,10 +75,6 @@ public class JoinTableInContext
 
 		//--- Build the list of "inverse join columns"
 		_inverseJoinColumns = new LinkedList<JoinColumnInContext>();
-//		InverseJoinColumns inverseJoinColumns = joinTable.getInverseJoinColumns() ;
-//		for ( JoinColumn jc : inverseJoinColumns ) {
-//			_inverseJoinColumns.add( new JoinColumnInContext(jc) ) ;
-//		}
 		if ( joinTable.getInverseJoinColumns() != null ) {
 			for ( JoinColumn jc : joinTable.getInverseJoinColumns() ) {
 				_inverseJoinColumns.add( new JoinColumnInContext(jc) ) ;
@@ -73,29 +83,60 @@ public class JoinTableInContext
 	}
 
 	//--------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the table name "
+			}
+	)
 	public String getName() {
 		return _name;
 	}
 
 	//--------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the table schema if any"
+			}
+	)
 	public String getSchema() {
 		return _schema;
 	}
 
 	//--------------------------------------------------------------------------
+	@VelocityMethod(
+			text={	
+				"Returns the table catalog if any "
+				}
+		)
 	public String getCatalog() {
 		return _catalog;
 	}
 
 	//--------------------------------------------------------------------------
+	@VelocityMethod(
+			text={	
+				"Returns the join columns"
+				}
+		)
 	public LinkedList<JoinColumnInContext> getJoinColumns()
 	{
 		return _joinColumns ;
 	}
 	
 	//--------------------------------------------------------------------------
+	@VelocityMethod(
+			text={	
+				"Returns the inverse join columns"
+				}
+		)
 	public LinkedList<JoinColumnInContext> getInverseJoinColumns()
 	{
 		return _inverseJoinColumns ; 
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@Override
+	public String toString() {
+		return _name ;
 	}
 }

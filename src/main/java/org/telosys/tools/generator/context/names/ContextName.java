@@ -65,6 +65,7 @@ public class ContextName {
 	public final static String  LINK              = "link" ;
 	public final static String  LINK_ATTRIBUTE    = "linkAttribute" ; // v 2.1.0
 	public final static String  JOIN_COLUMN       = "joinColumn" ; // v 2.1.0
+	public final static String  JOIN_TABLE        = "joinTable" ; // v 3.3.0 (added for documentation)
 	
 	public final static String  FK                = "fk" ;    // v 2.0.7
 	public final static String  FKCOL             = "fkcol" ; // v 2.0.7

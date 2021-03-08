@@ -41,7 +41,9 @@ import org.telosys.tools.generator.context.tools.AnnotationsForJPA;
 public class Jpa {
 
 	private static final List<String> VOID_STRINGS_LIST = new LinkedList<>();
-
+	
+	private boolean genTargetEntity = false ;
+	
 	//-------------------------------------------------------------------------------------
 	// CONSTRUCTOR
 	//-------------------------------------------------------------------------------------
@@ -49,6 +51,14 @@ public class Jpa {
 		super();
 	}
 	
+	public boolean getGenTargetEntity() {
+		return genTargetEntity;
+	}
+
+	public void setGenTargetEntity(boolean v) {
+		this.genTargetEntity = v;
+	}
+
 	//-------------------------------------------------------------------------------------
 	// JPA IMPORTS
 	//-------------------------------------------------------------------------------------
@@ -279,32 +289,68 @@ public class Jpa {
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append( "@" + cardinality ) ;
-		if ( targetEntityClassName != null ) {
+//		if ( targetEntityClassName != null ) {
+////			sb.append( "(" );
+//			//--- Common further information : cascade, fetch and optional
+//			// ie "cascade = CascadeType.ALL, fetch = FetchType.EAGER"
+//			String sCardinalityFurtherInformation = getCardinalityFurtherInformation(entityLink);
+//			if ( ! StrUtil.nullOrVoid(sCardinalityFurtherInformation)) {
+//				sb.append( sCardinalityFurtherInformation );
+//				sb.append( ", " );
+//				notVoid = true ;
+//			}
+//			//--- targetEntity ( for ManyToMany and OneToMany )
+//			if ( this.genTargetEntity ) {
+//				if ( notVoid ) {
+//					sb.append( ", " );
+//				}
+//				sb.append( "targetEntity=" + targetEntityClassName + ".class" ) ;			
+//				notVoid = true ;
+//			}
+////			sb.append( ")" );
+//			if ( notVoid ) {
+//				return "(" + sb.toString() + ")";
+//			}
+//		}
+//		else {
+//			//--- Common further information : cascade, fetch and optional
+//			// ie "cascade = CascadeType.ALL, fetch = FetchType.EAGER"
+//			String sCardinalityFurtherInformation = getCardinalityFurtherInformation(entityLink);
+//			if ( ! StrUtil.nullOrVoid(sCardinalityFurtherInformation)) {
+//				sb.append( "(" );
+//				sb.append( sCardinalityFurtherInformation );
+//				sb.append( ")" );
+//			}
+//		}
+		String options = buildCardinalityOptions(entityLink, targetEntityClassName);
+		if ( ! StrUtil.nullOrVoid(options) ) {
 			sb.append( "(" );
-			//--- Common further information : cascade, fetch and optional
-			// ie "cascade = CascadeType.ALL, fetch = FetchType.EAGER"
-			String sCardinalityFurtherInformation = getCardinalityFurtherInformation(entityLink);
-			if ( ! StrUtil.nullOrVoid(sCardinalityFurtherInformation)) {
-				sb.append( sCardinalityFurtherInformation );
-				sb.append( ", " );
-			}
-			//--- targetEntity ( for ManyToMany and OneToMany )
-			sb.append( "targetEntity=" + targetEntityClassName + ".class" ) ;			
+			sb.append( options );
 			sb.append( ")" );
-		}
-		else {
-			//--- Common further information : cascade, fetch and optional
-			// ie "cascade = CascadeType.ALL, fetch = FetchType.EAGER"
-			String sCardinalityFurtherInformation = getCardinalityFurtherInformation(entityLink);
-			if ( ! StrUtil.nullOrVoid(sCardinalityFurtherInformation)) {
-				sb.append( "(" );
-				sb.append( sCardinalityFurtherInformation );
-				sb.append( ")" );
-			}
 		}
 		return sb.toString();
 	}
 	
+	//-------------------------------------------------------------------------------------
+	private String buildCardinalityOptions(LinkInContext entityLink, String targetEntityClassName) {
+		boolean notVoid = false ;
+		StringBuilder sb = new StringBuilder();
+		//--- Common further information : cascade, fetch and optional
+		// ie "cascade = CascadeType.ALL, fetch = FetchType.EAGER"
+		String sCardinalityFurtherInformation = getCardinalityFurtherInformation(entityLink);
+		if ( ! StrUtil.nullOrVoid(sCardinalityFurtherInformation) ) {
+			sb.append( sCardinalityFurtherInformation );
+			notVoid = true ;
+		}
+		//--- targetEntity ( for ManyToMany and OneToMany )
+		if ( this.genTargetEntity && targetEntityClassName != null ) {
+			if ( notVoid ) {
+				sb.append( ", " );
+			}
+			sb.append( "targetEntity=" + targetEntityClassName + ".class" ) ;			
+		}
+		return sb.toString();
+	}
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Build an return the cardinality annotation for an "INVERSE SIDE" <br>
@@ -322,12 +368,13 @@ public class Jpa {
 		StringBuilder annotation = new StringBuilder();
 		annotation.append( "@" + cardinality ) ;
 		annotation.append( "(" );
+		boolean notVoid = false ;
 		//--- Common further information : cascade, fetch and optional
 		// ie "cascade = CascadeType.ALL, fetch = FetchType.EAGER"
 		String sCardinalityFurtherInformation = getCardinalityFurtherInformation(entityLink);
 		if ( ! StrUtil.nullOrVoid(sCardinalityFurtherInformation)) {
 			annotation.append( sCardinalityFurtherInformation );
-			annotation.append( ", " ); 
+			notVoid = true ;
 		}
 		//--- mappedBy - NB : no "mappedBy" for ManyToOne (see JPA javadoc) ( cannot be an inverse side )
 		if ( ! entityLink.isCardinalityManyToOne() ) { 
@@ -338,12 +385,20 @@ public class Jpa {
 				mappedBy = inferMappedBy(entityLink);
 			}
 			if ( mappedBy != null ) {
+				if ( notVoid ) {
+					annotation.append( ", " ); 
+				}
 				annotation.append( "mappedBy=\"" + mappedBy + "\"" );
-				annotation.append( ", " ); 
+				notVoid = true ;
 			}
 		}
 		//--- targetEntity ( always usable, even with ManyToOne )
-		annotation.append( "targetEntity=" + targetEntityClassName + ".class" ); // No quotes 
+		if ( this.genTargetEntity && targetEntityClassName != null ) {
+			if ( notVoid ) {
+				annotation.append( ", " ); 
+			}
+			annotation.append( "targetEntity=" + targetEntityClassName + ".class" ); // No quotes
+		}
 		//---
 		annotation.append( ")" );
 		return annotation.toString();

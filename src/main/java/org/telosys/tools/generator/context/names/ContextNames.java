@@ -111,6 +111,8 @@ public class ContextNames {
 		PREDEFINED_NAMES_LIST.add( ContextName.VALUES ); // v 3.0.0
 		PREDEFINED_NAMES_LIST.add( ContextName.KEY_VALUES ); // v 3.0.0
 		PREDEFINED_NAMES_LIST.add( ContextName.DATA_VALUES ); // v 3.0.0
+
+		PREDEFINED_NAMES_LIST.add( ContextName.JOIN_TABLE ); // v 3.3.0 (for documentation)
 	}
 
 //	private static List<String> WIZARDS_OBJECTS_LIST = new LinkedList<String>();

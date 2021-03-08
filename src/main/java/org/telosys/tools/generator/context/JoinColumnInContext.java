@@ -21,7 +21,7 @@ import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.JoinColumn;
 
 /**
- * Link exposed in the Velocity Context 
+ * Join column exposed in the Velocity Context 
  *  
  * @author L.Guerin
  */
@@ -137,6 +137,12 @@ public class JoinColumnInContext {
 	)
 	public boolean isInsertable() {
 		return _insertable;
+	}
+
+	//-------------------------------------------------------------------------------------
+	@Override
+	public String toString() {
+		return _name ;
 	}
 
 }
