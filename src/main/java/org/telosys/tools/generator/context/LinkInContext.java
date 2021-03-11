@@ -115,7 +115,7 @@ public class LinkInContext {
 		_owningSide = link.isOwningSide();
 		
 		_cardinality = link.getCardinality();
-		_fetchType = link.getFetchType();
+		_fetchType = link.getFetchType() != null ? link.getFetchType() : FetchType.DEFAULT ;
 		_optional = link.getOptional();
 		_cascadeOptions = link.getCascadeOptions();
 	}

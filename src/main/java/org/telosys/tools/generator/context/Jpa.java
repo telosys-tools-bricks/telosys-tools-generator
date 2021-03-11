@@ -20,13 +20,13 @@ import java.util.List;
 
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.GeneratorException;
-import org.telosys.tools.generator.GeneratorUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.context.tools.AnnotationsBuilder;
 import org.telosys.tools.generator.context.tools.AnnotationsForJPA;
+import org.telosys.tools.generic.model.FetchType;
 
 //-------------------------------------------------------------------------------------
 @VelocityObject(
@@ -42,7 +42,12 @@ public class Jpa {
 
 	private static final List<String> VOID_STRINGS_LIST = new LinkedList<>();
 	
-	private boolean genTargetEntity = false ;
+	private boolean   genTargetEntity = false ;
+	private FetchType linkManyToOneFetchType  = FetchType.UNDEFINED;
+	private FetchType linkOneToOneFetchType   = FetchType.UNDEFINED;
+	private FetchType linkOneToManyFetchType  = FetchType.UNDEFINED;
+	private FetchType linkManyToManyFetchType = FetchType.UNDEFINED;
+	
 	
 	//-------------------------------------------------------------------------------------
 	// CONSTRUCTOR
@@ -51,14 +56,56 @@ public class Jpa {
 		super();
 	}
 	
+	//-------------------------------------------------------------------------------------
 	public boolean getGenTargetEntity() {
 		return genTargetEntity;
 	}
-
 	public void setGenTargetEntity(boolean v) {
 		this.genTargetEntity = v;
 	}
 
+	//-------------------------------------------------------------------------------------
+	public FetchType getManyToOneFetchType() {
+		return this.linkManyToOneFetchType;
+	}
+	public void setManyToOneFetchType(String s) {
+		this.linkManyToOneFetchType = getFetchType(s);
+	}
+
+	public FetchType getOneToOneFetchType() {
+		return this.linkOneToOneFetchType;
+	}
+	public void setOneToOneFetchType(String s) {
+		this.linkOneToOneFetchType = getFetchType(s);
+	}
+
+	public FetchType getOneToManyFetchType() {
+		return this.linkOneToManyFetchType;
+	}
+	public void setOneToManyFetchType(String s) {
+		this.linkOneToManyFetchType = getFetchType(s);
+	}
+
+	public FetchType getManyToManyFetchType() {
+		return this.linkManyToManyFetchType;
+	}
+	public void setManyToManyFetchType(String s) {
+		this.linkManyToManyFetchType = getFetchType(s);
+	}
+
+	private FetchType getFetchType(String s) {
+		if ( ! StrUtil.nullOrVoid(s) ) {
+			String ft = s.toUpperCase();
+			if ("EAGER".equals(ft) ) {
+				return FetchType.EAGER; 
+			}
+			if ("LAZY".equals(ft) ) {
+				return FetchType.LAZY; 
+			}
+		}
+		// Invalid value 
+		return FetchType.UNDEFINED;
+	}
 	//-------------------------------------------------------------------------------------
 	// JPA IMPORTS
 	//-------------------------------------------------------------------------------------
@@ -173,107 +220,116 @@ public class Jpa {
 	public String linkAnnotations( int marginSize, LinkInContext entityLink, List<AttributeInContext> alreadyMappedFields )
 				throws GeneratorException {
 		
-		String targetEntityClassName = entityLink.getTargetEntity().getName();
-
+//		String targetEntityClassName = entityLink.getTargetEntity().getName();
+//
+//		AnnotationsBuilder annotations = new AnnotationsBuilder(marginSize);
+//		
+//		if ( entityLink.isOwningSide() ) {
+//			if ( entityLink.isCardinalityOneToOne() ) {
+//				// Examples :
+//				//   @OneToOne 
+//			    //   @JoinColumn(name="BADGE_NUMBER", referencedColumnName="BADGE_NUMBER")
+//
+//				annotations.addLine(buildCardinalityAnnotationForOwningSide( entityLink, "OneToOne", null ) ); 
+//				processJoinColumns(annotations, entityLink, entityLink.getJoinColumns(), alreadyMappedFields );
+//			} 
+//			else if ( entityLink.isCardinalityManyToOne() ) {
+//				annotations.addLine(buildCardinalityAnnotationForOwningSide( entityLink, "ManyToOne", null ) ); 
+//				processJoinColumns(annotations, entityLink, entityLink.getJoinColumns(), alreadyMappedFields );
+//			} 
+//			else if ( entityLink.isCardinalityManyToMany() ) {
+//				annotations.addLine(buildCardinalityAnnotationForOwningSide( entityLink, "ManyToMany", targetEntityClassName ) ); 
+//				processJoinTable(annotations, entityLink) ;
+//			}
+//			else if ( entityLink.isCardinalityOneToMany() ) {
+//				//--- Possible for unidirectional "OneToMany" relationship ( whithout inverse side )
+//				annotations.addLine(buildCardinalityAnnotationForOwningSide( entityLink, "OneToMany", targetEntityClassName ) ); 
+//				processJoinTable(annotations, entityLink) ;				
+//			} 
+//			else {
+//				// Error 
+//			}
+//		} 
+//		else {
+//			//--- INVERSE SIDE
+//			if (entityLink.isCardinalityOneToOne()) {
+//				annotations.addLine(buildCardinalityAnnotationForInverseSide( entityLink, "OneToOne" ) ); 
+//			} 
+//			else if (entityLink.isCardinalityOneToMany()) {
+//				annotations.addLine(buildCardinalityAnnotationForInverseSide( entityLink, "OneToMany" ) ); 
+//			} 
+//			else if (entityLink.isCardinalityManyToMany()) {
+//				annotations.addLine(buildCardinalityAnnotationForInverseSide( entityLink, "ManyToMany" ) ); 
+//			} 
+//			else if (entityLink.isCardinalityManyToOne()) {
+//				// Not supposed to occur for an INVERSE SIDE !
+//				annotations.addLine(buildCardinalityAnnotationForInverseSide( entityLink, "ManyToOne" ) ); 
+//			} 
+//			else {
+//				// Error 
+//			}
+//		}
+//		return annotations.getAnnotations();
 		AnnotationsBuilder annotations = new AnnotationsBuilder(marginSize);
-		
-		if ( entityLink.isOwningSide() ) {
-			if ( entityLink.isCardinalityOneToOne() ) {
-				// Examples :
-				//   @OneToOne 
-			    //   @JoinColumn(name="BADGE_NUMBER", referencedColumnName="BADGE_NUMBER")
-
-				annotations.addLine(getCardinalityAnnotationForOwningSide( entityLink, "OneToOne", null ) ); 
-				processJoinColumns(annotations, entityLink, entityLink.getJoinColumns(), alreadyMappedFields );
-			} 
-			else if ( entityLink.isCardinalityManyToOne() ) {
-				annotations.addLine(getCardinalityAnnotationForOwningSide( entityLink, "ManyToOne", null ) ); 
-				processJoinColumns(annotations, entityLink, entityLink.getJoinColumns(), alreadyMappedFields );
-			} 
-			else if ( entityLink.isCardinalityManyToMany() ) {
-				annotations.addLine(getCardinalityAnnotationForOwningSide( entityLink, "ManyToMany", targetEntityClassName ) ); 
-				processJoinTable(annotations, entityLink) ;
-			}
-			else if ( entityLink.isCardinalityOneToMany() ) {
-				//--- Possible for unidirectional "OneToMany" relationship ( whithout inverse side )
-				annotations.addLine(getCardinalityAnnotationForOwningSide( entityLink, "OneToMany", targetEntityClassName ) ); 
-				processJoinTable(annotations, entityLink) ;				
-			} 
-			else {
-				// Error 
-			}
-		} 
-		else {
-			//--- INVERSE SIDE
-			if (entityLink.isCardinalityOneToOne()) {
-				annotations.addLine(getCardinalityAnnotationForInverseSide( entityLink, "OneToOne" ) ); 
-			} 
-			else if (entityLink.isCardinalityOneToMany()) {
-				annotations.addLine(getCardinalityAnnotationForInverseSide( entityLink, "OneToMany" ) ); 
-			} 
-			else if (entityLink.isCardinalityManyToMany()) {
-				annotations.addLine(getCardinalityAnnotationForInverseSide( entityLink, "ManyToMany" ) ); 
-			} 
-			else if (entityLink.isCardinalityManyToOne()) {
-				// Not supposed to occur for an INVERSE SIDE !
-				annotations.addLine(getCardinalityAnnotationForInverseSide( entityLink, "ManyToOne" ) ); 
-			} 
-			else {
-				// Error 
-			}
-		}
+		processLinkCardinalityAnnotation(annotations, entityLink) ;
+		processLinkJoinAnnotation(annotations, entityLink, alreadyMappedFields );
 		return annotations.getAnnotations();
 	}
 	
 	public String linkCardinalityAnnotation(int leftMargin, LinkInContext entityLink )
 			throws GeneratorException {
-		String annotation = "" ;
-		String targetEntityClassName = entityLink.getTargetEntity().getName();
-		if ( entityLink.isOwningSide() ) {
-			if ( entityLink.isCardinalityOneToOne() ) {
-				annotation = getCardinalityAnnotationForOwningSide( entityLink, "OneToOne", null ) ; 
-			} 
-			else if ( entityLink.isCardinalityManyToOne() ) {
-				annotation = getCardinalityAnnotationForOwningSide( entityLink, "ManyToOne", null ) ; 
-			} 
-			else if ( entityLink.isCardinalityManyToMany() ) {
-				annotation = getCardinalityAnnotationForOwningSide( entityLink, "ManyToMany", targetEntityClassName ) ; 
-			}
-			else if ( entityLink.isCardinalityOneToMany() ) {
-				//--- Possible for unidirectional "OneToMany" relationship ( whithout inverse side )
-				annotation = getCardinalityAnnotationForOwningSide( entityLink, "OneToMany", targetEntityClassName ) ; 
-			} 
-		} 
-		else {
-			//--- INVERSE SIDE
-			if (entityLink.isCardinalityOneToOne()) {
-				annotation = getCardinalityAnnotationForInverseSide( entityLink, "OneToOne" ); 
-			} 
-			else if (entityLink.isCardinalityOneToMany()) {
-				annotation = getCardinalityAnnotationForInverseSide( entityLink, "OneToMany" ); 
-			} 
-			else if (entityLink.isCardinalityManyToMany()) {
-				annotation = getCardinalityAnnotationForInverseSide( entityLink, "ManyToMany" ); 
-			} 
-			else if (entityLink.isCardinalityManyToOne()) {
-				// Not supposed to occur for an INVERSE SIDE !
-				annotation = getCardinalityAnnotationForInverseSide( entityLink, "ManyToOne" ) ; 
-			} 
-		}
-		return GeneratorUtil.blanks(leftMargin) + annotation;
+//		String annotation = "" ;
+//		String targetEntityClassName = entityLink.getTargetEntity().getName();
+//		if ( entityLink.isOwningSide() ) {
+//			if ( entityLink.isCardinalityOneToOne() ) {
+//				annotation = buildCardinalityAnnotationForOwningSide( entityLink, "OneToOne", null ) ; 
+//			} 
+//			else if ( entityLink.isCardinalityManyToOne() ) {
+//				annotation = buildCardinalityAnnotationForOwningSide( entityLink, "ManyToOne", null ) ; 
+//			} 
+//			else if ( entityLink.isCardinalityManyToMany() ) {
+//				annotation = buildCardinalityAnnotationForOwningSide( entityLink, "ManyToMany", targetEntityClassName ) ; 
+//			}
+//			else if ( entityLink.isCardinalityOneToMany() ) {
+//				//--- Possible for unidirectional "OneToMany" relationship ( whithout inverse side )
+//				annotation = buildCardinalityAnnotationForOwningSide( entityLink, "OneToMany", targetEntityClassName ) ; 
+//			} 
+//		} 
+//		else {
+//			//--- INVERSE SIDE
+//			if (entityLink.isCardinalityOneToOne()) {
+//				annotation = buildCardinalityAnnotationForInverseSide( entityLink, "OneToOne" ); 
+//			} 
+//			else if (entityLink.isCardinalityOneToMany()) {
+//				annotation = buildCardinalityAnnotationForInverseSide( entityLink, "OneToMany" ); 
+//			} 
+//			else if (entityLink.isCardinalityManyToMany()) {
+//				annotation = buildCardinalityAnnotationForInverseSide( entityLink, "ManyToMany" ); 
+//			} 
+//			else if (entityLink.isCardinalityManyToOne()) {
+//				// Not supposed to occur for an INVERSE SIDE !
+//				annotation = buildCardinalityAnnotationForInverseSide( entityLink, "ManyToOne" ) ; 
+//			} 
+//		}
+		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
+		processLinkCardinalityAnnotation(annotations, entityLink) ;
+		return annotations.getAnnotations();
 	}
 	
 	public String linkJoinAnnotation(int leftMargin, LinkInContext entityLink, List<AttributeInContext> alreadyMappedFields ) {
+//		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
+//		if ( entityLink.isCardinalityManyToMany() ) {
+//			processJoinTable(annotations, entityLink) ;
+//		} 
+//		else {
+//		    // Example : @JoinColumn(name="BADGE_NUMBER", referencedColumnName="BADGE_NUMBER")
+//			// used in owning side ManyToOne ( or OneToOne )
+//			// can be used also for unidirectional OneToMany relationship (since JPA 2.x)
+//			processJoinColumns(annotations, entityLink, entityLink.getJoinColumns(), alreadyMappedFields );
+//		}
+//		return annotations.getAnnotations();
 		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
-		if ( entityLink.isCardinalityManyToMany() ) {
-			processJoinTable(annotations, entityLink) ;
-		} 
-		else {
-		    // Example : @JoinColumn(name="BADGE_NUMBER", referencedColumnName="BADGE_NUMBER")
-			// used in owning side ManyToOne ( or OneToOne )
-			// can be used also for unidirectional OneToMany relationship (since JPA 2.x)
-			processJoinColumns(annotations, entityLink, entityLink.getJoinColumns(), alreadyMappedFields );
-		}
+		processLinkJoinAnnotation(annotations, entityLink, alreadyMappedFields );
 		return annotations.getAnnotations();
 	}
 	
@@ -285,7 +341,7 @@ public class Jpa {
 	 * @param targetEntityClassName the target entity ( or null if none ) 
 	 * @return
 	 */
-	private String getCardinalityAnnotationForOwningSide( LinkInContext entityLink, String cardinality, String targetEntityClassName ) 
+	private String buildCardinalityAnnotationForOwningSide( LinkInContext entityLink, String cardinality, String targetEntityClassName ) 
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append( "@" + cardinality ) ;
@@ -337,7 +393,7 @@ public class Jpa {
 		StringBuilder sb = new StringBuilder();
 		//--- Common further information : cascade, fetch and optional
 		// ie "cascade = CascadeType.ALL, fetch = FetchType.EAGER"
-		String sCardinalityFurtherInformation = getCardinalityFurtherInformation(entityLink);
+		String sCardinalityFurtherInformation = buildCardinalityFurtherInformation(entityLink);
 		if ( ! StrUtil.nullOrVoid(sCardinalityFurtherInformation) ) {
 			sb.append( sCardinalityFurtherInformation );
 			notVoid = true ;
@@ -361,7 +417,7 @@ public class Jpa {
 	 * @return
 	 * @throws GeneratorException
 	 */
-	private String getCardinalityAnnotationForInverseSide( LinkInContext entityLink, String cardinality ) 
+	private String buildCardinalityAnnotationForInverseSide( LinkInContext entityLink, String cardinality ) 
 					throws GeneratorException  {
 		String targetEntityClassName = entityLink.getTargetEntity().getName();
 		
@@ -371,7 +427,7 @@ public class Jpa {
 		boolean notVoid = false ;
 		//--- Common further information : cascade, fetch and optional
 		// ie "cascade = CascadeType.ALL, fetch = FetchType.EAGER"
-		String sCardinalityFurtherInformation = getCardinalityFurtherInformation(entityLink);
+		String sCardinalityFurtherInformation = buildCardinalityFurtherInformation(entityLink);
 		if ( ! StrUtil.nullOrVoid(sCardinalityFurtherInformation)) {
 			annotation.append( sCardinalityFurtherInformation );
 			notVoid = true ;
@@ -446,7 +502,7 @@ public class Jpa {
 	 * @param link
 	 * @return
 	 */
-	private String getCardinalityFurtherInformation(LinkInContext link) {
+	private String buildCardinalityFurtherInformation(LinkInContext link) {
 		/*
 		 * JPA documentation
 		 * OneToOne   : cascade + fecth + optional
@@ -544,14 +600,37 @@ public class Jpa {
 
 	//-------------------------------------------------------------------------------------
 	private String buildFetch(LinkInContext link) {
-		// JPA doc : default = EAGER
+		String fetchType = determineFetchType(link);
+		if ( ! StrUtil.nullOrVoid(fetchType) ) {
+			return "fetch = FetchType." + fetchType ;
+		}
+		return ""; // Nothing => use JPA default fetch type
+	}
+	private String determineFetchType(LinkInContext link) {
 		if ( link.isFetchEAGER() ) { 
-			return "fetch = FetchType.EAGER" ; 
+			// has been defined in the model => use it
+			return "EAGER" ; 
 		}
 		if ( link.isFetchLAZY()  ) { 
-			return "fetch = FetchType.LAZY" ;
+			// has been defined in the model => use it
+			return "LAZY" ;
 		}
-		return "";
+		if ( link.isFetchDEFAULT() ) {
+			// has not been defined in the model => use $jpa default fetch type if any 
+			if ( link.isCardinalityOneToOne() && this.linkOneToOneFetchType != FetchType.UNDEFINED ) {
+				return this.linkOneToOneFetchType.getText();
+			}
+			if ( link.isCardinalityManyToOne() && this.linkManyToOneFetchType != FetchType.UNDEFINED ) {
+				return this.linkManyToOneFetchType.getText();
+			}
+			if ( link.isCardinalityOneToMany() && this.linkOneToManyFetchType != FetchType.UNDEFINED ) {
+				return this.linkOneToManyFetchType.getText();
+			}
+			if ( link.isCardinalityManyToMany() && this.linkManyToManyFetchType != FetchType.UNDEFINED ) {
+				return this.linkManyToManyFetchType.getText();
+			}
+		}
+		return ""; // Nothing => use JPA default fetch type
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -566,6 +645,55 @@ public class Jpa {
 		return "";
 	}
 
+	private void processLinkCardinalityAnnotation(AnnotationsBuilder annotations, LinkInContext link) 
+			throws GeneratorException {
+		String annotation = "" ;
+		String targetEntityClassName = link.getTargetEntity().getName();
+		if ( link.isOwningSide() ) {
+			if ( link.isCardinalityOneToOne() ) {
+				annotation = buildCardinalityAnnotationForOwningSide( link, "OneToOne", null ) ; 
+			} 
+			else if ( link.isCardinalityManyToOne() ) {
+				annotation = buildCardinalityAnnotationForOwningSide( link, "ManyToOne", null ) ; 
+			} 
+			else if ( link.isCardinalityManyToMany() ) {
+				annotation = buildCardinalityAnnotationForOwningSide( link, "ManyToMany", targetEntityClassName ) ; 
+			}
+			else if ( link.isCardinalityOneToMany() ) {
+				//--- Possible for unidirectional "OneToMany" relationship ( whithout inverse side )
+				annotation = buildCardinalityAnnotationForOwningSide( link, "OneToMany", targetEntityClassName ) ; 
+			} 
+		} 
+		else {
+			//--- INVERSE SIDE
+			if (link.isCardinalityOneToOne()) {
+				annotation = buildCardinalityAnnotationForInverseSide( link, "OneToOne" ); 
+			} 
+			else if (link.isCardinalityOneToMany()) {
+				annotation = buildCardinalityAnnotationForInverseSide( link, "OneToMany" ); 
+			} 
+			else if (link.isCardinalityManyToMany()) {
+				annotation = buildCardinalityAnnotationForInverseSide( link, "ManyToMany" ); 
+			} 
+			else if (link.isCardinalityManyToOne()) {
+				// Not supposed to occur for an INVERSE SIDE !
+				annotation = buildCardinalityAnnotationForInverseSide( link, "ManyToOne" ) ; 
+			} 
+		}
+		annotations.addLine(annotation);
+	}
+	
+	private void processLinkJoinAnnotation(AnnotationsBuilder annotations, LinkInContext entityLink, List<AttributeInContext> alreadyMappedFields ) {
+		if ( entityLink.isCardinalityManyToMany() ) {
+			processJoinTable(annotations, entityLink) ;
+		} 
+		else {
+		    // Example : @JoinColumn(name="BADGE_NUMBER", referencedColumnName="BADGE_NUMBER")
+			// used in owning side ManyToOne ( or OneToOne )
+			// can be used also for unidirectional OneToMany relationship (since JPA 2.x)
+			processJoinColumns(annotations, entityLink, entityLink.getJoinColumns(), alreadyMappedFields );
+		}
+	}	
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Generates a "@JoinColumn" (single column) or "@JoinColumns" (multiple columns) annotation
@@ -577,7 +705,7 @@ public class Jpa {
 	private void processJoinColumns(AnnotationsBuilder annotations, LinkInContext link, 
 			List<JoinColumnInContext> joinColumns, List<AttributeInContext> alreadyMappedFields ) 
 	{
-		String[] jc = getJoinColumnAnnotations( link, joinColumns, alreadyMappedFields );
+		String[] jc = buildJoinColumnAnnotations( link, joinColumns, alreadyMappedFields );
 		if ( jc != null ) {
 			if ( jc.length == 1 ) {
 				// Single Join Column
@@ -623,18 +751,20 @@ public class Jpa {
 			{
 				processJoinTableColumns(annotations, link, inverseJoinColumns, "inverseJoinColumns", "" );
 			}
-			annotations.addLine(" ) \n" );
+//			annotations.addLine(" ) \n" );
+			annotations.addLine(" )" );
 		}
-		else {
-			annotations.addLine( "@JoinTable(name=\"NO_JOIN_TABLE_FOR_THIS_LINK\" ) \n" );
-		}
+		// else : no join table (not an error)
+//		else {
+//			annotations.addLine( "// @JoinTable ERROR : NO JOIN TABLE FOR THIS LINK ! " );
+//		}
 	}
 
 	//-------------------------------------------------------------------------------------
 	private void processJoinTableColumns( AnnotationsBuilder annotations, LinkInContext link, 
 			List<JoinColumnInContext> joinColumns, String name,  String end )
 	{
-		String[] jc = getJoinColumnAnnotations( link, joinColumns, null );
+		String[] jc = buildJoinColumnAnnotations( link, joinColumns, null );
 		if ( jc != null ) {
 			if ( jc.length == 1 ) 
 			{
@@ -673,13 +803,13 @@ public class Jpa {
 	 * @param alreadyMappedFields
 	 * @return
 	 */
-	private String[] getJoinColumnAnnotations( LinkInContext link, List<JoinColumnInContext> joinColumns, 
+	private String[] buildJoinColumnAnnotations( LinkInContext link, List<JoinColumnInContext> joinColumns, 
 			List<AttributeInContext> alreadyMappedFields ) 
 	{
 		String[] annotations = new String[joinColumns.size()];
 		int i = 0 ;
 		for ( JoinColumnInContext jc : joinColumns ) {
-			annotations[i++] = getJoinColumnAnnotation(jc, link, alreadyMappedFields);
+			annotations[i++] = buildJoinColumnAnnotation(jc, link, alreadyMappedFields);
 		}
 		return annotations;
 	}
@@ -692,7 +822,7 @@ public class Jpa {
 	 * @param alreadyMappedFields
 	 * @return
 	 */
-	private String getJoinColumnAnnotation(JoinColumnInContext joinColumn, LinkInContext link, List<AttributeInContext> alreadyMappedFields ) {
+	private String buildJoinColumnAnnotation(JoinColumnInContext joinColumn, LinkInContext link, List<AttributeInContext> alreadyMappedFields ) {
 		StringBuilder annotation = new StringBuilder();
 		annotation.append( "@JoinColumn(");
 		annotation.append( "name=\"" + joinColumn.getName()+"\"" );
@@ -716,6 +846,10 @@ public class Jpa {
 				annotation.append( "insertable=false" ); 
 				annotation.append( ", " );
 				annotation.append( "updatable=false" ); 
+			}
+			if ( ! joinColumn.isNullable() ) { // v 3.3.0
+				annotation.append( ", " );
+				annotation.append( "nullable=false" ); 
 			}
 		}
 		annotation.append( ")");
