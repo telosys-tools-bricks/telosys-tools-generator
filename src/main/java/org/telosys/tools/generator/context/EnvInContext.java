@@ -24,6 +24,7 @@ import org.telosys.tools.generic.model.types.LiteralValuesProviderForCSharp;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForGo;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForJava;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForJavaScript;
+import org.telosys.tools.generic.model.types.LiteralValuesProviderForPHP;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForPython;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForTypeScript;
 import org.telosys.tools.generic.model.types.TypeConverter;
@@ -173,7 +174,7 @@ public class EnvInContext {
 	}
 	
 	//-------------------------------------------------------------------------------------
-	protected void checkLanguageValidity(String language) throws GeneratorException {
+	private void checkLanguageValidity(String language) throws GeneratorException {
 		String languageUC = language.toUpperCase() ;
 		if ( JAVA.equals(languageUC) ) return ;
 		if ( CSHARP.equals(languageUC) ) return ;
@@ -203,11 +204,21 @@ public class EnvInContext {
 	
 	//-------------------------------------------------------------------------------------
 	/**
-	 * Returns the TypeConverter corresponding to the current language
+	 * Returns the TypeConverter corresponding to the current language <br>
+	 * and with the specific collection type if any
 	 * @return
 	 * @since ver 3.0.0
 	 */
-	protected TypeConverter getTypeConverter()  {
+	public TypeConverter getTypeConverter() { // keep 'public' for debug in '.vm' files
+		TypeConverter typeConverter = createTypeConverterForCurrentLanguage();
+		// set specific collection type if any 
+		if ( specificCollectionType != null ) {
+			typeConverter.setSpecificCollectionType(specificCollectionType);
+		}
+		return typeConverter;
+	}
+	
+	private TypeConverter createTypeConverterForCurrentLanguage()  {
 		String languageUC = this.language.toUpperCase() ;
 		if ( JAVA.equals(languageUC) ) {
 			return new TypeConverterForJava() ;
@@ -241,7 +252,7 @@ public class EnvInContext {
 	 * @return
 	 * @since ver 3.0.0
 	 */
-	protected LiteralValuesProvider getLiteralValuesProvider()  {
+	public LiteralValuesProvider getLiteralValuesProvider()  {
 		String languageUC = this.language.toUpperCase() ;
 		if ( JAVA.equals(languageUC) ) {
 			return new LiteralValuesProviderForJava() ;
@@ -260,6 +271,9 @@ public class EnvInContext {
 		}
 		else if ( PYTHON.equals(languageUC) ) {
 			return new LiteralValuesProviderForPython();
+		}
+		else if ( PHP.equals(languageUC) ) {
+			return new LiteralValuesProviderForPHP();
 		}
 		else {
 			// By default : Java  ( not supposed to happen ) 

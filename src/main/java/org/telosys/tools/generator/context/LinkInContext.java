@@ -18,7 +18,6 @@ package org.telosys.tools.generator.context;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.GeneratorUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
@@ -127,8 +126,8 @@ public class LinkInContext {
 	}
 	
 	/**
-	 * Returns the default collection simple type <br>
-	 * (for the time being the type is always a Java List)
+	 * Returns the collection type <br>
+	 * depending on the current language and the specific collection type if any
 	 * @param className
 	 * @return
 	 */
@@ -136,11 +135,6 @@ public class LinkInContext {
 		// Before v 3.3.0 : return "List<" + className + ">" ; 
 		// get collection type from current target language (added in v 3.3.0 )
 		TypeConverter typeConverter = _envInContext.getTypeConverter();
-		// set specific collection type if any 
-		String specificCollectionType = _envInContext.getCollectionType();
-		if ( StrUtil.nullOrVoid(specificCollectionType) ) {
-			typeConverter.setSpecificCollectionType(specificCollectionType);
-		}
 		// get collection type for the current language 
 		String collectionType = typeConverter.getCollectionType(className);
 		if ( collectionType != null ) {

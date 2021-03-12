@@ -147,7 +147,8 @@ public class Jpa {
 		for ( LinkInContext link : entity.getLinks() ) {
 			if ( link.isCardinalityOneToMany() || link.isCardinalityManyToMany() ) {
 				// collection types used for JPA link
-				linkAttributeTypes.add( fieldType(link) );
+//				linkAttributeTypes.add( fieldType(link) );
+				linkAttributeTypes.add( link.getFieldType() );
 			}
 		}
 		// Build all imports 
@@ -189,28 +190,28 @@ public class Jpa {
 //		return jpaImports ;
 //	}
 	
-	// WIP :
-	// $jpa.fieldType($link)
-	// $jpa.formattedFieldType($link, 10)
-	public String fieldType(LinkInContext link) throws GeneratorException {
-		String targetEntityClassName = link.getTargetEntitySimpleType() ; 
-		if ( link.isCardinalityOneToMany() || link.isCardinalityManyToMany() ) {
-			// Collection : List<Student>, Set<Book>, etc
-			return this.collectionType + "<" + targetEntityClassName + ">" ; 
-		} else {
-			// Basic type : Student, Book, etc
-			return targetEntityClassName ;
-		}
-	}
-	public String formattedFieldType(LinkInContext link, int expectedLength) throws GeneratorException
-    {
-		String currentType = fieldType(link);
-        int delta = expectedLength - currentType.length();
-        if (delta > 0) { // if trailing blanks needed
-            return currentType + GeneratorUtil.blanks(delta);
-        }
-        return currentType;
-    }
+//	// WIP :
+//	// $jpa.fieldType($link)
+//	// $jpa.formattedFieldType($link, 10)
+//	public String fieldType(LinkInContext link) throws GeneratorException {
+//		String targetEntityClassName = link.getTargetEntitySimpleType() ; 
+//		if ( link.isCardinalityOneToMany() || link.isCardinalityManyToMany() ) {
+//			// Collection : List<Student>, Set<Book>, etc
+//			return this.collectionType + "<" + targetEntityClassName + ">" ; 
+//		} else {
+//			// Basic type : Student, Book, etc
+//			return targetEntityClassName ;
+//		}
+//	}
+//	public String formattedFieldType(LinkInContext link, int expectedLength) throws GeneratorException
+//    {
+//		String currentType = fieldType(link);
+//        int delta = expectedLength - currentType.length();
+//        if (delta > 0) { // if trailing blanks needed
+//            return currentType + GeneratorUtil.blanks(delta);
+//        }
+//        return currentType;
+//    }
 
 	//-------------------------------------------------------------------------------------
 	// ENTITY JPA ANNOTATIONS
