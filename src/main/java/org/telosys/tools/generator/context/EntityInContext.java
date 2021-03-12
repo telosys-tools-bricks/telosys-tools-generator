@@ -126,7 +126,7 @@ public class EntityInContext
 		//--- Initialize all the LINKS for the current entity
 		_links = new LinkedList<>();
 		for ( Link link : entity.getLinks() ) { // v 3.0.0
-			LinkInContext linkInContext = new LinkInContext(this, link, _modelInContext ); // v 3.0.0
+			LinkInContext linkInContext = new LinkInContext(this, link, _modelInContext, _env ); // v 3.0.0
 			_links.add(linkInContext);
 		}
 		

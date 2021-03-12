@@ -18,6 +18,7 @@ package org.telosys.tools.generator.context;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.GeneratorUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
@@ -30,6 +31,7 @@ import org.telosys.tools.generic.model.FetchType;
 import org.telosys.tools.generic.model.JoinColumn;
 import org.telosys.tools.generic.model.Link;
 import org.telosys.tools.generic.model.Optional;
+import org.telosys.tools.generic.model.types.TypeConverter;
 
 /**
  * Link exposed in the Velocity Context 
@@ -59,6 +61,7 @@ public class LinkInContext {
     private final EntityInContext  _entity ; // the entity to which the link belongs
 
 	private final ModelInContext   _modelInContext ;  // v 3.0.0 (replaces EntitiesManager)
+	private final EnvInContext     _envInContext ; // ver 3.3.0
 
 	private final List<JoinColumnInContext> _joinColumns ; 
 	private final JoinTableInContext        _joinTable ; 
@@ -83,11 +86,14 @@ public class LinkInContext {
 	 * @param entity
 	 * @param link
 	 * @param modelInContext
+	 * @param envInContext
 	 */
-	public LinkInContext(final EntityInContext entity, final Link link, final ModelInContext modelInContext ) 
+	public LinkInContext(EntityInContext entity, Link link, 
+			ModelInContext modelInContext, EnvInContext envInContext ) 
 	{
 		this._entity = entity ;
 		this._modelInContext = modelInContext ; // v 3.0.0
+		this._envInContext = envInContext ; // v 3.3.0
 		
 		//--- Build the list of "join columns"
 		_joinColumns = new LinkedList<>();
@@ -127,8 +133,23 @@ public class LinkInContext {
 	 * @return
 	 */
 	private String buildCollectionType(String className) {
-		// TODO : get it from current target language ?
-		return "List<" + className + ">" ; 
+		// Before v 3.3.0 : return "List<" + className + ">" ; 
+		// get collection type from current target language (added in v 3.3.0 )
+		TypeConverter typeConverter = _envInContext.getTypeConverter();
+		// set specific collection type if any 
+		String specificCollectionType = _envInContext.getCollectionType();
+		if ( StrUtil.nullOrVoid(specificCollectionType) ) {
+			typeConverter.setSpecificCollectionType(specificCollectionType);
+		}
+		// get collection type for the current language 
+		String collectionType = typeConverter.getCollectionType(className);
+		if ( collectionType != null ) {
+			return collectionType ;
+		}
+		else {
+			throw new IllegalStateException("Cannot get collection type (language="
+					+ _envInContext.getLanguage()+")");
+		}
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -449,7 +470,8 @@ public class LinkInContext {
 //		return type;
 		
 		// NEW in v 3.3.0
-		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
+//		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
+		if ( this.isCollectionType() ) {
 			return buildCollectionType(targetEntityClassName);
 		} else {
 			return targetEntityClassName ;
@@ -572,6 +594,17 @@ public class LinkInContext {
 	)
 	public boolean isCardinalityManyToMany() {
 		return _cardinality == Cardinality.MANY_TO_MANY ;
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns TRUE if the link is a collection",
+			"In other words, if its cardinality is 'OneToMany' or 'ManyToMany'"
+			}
+	)
+	public boolean isCollectionType() {
+		return _cardinality == Cardinality.ONE_TO_MANY || _cardinality == Cardinality.MANY_TO_MANY ;
 	}
 
 	//-------------------------------------------------------------------------------------

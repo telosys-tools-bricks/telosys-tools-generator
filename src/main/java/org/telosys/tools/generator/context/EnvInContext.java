@@ -31,6 +31,7 @@ import org.telosys.tools.generic.model.types.TypeConverterForCSharp;
 import org.telosys.tools.generic.model.types.TypeConverterForGo;
 import org.telosys.tools.generic.model.types.TypeConverterForJava;
 import org.telosys.tools.generic.model.types.TypeConverterForJavaScript;
+import org.telosys.tools.generic.model.types.TypeConverterForPHP;
 import org.telosys.tools.generic.model.types.TypeConverterForPython;
 import org.telosys.tools.generic.model.types.TypeConverterForTypeScript;
 
@@ -49,15 +50,17 @@ public class EnvInContext {
 	private static final String JAVA       = "JAVA" ;
 	private static final String CSHARP     = "C#" ;
 	private static final String GO         = "GO" ;
-	
 	private static final String TYPESCRIPT = "TYPESCRIPT" ;
 	private static final String JAVASCRIPT = "JAVASCRIPT" ;
 	private static final String PYTHON     = "PYTHON" ;
+	private static final String PHP        = "PHP" ;
 	
 	private String entityClassNamePrefix = "" ;
 	private String entityClassNameSuffix = "" ;
 	
 	private String language = "Java" ; // v 3.0.0
+	
+	private String specificCollectionType = null ; // v 3.3.0
 	
 	//-------------------------------------------------------------------------------------
 	// CONSTRUCTOR
@@ -178,6 +181,7 @@ public class EnvInContext {
 		if ( TYPESCRIPT.equals(languageUC) ) return ;
 		if ( JAVASCRIPT.equals(languageUC) ) return ;
 		if ( PYTHON.equals(languageUC) ) return ;
+		if ( PHP.equals(languageUC) ) return ;
 		// Unknown language
 		throw new GeneratorException("Unknown language '" + language + "'");
 	}
@@ -223,6 +227,9 @@ public class EnvInContext {
 		else if ( PYTHON.equals(languageUC) ) {
 			return new TypeConverterForPython() ;
 		}
+		else if ( PHP.equals(languageUC) ) {
+			return new TypeConverterForPHP() ;
+		}
 		else {
 			// By default : Java  ( not supposed to happen ) 
 			return new TypeConverterForJava() ;
@@ -258,5 +265,39 @@ public class EnvInContext {
 			// By default : Java  ( not supposed to happen ) 
 			return new LiteralValuesProviderForJava() ;
 		}
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Set a specific collection type for the current code generation",
+			"The given type will be used as the new default type for the collections "
+			},
+		example={ 
+			"#set ( $env.collectionType = 'java.util.Set' )    ## for Java ",
+			"#set ( $env.collectionType = 'java.util.Vector' ) ## for Java ",
+			"#set ( $env.collectionType = 'Collection' )       ## for C# ",
+			},
+		parameters = { 
+			"specificCollectionType : the type to be used (full type if any) " 
+			},
+		since = "3.3.0"
+			)
+	public void setCollectionType(String specificCollectionType) {
+		this.specificCollectionType = specificCollectionType;
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the current specific collection type"
+			},
+		example={ 
+			"$env.language" 
+			},
+		since = "3.3.0"
+			)
+	public String getCollectionType() {
+		return this.specificCollectionType != null ? this.specificCollectionType : "" ;
 	}
 }

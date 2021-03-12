@@ -253,7 +253,7 @@ public class Java {
 				)
 	public List<String> imports( List<AttributeInContext> attributesList ) {
 		if ( attributesList != null ) {
-			ImportsList imports = new ImportsList();
+			JavaImportsList imports = new JavaImportsList();
 			for ( AttributeInContext attribute : attributesList ) {
 				// register the type to be imported if necessary
 				imports.declareType( attribute.getFullType() ); 
@@ -283,7 +283,7 @@ public class Java {
 				)
 	public List<String> imports( EntityInContext entity ) throws GeneratorException {
 		if ( entity != null ) {
-			ImportsList imports = new ImportsList();
+			JavaImportsList imports = new JavaImportsList();
 			//--- All the attributes
 			for ( AttributeInContext attribute : entity.getAttributes() ) {
 				// register the type to be imported if necessary
