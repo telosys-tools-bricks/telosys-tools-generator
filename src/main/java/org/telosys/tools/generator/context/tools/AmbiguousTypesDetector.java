@@ -18,7 +18,7 @@ package org.telosys.tools.generator.context.tools;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.telosys.tools.commons.JavaClassUtil;
+import org.telosys.tools.commons.JavaTypeUtil;
 import org.telosys.tools.generator.context.AttributeInContext;
 
 public class AmbiguousTypesDetector {
@@ -92,7 +92,8 @@ public class AmbiguousTypesDetector {
 		LinkedList<String> ambiguousTypes = new LinkedList<String>() ;
 
 		for ( String fullType : _fullTypesList ) {
-			String shortName = JavaClassUtil.shortName(fullType);
+			//String shortName = JavaClassUtil.shortName(fullType);
+			String shortName = JavaTypeUtil.shortType(fullType); // v 3.3.0
 			
 			// if more than one occurrence of this short name in the list 
 			// ( eg  2 occurrences : "java.util.Date" and "java.sql.Date" for the "Date" short name )

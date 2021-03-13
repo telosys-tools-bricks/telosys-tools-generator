@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.GeneratorException;
-import org.telosys.tools.generator.GeneratorUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
@@ -136,27 +135,28 @@ public class Jpa {
 	)
 	@VelocityReturnType("List of 'String'")
 	public List<String> imports(EntityInContext entity) throws GeneratorException {
-		JavaImportsList imports = new JavaImportsList();
-		//--- Get all the basic attributes types
-		List<String> basicAttributeTypes = new LinkedList<>();
-		for ( AttributeInContext attribute : entity.getAttributes() ) {
-			basicAttributeTypes.add(attribute.getFullType() ); 
-		}
-		//--- Get all the link attributes types
-		List<String> linkAttributeTypes = new LinkedList<>();
-		for ( LinkInContext link : entity.getLinks() ) {
-			if ( link.isCardinalityOneToMany() || link.isCardinalityManyToMany() ) {
-				// collection types used for JPA link
-//				linkAttributeTypes.add( fieldType(link) );
-				linkAttributeTypes.add( link.getFieldType() );
-			}
-		}
-		// Build all imports 
-		imports.buildImports(basicAttributeTypes, linkAttributeTypes);
-		List<String> list = imports.getFinalImportsList();
-		if ( ! list.isEmpty() ) {
-			list.add("");
-		}
+//		JavaImportsList imports = new JavaImportsList();
+//		//--- Get all the basic attributes types
+//		List<String> basicAttributeTypes = new LinkedList<>();
+//		for ( AttributeInContext attribute : entity.getAttributes() ) {
+//			basicAttributeTypes.add(attribute.getFullType() ); 
+//		}
+//		//--- Get all the link attributes types
+//		List<String> linkAttributeTypes = new LinkedList<>();
+//		for ( LinkInContext link : entity.getLinks() ) {
+//			if ( link.isCardinalityOneToMany() || link.isCardinalityManyToMany() ) {
+//				// collection types used for JPA link
+////				linkAttributeTypes.add( fieldType(link) );
+//				linkAttributeTypes.add( link.getFieldType() );
+//			}
+//		}
+//		// Build all imports 
+//		imports.buildImports(basicAttributeTypes, linkAttributeTypes);
+//		List<String> list = imports.getFinalImportsList();
+//		if ( ! list.isEmpty() ) {
+//			list.add("");
+//		}
+		List<String> list = new LinkedList<>();
 		list.add("javax.persistence.*");
 		return list;
 	}

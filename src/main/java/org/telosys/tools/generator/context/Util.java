@@ -18,7 +18,7 @@ package org.telosys.tools.generator.context ;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 
-import org.telosys.tools.commons.JavaClassUtil;
+import org.telosys.tools.commons.JavaTypeUtil;
 
 public class Util {
 
@@ -148,7 +148,8 @@ public class Util {
     		}    		
     	}
 		// No full names to keep => reduce it to short name
-		return JavaClassUtil.shortName(sLongType);
+		//return JavaClassUtil.shortName(sLongType);
+		return JavaTypeUtil.shortType(sLongType); // v 3.3.0
 	}
 
     /**

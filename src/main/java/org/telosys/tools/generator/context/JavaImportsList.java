@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.telosys.tools.commons.JavaTypeUtil;
-import org.telosys.tools.generator.GeneratorException;
 
 /**
  * List of full java class names that need imports<br>
@@ -116,14 +115,14 @@ public class JavaImportsList {
 			java.util.TreeMap.class
 			};
 	
-	private void declareCollectionType(String type) {
-		for ( Class<?> clazz : COLLECTIONS ) {
-			// "Collection<Type>", "List<Type>", "Set<Type>"
-			if ( type.contains(clazz.getSimpleName()) && type.contains("<") && type.contains(">") ) {
-				declareType(clazz.getCanonicalName());
-			} 
-		}
-	}
+//	private void declareCollectionType(String type) {
+//		for ( Class<?> clazz : COLLECTIONS ) {
+//			// "Collection<Type>", "List<Type>", "Set<Type>"
+//			if ( type.contains(clazz.getSimpleName()) && type.contains("<") && type.contains(">") ) {
+//				declareType(clazz.getCanonicalName());
+//			} 
+//		}
+//	}
 	
 	private void declareLinkType(String inputType) {
 		String type = inputType.trim();
