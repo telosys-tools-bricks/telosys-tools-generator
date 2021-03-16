@@ -26,6 +26,7 @@ import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.context.tools.AnnotationsBuilder;
 import org.telosys.tools.generator.context.tools.AnnotationsForJPA;
+import org.telosys.tools.generic.model.BooleanValue;
 import org.telosys.tools.generic.model.FetchType;
 
 //-------------------------------------------------------------------------------------
@@ -44,10 +45,14 @@ public class Jpa {
 	
 	private boolean   genTargetEntity = false ;
 	private String    collectionType  = "List" ;
-	private FetchType linkManyToOneFetchType  = FetchType.UNDEFINED;
-	private FetchType linkOneToOneFetchType   = FetchType.UNDEFINED;
-	private FetchType linkOneToManyFetchType  = FetchType.UNDEFINED;
-	private FetchType linkManyToManyFetchType = FetchType.UNDEFINED;
+	
+	private FetchType linkManyToOneFetchType  = FetchType.UNDEFINED; // v 3.3.0
+	private FetchType linkOneToOneFetchType   = FetchType.UNDEFINED; // v 3.3.0
+	private FetchType linkOneToManyFetchType  = FetchType.UNDEFINED; // v 3.3.0
+	private FetchType linkManyToManyFetchType = FetchType.UNDEFINED; // v 3.3.0
+	
+	private BooleanValue joinColumnInsertable = BooleanValue.UNDEFINED; // v 3.3.0
+	private BooleanValue joinColumnUpdatable  = BooleanValue.UNDEFINED; // v 3.3.0
 	
 	
 	//-------------------------------------------------------------------------------------
@@ -115,6 +120,50 @@ public class Jpa {
 		// Invalid value 
 		return FetchType.UNDEFINED;
 	}
+
+	//-------------------------------------------------------------------------------------
+	public String getJoinColumnInsertable() {
+		return this.joinColumnInsertable.getText() ;
+	}
+	public void setJoinColumnInsertable(String s) {
+		this.joinColumnInsertable = getBooleanValue(s);
+	}
+	public void setJoinColumnInsertable(boolean b) {
+		this.joinColumnInsertable = getBooleanValue(b);
+	}
+
+	public String getJoinColumnUpdatable() {
+		return this.joinColumnUpdatable.getText() ;
+	}
+	public void setJoinColumnUpdatable(String s) {
+		this.joinColumnUpdatable = getBooleanValue(s);
+	}
+	public void setJoinColumnUpdatable(boolean b) {
+		this.joinColumnUpdatable = getBooleanValue(b);
+	}
+
+	private BooleanValue getBooleanValue(String s) {
+		if ( ! StrUtil.nullOrVoid(s) ) {
+			String ft = s.toUpperCase();
+			if ("TRUE".equals(ft) ) {
+				return BooleanValue.TRUE; 
+			}
+			if ("FALSE".equals(ft) ) {
+				return BooleanValue.FALSE; 
+			}
+		}
+		// Invalid value 
+		return BooleanValue.UNDEFINED;
+	}
+	private BooleanValue getBooleanValue(boolean b) {
+		if ( b ) {
+			return BooleanValue.TRUE; 
+		}
+		else {
+			return BooleanValue.FALSE; 
+		}
+	}
+
 	//-------------------------------------------------------------------------------------
 	// JPA IMPORTS
 	//-------------------------------------------------------------------------------------
@@ -325,61 +374,82 @@ public class Jpa {
 		processLinkJoinAnnotation(annotations, entityLink, alreadyMappedFields );
 		return annotations.getAnnotations();
 	}
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing all the JPA annotations for the given link",
+			"@ManyToOne, @OneToMany, etc",
+			"@JoinColumns / @JoinColumn "
+			},
+		example={ 
+			"$jpa.linkAnnotations( 4, $link )" },
+		parameters = { 
+			"leftMargin : the left margin (number of blanks)",
+			"link : the link from which the JPA annotations will be generated"},
+		since = "3.3.0"
+			)
+	public String linkAnnotations( int leftMargin, LinkInContext link )
+				throws GeneratorException {
+		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
+		processLinkCardinalityAnnotation(annotations, link) ;
+		processLinkJoinAnnotation(annotations, link, null );
+		return annotations.getAnnotations();
+	}
 	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing the JPA cardinality annotation for the given link",
+			"( e.g. @ManyToOne, @OneToMany, etc )"},
+		example={ 
+			"$jpa.linkCardinalityAnnotation(4,$link)" },
+		parameters = { 
+			"leftMargin : the left margin (number of blanks)",
+			"link : the link from which the JPA annotation will be generated"},
+		since = "3.3.0"
+			)
 	public String linkCardinalityAnnotation(int leftMargin, LinkInContext entityLink )
 			throws GeneratorException {
-//		String annotation = "" ;
-//		String targetEntityClassName = entityLink.getTargetEntity().getName();
-//		if ( entityLink.isOwningSide() ) {
-//			if ( entityLink.isCardinalityOneToOne() ) {
-//				annotation = buildCardinalityAnnotationForOwningSide( entityLink, "OneToOne", null ) ; 
-//			} 
-//			else if ( entityLink.isCardinalityManyToOne() ) {
-//				annotation = buildCardinalityAnnotationForOwningSide( entityLink, "ManyToOne", null ) ; 
-//			} 
-//			else if ( entityLink.isCardinalityManyToMany() ) {
-//				annotation = buildCardinalityAnnotationForOwningSide( entityLink, "ManyToMany", targetEntityClassName ) ; 
-//			}
-//			else if ( entityLink.isCardinalityOneToMany() ) {
-//				//--- Possible for unidirectional "OneToMany" relationship ( whithout inverse side )
-//				annotation = buildCardinalityAnnotationForOwningSide( entityLink, "OneToMany", targetEntityClassName ) ; 
-//			} 
-//		} 
-//		else {
-//			//--- INVERSE SIDE
-//			if (entityLink.isCardinalityOneToOne()) {
-//				annotation = buildCardinalityAnnotationForInverseSide( entityLink, "OneToOne" ); 
-//			} 
-//			else if (entityLink.isCardinalityOneToMany()) {
-//				annotation = buildCardinalityAnnotationForInverseSide( entityLink, "OneToMany" ); 
-//			} 
-//			else if (entityLink.isCardinalityManyToMany()) {
-//				annotation = buildCardinalityAnnotationForInverseSide( entityLink, "ManyToMany" ); 
-//			} 
-//			else if (entityLink.isCardinalityManyToOne()) {
-//				// Not supposed to occur for an INVERSE SIDE !
-//				annotation = buildCardinalityAnnotationForInverseSide( entityLink, "ManyToOne" ) ; 
-//			} 
-//		}
 		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
 		processLinkCardinalityAnnotation(annotations, entityLink) ;
 		return annotations.getAnnotations();
 	}
 	
-	public String linkJoinAnnotation(int leftMargin, LinkInContext entityLink, List<AttributeInContext> alreadyMappedFields ) {
-//		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
-//		if ( entityLink.isCardinalityManyToMany() ) {
-//			processJoinTable(annotations, entityLink) ;
-//		} 
-//		else {
-//		    // Example : @JoinColumn(name="BADGE_NUMBER", referencedColumnName="BADGE_NUMBER")
-//			// used in owning side ManyToOne ( or OneToOne )
-//			// can be used also for unidirectional OneToMany relationship (since JPA 2.x)
-//			processJoinColumns(annotations, entityLink, entityLink.getJoinColumns(), alreadyMappedFields );
-//		}
-//		return annotations.getAnnotations();
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing the JPA JoinColumn(s) annotations for the given link",
+			"The list of mapped fields is used to determine if a JoinColumn is already mapped as a field",
+			"If a JoinColumn is based on a field already mapped then 'insertable=false, updatable=false' is set"
+			},
+		example={ 
+			"$jpa.linkJoinAnnotation( 4, $link, $listOfMappedFields )" },
+		parameters = { 
+			"leftMargin : the left margin (number of blanks)",
+			"link : the link from which the JPA annotation will be generated",
+			"alreadyMappedFields : list of all the fields already mapped by JPA as 'simple fields' "},
+		since = "3.3.0"
+			)
+	public String linkJoinAnnotation(int leftMargin, LinkInContext link, List<AttributeInContext> alreadyMappedFields ) {
 		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
-		processLinkJoinAnnotation(annotations, entityLink, alreadyMappedFields );
+		processLinkJoinAnnotation(annotations, link, alreadyMappedFields );
+		return annotations.getAnnotations();
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing the JPA JoinColumn(s) annotations for the given link"},
+		example={ 
+			"$jpa.linkJoinAnnotation(4,$link)" },
+		parameters = { 
+			"leftMargin : the left margin (number of blanks)",
+			"link : the link from which the JPA annotation will be generated"},
+		since = "3.3.0"
+			)
+	public String linkJoinAnnotation(int leftMargin, LinkInContext entityLink ) {
+		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
+		processLinkJoinAnnotation(annotations, entityLink, null );
 		return annotations.getAnnotations();
 	}
 	
@@ -749,8 +819,8 @@ public class Jpa {
 	 * Generates a "@JoinColumn" (single column) or "@JoinColumns" (multiple columns) annotation
 	 * @param annotations
 	 * @param link
-	 * @param joinColumns
-	 * @param alreadyMappedFields
+	 * @param joinColumns 
+	 * @param alreadyMappedFields (not used if null)
 	 */
 	private void processJoinColumns(AnnotationsBuilder annotations, LinkInContext link, 
 			List<JoinColumnInContext> joinColumns, List<AttributeInContext> alreadyMappedFields ) 
@@ -850,7 +920,7 @@ public class Jpa {
 	 *  
 	 * @param link
 	 * @param joinColumns
-	 * @param alreadyMappedFields
+	 * @param alreadyMappedFields (not used if null)
 	 * @return
 	 */
 	private String[] buildJoinColumnAnnotations( LinkInContext link, List<JoinColumnInContext> joinColumns, 
@@ -869,21 +939,17 @@ public class Jpa {
 	 * Build and return a single "@JoinColumn" annotation 
 	 * @param joinColumn
 	 * @param link
-	 * @param alreadyMappedFields
+	 * @param alreadyMappedFields (not used if null)
 	 * @return
 	 */
 	private String buildJoinColumnAnnotation(JoinColumnInContext joinColumn, LinkInContext link, List<AttributeInContext> alreadyMappedFields ) {
-		StringBuilder annotation = new StringBuilder();
-		annotation.append( "@JoinColumn(");
-		annotation.append( "name=\"" + joinColumn.getName()+"\"" );
-		annotation.append( ", " );
-		annotation.append( "referencedColumnName=\"" + joinColumn.getReferencedColumnName()+"\"" );
-		// TODO 
-		// columnDefinition
-		// nullable
-		// table
-		// unique
-		if ( link.isCardinalityManyToOne() || link.isCardinalityOneToOne() ) {
+		StringBuilder sb = new StringBuilder();
+		sb.append( "@JoinColumn(");
+		sb.append( "name=\"" + joinColumn.getName()+"\"" );
+		sb.append( ", " );
+		sb.append( "referencedColumnName=\"" + joinColumn.getReferencedColumnName()+"\"" );
+//		if ( link.isCardinalityManyToOne() || link.isCardinalityOneToOne() ) {
+// for all "JoinColumn"
 			/*
 			 * Defining "insertable=false, updatable=false" is useful when you need 
 			 * to map a field more than once in an entity, typically:
@@ -891,19 +957,52 @@ public class Jpa {
 			 *  - when using a shared primary key
 			 *  - when using cascaded primary keys
 			 */
-			if ( isColumnAlreadyMappedAsAField (joinColumn, alreadyMappedFields ) ) {
-				annotation.append( ", " );
-				annotation.append( "insertable=false" ); 
-				annotation.append( ", " );
-				annotation.append( "updatable=false" ); 
+			if ( alreadyMappedFields != null ) {
+				sb.append( buildJoinColumnInsertableUpdatable(joinColumn,alreadyMappedFields) );
+			}
+			else {
+				sb.append( buildJoinColumnInsertableUpdatable(link) );
 			}
 			if ( ! joinColumn.isNullable() ) { // v 3.3.0
-				annotation.append( ", " );
-				annotation.append( "nullable=false" ); 
+				sb.append( ", " );
+				sb.append( "nullable=false" ); 
 			}
+//		}
+		sb.append( ")");
+		return sb.toString();
+	}
+	
+	private String buildJoinColumnInsertableUpdatable(LinkInContext link) {
+		StringBuilder sb = new StringBuilder();
+		if ( getFlag(this.joinColumnInsertable, link.getInsertableFlag() ) == BooleanValue.FALSE ) {
+			sb.append( ", insertable=false" ); 
 		}
-		annotation.append( ")");
-		return annotation.toString();
+		if ( getFlag(this.joinColumnUpdatable, link.getUpdatableFlag() ) == BooleanValue.FALSE ) {
+			sb.append( ", updatable=false" ); 
+		}
+		return sb.toString();
+	}
+	private BooleanValue getFlag(BooleanValue jpaFlag, BooleanValue linkFlag) {
+		if ( linkFlag == BooleanValue.FALSE ) { 
+			// explicitly set to FALSE at link level 
+			return BooleanValue.FALSE ;
+		}
+		if ( jpaFlag == BooleanValue.FALSE && linkFlag != BooleanValue.TRUE ) {
+			// not explicitly set to TRUE at link level (FALSE or UNDEFINED)
+			return BooleanValue.FALSE ;
+		}
+		return BooleanValue.UNDEFINED;
+	}
+	
+	private String buildJoinColumnInsertableUpdatable(JoinColumnInContext joinColumn, List<AttributeInContext> alreadyMappedFields ) {
+		StringBuilder sb = new StringBuilder();
+		if ( isColumnAlreadyMappedAsAField (joinColumn, alreadyMappedFields ) ) {
+			sb.append( ", " );
+			sb.append( "insertable=false" ); 
+			sb.append( ", " );
+			sb.append( "updatable=false" ); 
+		}
+		return sb.toString();
 	}
 	
 	/**

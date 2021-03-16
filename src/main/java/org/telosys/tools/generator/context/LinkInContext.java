@@ -24,6 +24,7 @@ import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generic.model.BooleanValue;
 import org.telosys.tools.generic.model.Cardinality;
 import org.telosys.tools.generic.model.CascadeOptions;
 import org.telosys.tools.generic.model.FetchType;
@@ -79,6 +80,10 @@ public class LinkInContext {
 	private final Optional       _optional ;
 	private final CascadeOptions _cascadeOptions ;
 	
+    private final BooleanValue  _insertable ; // Added in v 3.3.0
+    private final BooleanValue  _updatable  ; // Added in v 3.3.0
+	
+	
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -123,6 +128,9 @@ public class LinkInContext {
 		_fetchType = link.getFetchType() != null ? link.getFetchType() : FetchType.DEFAULT ;
 		_optional = link.getOptional();
 		_cascadeOptions = link.getCascadeOptions();
+		
+		_insertable = link.getInsertable();
+		_updatable  = link.getUpdatable();
 	}
 	
 	/**
@@ -743,5 +751,106 @@ public class LinkInContext {
 	public boolean isOptionalTrue() {
 		return _optional == Optional.TRUE ;
 	}
+	
+	//-------------------------------------------------------------------------------------
+	// "insertable" / "updatable"
+	//-------------------------------------------------------------------------------------
+//	//-------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns true if the 'insertable' flag is true"
+//			},
+//		since="3.3.0"
+//	)
+//    public boolean isInsertableTrue() {
+//        return this._insertable == BooleanValue.TRUE;
+//    }
+	//-------------------------------------------------------------------------------------
+	protected BooleanValue getInsertableFlag() {
+		return this._insertable;
+	}
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns true if 'insertable' flag equals the given value",
+			"The flag can be 'undefined' then then neither true nor false"
+		},
+		parameters = { 
+			"value : the boolean value" 
+		},
+		since="3.3.0"
+	)
+	public boolean insertableIs(boolean value) {
+		if ( value ) {
+			return this._insertable == BooleanValue.TRUE ;
+		} else {
+			return this._insertable == BooleanValue.FALSE ;
+		}
+	}
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the 'insertable' flag value as string",
+			"( 'true' or 'false' or 'undefined' )"
+			},
+		since="3.3.0"
+	)
+    public String getInsertable() {
+        return this._insertable.getText();
+    }
+	
+//	//-------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns true if the 'updatable' flag is true"
+//			},
+//		since="3.3.0"
+//	)
+//    public boolean isUpdatableTrue() {
+//        return this._updatable == BooleanValue.TRUE;
+//    }
+//	//-------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns true if the 'updatable' flag is false"
+//			},
+//		since="3.3.0"
+//	)
+//    public boolean isUpdatableFalse() {
+//        return this._updatable == BooleanValue.FALSE;
+//    }
+	//-------------------------------------------------------------------------------------
+	protected BooleanValue getUpdatableFlag() {
+		return this._updatable;
+	}
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns true if 'updatable' flag equals the given value",
+			"The flag can be 'undefined' then then neither true nor false"
+		},
+		parameters = { 
+			"value : the boolean value" 
+		},
+		since="3.3.0"
+	)
+	public boolean updatableIs(boolean value) {
+		if ( value ) {
+			return this._updatable == BooleanValue.TRUE ;
+		} else {
+			return this._updatable == BooleanValue.FALSE ;
+		}
+	}
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the 'updatable' flag value as string",
+			"( 'true' or 'false' or 'undefined' )"
+			},
+		since="3.3.0"
+	)
+    public String getUpdatable() {
+        return this._updatable.getText();
+    }
 
 }
