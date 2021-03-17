@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.telosys.tools.commons.jdbctypes.JdbcTypesManager;
 import org.telosys.tools.generic.model.Attribute;
+import org.telosys.tools.generic.model.BooleanValue;
 import org.telosys.tools.generic.model.DateType;
 import org.telosys.tools.generic.model.ForeignKeyPart;
 
@@ -1089,6 +1090,16 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 	@Override
 	public boolean hasFKParts() {
 		return false;
+	}
+
+	@Override
+	public BooleanValue getInsertable() {
+		return BooleanValue.UNDEFINED;
+	}
+
+	@Override
+	public BooleanValue getUpdatable() {
+		return BooleanValue.UNDEFINED;
 	}
 
 }
