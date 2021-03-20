@@ -1481,7 +1481,7 @@ public class AttributeInContext {
 	//-------------------------------------------------------------------------------------
 	// "insertable" / "updatable"  ( v 3.3.0 )
 	//-------------------------------------------------------------------------------------
-	protected BooleanValue getInsertableFlag() {
+	public BooleanValue getInsertableFlag() {
 		return this._insertable;
 	}
 	//-------------------------------------------------------------------------------------
@@ -1515,7 +1515,7 @@ public class AttributeInContext {
     }
 	
 	//-------------------------------------------------------------------------------------
-	protected BooleanValue getUpdatableFlag() {
+	public BooleanValue getUpdatableFlag() {
 		return this._updatable;
 	}
 	//-------------------------------------------------------------------------------------
