@@ -20,6 +20,7 @@ import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.types.LiteralValuesProvider;
+import org.telosys.tools.generic.model.types.LiteralValuesProviderForCPlusPlus;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForCSharp;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForGo;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForJava;
@@ -28,6 +29,7 @@ import org.telosys.tools.generic.model.types.LiteralValuesProviderForPHP;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForPython;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForTypeScript;
 import org.telosys.tools.generic.model.types.TypeConverter;
+import org.telosys.tools.generic.model.types.TypeConverterForCPlusPlus;
 import org.telosys.tools.generic.model.types.TypeConverterForCSharp;
 import org.telosys.tools.generic.model.types.TypeConverterForGo;
 import org.telosys.tools.generic.model.types.TypeConverterForJava;
@@ -55,6 +57,7 @@ public class EnvInContext {
 	private static final String JAVASCRIPT = "JAVASCRIPT" ;
 	private static final String PYTHON     = "PYTHON" ;
 	private static final String PHP        = "PHP" ;
+	private static final String CPLUSPLUS  = "C++" ;
 	
 	private String entityClassNamePrefix = "" ;
 	private String entityClassNameSuffix = "" ;
@@ -183,6 +186,7 @@ public class EnvInContext {
 		if ( JAVASCRIPT.equals(languageUC) ) return ;
 		if ( PYTHON.equals(languageUC) ) return ;
 		if ( PHP.equals(languageUC) ) return ;
+		if ( CPLUSPLUS.equals(languageUC) ) return ;
 		// Unknown language
 		throw new GeneratorException("Unknown language '" + language + "'");
 	}
@@ -241,6 +245,9 @@ public class EnvInContext {
 		else if ( PHP.equals(languageUC) ) {
 			return new TypeConverterForPHP() ;
 		}
+		else if ( CPLUSPLUS.equals(languageUC) ) {
+			return new TypeConverterForCPlusPlus() ;
+		}
 		else {
 			// By default : Java  ( not supposed to happen ) 
 			return new TypeConverterForJava() ;
@@ -274,6 +281,9 @@ public class EnvInContext {
 		}
 		else if ( PHP.equals(languageUC) ) {
 			return new LiteralValuesProviderForPHP();
+		}
+		else if ( CPLUSPLUS.equals(languageUC) ) {
+			return new LiteralValuesProviderForCPlusPlus() ;
 		}
 		else {
 			// By default : Java  ( not supposed to happen ) 
