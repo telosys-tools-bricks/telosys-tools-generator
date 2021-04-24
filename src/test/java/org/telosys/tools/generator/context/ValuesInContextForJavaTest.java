@@ -290,7 +290,7 @@ public class ValuesInContextForJavaTest {
 		
 		FakeAttribute attrib = new FakeAttribute("time3", "time");
 		attrib.setDateType(DateType.TIME_ONLY);
-		attrib.setSqlTypeExpected(true);
+//		attrib.setSqlTypeExpected(true);
 //		AttributeInContext attrib = buildAttributeInContext("time2",     "time"      ) ;
 		attributes.add( buildAttributeInContext(attrib) );
 		

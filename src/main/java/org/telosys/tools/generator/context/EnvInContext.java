@@ -15,6 +15,9 @@
  */
 package org.telosys.tools.generator.context;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
@@ -65,6 +68,9 @@ public class EnvInContext {
 	private String language = "Java" ; // v 3.0.0
 	
 	private String specificCollectionType = null ; // v 3.3.0
+
+	private Map<String,String> databaseTypesMapping = new LinkedHashMap<>() ; // v 3.3.0
+	private String database = "default" ; // v 3.3.0
 	
 	//-------------------------------------------------------------------------------------
 	// CONSTRUCTOR
@@ -324,4 +330,37 @@ public class EnvInContext {
 	public String getCollectionType() {
 		return this.specificCollectionType != null ? this.specificCollectionType : "" ;
 	}
+	
+	
+	//-------------------------------------------------------------------------------------
+	public void setDatabaseTypesMapping(Map<String,String> map) {
+		this.databaseTypesMapping = map;
+	}
+	
+//	public String getDatabaseTypesMapping() {
+//		int i = 0;
+//		StringBuilder sb = new StringBuilder("{\n");
+//	    for (String key : databaseTypesMapping.keySet()) {
+//	    	if ( i > 0 ) {
+//	    		sb.append(", \n");
+//	    	}
+//	        sb.append(" \"" + key + "\" : \"" + databaseTypesMapping.get(key) + "\"");
+//	        i++;
+//	    }
+//		sb.append("\n}");
+//	    return sb.toString();	
+//	}
+
+	public Map<String,String> getDatabaseTypesMapping() {
+		return databaseTypesMapping;
+	}
+
+	//-------------------------------------------------------------------------------------
+	public void setDatabase(String db) {
+		this.database = db;
+	}
+	public String getDatabase() {
+		return this.database;
+	}
+	
 }

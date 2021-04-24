@@ -275,11 +275,23 @@ public class AnnotationsForJPA
 			sb.append( ", updatable=false" ); 
 		}
 
+		// columnDefinition : (Optional) The SQL fragment that is used when generating the DDL for the column.
+		// TODO
+		/*
+		if ( genColumnDefinition ) {
+			sb.append( ", columnDefinition=\"" );
+			sb.append( _attribute.getSqlDDL() ); // TODO : change  ATTR.getDatabaseTypeWithSize()
+			if ( _attribute.isDatabaseNotNull() || _attribute.isNotNull() ) {
+				sb.append( " NOT NULL" );
+			}
+			sb.append( "\"" );
+		}
+		*/
+
 		//s = s + ")" ;
 		sb.append(")");
 		
 		//--- Other elements for "@Column" ( from JavaDoc / Java EE 6 )
-		// columnDefinition : (Optional) The SQL fragment that is used when generating the DDL for the column.
 		// precision : (Optional) The precision for a decimal (exact numeric) column.
 		// scale : (Optional) The scale for a decimal (exact numeric) column.
 		// table : (Optional) The name of the table that contains the column.

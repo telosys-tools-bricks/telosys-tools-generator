@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.telosys.tools.commons.DatabaseUtil;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.jdbctypes.JdbcTypes;
 import org.telosys.tools.commons.jdbctypes.JdbcTypesManager;
@@ -158,6 +157,8 @@ public class AttributeInContext {
 
     private final BooleanValue  _insertable ; // Added in v 3.3.0
     private final BooleanValue  _updatable  ; // Added in v 3.3.0
+    
+    private final String sqlType ; // Added in v 3.3.0
 	
 	//-----------------------------------------------------------------------------------------------
 	/**
@@ -217,6 +218,8 @@ public class AttributeInContext {
         this.jdbcTypeCode     = attribute.getJdbcTypeCode() != null ? attribute.getJdbcTypeCode() : 0 ; // v 3.0.0
         this.jdbcTypeName     = StrUtil.notNull( attribute.getJdbcTypeName() );
         this.isKeyElement     = attribute.isKeyElement(); // v 3.0.0
+        // TODO
+        this.sqlType = "" ; // v 3.3.0 
         
 		//--- Foreign Keys / references
         this.isForeignKey          = attribute.isFK() ; // v 3.0.0
@@ -586,9 +589,34 @@ public class AttributeInContext {
 		since="2.0.7"
 	)
     public String getDatabaseTypeWithSize() {
-        return DatabaseUtil.getNativeTypeWithSize(dataBaseType, databaseSize, jdbcTypeCode);
+		if ( StrUtil.nullOrVoid(dataBaseType)) {
+			// No database type
+			return "";
+		}
+		if ( isSizeRequired(dataBaseType) ) {
+			if ( StrUtil.nullOrVoid(databaseSize)) {
+				// no database size 
+				return dataBaseType;
+			}
+			else {
+				// database size
+				return this.dataBaseType.trim() + "(" + this.databaseSize.trim() + ")" ;
+			}
+		}
+		else {
+			// no size required
+			return this.dataBaseType.trim() ;
+		}
     }
-
+    private boolean isSizeRequired(String type) {
+		if ( type.contains("VARCHAR") ) return true; // VARCHAR, VARCHAR2
+		if ( type.contains("CHAR") ) return true;
+		if ( type.contains("DECIMAL") ) return true;
+		if ( type.contains("NUMERIC") ) return true;
+		if ( type.contains("NUMBER") ) return true;
+		return false;
+    }
+    
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -1548,4 +1576,27 @@ public class AttributeInContext {
         return this._updatable.getText();
     }
 	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the database SQL type corresponding to the attribute",
+			"for example : INTEGER, VARCHAR(24), NUMBER, CHAR(3), etc...",
+			"Returns the 'sqlType' if explicitly defined or tries to infer it from the neutral type",
+			"The Sql Type inference is based on 'env.database' (PostgreSQL, MySQL, etc)", 
+			"or 'env.databaseTypesMapping' (specific types mapping)"
+			},
+		since="3.3.0"
+	)
+    public String getSqlType() {
+		if ( StrUtil.nullOrVoid(this.sqlType) ) {
+			// not explicitly defined => try to infer SQL type
+	        return SqlTypeProvider.getSqlType(this, this.envInContext);
+		}
+		else {
+			// explicitly defined => return it
+			return this.sqlType;
+		}
+    }
+
+
 }

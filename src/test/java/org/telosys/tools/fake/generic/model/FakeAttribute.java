@@ -90,7 +90,7 @@ public class FakeAttribute implements Attribute {
 	private boolean isPrimitiveTypeExpected = false ;
 	private boolean isUnsignedTypeExpected = false ;
 	private boolean isObjectTypeExpected = false ;
-	private boolean isSqlTypeExpected = false ;
+//	private boolean isSqlTypeExpected = false ;
 	
 	
 	/**
@@ -597,13 +597,13 @@ public class FakeAttribute implements Attribute {
 		this.isPrimitiveTypeExpected = v ;
 	}
 	
-	@Override
-	public boolean isSqlTypeExpected() {
-		return isSqlTypeExpected;
-	}
-	public void setSqlTypeExpected(boolean v) {
-		this.isSqlTypeExpected = v ;
-	}
+//	@Override
+//	public boolean isSqlTypeExpected() {
+//		return isSqlTypeExpected;
+//	}
+//	public void setSqlTypeExpected(boolean v) {
+//		this.isSqlTypeExpected = v ;
+//	}
 	
 	@Override
 	public boolean isUnsignedTypeExpected() {

@@ -295,13 +295,13 @@
 <table catalog="" databaseType="TABLE" javaBean="Testblob" name="TESTBLOB" schema="ROOT">
 <column dbComment="" dbDefaultValue="" dbName="ID" dbNotNull="true" dbPosition="1" dbPrimaryKey="true" dbSize="10" dbTypeName="INTEGER" inputType="number" javaName="id" javaType="java.lang.Integer" jdbcTypeCode="4" label="Id" notNull="true" selected="true"/>
 <column dbComment="" dbDefaultValue="" dbName="NAME" dbNotNull="false" dbPosition="2" dbSize="20" dbTypeName="VARCHAR" inputType="text" javaName="name" javaType="java.lang.String" jdbcTypeCode="12" label="Name" maxLength="20" notNull="false" selected="true"/>
-<column dbComment="" dbDefaultValue="" dbName="IMAGE" dbNotNull="false" dbPosition="3" dbSize="2147483647" dbTypeName="BLOB" inputType="" javaName="image" javaType="java.sql.Blob" jdbcTypeCode="2004" label="Image" notNull="false" selected="true"/>
+<column dbComment="" dbDefaultValue="" dbName="IMAGE" dbNotNull="false" dbPosition="3" dbSize="2147483647" dbTypeName="BLOB" inputType="" javaName="image" javaType="byte[]" jdbcTypeCode="2004" label="Image" notNull="false" selected="true"/>
 <column dbComment="" dbDefaultValue="" dbName="SIZE" dbNotNull="true" dbPosition="4" dbSize="10" dbTypeName="INTEGER" inputType="number" javaName="size" javaType="java.lang.Integer" jdbcTypeCode="4" label="Size" notNull="true" selected="true"/>
 </table>
 <table catalog="" databaseType="TABLE" javaBean="Testclob" name="TESTCLOB" schema="ROOT">
 <column dbComment="" dbDefaultValue="" dbName="ID" dbNotNull="true" dbPosition="1" dbPrimaryKey="true" dbSize="10" dbTypeName="INTEGER" inputType="number" javaName="id" javaType="java.lang.Integer" jdbcTypeCode="4" label="Id" notNull="true" selected="true"/>
 <column dbComment="" dbDefaultValue="" dbName="NAME" dbNotNull="false" dbPosition="2" dbSize="20" dbTypeName="VARCHAR" inputType="text" javaName="name" javaType="java.lang.String" jdbcTypeCode="12" label="Name" maxLength="20" notNull="false" selected="true"/>
-<column dbComment="" dbDefaultValue="" dbName="LONGTEXT" dbNotNull="false" dbPosition="3" dbSize="2147483647" dbTypeName="CLOB" inputType="" javaName="longtext" javaType="java.sql.Clob" jdbcTypeCode="2005" label="Longtext" notNull="false" selected="true"/>
+<column dbComment="" dbDefaultValue="" dbName="LONGTEXT" dbNotNull="false" dbPosition="3" dbSize="2147483647" dbTypeName="CLOB" inputType="" javaName="longtext" javaType="byte[]" jdbcTypeCode="2005" label="Longtext" notNull="false" selected="true"/>
 </table>
 <table catalog="" databaseType="TABLE" javaBean="Workgroup" name="WORKGROUP" schema="ROOT">
 <column dbComment="" dbDefaultValue="" dbName="ID" dbNotNull="true" dbPosition="1" dbPrimaryKey="true" dbSize="5" dbTypeName="SMALLINT" inputType="number" javaName="id" javaType="java.lang.Short" jdbcTypeCode="5" label="Id" notNull="true" selected="true"/>

@@ -350,15 +350,6 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		return _sDatabaseTypeName;
 	}
 	
-//	/**
-//     * Returns the database native type name with its size if the size make sense.<br>
-//     * Examples : INTEGER, VARCHAR(24), NUMBER, CHAR(3), etc... 
-//	 * @return
-//	 */
-//	public String getDatabaseTypeNameWithSize() {
-//		return DatabaseUtil.getNativeTypeWithSize(_sDatabaseTypeName, _iDatabaseSize, _iJdbcTypeCode);
-//	}
-
 	public void setDatabaseTypeName(String databaseTypeName) {
 		_sDatabaseTypeName = databaseTypeName;
 	}
@@ -1043,11 +1034,11 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		return false;
 	}
 
-	@Override
-	public boolean isSqlTypeExpected() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+//	@Override
+//	public boolean isSqlTypeExpected() {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
 
 	@Override
 	public boolean isUnsignedTypeExpected() {
