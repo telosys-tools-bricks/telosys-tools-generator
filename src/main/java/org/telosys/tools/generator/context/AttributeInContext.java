@@ -110,8 +110,8 @@ public class AttributeInContext {
 	//--- Database info -------------------------------------------------
     private final boolean isKeyElement      ;  // True if primary key
     
-    private final String  dataBaseName     ;  // Column name in the DB table
-    private final String  dataBaseType      ;  // Column type in the DB table
+    private final String  databaseName     ;  // Column name in the DB table
+    private final String  databaseType      ;  // Column type in the DB table
     private final String  databaseSize   ;     // Size of this column (if Varchar ) etc..
     private final String  databaseComment ;     // Comment of this column 
     private final String  databaseDefaultValue ;   
@@ -213,8 +213,8 @@ public class AttributeInContext {
 	    this.dateAfterValue  = StrUtil.notNull( attribute.getDateAfterValue() );
         
 		//--- Database info
-		this.dataBaseName     = StrUtil.notNull( attribute.getDatabaseName() ) ;
-        this.dataBaseType     = StrUtil.notNull( attribute.getDatabaseType() ) ; // v 3.0.0
+		this.databaseName     = StrUtil.notNull( attribute.getDatabaseName() ) ;
+        this.databaseType     = StrUtil.notNull( attribute.getDatabaseType() ) ; // v 3.0.0
         this.jdbcTypeCode     = attribute.getJdbcTypeCode() != null ? attribute.getJdbcTypeCode() : 0 ; // v 3.0.0
         this.jdbcTypeName     = StrUtil.notNull( attribute.getJdbcTypeName() );
         this.isKeyElement     = attribute.isKeyElement(); // v 3.0.0
@@ -566,7 +566,7 @@ public class AttributeInContext {
 			}
 	)
     public String getDatabaseName() {
-        return dataBaseName;
+        return databaseName;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -577,7 +577,7 @@ public class AttributeInContext {
 			}
 	)
     public String getDatabaseType() {
-        return dataBaseType;
+        return databaseType;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -589,23 +589,23 @@ public class AttributeInContext {
 		since="2.0.7"
 	)
     public String getDatabaseTypeWithSize() {
-		if ( StrUtil.nullOrVoid(dataBaseType)) {
+		if ( StrUtil.nullOrVoid(databaseType)) {
 			// No database type
 			return "";
 		}
-		if ( isSizeRequired(dataBaseType) ) {
+		if ( isSizeRequired(databaseType) ) {
 			if ( StrUtil.nullOrVoid(databaseSize)) {
 				// no database size 
-				return dataBaseType;
+				return databaseType;
 			}
 			else {
 				// database size
-				return this.dataBaseType.trim() + "(" + this.databaseSize.trim() + ")" ;
+				return this.databaseType.trim() + "(" + this.databaseSize.trim() + ")" ;
 			}
 		}
 		else {
 			// no size required
-			return this.dataBaseType.trim() ;
+			return this.databaseType.trim() ;
 		}
     }
     private boolean isSizeRequired(String type) {
