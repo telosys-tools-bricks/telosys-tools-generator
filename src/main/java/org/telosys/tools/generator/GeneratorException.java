@@ -15,6 +15,8 @@
  */
 package org.telosys.tools.generator;
 
+import org.telosys.tools.generator.engine.GeneratorEngineException;
+
 /**
  * Exception thrown if an error occurs when using the Generator
  * 
@@ -23,25 +25,31 @@ package org.telosys.tools.generator;
  */
 public class GeneratorException extends Exception 
 {
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
+     * Constructor
      * @param message
      */
-    public GeneratorException(String message)
-    {
+    public GeneratorException(String message) {
         super(message);
     }
 
     /**
+     * Constructor
      * @param message
      * @param cause
      */
-    public GeneratorException(String message, Throwable cause)
-    {
+    public GeneratorException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    /**
+     * Constructor 
+     * Transforms a GeneratorEngineException to GeneratorException
+     * @param engineException
+     */
+    public GeneratorException(GeneratorEngineException engineException) {
+        super(engineException.getMessage(), engineException.getCause());
     }
 }

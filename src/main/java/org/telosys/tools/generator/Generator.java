@@ -31,6 +31,7 @@ import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generator.engine.GeneratorContext;
 import org.telosys.tools.generator.engine.GeneratorEngine;
+import org.telosys.tools.generator.engine.GeneratorEngineException;
 import org.telosys.tools.generator.engine.GeneratorTemplate;
 import org.telosys.tools.generic.model.Model;
 
@@ -45,9 +46,9 @@ public class Generator {
 	public static final boolean CREATE_DIR = true ;
 	public static final boolean DO_NOT_CREATE_DIR = false ;
 	
-	private final TelosysToolsCfg          _telosysToolsCfg ; // v 3.0.0
-	private final String                   _bundleName ; // v 3.0.0
-	private final TelosysToolsLogger       _logger ;
+	private final TelosysToolsCfg          telosysToolsCfg ; // v 3.0.0
+	private final String                   bundleName ; // v 3.0.0
+	private final TelosysToolsLogger       logger ;
 
 	/**
 	 * Constructor 
@@ -55,22 +56,22 @@ public class Generator {
 	 * @param logger
 	 */
 	public Generator( TelosysToolsCfg telosysToolsCfg, String bundleName, TelosysToolsLogger logger)  { // v 3.0.0
-		_logger = logger; 
+		this.logger = logger; 
 		
 		if ( telosysToolsCfg == null ) {
 			throw new IllegalArgumentException("TelosysToolsCfg parameter is null");
 		}
-		_telosysToolsCfg = telosysToolsCfg;
+		this.telosysToolsCfg = telosysToolsCfg;
 
 		if ( bundleName == null ) {
 			throw new IllegalArgumentException("Bundle name parameter is null");
 		}
-		_bundleName = bundleName ; // v 3.0.0
+		this.bundleName = bundleName ; // v 3.0.0
 	}
 	
 	private void log(String s) {
-		if (_logger != null) {
-			_logger.log(s);
+		if (logger != null) {
+			logger.log(s);
 		}
 	}
 	
@@ -80,11 +81,11 @@ public class Generator {
 	private GeneratorTemplate loadTemplate(Target target) throws GeneratorException {
 		
 		String templateFileName  = target.getTemplate();
-		String templateDirectory = _telosysToolsCfg.getTemplatesFolderAbsolutePath(); // v 3.0.0
+		String templateDirectory = telosysToolsCfg.getTemplatesFolderAbsolutePath(); // v 3.0.0
 
 		checkTemplate( templateDirectory, templateFileName);
 		
-		String bundleFolderAbsolutePath = _telosysToolsCfg.getTemplatesFolderAbsolutePath(_bundleName) ; 
+		String bundleFolderAbsolutePath = telosysToolsCfg.getTemplatesFolderAbsolutePath(bundleName) ; 
 		// Examples : 
 		//  "/foo/bar/TelosysTools/templates/basic-templates", "myfile.vm"
 		//  "/foo/bar/TelosysTools/templates/basic-templates", "subdir/myfile.vm"
@@ -111,8 +112,8 @@ public class Generator {
 
 		//--- Templates directory full path ( with bundle name if any )
 		String templatesFolderFullPath = sTemplateDirectory ;
-		if ( ! StrUtil.nullOrVoid(_bundleName)) {
-			templatesFolderFullPath = FileUtil.buildFilePath(sTemplateDirectory, _bundleName);
+		if ( ! StrUtil.nullOrVoid(bundleName)) {
+			templatesFolderFullPath = FileUtil.buildFilePath(sTemplateDirectory, bundleName);
 		}
 		//--- Template file full path 
 		String sTemplateFullPath = FileUtil.buildFilePath(templatesFolderFullPath, sTemplateFileName);
@@ -133,7 +134,7 @@ public class Generator {
 	 * @return
 	 * @throws GeneratorException
 	 */
-	private InputStream generateInMemory(Target target, GeneratorContext generatorContext) throws Exception
+	private InputStream generateInMemory(Target target, GeneratorContext generatorContext) throws GeneratorException
 	{
 		log("generateInMemory()...");
 		
@@ -151,7 +152,11 @@ public class Generator {
 			//--- Create a new GENERATOR ENGINE
 			GeneratorEngine generatorEngine = new GeneratorEngine();
 			//--- GENERATION 
-			result = generatorEngine.generate(generatorTemplate, generatorContext );
+			try {
+				result = generatorEngine.generate(generatorTemplate, generatorContext );
+			} catch (GeneratorEngineException generatorEngineException) {
+				throw new GeneratorException(generatorEngineException);
+			}
 			//------------------------------------------------------------------
 		}
 		finally {
@@ -184,14 +189,14 @@ public class Generator {
 			entityName = "(no entity)" ;
 		}
 		
-		_logger.info("Gen : " + target.getTemplate() + " : " +  entityName  );
+		logger.info("Gen : " + target.getTemplate() + " : " +  entityName  );
 		
 		//--- Creation of a full context for the generator
-		GeneratorContextBuilder generatorContextBuilder = new GeneratorContextBuilder(_telosysToolsCfg, _logger);
+		GeneratorContextBuilder generatorContextBuilder = new GeneratorContextBuilder(telosysToolsCfg, logger);
 		GeneratorContext generatorContext = generatorContextBuilder.initFullContext(
 				model, 
 				//_databasesConfigurations, 
-				_bundleName,
+				bundleName,
 				selectedEntitiesNames, 
 				target, 
 				generatedTargets);
@@ -203,17 +208,17 @@ public class Generator {
 		} catch (Exception e) {
 			//_logger.error( ExceptionUtil.getStackTraceAsString(e) ); // Useless : "ASTMethod.handleInvocationException"
 			String msg = "Entity '" + target.getEntityName() + "' - Template '" + target.getTemplate() + "'" ;
-			_logger.error(msg);
-			_logger.error(e.getMessage());
+			logger.error(msg);
+			logger.error(e.getMessage());
 			throw new GeneratorException(msg + " : " + e.getMessage(), e);
 		} // Generate the target in memory
-		_logger.log("Generation OK.");
+		logger.log("Generation OK.");
 
 		//---------- Save the result in the file
-		String outputFileName = target.getOutputFileNameInFileSystem( _telosysToolsCfg.getDestinationFolderAbsolutePath() ); // v 3.0.0
-		_logger.log("Saving target file : " + outputFileName );
+		String outputFileName = target.getOutputFileNameInFileSystem( telosysToolsCfg.getDestinationFolderAbsolutePath() ); // v 3.0.0
+		logger.log("Saving target file : " + outputFileName );
 		saveStreamInFile(is, outputFileName, true );
-		_logger.info("OK :  " + target.getOutputFileNameInProject() );
+		logger.info("OK :  " + target.getOutputFileNameInProject() );
 		
 		//---------- Add the generated target in the list if any
 		if ( generatedTargets != null ) {
@@ -234,7 +239,7 @@ public class Generator {
 		else {
 			File parentFile = file.getParentFile();
 			if ( ! parentFile.exists() ) {
-				if ( bCreateDir == false ) {
+				if ( ! bCreateDir ) {
 					throw new GeneratorException("Target directory '"+ parentFile.toString() + "' not found !");
 				}
 				else {
@@ -245,14 +250,12 @@ public class Generator {
 		}
 		
 		//--- Write the file
-		try {
-			OutputStream out = new FileOutputStream(file);
-			byte buf[] = new byte[1024];
+		try ( OutputStream out = new FileOutputStream(file) ) {
+			byte[] buf = new byte[1024];
 			int len;
 			while ((len = is.read(buf)) > 0) {
 				out.write(buf, 0, len);
 			}
-			out.close();
 			is.close();
 		} catch (IOException e) {
 			throw new GeneratorException("Cannot save file "+fileName, e);
