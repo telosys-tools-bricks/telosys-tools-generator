@@ -30,6 +30,7 @@ import org.telosys.tools.generic.model.types.LiteralValuesProviderForJava;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForJavaScript;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForPHP;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForPython;
+import org.telosys.tools.generic.model.types.LiteralValuesProviderForScala;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForTypeScript;
 import org.telosys.tools.generic.model.types.TypeConverter;
 import org.telosys.tools.generic.model.types.TypeConverterForCPlusPlus;
@@ -39,6 +40,7 @@ import org.telosys.tools.generic.model.types.TypeConverterForJava;
 import org.telosys.tools.generic.model.types.TypeConverterForJavaScript;
 import org.telosys.tools.generic.model.types.TypeConverterForPHP;
 import org.telosys.tools.generic.model.types.TypeConverterForPython;
+import org.telosys.tools.generic.model.types.TypeConverterForScala;
 import org.telosys.tools.generic.model.types.TypeConverterForTypeScript;
 
 //-------------------------------------------------------------------------------------
@@ -60,7 +62,8 @@ public class EnvInContext {
 	private static final String JAVASCRIPT = "JAVASCRIPT" ;
 	private static final String PYTHON     = "PYTHON" ;
 	private static final String PHP        = "PHP" ;
-	private static final String CPLUSPLUS  = "C++" ;
+	private static final String CPLUSPLUS  = "C++" ; // v 3.3.0
+	private static final String SCALA      = "SCALA" ; // v 3.3.0
 	
 	private String entityClassNamePrefix = "" ;
 	private String entityClassNameSuffix = "" ;
@@ -193,6 +196,7 @@ public class EnvInContext {
 		if ( PYTHON.equals(languageUC) ) return ;
 		if ( PHP.equals(languageUC) ) return ;
 		if ( CPLUSPLUS.equals(languageUC) ) return ;
+		if ( SCALA.equals(languageUC) ) return ;
 		// Unknown language
 		throw new GeneratorException("Unknown language '" + language + "'");
 	}
@@ -254,6 +258,9 @@ public class EnvInContext {
 		else if ( CPLUSPLUS.equals(languageUC) ) {
 			return new TypeConverterForCPlusPlus() ;
 		}
+		else if ( SCALA.equals(languageUC) ) {
+			return new TypeConverterForScala() ;
+		}
 		else {
 			// By default : Java  ( not supposed to happen ) 
 			return new TypeConverterForJava() ;
@@ -290,6 +297,9 @@ public class EnvInContext {
 		}
 		else if ( CPLUSPLUS.equals(languageUC) ) {
 			return new LiteralValuesProviderForCPlusPlus() ;
+		}
+		else if ( SCALA.equals(languageUC) ) {
+			return new LiteralValuesProviderForScala() ;
 		}
 		else {
 			// By default : Java  ( not supposed to happen ) 
@@ -337,20 +347,6 @@ public class EnvInContext {
 		this.databaseTypesMapping = map;
 	}
 	
-//	public String getDatabaseTypesMapping() {
-//		int i = 0;
-//		StringBuilder sb = new StringBuilder("{\n");
-//	    for (String key : databaseTypesMapping.keySet()) {
-//	    	if ( i > 0 ) {
-//	    		sb.append(", \n");
-//	    	}
-//	        sb.append(" \"" + key + "\" : \"" + databaseTypesMapping.get(key) + "\"");
-//	        i++;
-//	    }
-//		sb.append("\n}");
-//	    return sb.toString();	
-//	}
-
 	public Map<String,String> getDatabaseTypesMapping() {
 		return databaseTypesMapping;
 	}

@@ -49,8 +49,8 @@ import org.telosys.tools.generator.engine.GeneratorContext;
 //-------------------------------------------------------------------------------------
 public class FnInContext {
 
-	private final GeneratorContext _generatorContext ;
-	private final EnvInContext     _env ;
+	private final GeneratorContext generatorContext ;
+	private final EnvInContext     env ;
 	
 	/**
 	 * Constructor
@@ -59,8 +59,8 @@ public class FnInContext {
 	 */
 	public FnInContext(GeneratorContext generatorContext, EnvInContext env ) {
 		super();
-		this._generatorContext = generatorContext;
-		this._env = env ;
+		this.generatorContext = generatorContext;
+		this.env = env ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -76,9 +76,7 @@ public class FnInContext {
 	)
 	public boolean isBlank (String s) {
 		if ( s != null ) {
-			if ( s.trim().length() > 0 ) {
-				return false ; 
-			}
+			return s.trim().length() == 0;
 		}
 		return true ;
 	}
@@ -222,7 +220,7 @@ public class FnInContext {
 			)
 	public String argumentsListWithType( List<AttributeInContext> fieldsList )  {
 		if ( fieldsList != null ) {
-			if ( _env.languageIsGo() ) {
+			if ( env.languageIsGo() ) {
 				// Specific order for Go : "name type"
 				return argumentsListWithTypeAfterArg(fieldsList);
 			}
@@ -287,7 +285,7 @@ public class FnInContext {
 			)
 	public String argumentsListWithWrapperType( List<AttributeInContext> attributesList )  {
 		if ( attributesList != null ) {
-			if ( _env.languageIsGo() ) {
+			if ( env.languageIsGo() ) {
 				// Specific order for Go : "name type"
 				// No wrapper type for go : reuse function for standard types
 				return argumentsListWithTypeAfterArg(attributesList);
@@ -377,16 +375,11 @@ public class FnInContext {
 	}
 
 	//-------------------------------------------------------------------------------------
-//	public boolean isVariableDefined (String variableName) {
-//		return true ;
-//	}
-	
-	//-------------------------------------------------------------------------------------
 	private boolean isVoid(Object o, String functionName ) throws Exception {
 		if ( o != null ) {
 			if ( o instanceof List ) {
 				List<?> list = (List<?>) o ;
-				return list.size() == 0 ;
+				return list.isEmpty();
 			}
 			else if ( o instanceof Object[] ) {
 				Object[] array = (Object[]) o ;
@@ -503,7 +496,7 @@ public class FnInContext {
 			since = "2.1.0"
 			)
 	public boolean isDefined(String objectName) {
-		Object o = _generatorContext.get(objectName);
+		Object o = generatorContext.get(objectName);
 		return ( o != null );
 	}
 
@@ -521,7 +514,7 @@ public class FnInContext {
 			)
 	@VelocityReturnType("Any kind of object ")
 	public Object get(String objectName, Object defaultValue) {
-		Object o = _generatorContext.get(objectName);
+		Object o = generatorContext.get(objectName);
 		return ( o != null ? o : defaultValue );
 	}
 
@@ -595,7 +588,7 @@ public class FnInContext {
 			since = "2.1.1"
 			)
 	public ValuesInContext buildValues(final List<AttributeInContext> attributes, final int step) {
-		return new ValuesInContext( attributes, step, _env ) ;
+		return new ValuesInContext( attributes, step, env ) ;
 	}	
 	
 	/*** ORIGINAL METHOD DEFINED IN SPECIFIC CLASS
@@ -1075,7 +1068,7 @@ public class FnInContext {
 	}
 	
 	private ProjectInContext getProjectFromGeneratorContext() throws Exception {
-		Object o = _generatorContext.get(ContextName.PROJECT);
+		Object o = generatorContext.get(ContextName.PROJECT);
 		if ( o != null ) {
 			return (ProjectInContext) o ;
 		}
@@ -1085,7 +1078,7 @@ public class FnInContext {
 	}
 	
 	private BundleInContext getBundleFromGeneratorContext() throws Exception {
-		Object o = _generatorContext.get(ContextName.BUNDLE);
+		Object o = generatorContext.get(ContextName.BUNDLE);
 		if ( o != null ) {
 			return (BundleInContext) o ;
 		}
@@ -1095,7 +1088,7 @@ public class FnInContext {
 	}
 	
 	private ModelInContext getModelFromGeneratorContext() throws Exception {
-		Object o = _generatorContext.get(ContextName.MODEL);
+		Object o = generatorContext.get(ContextName.MODEL);
 		if ( o != null ) {
 			return (ModelInContext) o ;
 		}

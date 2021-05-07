@@ -56,10 +56,6 @@ public class DatabaseInContext
     private final String     metadataCatalog ;
     private final String     metadataSchema ;
 
-//    private String     metadataTableNamePattern = null;
-//
-//    private String     metadataTableTypes       = null;
-
     /**
      * Constructor
      */

@@ -37,6 +37,7 @@ import org.telosys.tools.generator.context.LinkAttributesPairInContext;
 import org.telosys.tools.generator.context.LinkInContext;
 import org.telosys.tools.generator.context.Loader;
 import org.telosys.tools.generator.context.ModelInContext;
+import org.telosys.tools.generator.context.NowInContext;
 import org.telosys.tools.generator.context.ProjectInContext;
 import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generator.context.Today;
@@ -61,7 +62,6 @@ public class ObjectsList {
 		Java.class, // ver 2.0.7
 		Jpa.class, // ver 2.0.7
 		BeanValidation.class, // ver 2.0.7
-		//JavaBeanClass.class,
 		EntityInContext.class, // replaces JavaBeanClass.class ( ver 2.1.0 )
 		AttributeInContext.class,
 		ForeignKeyInContext.class, // ver 2.0.7
@@ -70,11 +70,9 @@ public class ObjectsList {
 		LinkInContext.class,
 		LinkAttributesPairInContext.class, // ver 2.1.0
 		Loader.class,
-		//Model.class, // ver 2.0.7
 		ModelInContext.class, // ver 2.1.0
 		DatabasesInContext.class, // ver 2.1.0
 		DatabaseInContext.class, // ver 2.1.0
-		//ProjectConfiguration.class,
 		ProjectInContext.class, // ver 2.1.0
 		Target.class,
 		Today.class,
@@ -84,7 +82,9 @@ public class ObjectsList {
 		H2InContext.class, // ver 2.1.1
 		
 		HtmlInContext.class, // v 3.0.0
-		ValuesInContext.class // v 3.0.0
+		ValuesInContext.class, // v 3.0.0
+
+		NowInContext.class // v 3.3.0
 	};
 
 	public static final Class<?>[] getObjectsClasses() {

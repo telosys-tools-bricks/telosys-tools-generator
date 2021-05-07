@@ -330,15 +330,6 @@ public class Target
     		beannameValue = this.forcedEntityName ;
     	}
     	
-//    	// entityClassName is not defined => nothing to do
-//    	if ( this.entityName == null ) return originalString ;
-//    	if ( this.entityName.length() == 0 ) return originalString ;
-//    	// replace "${BEANNAME}" if any
-//    	HashMap<String,String> hm = new HashMap<String,String>();
-//    	hm.put("${BEANNAME}",    this.entityName );		
-//    	hm.put("${BEANNAME_LC}", this.entityName.toLowerCase() );
-//    	hm.put("${BEANNAME_UC}", this.entityName.toUpperCase() );
-
     	// beannameValue is not defined => nothing to do
     	if ( beannameValue == null ) return originalString ;
     	if ( beannameValue.length() == 0 ) return originalString ;

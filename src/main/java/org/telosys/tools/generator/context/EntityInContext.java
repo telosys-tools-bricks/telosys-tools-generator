@@ -59,6 +59,8 @@ import org.telosys.tools.generic.model.Link;
 //-------------------------------------------------------------------------------------
 public class EntityInContext 
 {
+	private static final String GET_ATTR_BY_CRITERIA = "getAttributesByCriteria";
+	
 	//--- Static void lists
 	private static final List<AttributeInContext>  VOID_ATTRIBUTES_LIST    = new LinkedList<>();
 	private static final List<ForeignKeyInContext> VOID_FOREIGN_KEYS_LIST  = new LinkedList<>();
@@ -274,11 +276,8 @@ public class EntityInContext
 	@VelocityReturnType("List of 'link' objects")
 	public List<LinkInContext> getLinks() 
 	{
-		if ( _links != null )
-		{
-			if ( _links.size() > 0 ) {
-				return _links ;
-			}
+		if ( _links != null && ! _links.isEmpty() ) {
+			return _links ;
 		}
 		return VOID_LINKS_LIST ;
 	}
@@ -296,17 +295,15 @@ public class EntityInContext
 	@VelocityReturnType("List of 'link' objects")
 	public List<LinkInContext> getSelectedLinks() 
 	{
-		if ( _links != null )
+		if ( _links != null && ! _links.isEmpty() )
 		{
-			if ( _links.size() > 0 ) {
-				LinkedList<LinkInContext> selectedLinks = new LinkedList<LinkInContext>();
-				for ( LinkInContext link : _links ) {
-					if ( link.isSelected() ) {
-						selectedLinks.add(link) ;
-					}
+			LinkedList<LinkInContext> selectedLinks = new LinkedList<LinkInContext>();
+			for ( LinkInContext link : _links ) {
+				if ( link.isSelected() ) {
+					selectedLinks.add(link) ;
 				}
-				return selectedLinks ;
 			}
+			return selectedLinks ;
 		}
 		return VOID_LINKS_LIST ;
 	}
@@ -324,7 +321,7 @@ public class EntityInContext
 	@VelocityNoDoc
 	public List<AttributeInContext> getAttributesByCriteria( int c1  ) 
 	{
-		logDebug("getAttributesByCriteria(" + c1 + ")" );
+		logDebug(GET_ATTR_BY_CRITERIA + "(" + c1 + ")" );
 		checkCriterion(c1);
 		return getAttributesByAddedCriteria(c1);
 	}
@@ -332,7 +329,7 @@ public class EntityInContext
 	@VelocityNoDoc
 	public List<AttributeInContext> getAttributesByCriteria( int c1, int c2 ) 
 	{
-		logDebug("getAttributesByCriteria(" + c1 + "," + c2 + ")" );
+		logDebug(GET_ATTR_BY_CRITERIA + "(" + c1 + "," + c2 + ")" );
 		checkCriterion(c1);
 		checkCriterion(c2);
 		return getAttributesByAddedCriteria(c1 + c2);
@@ -341,7 +338,7 @@ public class EntityInContext
 	@VelocityNoDoc
 	public List<AttributeInContext> getAttributesByCriteria( int c1, int c2, int c3 ) 
 	{
-		logDebug("getAttributesByCriteria(" + c1 + "," + c2 + "," + c3 + ")" );
+		logDebug(GET_ATTR_BY_CRITERIA + "(" + c1 + "," + c2 + "," + c3 + ")" );
 		checkCriterion(c1);
 		checkCriterion(c2);
 		checkCriterion(c3);
@@ -368,7 +365,7 @@ public class EntityInContext
 	@VelocityReturnType("List of 'attribute' objects")
 	public List<AttributeInContext> getAttributesByCriteria( int c1, int c2, int c3, int c4 ) 
 	{
-		logDebug("getAttributesByCriteria(" + c1 + "," + c2 + "," + c3 + "," + c4 + ")" );
+		logDebug(GET_ATTR_BY_CRITERIA + "(" + c1 + "," + c2 + "," + c3 + "," + c4 + ")" );
 		checkCriterion(c1);
 		checkCriterion(c2);
 		checkCriterion(c3);
@@ -981,20 +978,14 @@ public class EntityInContext
 	public AttributeInContext getAutoincrementedKeyAttribute() 
 	{
 		List<AttributeInContext> keyAttributes = getKeyAttributes();
-    	if ( keyAttributes != null )
+    	if ( keyAttributes != null && keyAttributes.size() == 1 )
     	{
-        	if ( keyAttributes.size() == 1 ) 
-    		{
-    			// Only one attribute in the PK
-    			AttributeInContext attribute = keyAttributes.get(0);
-    			if ( attribute != null ) {
-                    if ( attribute.isAutoIncremented() ) 
-                    {
-                    	// This unique PK field is auto-incremented => return it
-                    	return attribute ; 
-                    }
-    			}
-    		}
+			// Only one attribute in the PK
+			AttributeInContext attribute = keyAttributes.get(0);
+			if ( attribute != null && attribute.isAutoIncremented() ) {
+            	// This unique PK field is auto-incremented => return it
+            	return attribute ; 
+			}
     	}
     	return null ;
 	}
@@ -1016,15 +1007,13 @@ public class EntityInContext
 		for ( AttributeInContext attribute : attributes ) {
 			//--- Is this attribute involved in a link ?
 			for( LinkInContext link : this.getLinks()  ) {
-				if( link.isOwningSide() ) {
-					//--- Only if the link uses one of the given attributes
-					if ( link.usesAttribute(attribute) ) {
-						String referencedEntityType = link.getTargetEntitySimpleType() ;
-						//--- Found => add it in the list
-						if ( referencedEntityTypes.contains(referencedEntityType) == false ) {
-							//--- Not already in the list => add it
-							referencedEntityTypes.add( link.getTargetEntitySimpleType() );
-						}
+				//--- Only if the link uses one of the given attributes
+				if( link.isOwningSide() && link.usesAttribute(attribute) ) {
+					String referencedEntityType = link.getTargetEntitySimpleType() ;
+					//--- Found => add it in the list
+					if ( referencedEntityTypes.contains(referencedEntityType) == false ) {
+						//--- Not already in the list => add it
+						referencedEntityTypes.add( link.getTargetEntitySimpleType() );
 					}
 				}
 			}

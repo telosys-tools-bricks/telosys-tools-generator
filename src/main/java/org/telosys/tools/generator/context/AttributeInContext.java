@@ -232,7 +232,6 @@ public class AttributeInContext {
         }
 
         this.isAutoIncremented  = attribute.isAutoIncremented();
-        //this.databaseSize     = attribute.getDatabaseSize() != null ? attribute.getDatabaseSize() : "" ;
         this.databaseSize     = StrUtil.notNull( attribute.getDatabaseSize() ) ; 
         this.databaseComment  = StrUtil.notNull( attribute.getDatabaseComment() ) ; 
         this.databaseDefaultValue = StrUtil.notNull( attribute.getDatabaseDefaultValue() ) ; 
@@ -509,7 +508,6 @@ public class AttributeInContext {
 					}
 	)
 	public String getGetter() {
-		//return Util.buildGetter(name, this.getType() );
 		return Util.buildGetter(name, this.isBooleanType() && this.isPrimitiveType() ); // v 3.3.0
 	}
 
@@ -657,11 +655,6 @@ public class AttributeInContext {
 	)
     public boolean hasDatabaseDefaultValue() {
     	if ( isAutoIncremented ) return false ; // No default value for auto-incremented fields
-//        if ( databaseDefaultValue != null )
-//        {
-//        	if ( databaseDefaultValue.length() > 0 ) return true ;
-//        }
-//        return false ;
 		return ! StrUtil.nullOrVoid(databaseDefaultValue);
     }
     
@@ -672,8 +665,6 @@ public class AttributeInContext {
 		}
 	)
     public String getDatabaseDefaultValue() {
-//    	if ( hasDatabaseDefaultValue() ) return databaseDefaultValue ;
-//        return "" ;
         return databaseDefaultValue ; 
     }
     
@@ -962,7 +953,6 @@ public class AttributeInContext {
 			}
 	)
 	public boolean hasDateBeforeValidation() {
-		//return _bDateBefore;
 		return ! StrUtil.nullOrVoid(dateBeforeValue); // v 3.3.0
 	}
 	
@@ -982,7 +972,6 @@ public class AttributeInContext {
 			}
 	)
 	public boolean hasDateAfterValidation() {
-//		return _bDateAfter;
 		return ! StrUtil.nullOrVoid(dateAfterValue); // v 3.3.0
 	}
 	
@@ -1037,7 +1026,6 @@ public class AttributeInContext {
 			}
 	)
     public boolean hasDefaultValue() {
-    	//return ( defaultValue != null ) ;
 		return ! StrUtil.nullOrVoid(defaultValue);
     }
 	//-------------------------------------------------------------------------------------

@@ -36,17 +36,17 @@ import org.telosys.tools.generic.model.DateType;
 public class Const {
 
 	//--- Attributes filter criteria
-	public final static int KEY      = 1 ;
-	public final static int NOT_KEY  = 2 ;
+	public static final int KEY      = 1 ;
+	public static final int NOT_KEY  = 2 ;
 	
-	public final static int TEXT     = 4 ;
-	public final static int NOT_TEXT = 8 ;
+	public static final int TEXT     = 4 ;
+	public static final int NOT_TEXT = 8 ;
 	
-	public final static int IN_LINKS     = 16 ;
-	public final static int NOT_IN_LINKS = 32 ;
+	public static final int IN_LINKS     = 16 ;
+	public static final int NOT_IN_LINKS = 32 ;
 	
-	public final static int IN_SELECTED_LINKS      =  64 ;
-	public final static int NOT_IN_SELECTED_LINKS  = 128 ;
+	public static final int IN_SELECTED_LINKS      =  64 ;
+	public static final int NOT_IN_SELECTED_LINKS  = 128 ;
 	
 	@VelocityConstant
 	public int getKEY() {
@@ -87,22 +87,18 @@ public class Const {
 	
 	@VelocityConstant
 	public int getNO_DATE_TYPE() {
-		//return AttributeInContext.NO_DATE_TYPE ;
 		return DateType.UNDEFINED.getValue() ; // v 3.0.0
 	}
 	@VelocityConstant
 	public int getDATE_ONLY() {
-		//return AttributeInContext.DATE_ONLY ;
 		return DateType.DATE_ONLY.getValue() ; // v 3.0.0
 	}
 	@VelocityConstant
 	public int getTIME_ONLY() {
-		//return AttributeInContext.TIME_ONLY ;
 		return DateType.TIME_ONLY.getValue() ; // v 3.0.0
 	}
 	@VelocityConstant
 	public int getDATE_AND_TIME() {
-		//return AttributeInContext.DATE_AND_TIME ;
 		return DateType.DATE_AND_TIME.getValue() ; // v 3.0.0
 	}
 

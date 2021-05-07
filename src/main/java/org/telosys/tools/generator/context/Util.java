@@ -22,14 +22,6 @@ import org.telosys.tools.commons.JavaTypeUtil;
 
 public class Util {
 
-//	public static String numberToString(Number value, String defaultValue) {
-//		if ( value != null ) {
-//			return value.toString();
-//		}
-//		else {
-//			return defaultValue ;
-//		}
-//	}
 	public static String bigDecimalToString(BigDecimal value, String defaultValue) {
 		if ( value != null ) {
 			return value.toString();
@@ -57,25 +49,6 @@ public class Util {
 		}
 	}
 	
-//    /**
-//     * Returns 'getFoo' for 'foo'(or 'isFoo' if foo is boolean )
-//     * @param attributeName
-//     * @param sLongType
-//     * @return
-//     */
-//    public static String buildGetter(String attributeName, String sLongType) {
-//		//String s = attName.substring(0, 1).toUpperCase()+attName.substring(1, attName.length());
-//		if ( "boolean".equals(sLongType) )
-//		{
-//			//return "is" + s;
-//			return "is" + transformAttributeName(attributeName) ;
-//		}
-//		else
-//		{
-//			//return "get" + s;
-//			return "get" + transformAttributeName(attributeName) ;
-//		}
-//	}
     /**
      * Returns 'getFoo' for 'foo'(or 'isFoo' if foo is boolean )
      * @param attributeName

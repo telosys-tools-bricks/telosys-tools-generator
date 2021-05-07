@@ -46,7 +46,6 @@ import org.telosys.tools.generic.model.Model;
 public class EmbeddedGenerator {
 
 	private final Model              _model ;
-//	private final GeneratorConfig    generatorConfig ; // replaced by TelosysToolsCfg in v 3.0.0
 	private final TelosysToolsCfg    _telosysToolsCfg ; // v 3.0.0
 	private final String             _bundleName ; // v 3.0.0
 	
@@ -61,7 +60,6 @@ public class EmbeddedGenerator {
 	public EmbeddedGenerator() {
 		super();
 		this._model = null ;
-		//this.generatorConfig = null ;// v 3.0.0
 		this._telosysToolsCfg = null ; // v 3.0.0
 		this._bundleName = null ; // v 3.0.0
 		this._logger = null ;
@@ -70,13 +68,6 @@ public class EmbeddedGenerator {
 		this._generatedTargets = null ;
 	}
 
-//	public EmbeddedGenerator(	Model model,
-//								// GeneratorConfig generatorConfig,  // v 3.0.0
-//								TelosysToolsCfg telosysToolsCfg, // v 3.0.0
-//								TelosysToolsLogger logger, 
-//								
-//								List<String> selectedEntitiesNames,
-//								List<Target> generatedTargets) {
 	/**
 	 * Constructor for real embedded generator that can generate sub-targets from a template
 	 * @param telosysToolsCfg
@@ -87,7 +78,6 @@ public class EmbeddedGenerator {
 	 * @param generatedTargets
 	 */
 	public EmbeddedGenerator(	
-			// GeneratorConfig generatorConfig,  // v 3.0.0
 			TelosysToolsCfg telosysToolsCfg, // v 3.0.0
 			String bundleName, // v 3.0.0
 			TelosysToolsLogger logger, 
@@ -101,7 +91,6 @@ public class EmbeddedGenerator {
 		this._bundleName = bundleName ; // v 3.0.0
 		this._logger = logger;
 		
-//		if ( model != null && generatorConfig != null && logger != null ) {
 		this._model = model;
 		this._selectedEntitiesNames = selectedEntitiesNames ;
 		this._generatedTargets = generatedTargets ;
@@ -141,63 +130,6 @@ public class EmbeddedGenerator {
     {
         return GeneratorVersion.GENERATOR_VERSION ;
     }
-	
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Generates an other target with the given template file "
-//			},
-//		parameters = { 
-//			"entityId : the id of the entity",
-//			"outputFile : the file name to be generated ",
-//			"outputFolder : the folder where to generate the file",			
-//			"templateFile : the template file to be used "			
-//			},
-//		example = {
-//			"#if ( $entity.hasCompositePrimaryKey() )",
-//			"$generator.generate($target.entityName , \"${entity.name}Key.java\", $target.folder, \"jpa_bean_pk.vm\" ) ",
-//			"#end"
-//		}
-//	)
-//	public void generate(String entityId, String outputFile, String outputFolder, String templateFile) throws GeneratorException
-//	{
-//		String err = "Cannot generate with embedded generator ";
-//		
-//		if ( canGenerate != true ) {
-//			throw new GeneratorException( err + "(environment not available)");
-//		}
-//		
-//		if ( null == entityId ) {
-//			throw new GeneratorException( err + "(entity name is null)");
-//		}
-//		if ( null == outputFile ) {
-//			throw new GeneratorException( err + "(output file is null)");
-//		}
-//		if ( null == outputFolder ) {
-//			throw new GeneratorException( err + "(output folder is null)");
-//		}
-//		if ( null == templateFile ) {
-//			throw new GeneratorException( err + "(template file is null)");
-//		}
-//		
-//		Variable[] allVariables = generatorConfig.getTelosysToolsCfg().getAllVariables(); // v 2.1.0
-//		
-//		//Entity entity = model.getEntityByName(entityName.trim());
-//		Entity entity = model.getEntityById(entityId.trim());
-//		if ( null == entity ) {
-//			throw new GeneratorException( err + "(entity '" + entityId + "' not found in repository)");
-//		}
-//		
-//		TargetDefinition genericTarget = new TargetDefinition("Dynamic target", outputFile, outputFolder, templateFile, "");
-//		
-//		//Target target = new Target( genericTarget, entity.getName(), entity.getBeanJavaClass(), allVariables ); // v 2.1.0
-//		Target target = new Target( genericTarget, entity, allVariables ); // v 3.0.0
-//		
-//		Generator generator = new Generator(target, generatorConfig, model, logger); // v 2.0.7
-//		
-//		generator.generateTarget(target, model, selectedEntitiesNames, this.generatedTargets);
-//		
-//	}
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(

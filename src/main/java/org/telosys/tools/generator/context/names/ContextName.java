@@ -22,62 +22,69 @@ package org.telosys.tools.generator.context.names;
  *  
  */
 public class ContextName {
+	
+	/**
+	 * Private constructor
+	 */
+	private ContextName() {
+	}
 
 	//--- Special characters 
-	public final static String  DOLLAR  = "DOLLAR" ;
-	public final static String  SHARP   = "SHARP" ;
-	public final static String  AMP     = "AMP";     // ampersand 
-	public final static String  QUOT    = "QUOT" ;   // double quotation mark
-	public final static String  LT      = "LT" ;     // less-than sign
-	public final static String  GT      = "GT" ;     // greater-than sign
-	public final static String  LBRACE  = "LBRACE" ; // left brace
-	public final static String  RBRACE  = "RBRACE" ; // right brace
-	public final static String  NEWLINE = "NEWLINE" ; // new line character ( '\n' in Java ) #LGU 2017-08-16
-	public final static String  TAB     = "TAB" ;     // tabulation character ( '\t' in Java ) #LGU 2017-08-16
+	public static final String  DOLLAR  = "DOLLAR" ;
+	public static final String  SHARP   = "SHARP" ;
+	public static final String  AMP     = "AMP";     // ampersand 
+	public static final String  QUOT    = "QUOT" ;   // double quotation mark
+	public static final String  LT      = "LT" ;     // less-than sign
+	public static final String  GT      = "GT" ;     // greater-than sign
+	public static final String  LBRACE  = "LBRACE" ; // left brace
+	public static final String  RBRACE  = "RBRACE" ; // right brace
+	public static final String  NEWLINE = "NEWLINE" ; // new line character ( '\n' in Java ) #LGU 2017-08-16
+	public static final String  TAB     = "TAB" ;     // tabulation character ( '\t' in Java ) #LGU 2017-08-16
 		
 	//--- Standard objects names always in context
-	public final static String  GENERATOR         = "generator" ;
-	public final static String  TODAY             = "today" ;
-	public final static String  CONST             = "const" ;
-	public final static String  FN                = "fn" ;	
-	public final static String  LOADER            = "loader" ;
-	public final static String  PROJECT           = "project" ;
-	public final static String  HTML              = "html" ; // ver 3.0.0
-	public final static String  JAVA              = "java" ; // ver 2.0.7
-	public final static String  JPA               = "jpa" ; // ver 2.0.7
-	public final static String  BEAN_VALIDATION   = "beanValidation" ; // ver 2.0.7
-	public final static String  ENV               = "env" ; // ver 2.1.0
-	public final static String  JDBC              = "jdbc" ; // ver 2.1.1
-	public final static String  JDBC_FACTORY      = "jdbcFactory" ; // ver 2.1.1
-	public final static String  H2                = "h2" ;	// ver 2.1.1
+	public static final String  GENERATOR         = "generator" ;
+	public static final String  TODAY             = "today" ; // Deprecated since "now" in v 3.3.0
+	public static final String  CONST             = "const" ;
+	public static final String  FN                = "fn" ;	
+	public static final String  LOADER            = "loader" ;
+	public static final String  PROJECT           = "project" ;
+	public static final String  HTML              = "html" ; // ver 3.0.0
+	public static final String  JAVA              = "java" ; // ver 2.0.7
+	public static final String  JPA               = "jpa" ; // ver 2.0.7
+	public static final String  BEAN_VALIDATION   = "beanValidation" ; // ver 2.0.7
+	public static final String  ENV               = "env" ; // ver 2.1.0
+	public static final String  JDBC              = "jdbc" ; // ver 2.1.1
+	public static final String  JDBC_FACTORY      = "jdbcFactory" ; // ver 2.1.1
+	public static final String  H2                = "h2" ;	// ver 2.1.1
+	public static final String  NOW               = "now" ; // ver 3.3.0
 	//---  
-	public final static String  ENTITY            = "entity" ;   
-	public final static String  SELECTED_ENTITIES = "selectedEntities" ;
-	public final static String  TARGET            = "target" ;
-	public final static String  MODEL             = "model" ; // ver 2.0.7
-	public final static String  BUNDLE            = "bundle" ; // ver 3.3.0
+	public static final String  ENTITY            = "entity" ;   
+	public static final String  SELECTED_ENTITIES = "selectedEntities" ;
+	public static final String  TARGET            = "target" ;
+	public static final String  MODEL             = "model" ; // ver 2.0.7
+	public static final String  BUNDLE            = "bundle" ; // ver 3.3.0
 
 	//--- Template objects names retrieved from standard objects 
-	public final static String  ATTRIBUTE         = "attribute" ;
-	public final static String  ATTRIB            = "attrib" ; // Other name for "attribute"
-	public final static String  FIELD             = "field" ;  // Other name for "attribute"
+	public static final String  ATTRIBUTE         = "attribute" ;
+	public static final String  ATTRIB            = "attrib" ; // Other name for "attribute"
+	public static final String  FIELD             = "field" ;  // Other name for "attribute"
 	
-	public final static String  LINK              = "link" ;
-	public final static String  LINK_ATTRIBUTE    = "linkAttribute" ; // v 2.1.0
-	public final static String  JOIN_COLUMN       = "joinColumn" ; // v 2.1.0
-	public final static String  JOIN_TABLE        = "joinTable" ; // v 3.3.0 (added for documentation)
+	public static final String  LINK              = "link" ;
+	public static final String  LINK_ATTRIBUTE    = "linkAttribute" ; // v 2.1.0
+	public static final String  JOIN_COLUMN       = "joinColumn" ; // v 2.1.0
+	public static final String  JOIN_TABLE        = "joinTable" ; // v 3.3.0 (added for documentation)
 	
-	public final static String  FK                = "fk" ;    // v 2.0.7
-	public final static String  FKCOL             = "fkcol" ; // v 2.0.7
+	public static final String  FK                = "fk" ;    // v 2.0.7
+	public static final String  FKCOL             = "fkcol" ; // v 2.0.7
 
-	public final static String  DATABASE          = "database" ; // ver 2.1.0
-	public final static String  DATABASES         = "databases" ; // ver 2.1.0
+	public static final String  DATABASE          = "database" ; // ver 2.1.0
+	public static final String  DATABASES         = "databases" ; // ver 2.1.0
 	
-	public final static String  VALUES            = "values" ; // ver 3.0.0
-	public final static String  KEY_VALUES        = "keyValues" ; // ver 3.0.0
-	public final static String  DATA_VALUES       = "dataValues" ; // ver 3.0.0
+	public static final String  VALUES            = "values" ; // ver 3.0.0
+	public static final String  KEY_VALUES        = "keyValues" ; // ver 3.0.0
+	public static final String  DATA_VALUES       = "dataValues" ; // ver 3.0.0
 
-	public final static String  FILE              = "file" ; // ver 3.3.0
+	public static final String  FILE              = "file" ; // ver 3.3.0
 	
 	//---  
 	

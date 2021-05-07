@@ -30,66 +30,72 @@ import org.telosys.tools.generator.context.names.ContextName;
  */
 //-------------------------------------------------------------------------------------
 @VelocityObject(
-		contextName= ContextName.TODAY ,
-		text = "Object providing the current system date and time ",
-		since = ""
+		contextName= ContextName.NOW ,
+		text = "Object providing the current system date and time in different formats",
+		since = "3.3.0"
  )
 //-------------------------------------------------------------------------------------
-public class Today
-{
-    private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd" ; // ISO
-    private static final String DEFAULT_TIME_FORMAT = "HH:mm:ss"   ; // ISO
+public class NowInContext {
     
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the current date with the default format (ISO date format)"
-			}
+			"Returns the current date with the default format 'yyyy-MM-dd' ",
+			"example : '2019-07-14' "
+		},
+		example={ 
+			"$now.date" 
+		}
 	)
-    public String getDate()
-    {
-        return newFormattedDate(DEFAULT_DATE_FORMAT);
+    public String getDate() {
+        return newFormattedDate("yyyy-MM-dd");
     }
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the current date formatted with the given format"
-			},
-		parameters={
-			"format : the Java date format (cf 'SimpleDateFormat' JavaDoc) "
+			"Returns the current time with the default format 'HH:mm:ss' ",
+			"example : '14:55:34' "
+		},
+		example={ 
+			"$now.time" 
 		}
 	)
-    public String date( String sFormat )
-    {
-        return newFormattedDate(sFormat);
-    }
-
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the current time with the default format (ISO time format)"
-			}
-	)
-    public String getTime()
-    {
-        return newFormattedDate(DEFAULT_TIME_FORMAT);
+    public String getTime() {
+        return newFormattedDate("HH:mm:ss");
     }
     
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the current time formatted with the given format"
-			},
-		parameters={
-			"format : the Java date format (cf 'SimpleDateFormat' JavaDoc) "
+			"Returns the current date and time with the default format 'yyyy-MM-dd HH:mm:ss' ",
+			"example : '2019-07-14 14:55:34' "
+		},
+		example={ 
+			"$now.datetime" 
 		}
 	)
-    public String time( String sFormat )
-    {
+    public String getDatetime() {
+        return newFormattedDate("yyyy-MM-dd HH:mm:ss");
+    }
+    
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the current date/time formatted with the given format"
+		},
+		example={ 
+			"$now.format('yyyy-MM')" 
+			},
+		parameters={
+			"format : the desired format ",
+			"  the format is based on Java date/time format (cf 'SimpleDateFormat' JavaDoc) "
+		}
+	)
+    public String format(String sFormat ) {
         return newFormattedDate(sFormat);
     }
-	
+
 	//-------------------------------------------------------------------------------------
     private String newFormattedDate( String sFormat ) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(sFormat);

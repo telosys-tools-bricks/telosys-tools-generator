@@ -47,13 +47,6 @@ import org.telosys.tools.generator.context.names.ContextName;
 //-------------------------------------------------------------------------------------
 public class Loader {
 	
-//	private final static String CLASSES = "classes" ;
-//	private final static String LIB = "classes" ;
-	
-    //-----------------------------------------------------------------------------
-    // Attributes
-    //-----------------------------------------------------------------------------
-
     private final SpecificClassLoader    specificClassLoader ; // Specific Class Loader instance
 
 	private final String                 templatesFolderFullPath ; // Full templates full path with bundle name
@@ -87,29 +80,6 @@ public class Loader {
 		classpath.addJarFilesInDirectory(this.libFolder);  // "templates/(bundle)/lib/*.jar"
 		return classpath ;
 	}
-	
-
-//	//--------------------------------------------------------------------------------------------------------------
-//	/**
-//	 * Returns the folder where to search the classes to be loaded <br>
-//	 * The folder is "classes" in the project templates folder
-//	 * @return
-//	 */
-//	private File getClassesFolderAsFile()
-//	{
-//		//String templatesFolder = projectConfig.getTemplatesFolderFullPath();
-//		String templatesFolder = this.templatesFolderFullPath ;
-//		String javaClassFolder ;		
-//		if ( templatesFolder.endsWith("/") || templatesFolder.endsWith("\\") ) {
-//			javaClassFolder = templatesFolder + CLASSES ;
-//		}
-//		else {
-//			javaClassFolder = templatesFolder + "/" + CLASSES ;
-//		}
-//		// Create a File object on the root of the directory containing the class file
-//		File file = new File(javaClassFolder);
-//		return file ;
-//	}
 	
 	//--------------------------------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -206,39 +176,12 @@ public class Loader {
 		} catch (IllegalAccessException e) {
 			throw new GeneratorException("Cannot create instance for " + javaClassName + " (IllegalAccessException)", e);
 		}
-//			//--- Put the new instance in the Velocity context
-//			if ( instance != null ) {
-//				velocityContext.put(nameInContext, instance);
-//			}
 		return instance ;
 	}
 	
 	//--------------------------------------------------------------------------------------------------------------
 	private Class<?> loadJavaClassFromFile( String javaClassName ) throws GeneratorException
 	{
-//		ClassLoader currentClassLoader = this.getClass().getClassLoader();
-//		File file = getClassesFolderAsFile();
-//		
-//		Class<?> javaClass = null ;
-//		
-//		try {
-//		    // Convert File to URL
-//		    URL url = file.toURI().toURL();    //  "file:/c:/templatesFolder/"
-//		    URL[] urls = new URL[]{url}; // the URLs from which to load classes and resources
-//
-//		    // Create a new class loader with the given directory and the current class loader as parent class loader
-//		    ClassLoader classLoader = new URLClassLoader(urls, currentClassLoader );
-//
-//		    // Load the class ( should be located in "file:/c:/templatesFolder/" )
-//		    javaClass = classLoader.loadClass(javaClassName);
-//		} catch (MalformedURLException e) {
-//			throw new GeneratorException("Cannot load class " + javaClassName + " (MalformedURLException)", e);
-//		} catch (ClassNotFoundException e) {
-//			throw new GeneratorException("Cannot load class " + javaClassName + " (ClassNotFoundException)", e);
-//		}
-//		
-//		return javaClass ;
-		
 		Class<?> javaClass = null ;
 		try {
 			javaClass = specificClassLoader.loadClass(javaClassName);

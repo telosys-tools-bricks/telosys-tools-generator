@@ -46,9 +46,7 @@ import org.telosys.tools.generator.context.names.ContextName;
 //-------------------------------------------------------------------------------------
 public class DatabasesInContext {
 
-	//private int databaseDefaultId = 0 ;
-	
-	private Map<Integer, DatabaseInContext> _databasesMap = new HashMap<Integer, DatabaseInContext>();
+	private Map<Integer, DatabaseInContext> databasesMap = new HashMap<>();
 
 	/**
 	 * Constructor
@@ -59,24 +57,18 @@ public class DatabasesInContext {
 		List<DatabaseConfiguration> list = databasesConfigurations.getDatabaseConfigurationsList();
 		for ( DatabaseConfiguration dbcfg : list ) {
 			DatabaseInContext db = new DatabaseInContext(dbcfg) ;
-			//Integer databaseId = new Integer(db.getId());
 			Integer databaseId = Integer.valueOf(db.getId()); // v 3.0.0 : Sonar Perf Issue Fixed
-			_databasesMap.put(databaseId, db);
+			databasesMap.put(databaseId, db);
 		}
 	}
 	
-//	public int getDatabaseDefaultId() {
-//		return databaseDefaultId;
-//	}
-
 	//----------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={ "Returns the database for the given id (or null if none)" },
 		parameters={"id : the database id"}
 		)
 	public DatabaseInContext getDatabase(int id) {
-		//return _databasesMap.get(new Integer(id)) ;
-		return _databasesMap.get(Integer.valueOf(id)) ; // v 3.0.0 : Sonar Perf Issue Fixed
+		return databasesMap.get(Integer.valueOf(id)) ; // v 3.0.0 : Sonar Perf Issue Fixed
 	}
 	
 	//----------------------------------------------------------------------------------
@@ -85,8 +77,7 @@ public class DatabasesInContext {
 		parameters={"id : the database id"}
 		)
 	public boolean hasDatabase(int id) {
-		// return _databasesMap.get(new Integer(id)) != null ;
-		return _databasesMap.get(Integer.valueOf(id)) != null ; // v 3.0.0 : Sonar Perf Issue Fixed
+		return databasesMap.get(Integer.valueOf(id)) != null ; // v 3.0.0 : Sonar Perf Issue Fixed
 	}
 	
 	//----------------------------------------------------------------------------------
@@ -94,7 +85,7 @@ public class DatabasesInContext {
 		text={ "Returns the number of databases " }
 		)
 	public int getNumberOfDatabases() {
-		return _databasesMap.size();
+		return databasesMap.size();
 	}
 	
 	//----------------------------------------------------------------------------------
@@ -104,13 +95,13 @@ public class DatabasesInContext {
 	public List<DatabaseInContext> getList() {
 		
 		//--- List of sorted id
-		ArrayList<Integer> keysArrayList = new ArrayList<Integer>(_databasesMap.keySet()) ;
+		ArrayList<Integer> keysArrayList = new ArrayList<>(databasesMap.keySet()) ;
 		Collections.sort(keysArrayList) ;
 		
 		//--- List of databases sorted by id 
-		LinkedList<DatabaseInContext> list = new LinkedList<DatabaseInContext>();
+		LinkedList<DatabaseInContext> list = new LinkedList<>();
 		for ( Integer id : keysArrayList ) {
-			list.add( _databasesMap.get(id) ) ;
+			list.add( databasesMap.get(id) ) ;
 		}
 		return list;
 	}
