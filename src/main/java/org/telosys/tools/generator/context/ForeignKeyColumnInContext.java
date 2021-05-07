@@ -44,24 +44,22 @@ import org.telosys.tools.generic.model.ForeignKeyColumn;
 //-------------------------------------------------------------------------------------
 public class ForeignKeyColumnInContext
 {
-	private final int    _sequence ;
+	private final int    sequence ;
 
-	private final String _columnName ;
+	private final String columnName ;
 	
-	private final String _referencedColumnName ;
+	private final String referencedColumnName ;
 	
 	//-------------------------------------------------------------------------------------
-//	public ForeignKeyColumnInContext( int sequence, String columnName, String referencedColumnName ) {
-//		super();
-//		this._sequence   = sequence;
-//		this._columnName = columnName;
-//		this._referencedColumnName  = referencedColumnName;
-//	}
+	/**
+	 * Constructor
+	 * @param metadataFKColumn
+	 */
 	public ForeignKeyColumnInContext( ForeignKeyColumn metadataFKColumn ) { //  v 3.0.0
 		super();
-		this._sequence   = metadataFKColumn.getSequence();
-		this._columnName = metadataFKColumn.getColumnName();
-		this._referencedColumnName  = metadataFKColumn.getReferencedColumnName();
+		this.sequence   = metadataFKColumn.getSequence();
+		this.columnName = metadataFKColumn.getColumnName();
+		this.referencedColumnName  = metadataFKColumn.getReferencedColumnName();
 	}
 	 
 	//-------------------------------------------------------------------------------------
@@ -71,7 +69,7 @@ public class ForeignKeyColumnInContext
 			}
 	)
 	public String getColumnName() {
-		return _columnName;
+		return columnName;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -81,7 +79,7 @@ public class ForeignKeyColumnInContext
 			}
 	)
 	public int getSequence() {
-		return _sequence;
+		return sequence;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -91,16 +89,7 @@ public class ForeignKeyColumnInContext
 			}
 	)
 	public String getReferencedColumnName() {
-		return _referencedColumnName;
+		return referencedColumnName;
 	}
 
-	//-------------------------------------------------------------------------------
-//	public int compareTo(JavaBeanClassForeignKeyColumn other) {
-//		if ( other != null )
-//		{
-//			return ( this.getSequence() - other.getSequence() );
-//		}
-//		return 0;
-//	}
-	
 }

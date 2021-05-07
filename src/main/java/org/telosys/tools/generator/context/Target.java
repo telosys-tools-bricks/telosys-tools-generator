@@ -46,13 +46,10 @@ import org.telosys.tools.generic.model.Entity;
 //-------------------------------------------------------------------------------------
 public class Target 
 {
-	//private final static String BEANNAME = "BEANNAME" ;
-	
 	private final VariablesManager variablesManager ;
 	
 	private final String    targetName ;
 	
-	//private final String    file ;
 	private final String    originalFileDefinition ;
 	
 	private final String    folder ;
@@ -80,9 +77,7 @@ public class Target
 		this.forcedEntityName = null ;
 
 		//--- Replace the "$" variables in _sFile and _sFolder
-		//VariablesManager variablesManager = new VariablesManager( variables ); 
 		this.variablesManager = new VariablesManager( variables ); 
-		//this.file   = replaceVariables( targetDefinition.getFile(), variablesManager );
 		this.originalFileDefinition = targetDefinition.getFile() ;
 		
 		this.variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
@@ -104,9 +99,7 @@ public class Target
 		this.entityName = "" ;
 
 		//--- Replace the "$" variables in _sFile and _sFolder
-		//VariablesManager variablesManager = new VariablesManager( variables ); 		
 		this.variablesManager = new VariablesManager( variables ); 
-		//this.file   = replaceVariables( targetDefinition.getFile(), variablesManager );
 		this.originalFileDefinition = targetDefinition.getFile() ;
 		
 		this.variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
@@ -141,7 +134,6 @@ public class Target
 			}
 	)
 	public String getFile() {
-		//return file;
 		return replaceVariables( originalFileDefinition, variablesManager );
 	}
 
@@ -269,43 +261,6 @@ public class Target
 		return s2 ;
 	}
 	
-//	//-----------------------------------------------------------------------
-//	private String replaceVariables( String originalString, String sBeanClass, VariablesManager varmanager ) {
-//		//--- Replace the generic name "${BEANNAME}" if any
-////		String s1 = replace(originalString, ConfigDefaults.BEANNAME, sBeanClass);
-//		String s1 = replace(originalString, BEANNAME, sBeanClass);
-//
-//		//--- Replace the global project variables if any
-//		if ( varmanager != null ) {
-//			return varmanager.replaceVariables(s1);
-//		}
-//		else {
-//			return s1 ;
-//		}
-//	}
-//	
-//	//-----------------------------------------------------------------------
-//    private String replace(String sOriginal, String sSymbolicVar, String sValue) 
-//    {
-//    	String s   = "${" + sSymbolicVar + "}" ;
-//    	String sUC = "${" + sSymbolicVar + "_UC}" ;
-//    	String sLC = "${" + sSymbolicVar + "_LC}" ;
-//    	
-//		if ( sOriginal.indexOf(s) >= 0 )
-//		{
-//			return StrUtil.replaceVar(sOriginal, s, sValue);
-//		}
-//		else if ( sOriginal.indexOf(sUC) >= 0 )
-//		{
-//			return StrUtil.replaceVar(sOriginal, sUC, sValue.toUpperCase());
-//		}
-//		else if ( sOriginal.indexOf(sLC) >= 0 )
-//		{
-//			return StrUtil.replaceVar(sOriginal, sLC, sValue.toLowerCase());
-//		}
-//		return sOriginal ;
-//    }
-
 	private String replaceVariables( String originalString, VariablesManager varmanager ) {
 		
 		String s1 = originalString;
@@ -334,13 +289,13 @@ public class Target
     	if ( beannameValue == null ) return originalString ;
     	if ( beannameValue.length() == 0 ) return originalString ;
     	// beannameValue is defined => replace "${BEANNAME}" 
-    	HashMap<String,String> hm = new HashMap<String,String>();
+    	HashMap<String,String> hm = new HashMap<>();
     	hm.put("${BEANNAME}",    beannameValue );		
     	hm.put("${BEANNAME_LC}", beannameValue.toLowerCase() );
     	hm.put("${BEANNAME_UC}", beannameValue.toUpperCase() );
 
-    	VariablesManager variablesManager = new VariablesManager(hm) ;
-    	return variablesManager.replaceVariables(originalString);
+    	VariablesManager varManager = new VariablesManager(hm) ;
+    	return varManager.replaceVariables(originalString);
     }
 
 	/**
@@ -354,11 +309,9 @@ public class Target
 	{
 		String s = null ;
 		if ( folder.endsWith("/") || folder.endsWith("\\") ) {
-			//s = folder + file ;
 			s = folder + getFile() ;
 		}
 		else {
-			//s = folder + "/" + file ;
 			s = folder + "/" + getFile() ;
 		}
 		if ( s.startsWith("/") || s.startsWith("\\") ) {
@@ -384,9 +337,6 @@ public class Target
 	@VelocityNoDoc
 	@Override
 	public String toString() {
-//		return "Target [targetName=" + targetName + ", file=" + file
-//				+ ", folder=" + folder + ", template=" + template
-//				+ ", entityName=" + entityName + "]";
 		return "Target [targetName=" + targetName + ", file=" + getFile()
 				+ ", folder=" + folder + ", template=" + template
 				+ ", entityName=" + entityName + "]";

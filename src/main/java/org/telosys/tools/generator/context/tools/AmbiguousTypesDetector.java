@@ -23,8 +23,7 @@ import org.telosys.tools.generator.context.AttributeInContext;
 
 public class AmbiguousTypesDetector {
 
-	//private final List<JavaBeanClassAttribute> _attributes ;
-	private final List<String>                 _fullTypesList ;
+	private final List<String>  fullTypes ;
 
 	//-----------------------------------------------------------------------------------------------
 	/**
@@ -34,11 +33,9 @@ public class AmbiguousTypesDetector {
 	 */
 	public AmbiguousTypesDetector(List<AttributeInContext> attributes) {
 		super();
-		//this._attributes = attributes;
-		
-		_fullTypesList = new LinkedList<String>();
+		this.fullTypes = new LinkedList<>();
 		for ( AttributeInContext attribute : attributes ) {
-			if ( attribute.isPrimitiveType() != true ) {
+			if ( ! attribute.isPrimitiveType() ) {
 				registerType( attribute.getFullType() ); // "java.math.BigDecimal", "java.util.Date", ...
 			}
 		}
@@ -50,7 +47,7 @@ public class AmbiguousTypesDetector {
 	 */
 	public AmbiguousTypesDetector() {
 		super();
-		_fullTypesList = new LinkedList<String>();
+		fullTypes = new LinkedList<>();
 	}
 	
 	//-----------------------------------------------------------------------------------------------
@@ -62,8 +59,8 @@ public class AmbiguousTypesDetector {
 	public void registerType(String fullType)
 	{
 		// Store it only if not yet present in the list
-		if ( _fullTypesList.contains(fullType) == false ) {
-			_fullTypesList.add(fullType);
+		if ( ! fullTypes.contains(fullType) ) {
+			fullTypes.add(fullType);
 		}
 	}
 	
@@ -74,8 +71,8 @@ public class AmbiguousTypesDetector {
 	 */
 	public List<String> getAllTypes()
 	{
-		LinkedList<String> list = new LinkedList<String>() ;
-		for ( String fullType : _fullTypesList ) {
+		LinkedList<String> list = new LinkedList<>() ;
+		for ( String fullType : fullTypes ) {
 			list.add(fullType);
 		}
 		return list ;
@@ -89,19 +86,15 @@ public class AmbiguousTypesDetector {
 	 */
 	public List<String> getAmbiguousTypes()
 	{
-		LinkedList<String> ambiguousTypes = new LinkedList<String>() ;
+		LinkedList<String> ambiguousTypes = new LinkedList<>() ;
 
-		for ( String fullType : _fullTypesList ) {
+		for ( String fullType : fullTypes ) {
 			//String shortName = JavaClassUtil.shortName(fullType);
 			String shortName = JavaTypeUtil.shortType(fullType); // v 3.3.0
 			
 			// if more than one occurrence of this short name in the list 
 			// ( eg  2 occurrences : "java.util.Date" and "java.sql.Date" for the "Date" short name )
-			if ( shortNameCount(shortName) > 1 ) 
-			{
-//				if ( collidedTypes.contains(fullType) != true ) {
-//					collidedTypes.add(fullType);
-//				}
+			if ( shortNameCount(shortName) > 1 ) {
 				// Each type is unique in the original list : no risk of duplication
 				ambiguousTypes.add(fullType);
 			}
@@ -119,7 +112,7 @@ public class AmbiguousTypesDetector {
 	{
 		int count = 0 ;
 		String end = "." + shortName ;
-		for ( String s : _fullTypesList ) {
+		for ( String s : fullTypes ) {
 			if ( s.endsWith(end))
 			{
 				count++ ;

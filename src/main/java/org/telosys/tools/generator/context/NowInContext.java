@@ -95,7 +95,17 @@ public class NowInContext {
     public String format(String sFormat ) {
         return newFormattedDate(sFormat);
     }
-
+	
+	//-------------------------------------------------------------------------------------
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 * if $now (without mathod) in template 
+	 */
+	@Override
+	public String toString() {
+		return getDatetime();
+	}
+	
 	//-------------------------------------------------------------------------------------
     private String newFormattedDate( String sFormat ) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(sFormat);

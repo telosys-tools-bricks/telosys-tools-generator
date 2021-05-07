@@ -56,61 +56,27 @@ public class ForeignKeyInContext {
 	private final String  targetTableName  ;
 	private final List<ForeignKeyColumnInContext> fkColumns ;
 	
-	private int _updateRuleCode = 0 ;
-	private int _deleteRuleCode = 0 ;
-	private int _deferrableCode = 0 ;
-
-//	//-------------------------------------------------------------------------------------
-//	public JavaBeanClassForeignKey(final String fkName, 
-//			final String tableName, final String targetTableName, 
-//			List<JavaBeanClassForeignKeyColumn> fkColumns,
-//			final String updateRule, final String deleteRule, final String deferrable  ) 
-//	{
-//		this.fkName = fkName ;
-//		this.tableName = tableName ;
-//		this.targetTableName = targetTableName ;
-//		if ( fkColumns != null ) {
-//			this.fkColumns = fkColumns ;
-//		}
-//		else {
-//			this.fkColumns = new LinkedList<JavaBeanClassForeignKeyColumn>() ;
-//		}
-//		
-//		this._updateRule = updateRule ;
-//		this._deleteRule = deleteRule ;
-//		this._deferrable = deferrable ;
-//	}
+	private int updateRuleCode = 0 ;
+	private int deleteRuleCode = 0 ;
+	private int deferrableCode = 0 ;
 
 	//-------------------------------------------------------------------------------------
 	public ForeignKeyInContext(final ForeignKey foreignKey ) 
 	{
 		this.fkName = foreignKey.getName() ;
 		this.tableName = foreignKey.getTableName() ;
-		//this.targetTableName = metadataFK.getTableRef() ;
 		this.targetTableName = foreignKey.getReferencedTableName();
 		
-		this._updateRuleCode = 0 ;
-		this._deleteRuleCode = 0 ;
-		this._deferrableCode = 0 ;
-		this.fkColumns = new LinkedList<ForeignKeyColumnInContext>() ;
-//		if ( metadataFK.getForeignKeyColumnsCollection().size() > 0 ) {
-//			for ( ForeignKeyColumn metadataFKColumn : metadataFK.getForeignKeyColumnsCollection() ) {
-//				int    sequence = metadataFKColumn.getSequence();
-//				String columnName = metadataFKColumn.getColumnName();
-//				String referencedColumnName = metadataFKColumn.getColumnRef();
-//				fkColumns.add( new ForeignKeyColumnInContext(sequence, columnName, referencedColumnName ) ) ;
-//				//--- ON UPDATE, ON DELETE and DEFERRABLE (stored in each column in meta-data, keep the last one)
-//				this._updateRuleCode = metadataFKColumn.getUpdateRuleCode() ;
-//				this._deleteRuleCode = metadataFKColumn.getDeleteRuleCode() ;
-//				this._deferrableCode = metadataFKColumn.getDeferrableCode() ;
-//			}
-//		}
+		this.updateRuleCode = 0 ;
+		this.deleteRuleCode = 0 ;
+		this.deferrableCode = 0 ;
+		this.fkColumns = new LinkedList<>() ;
 
 		//--- V 3.0.0 
 		//--- ON UPDATE, ON DELETE and DEFERRABLE (stored in each column in meta-data, keep the last one)
-		this._updateRuleCode = foreignKey.getUpdateRuleCode() ;
-		this._deleteRuleCode = foreignKey.getDeleteRuleCode() ;
-		this._deferrableCode = foreignKey.getDeferrableCode() ;
+		this.updateRuleCode = foreignKey.getUpdateRuleCode() ;
+		this.deleteRuleCode = foreignKey.getDeleteRuleCode() ;
+		this.deferrableCode = foreignKey.getDeferrableCode() ;
 		
 		for ( ForeignKeyColumn metadataFKColumn : foreignKey.getColumns() ) {
 			fkColumns.add( new ForeignKeyColumnInContext(metadataFKColumn) );
@@ -183,16 +149,16 @@ public class ForeignKeyInContext {
 			}
 	)
 	public String getDeferrable() {
-		return MetadataUtil.getForeignKeyDeferrability(_deferrableCode).toUpperCase();
+		return MetadataUtil.getForeignKeyDeferrability(deferrableCode).toUpperCase();
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
-			text={	
-				"Returns the 'DEFERRABILITY' status code ( MetaData Code : 5,6,7 ) "
-				}
-		)
+		text={	
+			"Returns the 'DEFERRABILITY' status code ( MetaData Code : 5,6,7 ) "
+			}
+	)
 	public int getDeferrableCode() {
-		return _deferrableCode;
+		return deferrableCode;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -202,16 +168,16 @@ public class ForeignKeyInContext {
 			}
 	)
 	public String getDeleteRule() {
-		return MetadataUtil.getForeignKeyDeleteRule(_deleteRuleCode).toUpperCase();
+		return MetadataUtil.getForeignKeyDeleteRule(deleteRuleCode).toUpperCase();
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
-			text={	
-				"Returns the 'ON DELETE' rule code ( MetaData Code : 0,1,2,3,4 ) "
-				}
-		)
+		text={	
+			"Returns the 'ON DELETE' rule code ( MetaData Code : 0,1,2,3,4 ) "
+			}
+	)
 	public int getDeleteRuleCode() {
-		return _deleteRuleCode;
+		return deleteRuleCode;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -221,15 +187,15 @@ public class ForeignKeyInContext {
 			}
 	)
 	public String getUpdateRule() {
-		return MetadataUtil.getForeignKeyUpdateRule(_updateRuleCode).toUpperCase();
+		return MetadataUtil.getForeignKeyUpdateRule(updateRuleCode).toUpperCase();
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
-			text={	
-				"Returns the 'ON UPDATE' rule code ( MetaData Code : 0,1,2,3,4 ) "
-				}
-		)
+	text={	
+		"Returns the 'ON UPDATE' rule code ( MetaData Code : 0,1,2,3,4 ) "
+		}
+	)
 	public int getUpdateRuleCode() {
-		return _updateRuleCode;
+		return updateRuleCode;
 	}
 }

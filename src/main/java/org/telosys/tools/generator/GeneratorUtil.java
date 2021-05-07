@@ -17,6 +17,11 @@ package org.telosys.tools.generator;
 
 public class GeneratorUtil {
 
+	/**
+	 * Private constructor
+	 */
+	private GeneratorUtil() {}
+	
 	//-------------------------------------------------------------
     /**
      * Return a string composed of iSize blanks
@@ -28,7 +33,7 @@ public class GeneratorUtil {
         String sTrailingBlanks = "";
         if (iSize > 0) // if needs trailing blanks
         {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for ( int i = 0 ; i < iSize ; i++ )
             {
                 sb.append(' ');

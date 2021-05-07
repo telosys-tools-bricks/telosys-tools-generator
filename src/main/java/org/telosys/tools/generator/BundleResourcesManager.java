@@ -32,9 +32,9 @@ import org.telosys.tools.generator.context.Target;
 
 public class BundleResourcesManager {
 
-	private final TelosysToolsCfg    _telosysToolsCfg ;
-	private final String             _bundleName ;
-	private final TelosysToolsLogger _logger;
+	private final TelosysToolsCfg    telosysToolsCfg ;
+	private final String             bundleName ;
+	private final TelosysToolsLogger logger;
 	
 	//----------------------------------------------------------------------------------------------------
 	/**
@@ -45,16 +45,16 @@ public class BundleResourcesManager {
 	 */
 	public BundleResourcesManager(TelosysToolsCfg projectCfg, String bundleName, TelosysToolsLogger logger) {
 		super();
-		_telosysToolsCfg  = projectCfg ;
-		_bundleName       = bundleName ;
-		_logger           = logger ;
+		this.telosysToolsCfg  = projectCfg ;
+		this.bundleName       = bundleName ;
+		this.logger           = logger ;
 		log("created.");
 	}
 	
 	//----------------------------------------------------------------------------------------------------
 	private void log(String s) {
-		if (_logger != null) {
-			_logger.log( this.getClass().getSimpleName() + " : " + s);
+		if (logger != null) {
+			logger.log( this.getClass().getSimpleName() + " : " + s);
 		}
 	}
 	//----------------------------------------------------------------------------------------------------
@@ -66,11 +66,10 @@ public class BundleResourcesManager {
 	private List<Target> getResourcesTargets(List<TargetDefinition> targetsDefinitions ) {
 		log("getResourcesTargets()... " );
 		
-		Variable[] projectVariables = _telosysToolsCfg.getAllVariables();
-		LinkedList<Target> targets = new LinkedList<Target>();
+		Variable[] projectVariables = telosysToolsCfg.getAllVariables();
+		LinkedList<Target> targets = new LinkedList<>();
 		if ( targetsDefinitions != null ) {
 			for ( TargetDefinition targetDefinition : targetsDefinitions ) {
-				//Target target = new Target ( targetDefinition, "", "", projectVariables );
 				Target target = new Target ( targetDefinition, projectVariables ); // v 3.0.0
 				targets.add(target);
 			}
@@ -139,7 +138,7 @@ public class BundleResourcesManager {
 		String originResourceFullPath = FileUtil.buildFilePath(bundleResourcesFolder, resourceName );
 		log("resource full path = " + originResourceFullPath );
 		File originResourceFile = new File(originResourceFullPath);
-		if ( originResourceFile.exists() == false ) {
+		if ( ! originResourceFile.exists() ) {
 			throw new GeneratorException("Resource file or folder '" + originResourceFullPath + "' not found " );
 		}
 		return originResourceFile ;
@@ -147,10 +146,8 @@ public class BundleResourcesManager {
 	//----------------------------------------------------------------------------------------------------
 	private File getDestination(Target target) {
 		// "resources destination" = "project folder where to generate" in .cfg file 
-		//String destinationLocation = _telosysToolsCfg.getProjectAbsolutePath() ;
-		String destinationFullPath = target.getOutputFileNameInFileSystem(_telosysToolsCfg.getDestinationFolderAbsolutePath()) ; // v 3.0.0
-		File destinationFile = new File(destinationFullPath);
-		return destinationFile ;
+		String destinationFullPath = target.getOutputFileNameInFileSystem(telosysToolsCfg.getDestinationFolderAbsolutePath()) ; // v 3.0.0
+		return new File(destinationFullPath);
 	}
 	//----------------------------------------------------------------------------------------------------
 	private int copy(File origin, File destination, OverwriteChooser overwriteChooser, CopyHandler copyHandler ) {
@@ -173,10 +170,10 @@ public class BundleResourcesManager {
 	 * @throws Exception
 	 */
 	private String getBundleResourcesFolder() throws Exception {
-		String projectTemplatesFolder = _telosysToolsCfg.getTemplatesFolderAbsolutePath();
+		String projectTemplatesFolder = telosysToolsCfg.getTemplatesFolderAbsolutePath();
 		log("project templates folder = " + projectTemplatesFolder );
 		
-		String bundleResourcesFolder = FileUtil.buildFilePath(projectTemplatesFolder, _bundleName + "/resources");
+		String bundleResourcesFolder = FileUtil.buildFilePath(projectTemplatesFolder, bundleName + "/resources");
 		log("bundle resources folder = " + bundleResourcesFolder );
 		
 		File file = new File(bundleResourcesFolder);

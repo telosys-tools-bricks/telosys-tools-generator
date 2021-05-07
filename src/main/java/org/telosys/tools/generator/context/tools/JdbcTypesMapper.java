@@ -16,7 +16,8 @@
 package org.telosys.tools.generator.context.tools;
 
 import java.math.BigDecimal;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.telosys.tools.generator.context.AttributeInContext;
 
@@ -28,7 +29,7 @@ import org.telosys.tools.generator.context.AttributeInContext;
  */
 public class JdbcTypesMapper {
 	
-	private final static Hashtable<String,String> preparedStatementSetters = new Hashtable<String,String>() ;
+	private static final Map<String,String> preparedStatementSetters = new HashMap<>() ;
 	static {
 		preparedStatementSetters.put(String.class.getCanonicalName(),  "setString" );
 		
@@ -67,7 +68,7 @@ public class JdbcTypesMapper {
 		
 	}
 	
-	private final static Hashtable<String,String> resultSetGetters = new Hashtable<String,String>() ;
+	private static final Map<String,String> resultSetGetters = new HashMap<>() ;
 	static {
 		resultSetGetters.put(String.class.getCanonicalName(),  "getString" );
 		

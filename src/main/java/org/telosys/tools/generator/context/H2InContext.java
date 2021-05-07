@@ -77,7 +77,7 @@ public class H2InContext {
 			)
 	public List<String> ddlCreateTable(final EntityInContext entity) {
 		List<String> lines1 = buildTableDefinition (entity);
-		List<String> lines2 = new LinkedList<String>();
+		List<String> lines2 = new LinkedList<>();
 		lines2.add( "CREATE TABLE " + entity.getDatabaseTable() + " (") ;
 		
 		int c = 0 ;
@@ -96,7 +96,7 @@ public class H2InContext {
 	}	
 
 	private List<String> buildTableDefinition (final EntityInContext entity) {
-		List<String> lines = new LinkedList<String>();
+		List<String> lines = new LinkedList<>();
 		//--- Primary Key columns first 
 		for ( AttributeInContext attribute : entity.getKeyAttributes() ) {
 			lines.add( buildColumnDefinition(attribute) );
@@ -129,7 +129,6 @@ public class H2InContext {
 	}
 
 	private String buildColumnDefinition (final AttributeInContext attribute ) {
-		//"${attribute.databaseName} ${attribute.databaseType} #if($attribute.isNotNull()) NOT NULL #end ,"
 		StringBuilder sb = new StringBuilder();
 		sb.append( attribute.getDatabaseName() ) ;
 		sb.append( " ") ;
@@ -147,7 +146,7 @@ public class H2InContext {
 	/*
 	 * Mapping : "Neutral type" --> "H2 database type"
 	 */
-	private final static Map<String,String> mappingNeutralTypeToH2Type = new HashMap<String,String>() ; 
+	private static final Map<String,String> mappingNeutralTypeToH2Type = new HashMap<>() ; 
 	static {
 		mappingNeutralTypeToH2Type.put(NeutralType.BINARY,    "BINARY"   );
 		mappingNeutralTypeToH2Type.put(NeutralType.BOOLEAN,   "BOOLEAN"  );
@@ -172,11 +171,11 @@ public class H2InContext {
 		}
 		else {
 			//--- Standard case : get the mapped type
-			String H2Type = mappingNeutralTypeToH2Type.get(attribute.getNeutralType()) ;
-			if ( H2Type == null ) {
-				H2Type = "UNKNOWN_TYPE";
+			String h2Type = mappingNeutralTypeToH2Type.get(attribute.getNeutralType()) ;
+			if ( h2Type == null ) {
+				h2Type = "UNKNOWN_TYPE";
 			}
-			return H2Type ;
+			return h2Type ;
 		}
 	}
 	

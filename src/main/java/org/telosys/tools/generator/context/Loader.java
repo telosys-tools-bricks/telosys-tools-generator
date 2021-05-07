@@ -70,8 +70,7 @@ public class Loader {
 		SpecificClassPath specificClassPath = buildClassPath();
 		ClassLoader currentClassLoader = this.getClass().getClassLoader();
 
-		SpecificClassLoader loader = new SpecificClassLoader(specificClassPath, currentClassLoader);
-        return loader;
+		return new SpecificClassLoader(specificClassPath, currentClassLoader);
 	}
 	
 	private SpecificClassPath buildClassPath() {
@@ -135,8 +134,7 @@ public class Loader {
 		
 	)
 	public Class<?> loadClass( String javaClassName ) throws GeneratorException {
-		Class<?> javaClass = loadJavaClassFromFile( javaClassName ) ;
-		return javaClass ;
+		return loadJavaClassFromFile( javaClassName ) ;
 	}
 	
 	//--------------------------------------------------------------------------------------------------------------

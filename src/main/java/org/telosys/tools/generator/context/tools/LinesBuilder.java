@@ -17,8 +17,8 @@ package org.telosys.tools.generator.context.tools;
 
 public class LinesBuilder {
 	
-	final static int TYPE_TABS   = 1 ;
-	final static int TYPE_SPACES = 2 ;
+	private static final int TYPE_TABS   = 1 ;
+	private static final int TYPE_SPACES = 2 ;
 
 	private final StringBuilder sb ;
 	
@@ -67,21 +67,21 @@ public class LinesBuilder {
 	}
 
 	private String getIndentationWithSpaces(int indentLevel) {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder spaces = new StringBuilder();
 		for ( int level = 0 ; level < indentLevel ; level++ ) {
 			for ( int n = 0 ; n < indentationSize ; n++ ) {
-				sb.append(" ");
+				spaces.append(" ");
 			}
 		}
-		return sb.toString();
+		return spaces.toString();
 	}
 
 	private String getIndentationWithTabulations(int indentLevel) {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder tabs = new StringBuilder();
 		for ( int level = 0 ; level < indentLevel ; level++ ) {
-			sb.append("\t");
+			tabs.append("\t");
 		}
-		return sb.toString();
+		return tabs.toString();
 	}
 	
 }

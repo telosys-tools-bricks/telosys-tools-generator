@@ -25,22 +25,22 @@ import org.telosys.tools.generator.GeneratorUtil;
  */
 public class AnnotationsBuilder {
 
-	private StringBuffer _sbAnnotationsBuffer = null;
+	private final StringBuilder stringBuilder ;
 
-	private String       _sLeftMargin = "" ;
+	private final String        leftMarginString ;
 	
-	private int          _iAnnotationsCount = 0 ;
+	private int           annotationsCount = 0 ;
 	
 	
 	/**
 	 * Constructor
-	 * @param iLeftMargin
+	 * @param leftMargin
 	 */
-	public AnnotationsBuilder(int iLeftMargin) {
+	public AnnotationsBuilder(int leftMargin) {
 		super();
-		_sbAnnotationsBuffer = new StringBuffer();
-		_iAnnotationsCount = 0 ;
-		_sLeftMargin = GeneratorUtil.blanks(iLeftMargin);		
+		this.stringBuilder = new StringBuilder();
+		this.annotationsCount = 0 ;
+		this.leftMarginString = GeneratorUtil.blanks(leftMargin);		
 	}
 
 	/**
@@ -50,12 +50,12 @@ public class AnnotationsBuilder {
 	 */
 	public void addLine(String sAnnotation)
 	{
-		if ( _iAnnotationsCount > 0 ) {
-			_sbAnnotationsBuffer.append( "\n" );
+		if ( annotationsCount > 0 ) {
+			stringBuilder.append( "\n" );
 		}
-		_sbAnnotationsBuffer.append( _sLeftMargin );
-		_sbAnnotationsBuffer.append( sAnnotation );
-		_iAnnotationsCount++;
+		stringBuilder.append( leftMarginString );
+		stringBuilder.append( sAnnotation );
+		annotationsCount++;
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class AnnotationsBuilder {
 	 */
 	public String getAnnotations()
 	{
-		return _sbAnnotationsBuffer.toString() ;
+		return stringBuilder.toString() ;
 	}
 
 }

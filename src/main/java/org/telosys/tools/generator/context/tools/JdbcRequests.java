@@ -129,7 +129,7 @@ public class JdbcRequests {
 
 
 	private List<AttributeInContext> buildAttributesForPrimaryKey() {
-        List<AttributeInContext> list = new LinkedList<AttributeInContext>();
+        List<AttributeInContext> list = new LinkedList<>();
         for ( AttributeInContext attribute : entity.getAttributes() ) {
         	if ( attribute.isKeyElement() ) {
             	list.add(attribute);
@@ -139,7 +139,7 @@ public class JdbcRequests {
     }
     
     private List<AttributeInContext> buildAttributesForSelect() {
-        List<AttributeInContext> list = new LinkedList<AttributeInContext>();
+        List<AttributeInContext> list = new LinkedList<>();
         for ( AttributeInContext attribute : entity.getAttributes() ) {
         	list.add(attribute);
         }
@@ -147,10 +147,10 @@ public class JdbcRequests {
     }
 
     private List<AttributeInContext> buildAttributesForInsert() {
-        List<AttributeInContext> list = new LinkedList<AttributeInContext>();
+        List<AttributeInContext> list = new LinkedList<>();
         for ( AttributeInContext attribute : entity.getAttributes() ) {
         	// Do not use "auto-incremented" attributes
-        	if ( attribute.isAutoIncremented() == false ) {
+        	if ( ! attribute.isAutoIncremented() ) {
             	list.add(attribute);
         	}
         }
@@ -158,10 +158,10 @@ public class JdbcRequests {
     }
     
     private List<AttributeInContext> buildAttributesForUpdate() {
-        List<AttributeInContext> list = new LinkedList<AttributeInContext>();
+        List<AttributeInContext> list = new LinkedList<>();
         for ( AttributeInContext attribute : entity.getAttributes() ) {
         	// Do not use "primary key" and "auto-incremented" attributes
-        	if ( attribute.isKeyElement() == false && attribute.isAutoIncremented() == false ) {
+        	if ( ! attribute.isKeyElement() && ! attribute.isAutoIncremented() ) {
             	list.add(attribute);
         	}
         }
@@ -171,7 +171,7 @@ public class JdbcRequests {
     
     private String buildColumnsList(List<AttributeInContext> attributes, boolean bPrefix) 
     {
-        StringBuffer sb = new StringBuffer(200);
+        StringBuilder sb = new StringBuilder();
         int n = 0 ;
         for ( AttributeInContext attribute : attributes ) {
             if (n > 0) {
@@ -194,7 +194,7 @@ public class JdbcRequests {
      */
     private String whereCriteria(List<AttributeInContext> attributes, boolean bPrefix)
     {
-        StringBuffer sb = new StringBuffer(200);
+    	StringBuilder sb = new StringBuilder(200);
         int n = 0 ;
         for ( AttributeInContext attribute : attributes ) {
             if (n > 0) {
@@ -211,11 +211,11 @@ public class JdbcRequests {
 
     private String buildQuestionMarsks(List<AttributeInContext> attributes) 
     {
-    	if ( attributes.size() == 0 ) {
+    	if ( attributes.isEmpty() ) {
     		return "" ;
     	}
     	else {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for ( int c = 0 ; c < attributes.size() ; c++ )  {
                 if (c > 0) {
                     sb.append(", ");
@@ -233,20 +233,8 @@ public class JdbcRequests {
      */
     private String buildSetValuesForUpdate(List<AttributeInContext> attributes, boolean bPrefix)
     {
-        StringBuffer sb = new StringBuffer(200);
+    	StringBuilder sb = new StringBuilder(200);
         //--- Data Columns
-//        for ( int c = 0 ; c < _dataColumns.length ; c++ )
-//        {
-//            if (c > 0)
-//            {
-//                sb.append(", ");
-//            }
-//            if (bPrefix)
-//            {
-//                sb.append(_table + ".");
-//            }
-//            sb.append(_dataColumns[c] + " = ?");
-//        }
         int n = 0 ;
         for ( AttributeInContext attribute : attributes ) {
             if (n > 0) {

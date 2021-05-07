@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.commons.variables.VariablesNames;
-import org.telosys.tools.generator.context.names.ContextName;
 
 /**
  * Reserved context names
@@ -32,9 +31,9 @@ import org.telosys.tools.generator.context.names.ContextName;
  */
 public class ContextNames {
 	
-	private final static String[] VOID_STRING_ARRAY = {} ;
+	private static final String[] VOID_STRING_ARRAY = {} ;
 	
-	private static List<String> VARIABLES_LIST = new LinkedList<String>();
+	private static final List<String> VARIABLES_LIST = new LinkedList<>();
 	static {
 		//--- Special characters 
 		VARIABLES_LIST.add( ContextName.DOLLAR );
@@ -62,7 +61,8 @@ public class ContextNames {
 		Collections.sort(VARIABLES_LIST);
 	}
 
-	private static List<String> GENERATOR_OBJECTS_LIST = new LinkedList<String>();
+	
+	private static final List<String> GENERATOR_OBJECTS_LIST = new LinkedList<>();
 	static {
 		//--- Invariable objects 
 		GENERATOR_OBJECTS_LIST.add( ContextName.CONST ); 
@@ -70,7 +70,6 @@ public class ContextNames {
 		GENERATOR_OBJECTS_LIST.add( ContextName.JAVA ); // ver 2.0.7
 		GENERATOR_OBJECTS_LIST.add( ContextName.JPA ); // ver 2.0.7
 		GENERATOR_OBJECTS_LIST.add( ContextName.BEAN_VALIDATION ); // ver 2.0.7
-//		GENERATOR_OBJECTS_LIST.add( ContextName.GENERATION );  // ver 2.1.0  - REMOVED in ver 3.0.0
 		GENERATOR_OBJECTS_LIST.add( ContextName.GENERATOR ); 
 		GENERATOR_OBJECTS_LIST.add( ContextName.LOADER );
 		GENERATOR_OBJECTS_LIST.add( ContextName.PROJECT );
@@ -84,14 +83,13 @@ public class ContextNames {
 
 		//--- Current Entity/Target objects
 		GENERATOR_OBJECTS_LIST.add( ContextName.TARGET      );
-		//GENERATOR_OBJECTS_LIST.add( ContextName.BEAN_CLASS  ); // old name
 		GENERATOR_OBJECTS_LIST.add( ContextName.ENTITY      ); // new name
 		GENERATOR_OBJECTS_LIST.add( ContextName.SELECTED_ENTITIES  );
 
 		Collections.sort(GENERATOR_OBJECTS_LIST);
 	}
 
-	private static List<String> PREDEFINED_NAMES_LIST = new LinkedList<String>();
+	private static final List<String> PREDEFINED_NAMES_LIST = new LinkedList<>();
 	static {
 		PREDEFINED_NAMES_LIST.add( ContextName.ATTRIBUTE ); 
 		PREDEFINED_NAMES_LIST.add( ContextName.ATTRIB ); 
@@ -115,17 +113,7 @@ public class ContextNames {
 		PREDEFINED_NAMES_LIST.add( ContextName.JOIN_TABLE ); // v 3.3.0 (for documentation)
 	}
 
-//	private static List<String> WIZARDS_OBJECTS_LIST = new LinkedList<String>();
-//	static {
-//		//--- Invariable objects 
-//		WIZARDS_OBJECTS_LIST.add( ContextName.CLASS  );
-////		"context", 
-////		"screendata",
-////		"triggers"
-//
-//	}
-	
-	private static List<String> RESERVED_NAMES_LIST = new LinkedList<String>();
+	private static final List<String> RESERVED_NAMES_LIST = new LinkedList<>();
 	static {
 		for ( String s : VARIABLES_LIST ) {
 			RESERVED_NAMES_LIST.add(s);
@@ -136,13 +124,10 @@ public class ContextNames {
 		for ( String s : PREDEFINED_NAMES_LIST ) {
 			RESERVED_NAMES_LIST.add(s);
 		}
-//		for ( String s : WIZARDS_OBJECTS_LIST ) {
-//			RESERVED_NAMES_LIST.add(s);
-//		}
 		Collections.sort(RESERVED_NAMES_LIST);
 	}
 	
-	private static List<String> VARIABLE_AND_OBJECT_NAMES_LIST = new LinkedList<String>();
+	private static final List<String> VARIABLE_AND_OBJECT_NAMES_LIST = new LinkedList<>();
 	static {
 		for ( String s : VARIABLES_LIST ) {
 			VARIABLE_AND_OBJECT_NAMES_LIST.add(s);
@@ -153,22 +138,29 @@ public class ContextNames {
 		Collections.sort(VARIABLE_AND_OBJECT_NAMES_LIST);
 	}
 	
-	public final static String[] getVariableNames()
+	/**
+	 * Private constructor
+	 */
+	private ContextNames() {
+		
+	}
+	
+	public static final String[] getVariableNames()
 	{
 		return VARIABLES_LIST.toArray( VOID_STRING_ARRAY );
 	}
 	
-	public final static String[] getObjectNames()
+	public static final String[] getObjectNames()
 	{
 		return GENERATOR_OBJECTS_LIST.toArray( VOID_STRING_ARRAY );
 	}
 	
-	public final static String[] getObjectAndVariableNames()
+	public static final String[] getObjectAndVariableNames()
 	{
 		return VARIABLE_AND_OBJECT_NAMES_LIST.toArray( VOID_STRING_ARRAY );
 	}
 	
-	public final static String[] getPredefinedNames()
+	public static final String[] getPredefinedNames()
 	{
 		return PREDEFINED_NAMES_LIST.toArray( VOID_STRING_ARRAY );
 	}
@@ -177,7 +169,7 @@ public class ContextNames {
 	 * Returns a copy of all the variable names used in the Velocity Context
 	 * @return
 	 */
-	public final static String[] getReservedNames()
+	public static final String[] getReservedNames()
 	{
 		return RESERVED_NAMES_LIST.toArray( VOID_STRING_ARRAY );
 	}
@@ -186,7 +178,7 @@ public class ContextNames {
 	 * Returns a sorted copy of all the variable names used in the Velocity Context
 	 * @return
 	 */
-	public final static String[] getSortedReservedNames()
+	public static final String[] getSortedReservedNames()
 	{
 		String[] names = getReservedNames() ;
 		Arrays.sort(names);
@@ -198,7 +190,7 @@ public class ContextNames {
 	 * @param s
 	 * @return
 	 */
-	public final static boolean isReservedName(String s)
+	public static final boolean isReservedName(String s)
 	{
 		if ( s != null ) {
 			for ( String reserved : RESERVED_NAMES_LIST ) {
@@ -210,39 +202,13 @@ public class ContextNames {
 		return false ;
 	}
 	
-//	/**
-//	 * Returns an array containing the invalid variable names, <br>
-//	 * or null if all the names are valid.
-//	 * @param variables
-//	 * @return
-//	 */
-//	public final static String[] getInvalidVariableNames(Variable[] variables)
-//	{
-//		LinkedList<String> invalidVariables = null ; 
-//		if ( null == variables ) return null ;
-//		for ( int i = 0 ; i < variables.length ; i++ )
-//		{
-//			Variable v = variables[i];
-//			String sVarName = v.getName();
-//			if ( isReservedName(sVarName) )
-//			{
-//				if ( null == invalidVariables )
-//				{
-//					invalidVariables = new LinkedList<String>();
-//				}
-//				invalidVariables.add(sVarName);
-//			}
-//		}
-//		if ( invalidVariables != null ) return (String[]) invalidVariables.toArray(new String[0]);
-//		else return null ;
-//	}
 	/**
 	 * Returns a list of invalid variable names, <br>
 	 * or null if all the names are valid.
 	 * @param variables
 	 * @return
 	 */
-	public final static List<String> getInvalidVariableNames(List<Variable> variables) // v 3.0.0  (use List)
+	public static final List<String> getInvalidVariableNames(List<Variable> variables) // v 3.0.0  (use List)
 	{
 		if ( variables == null ) return null ;
 		LinkedList<String> invalidVariableNames = null ; 
@@ -251,7 +217,7 @@ public class ContextNames {
 			if ( isReservedName(variableName) ) { // invalid
 				// add the variable name in the list
 				if ( invalidVariableNames == null ) {
-					invalidVariableNames = new LinkedList<String>();
+					invalidVariableNames = new LinkedList<>();
 				}
 				invalidVariableNames.add(variableName);
 			}

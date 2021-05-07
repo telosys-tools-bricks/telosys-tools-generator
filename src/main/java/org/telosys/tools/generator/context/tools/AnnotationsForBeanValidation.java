@@ -27,7 +27,7 @@ import org.telosys.tools.generator.context.AttributeInContext;
  */
 public class AnnotationsForBeanValidation
 {
-	private AttributeInContext _attribute = null ;
+	private final AttributeInContext attribute ;
 	
 	/**
 	 * Constructor 
@@ -35,22 +35,22 @@ public class AnnotationsForBeanValidation
 	 */
 	public AnnotationsForBeanValidation(AttributeInContext attribute) {
 		super();
-		this._attribute = attribute;
+		this.attribute = attribute;
 	}
 
 	/**
 	 * Returns the validation annotations based on the 'actual type' 
-	 * @param iLeftMargin
+	 * @param leftMargin
 	 * @return
 	 */
-	public String getValidationAnnotations( int iLeftMargin ) {
+	public String getValidationAnnotations( int leftMargin ) {
 		//--- Reset everything at each call 
-		AnnotationsBuilder annotations = new AnnotationsBuilder(iLeftMargin);
+		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
 
 		//--- Build Annotations 
-		if ( _attribute.isNotNull() ) {
+		if ( attribute.isNotNull() ) {
 			//--- Only if not a primitive type ( @NotNull is useless for a primitive type ) 
-			if ( JavaTypeUtil.isPrimitiveType( _attribute.getFullType() ) == false ) {
+			if ( ! JavaTypeUtil.isPrimitiveType( attribute.getFullType() )  ) {
 				annotations.addLine("@NotNull" );
 			}
 		}
@@ -69,7 +69,7 @@ public class AnnotationsForBeanValidation
 		AnnotationsBuilder annotations = new AnnotationsBuilder(iLeftMargin);
 
 		//--- Build annotations 
-		if ( _attribute.isNotNull() ) {
+		if ( attribute.isNotNull() ) {
 			annotations.addLine("@NotNull" ); // Wrapper type => don't care if primitive type 
 		}
 		addOtherAnnotations(annotations);
@@ -77,61 +77,13 @@ public class AnnotationsForBeanValidation
 		return annotations.getAnnotations() ;
 	}
 	
-//	/**
-//	 * Returns the validation annotations
-//	 * @param iLeftMargin
-//	 * @return
-//	 */
-//	public String getValidationAnnotations( int iLeftMargin ) {
-//		//--- Reset everything at each call 
-//		AnnotationsBuilder annotations = new AnnotationsBuilder(iLeftMargin);
-//
-//		String sJavaFullType = _attribute.getFullType() ;
-//		
-//		//--- Annotations for all categories 
-//		if ( ! JavaTypeUtil.isPrimitiveType(sJavaFullType) ) 
-//		{
-//			if ( _attribute.isNotNull() ) 
-//			{
-//				annotations.addLine("@NotNull" );
-//			}
-//		}
-//
-//		//--- Annotations for each type category 
-//		if ( JavaTypeUtil.isCategoryBoolean( sJavaFullType ) )
-//		{
-//			// Nothing to do !
-//		}
-//		else if ( JavaTypeUtil.isCategoryString( sJavaFullType ) )
-//		{
-//			annotationSize(annotations);
-//			annotationPattern(annotations);
-//		}
-//		else if ( JavaTypeUtil.isCategoryNumber( sJavaFullType ) )
-//		{
-//			annotationMin(annotations);
-//			annotationMax(annotations);
-//		}
-//		else if ( JavaTypeUtil.isCategoryDateOrTime( sJavaFullType ) )
-//		{
-//			if ( _attribute.hasDatePastValidation() ) {
-//				annotations.addLine("@Past" );
-//			}
-//			if ( _attribute.hasDateFutureValidation() ) {
-//				annotations.addLine("@Future" );
-//			}
-//		}
-//		
-//		return annotations.getAnnotations() ;
-//	}
-	
 	/**
 	 * Add all required annotations for the current attribute ( except '@NotNull' annotation ) 
 	 * @param annotations
 	 * @param sJavaFullType
 	 */
 	private void addOtherAnnotations(AnnotationsBuilder annotations ) {
-		String sJavaFullType = _attribute.getFullType() ;
+		String sJavaFullType = attribute.getFullType() ;
 		
 		//--- Annotations for each type category 
 		if ( JavaTypeUtil.isCategoryBoolean( sJavaFullType ) )
@@ -150,10 +102,10 @@ public class AnnotationsForBeanValidation
 		}
 		else if ( JavaTypeUtil.isCategoryDateOrTime( sJavaFullType ) )
 		{
-			if ( _attribute.hasDatePastValidation() ) {
+			if ( attribute.hasDatePastValidation() ) {
 				annotations.addLine("@Past" );
 			}
-			if ( _attribute.hasDateFutureValidation() ) {
+			if ( attribute.hasDateFutureValidation() ) {
 				annotations.addLine("@Future" );
 			}
 		}
@@ -161,55 +113,30 @@ public class AnnotationsForBeanValidation
 
 	private boolean hasSizeConstraint()
 	{
-		if ( ! StrUtil.nullOrVoid ( _attribute.getMinLength() ) ) return true ;
-		if ( ! StrUtil.nullOrVoid ( _attribute.getMaxLength() ) ) return true ;
-		if ( _attribute.isNotEmpty() ) return true ;
+		if ( ! StrUtil.nullOrVoid ( attribute.getMinLength() ) ) return true ;
+		if ( ! StrUtil.nullOrVoid ( attribute.getMaxLength() ) ) return true ;
+		if ( attribute.isNotEmpty() ) return true ;
 		return false ;
 	}
 	private String minSize()
 	{
-		if ( ! StrUtil.nullOrVoid ( _attribute.getMinLength() ) ) {
-			return _attribute.getMinLength().trim() ;
+		if ( ! StrUtil.nullOrVoid ( attribute.getMinLength() ) ) {
+			return attribute.getMinLength().trim() ;
 		}
-		if ( _attribute.isNotEmpty() ) {
+		if ( attribute.isNotEmpty() ) {
 			return "1" ; // min=1
 		}
 		return null ;
 	}
 	private String maxSize()
 	{
-		if ( ! StrUtil.nullOrVoid ( _attribute.getMaxLength() ) ) {
-			return _attribute.getMaxLength().trim() ;
+		if ( ! StrUtil.nullOrVoid ( attribute.getMaxLength() ) ) {
+			return attribute.getMaxLength().trim() ;
 		}
 		return null ;
 	}
 	
-	private void annotationSize(AnnotationsBuilder annotations)
-	{
-//		String min = null ;
-//		String max = null ;
-//		if ( ! StrUtil.nullOrVoid ( _attribute.getMaxLength() ) )
-//		{
-//			max = _attribute.getMaxLength().trim() ;
-//			if ( ! StrUtil.nullOrVoid ( _attribute.getMinLength() ) )
-//			{
-//				min = _attribute.getMinLength().trim() ;
-//				annotations.addLine("@Size( min = " + min + ", max = " + max + " )");
-//			}
-//			else
-//			{
-//				annotations.addLine("@Size( max = " + max + " )");
-//			}
-//		}
-//		else
-//		{
-//			if ( ! StrUtil.nullOrVoid ( _attribute.getMinLength() ) )
-//			{
-//				min = _attribute.getMinLength().trim() ;
-//				annotations.addLine("@Size( min = " + min + " )");
-//			}
-//		}
-		
+	private void annotationSize(AnnotationsBuilder annotations) {		
 		if ( hasSizeConstraint() ) {
 			String minSize = minSize();
 			String maxSize = maxSize();
@@ -225,20 +152,16 @@ public class AnnotationsForBeanValidation
 		}
 	}
 
-
-	private void annotationPattern(AnnotationsBuilder annotations)
-	{
-		if ( ! StrUtil.nullOrVoid ( _attribute.getPattern() ) )
-		{
-			annotations.addLine("@Pattern( regexp = \"" + _attribute.getPattern() + "\" )");
+	private void annotationPattern(AnnotationsBuilder annotations) {
+		if ( ! StrUtil.nullOrVoid ( attribute.getPattern() ) ) {
+			annotations.addLine("@Pattern( regexp = \"" + attribute.getPattern() + "\" )");
 		}
 	}
 	
-	private void annotationMin(AnnotationsBuilder annotations)
-	{
-		if ( ! StrUtil.nullOrVoid ( _attribute.getMinValue() ) )
+	private void annotationMin(AnnotationsBuilder annotations) {
+		if ( ! StrUtil.nullOrVoid ( attribute.getMinValue() ) )
 		{
-			String min = _attribute.getMinValue().trim() ;
+			String min = attribute.getMinValue().trim() ;
 			if ( min.indexOf('.') >=0 ) {
 				annotations.addLine("@DecimalMin( value = \"" + min + "\" )");
 			}
@@ -250,9 +173,9 @@ public class AnnotationsForBeanValidation
 	
 	private void annotationMax(AnnotationsBuilder annotations)
 	{
-		if ( ! StrUtil.nullOrVoid ( _attribute.getMaxValue() ) )
+		if ( ! StrUtil.nullOrVoid ( attribute.getMaxValue() ) )
 		{
-			String max = _attribute.getMaxValue().trim() ;
+			String max = attribute.getMaxValue().trim() ;
 			if ( max.indexOf('.') >=0 ) {
 				annotations.addLine("@DecimalMax( value = \"" + max + "\" )");
 			}
