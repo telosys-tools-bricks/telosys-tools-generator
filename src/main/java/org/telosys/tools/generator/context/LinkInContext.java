@@ -83,7 +83,9 @@ public class LinkInContext {
     private final BooleanValue  _insertable ; // Added in v 3.3.0
     private final BooleanValue  _updatable  ; // Added in v 3.3.0
 	
-	
+    private final boolean isTransient ; // Added in v 3.3.0
+    private final boolean isEmbedded ; // Added in v 3.3.0
+    
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -131,6 +133,8 @@ public class LinkInContext {
 		
 		_insertable = link.getInsertable();
 		_updatable  = link.getUpdatable();
+		this.isTransient = link.isTransient(); // v 3.3.0
+		this.isEmbedded  = link.isEmbedded(); // v 3.3.0
 	}
 	
 	/**
@@ -140,7 +144,7 @@ public class LinkInContext {
 	 * @return
 	 */
 	private String buildCollectionType(String className) {
-		// Before v 3.3.0 : return "List<" + className + ">" ; 
+		// Before v 3.3.0 always return "List<" + className + ">" ; 
 		// get collection type from current target language (added in v 3.3.0 )
 		TypeConverter typeConverter = _envInContext.getTypeConverter();
 		// get collection type for the current language 
@@ -274,7 +278,7 @@ public class LinkInContext {
 	)
 	public boolean hasJoinColumns() {
 		if ( _joinColumns != null ) {
-			return ( _joinColumns.size() > 0 ) ; 
+			return ! _joinColumns.isEmpty() ;
 		}
 		return false ;
 	}
@@ -755,17 +759,6 @@ public class LinkInContext {
 	//-------------------------------------------------------------------------------------
 	// "insertable" / "updatable"
 	//-------------------------------------------------------------------------------------
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns true if the 'insertable' flag is true"
-//			},
-//		since="3.3.0"
-//	)
-//    public boolean isInsertableTrue() {
-//        return this._insertable == BooleanValue.TRUE;
-//    }
-	//-------------------------------------------------------------------------------------
 	protected BooleanValue getInsertableFlag() {
 		return this._insertable;
 	}
@@ -799,26 +792,6 @@ public class LinkInContext {
         return this._insertable.getText();
     }
 	
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns true if the 'updatable' flag is true"
-//			},
-//		since="3.3.0"
-//	)
-//    public boolean isUpdatableTrue() {
-//        return this._updatable == BooleanValue.TRUE;
-//    }
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns true if the 'updatable' flag is false"
-//			},
-//		since="3.3.0"
-//	)
-//    public boolean isUpdatableFalse() {
-//        return this._updatable == BooleanValue.FALSE;
-//    }
 	//-------------------------------------------------------------------------------------
 	protected BooleanValue getUpdatableFlag() {
 		return this._updatable;
@@ -852,5 +825,27 @@ public class LinkInContext {
     public String getUpdatable() {
         return this._updatable.getText();
     }
+	
+	//------------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+			"Returns TRUE if the link is marked as 'embedded' "
+		},
+	since="3.3.0"
+	)
+	public boolean isEmbedded() {
+		return this.isEmbedded  ; // v 3.3.0
+	}
+
+	//------------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+			"Returns TRUE if the link is marked as 'transient' "
+		},
+	since="3.3.0"
+	)
+	public boolean isTransient() {
+		return this.isTransient  ; // v 3.3.0
+	}
 
 }

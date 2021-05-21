@@ -29,9 +29,9 @@ public class FakeEntity implements Entity {
 	private String className;
 	private String packageName;
 	
-	private List<Attribute> attributes = new ArrayList<Attribute>();
+	private List<Attribute> attributes = new ArrayList<>();
 	
-	private List<ForeignKey> databaseForeignKeys = new ArrayList<ForeignKey>();
+	private List<ForeignKey> databaseForeignKeys = new ArrayList<>();
 	
 	private String databaseTable;
 	private String databaseCatalog;
@@ -41,8 +41,7 @@ public class FakeEntity implements Entity {
 	
 	
 	private String fullName;
-	private List<Link> links = new ArrayList<Link>();
-//	private String _package;
+	private List<Link> links = new ArrayList<>();
 	private Boolean tableType;
 	private Boolean viewType;
 
@@ -118,12 +117,6 @@ public class FakeEntity implements Entity {
 	public void setLinks(List<Link> links) {
 		this.links = links;
 	}
-//	public String getPackage() {
-//		return _package;
-//	}
-//	public void setPackage(String _package) {
-//		this._package = _package;
-//	}
 	public Boolean isTableType() {
 		return tableType;
 	}
@@ -170,8 +163,8 @@ public class FakeEntity implements Entity {
 
 	@Override
 	public List<String> getWarnings() {
-		List<String> warnings = new LinkedList<String>() ;
-		if ( hasId() == false ) {
+		List<String> warnings = new LinkedList<>() ;
+		if ( ! hasId() ) {
 			warnings.add("No ID");
 		}
 		return warnings;

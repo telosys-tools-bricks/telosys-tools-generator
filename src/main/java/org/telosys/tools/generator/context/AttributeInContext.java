@@ -159,6 +159,8 @@ public class AttributeInContext {
     private final BooleanValue  _updatable  ; // Added in v 3.3.0
     
     private final String sqlType ; // Added in v 3.3.0
+
+    private final boolean isTransient ; // Added in v 3.3.0
 	
 	//-----------------------------------------------------------------------------------------------
 	/**
@@ -298,7 +300,8 @@ public class AttributeInContext {
 		
 		_insertable = attribute.getInsertable(); // v 3.3.0
 		_updatable  = attribute.getUpdatable();  // v 3.3.0
-		
+
+		isTransient  = attribute.isTransient();  // v 3.3.0
 	}
 
 	protected final LanguageType getLanguageType() {
@@ -1585,6 +1588,16 @@ public class AttributeInContext {
 			return this.sqlType;
 		}
     }
-
+	
+	//------------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+			"Returns TRUE if the attribute is marked as 'transient' "
+		},
+	since="3.3.0"
+	)
+	public boolean isTransient() {
+		return this.isTransient  ; // v 3.3.0
+	}
 
 }

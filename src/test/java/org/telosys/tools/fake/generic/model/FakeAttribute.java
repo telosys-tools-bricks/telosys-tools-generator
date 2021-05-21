@@ -79,20 +79,18 @@ public class FakeAttribute implements Attribute {
 	private boolean isDateFuture = false;
 	private boolean isDatePast = false;
 	
-	//private boolean isUsedInForeignKey = false;
 	// An attribute can be involved in many FK, it can be both in a SIMPLE FK and in a COMPOSITE FK 
 	private boolean isForeignKeySimple     = false ; // ( false by default )
 	private boolean isForeignKeyComposite  = false ; // ( always false in the DSL model )
 	private String  referencedEntityClassName = null ; // no reference by default
 
-
 	// Annotations added for types
 	private boolean isPrimitiveTypeExpected = false ;
 	private boolean isUnsignedTypeExpected = false ;
 	private boolean isObjectTypeExpected = false ;
-//	private boolean isSqlTypeExpected = false ;
 	
-	
+    private boolean isTransient = false ; // V 3.3.0
+    
 	/**
 	 * Constructor
 	 * @param name
@@ -215,17 +213,6 @@ public class FakeAttribute implements Attribute {
 		this.entity = entity;
 	}
 	
-	// Removed in v 3.0.0
-//	@Override
-//	public String getFullType() {
-////		return fullType;
-//		LanguageType languageType = typeConverter.getType(this);
-//		return languageType.getFullType();
-//	}
-//	public void setFullType(String fullType) {
-//		this.fullType = fullType;
-//	}
-
 	@Override
 	public String getGeneratedValueGenerator() {
 		return generatedValueGenerator;
@@ -348,20 +335,6 @@ public class FakeAttribute implements Attribute {
 		this.sequenceGeneratorSequenceName = sequenceGeneratorSequenceName;
 	}
 
-	// Removed in v 3.0.0
-//	@Override
-//	public String getSimpleType() {
-////		return simpleType;
-//		LanguageType languageType = typeConverter.getType(this);
-//		if ( languageType == null ) {			
-//			throw new EntityParserException("Invalid type '" + this.getNeutralType() + "'");
-//		}
-//		return languageType.getSimpleType();
-//	}
-//	public void setSimpleType(String simpleType) {
-//		this.simpleType = simpleType;
-//	}
-
 	@Override
 	public String getTableGeneratorName() {
 		return tableGeneratorName;
@@ -403,19 +376,6 @@ public class FakeAttribute implements Attribute {
 		this.tableGeneratorValueColumnName = tableGeneratorValueColumnName;
 	}
 	
-//	public String getType() {
-//		return type;
-//	}
-//	public void setType(String type) {
-//		this.type = type;
-//	}
-//	public String getWrapperType() {
-//		return wrapperType;
-//	}
-//	public void setWrapperType(String wrapperType) {
-//		this.wrapperType = wrapperType;
-//	}
-
 	@Override
 	public boolean hasSequenceGenerator() {
 		return hasSequenceGenerator;
@@ -536,15 +496,6 @@ public class FakeAttribute implements Attribute {
 		this.selected = selected;
 	}
 
-
-// Replaced by "isFK" in v 3.0.0
-//	@Override
-//	public boolean isUsedInForeignKey() {
-//		return isUsedInForeignKey;
-//	}
-//	public void setUsedInForeignKey(boolean isUsedInForeignKey) {
-//		this.isUsedInForeignKey = isUsedInForeignKey;
-//	}
 	@Override
 	public boolean isFK() {
 		return isForeignKeySimple || isForeignKeyComposite ;
@@ -558,10 +509,6 @@ public class FakeAttribute implements Attribute {
 		return isForeignKeySimple;
 	}
 
-// Never "Composite" in this model (DSL)
-//	public void setFKComposite(boolean flag) {
-//		_bForeignKeyComposite = flag ;
-//	}
 	@Override
 	public boolean isFKComposite() {
 		return isForeignKeyComposite; // Always FALSE (never "Composite" in a DSL model)
@@ -596,14 +543,6 @@ public class FakeAttribute implements Attribute {
 	public void setPrimitiveTypeExpected(boolean v) {
 		this.isPrimitiveTypeExpected = v ;
 	}
-	
-//	@Override
-//	public boolean isSqlTypeExpected() {
-//		return isSqlTypeExpected;
-//	}
-//	public void setSqlTypeExpected(boolean v) {
-//		this.isSqlTypeExpected = v ;
-//	}
 	
 	@Override
 	public boolean isUnsignedTypeExpected() {
@@ -650,6 +589,13 @@ public class FakeAttribute implements Attribute {
 	public BooleanValue getUpdatable() {
 		return BooleanValue.UNDEFINED;
 	}
-
+	
+    @Override
+    public boolean isTransient() { // v 3.3.0
+        return this.isTransient;
+    }
+    public void setTransient(boolean b) { // v 3.3.0
+        this.isTransient = b;
+    }
 	
 }
