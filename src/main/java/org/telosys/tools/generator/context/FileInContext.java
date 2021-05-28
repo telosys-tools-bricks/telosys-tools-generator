@@ -25,6 +25,7 @@ import java.util.List;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
+import org.telosys.tools.generator.context.exceptions.GeneratorFileException;
 import org.telosys.tools.generator.context.names.ContextName;
 
 //-------------------------------------------------------------------------------------
@@ -211,13 +212,14 @@ public class FileInContext {
 		},
 		since = "3.3.0"
 		)
-	public String getCanonicalPath() throws Exception {
+	public String getCanonicalPath() {
 		try {
 			return file.getCanonicalPath();
 		} catch (IOException e) {
 			// IOException possible because the construction of the canonical pathname 
 			// may require filesystem queries
-			throw e;
+			String msg = "IOException : " + e.getMessage() + " : " + file.getName();
+			throw new GeneratorFileException("getCanonicalPath", msg);			
 		}
 	}
 	
@@ -233,7 +235,7 @@ public class FileInContext {
 		},
 		since = "3.3.0"
 		)
-	public List<String> loadLines() throws Exception {
+	public List<String> loadLines() {
 		return readAllLines();
 	}
 	
@@ -249,7 +251,7 @@ public class FileInContext {
 		},
 		since = "3.3.0"
 		)
-	public List<String> loadLines(int numberOfLinesToIgnore) throws Exception {
+	public List<String> loadLines(int numberOfLinesToIgnore) {
 		List<String> allLines = readAllLines();
 		List<String> lines = new LinkedList<>();
 		int n = 0 ;
@@ -274,7 +276,7 @@ public class FileInContext {
 		},
 		since = "3.3.0"
 		)
-	public String loadContent() throws Exception {
+	public String loadContent() {
 		return linesToString(loadLines());
 	}
 	
@@ -290,7 +292,7 @@ public class FileInContext {
 		},
 		since = "3.3.0"
 		)
-	public String loadContent(int numberOfLinesToIgnore) throws Exception {
+	public String loadContent(int numberOfLinesToIgnore) {
 		return linesToString(loadLines(numberOfLinesToIgnore));
 	}
 	
@@ -312,7 +314,7 @@ public class FileInContext {
 		},
 		since = "3.3.0"
 		)
-	public List<List<String>> loadValues(String separator) throws Exception {
+	public List<List<String>> loadValues(String separator) {
 		List<String> lines = loadLines();
 		return splitLines(lines, separator);
 	}
@@ -337,7 +339,7 @@ public class FileInContext {
 		},
 		since = "3.3.0"
 		)
-	public List<List<String>> loadValues(String separator, int numberOfLinesToIgnore) throws Exception {
+	public List<List<String>> loadValues(String separator, int numberOfLinesToIgnore) {
 		List<String> lines = loadLines(numberOfLinesToIgnore);
 		return splitLines(lines, separator);
 	}
@@ -346,20 +348,23 @@ public class FileInContext {
 	// private methods
 	//----------------------------------------------------------------------------------------
 	
-	private List<String> readAllLines() throws Exception {
+	private List<String> readAllLines() {
+		final String functionName = "loadLines"; // called only by loadLines(..)
 		if ( ! file.exists() ) {
-			throw new Exception("Read file error (file not found) : " + file.getName());
+			String msg = "Read file error (file not found) : " + file.getName();
+			throw new GeneratorFileException(functionName, msg);
 		}
 		if ( ! file.isFile() ) {
-			throw new Exception("Read file error (not a file) : " + file.getName());
+			String msg = "Read file error (not a file) : " + file.getName();
+			throw new GeneratorFileException(functionName, msg);
 		}
 		try {
 			// Read all lines from a file.  
 			// Bytes from the file are decoded into characters using the UTF-8 charset.
 			return Files.readAllLines(file.toPath());
 		} catch (IOException e) {
-			throw new Exception("Read file error (IOException) : " 
-					+ e.getMessage() + " : " + file.getName());
+			String msg = "Read file error (IOException) : " + e.getMessage() + " : " + file.getName();
+			throw new GeneratorFileException(functionName, msg);
 		}
 	}
 	
@@ -372,7 +377,8 @@ public class FileInContext {
 		return sb.toString();
 	}
 	
-	private List<List<String>> splitLines(List<String> lines, String separator) throws Exception {
+	private List<List<String>> splitLines(List<String> lines, String separator) {
+		final String functionName = "loadValues"; // called only by loadValues(..)
 		char sepChar = 0;
 		if ( separator != null && separator.length() > 0 ) {
 			sepChar = separator.charAt(0);
@@ -384,7 +390,7 @@ public class FileInContext {
 			return linesOfValues;
 		}
 		else {
-			throw new Exception("Invalid separator '" + separator + "'");
+			throw new GeneratorFileException(functionName, "Invalid separator '" + separator + "'");
 		}
 	}
 	

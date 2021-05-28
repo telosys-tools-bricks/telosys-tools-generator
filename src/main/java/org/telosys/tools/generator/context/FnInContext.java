@@ -15,19 +15,21 @@
  */
 package org.telosys.tools.generator.context;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import org.telosys.tools.commons.FileUtil;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.XmlUtil;
+import org.telosys.tools.generator.GenerationCancellationException;
+import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
+import org.telosys.tools.generator.context.exceptions.GeneratorFunctionException;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.engine.GeneratorContext;
 
@@ -133,11 +135,12 @@ public class FnInContext {
 			},
 		parameters = { 
 			"s : the string to be processed",
-			"c : the character to be protected with a backslash" }
-			)
+			"c : the character to be protected with a backslash" 
+			}
+	)
 	public String backslash(String s, String c) {
 		if ( c.length() != 1 ) {
-			throw new IllegalArgumentException("Single character expected (c='" + c +"')");
+			throw new GeneratorFunctionException("backslash", "invalid arg 2 : single character expected ");
 		}
 		char c2 = c.charAt(0);
 		return StrUtil.backslash(s, c2);
@@ -347,79 +350,92 @@ public class FnInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 			text={	
-				"Returns TRUE if the given List/Array is NOT VOID"
+				"Returns TRUE if the given list/map/array is NOT VOID"
 				},
 			example={ 
 				"#if ( $fn.isNotVoid( $entity.attributes ) ) "
 				},
-			parameters = { 	"collection : List or Array" },
+			parameters = { 	"list/map/array" },
 			since = "2.0.7"
 				)
-	public boolean isNotVoid(Object o) throws Exception {
+	public boolean isNotVoid(Object o) {
 		return ! isVoid(o, "isNotVoid" ) ;
 	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 			text={	
-				"Returns TRUE if the given List/Array is VOID"
+				"Returns TRUE if the given list/map/array is VOID"
 				},
 			example={ 
 				"#if ( $fn.isVoid( $entity.attributes ) ) "
 				},
-			parameters = { 	"collection : List or Array" },
+			parameters = { 	"list/map/array" },
 			since = "2.0.7"
 				)
-	public boolean isVoid(Object o) throws Exception {
+	public boolean isVoid(Object o) { 
 		return isVoid(o, "isVoid" ) ;
 	}
 
 	//-------------------------------------------------------------------------------------
-	private boolean isVoid(Object o, String functionName ) throws Exception {
+	private boolean isVoid(Object o, String functionName ) {
 		if ( o != null ) {
-			if ( o instanceof List ) {
-				List<?> list = (List<?>) o ;
-				return list.isEmpty();
+			if ( o instanceof Collection ) {
+				return ((Collection<?>) o).isEmpty() ;
+			}
+			else if ( o instanceof Map ) {
+				return ((Map<?,?>) o).isEmpty() ;
 			}
 			else if ( o instanceof Object[] ) {
-				Object[] array = (Object[]) o ;
-				return array.length == 0 ;
+				return ((Object[]) o).length == 0;
 			}
 			else {
-				throw new Exception(functionName + " : list or array expected") ;
+				throw new GeneratorFunctionException(functionName, "invalid arg : list/map/array expected");
 			}
 		}
 		else {
-			throw new Exception(functionName + " : list or array is null") ;
+			throw new GeneratorFunctionException(functionName, "argument is null");
 		}
 	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 			text={	
-				"Returns the SIZE of the given List or Array"
+				"Returns the SIZE of the given list/map/array"
 				},
 			example={ 
 				"Number of attribute = $fn.size( $entity.attributes )  "
 				},
-			parameters = { 	"collection : List or Array" },
+			parameters = { 	"list/map/array" },
 			since = "2.0.7"
 				)
-	public int size(Object o) throws Exception {
-		final String functionName = "size" ;
+	public int size(Object o) { 
 		if ( o != null ) {
-			if ( o instanceof List ) {
-				return ((List<?>) o).size() ;
+			if ( o instanceof Collection ) {
+				return ((Collection<?>) o).size() ;
+			}
+			else if ( o instanceof Map ) {
+				return ((Map<?,?>) o).size() ;
 			}
 			else if ( o instanceof Object[] ) {
 				return ((Object[]) o).length ;
 			}
 			else {
-				throw new Exception(functionName + " : list or array expected") ;
+				throw new GeneratorFunctionException("size", "invalid arg : list/map/array expected");
 			}
 		}
 		else {
-			throw new Exception(functionName + " : list or array is null") ;
+			throw new GeneratorFunctionException("size", "argument is null");
+		}
+	}
+
+	//-------------------------------------------------------------------------------------
+	public String className(Object o) { 
+		if ( o != null ) {
+			return o.getClass().getCanonicalName();
+		}
+		else {
+			return "null";
 		}
 	}
 
@@ -859,134 +875,6 @@ public class FnInContext {
 	//-------------------------------------------------------------------------------------
 	// File management ( v 3.3.0 )
 	//-------------------------------------------------------------------------------------
-/***
-	@VelocityMethod(text={	
-			"Tests whether the file or directory denoted by the given path exists"
-			},
-			parameters = { 
-				"filePath : the file path (relative or absolute)",
-				"if the file path is relative the project location is used as root path "
-			},
-			example = {
-				"#if ( $fn.fileExists($filePath) )  ",
-				"#end"
-			},
-			since = "3.3.0"
-			)
-	public boolean fileExists(String filePath) throws Exception {
-		File file = getFileFromPath(filePath) ;
-		return file.exists();
-	}
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(text={	
-			"Tests whether the file denoted by the given path is a directory"
-			},
-			parameters = { 
-				"filePath : the file path (relative or absolute)",
-				"if the file path is relative the project location is used as root path "
-			},
-			example = {
-				"#if ( $fn.isDirectory($filePath) )  ",
-				"#end"
-			},
-			since = "3.3.0"
-			)
-	public boolean isDirectory(String filePath) throws Exception {
-		File file = getFileFromPath(filePath) ;
-		return file.isDirectory();
-	}
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(text={	
-			"Tests whether the file denoted by the given path is a normal file"
-			},
-			parameters = { 
-				"filePath : the file path (relative or absolute)",
-				"if the file path is relative the project location is used as root path "
-			},
-			example = {
-				"#if ( $fn.isFile($filePath) )  ",
-				"#end"
-			},
-			since = "3.3.0"
-			)
-	public boolean isFile(String filePath) throws Exception {
-		File file = getFileFromPath(filePath) ;
-		return file.isFile();
-	}
-	
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(text={	
-			"Loads the contents of a file and returns it in a string",
-			"The file is supposed to be a text file",
-			"Bytes from the file are decoded into characters using the UTF-8 charset"
-			},
-			parameters = { 
-				"filePath : the file path (relative or absolute)",
-				"if the file path is relative the project location is used as root path "
-			},
-			example = {
-				"## insert the file content at the current position : ",
-				"$fn.loadFile($filePath) ",
-				"## set the file content in a variable : ",
-				"#set( $json = $fn.loadFile($jsonFile) ) "
-			},
-			since = "3.3.0"
-			)
-	public String loadFile (String filePath) throws Exception {
-		File file = getFileFromPath(filePath) ;
-		return loadFileContent(file);
-	}
-	
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(text={	
-			"Loads the contents of a file from the current bundle and returns it in a string",
-			"The file is supposed to be a text file",
-			"Bytes from the file are decoded into characters using the UTF-8 charset"
-			},
-			parameters = { 
-				"filePath : the file path (relative path in current bundle directory)"
-			},
-			example = {
-				"## insert the file content at the current position : ",
-				"$fn.loadFileFromBundle('foo.txt') ",
-				"## set the file content in a variable : ",
-				"#set( $json = $fn.loadFileFromBundle($jsonFile) ) "
-			},
-			since = "3.3.0"
-			)
-	public String loadFileFromBundle(String filePath) throws Exception {
-		String dir = getBundleLocationFullPath();
-		String fullPath = FileUtil.buildFilePath(dir, filePath);
-		File file = new File(fullPath) ;
-		return loadFileContent(file);
-	}
-	
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(text={	
-			"Loads the contents of a file from the current model folder and returns it in a string",
-			"The file is supposed to be a text file",
-			"Bytes from the file are decoded into characters using the UTF-8 charset"
-			},
-			parameters = { 
-				"filePath : the file path (relative path in current model directory)"
-			},
-			example = {
-				"## insert the file content at the current position : ",
-				"$fn.loadFileFromModel('foo.txt') ",
-				"## set the file content in a variable : ",
-				"#set( $json = $fn.loadFileFromModel($jsonFile) ) "
-			},
-			since = "3.3.0"
-			)
-	public String loadFileFromModel(String filePath) throws Exception {
-		String dir = getModelLocationFullPath();
-		String fullPath = FileUtil.buildFilePath(dir, filePath);
-		File file = new File(fullPath) ;
-		return loadFileContent(file);
-	}
-***/
-	//-------------------------------------------------------------------------------------
-	//-------------------------------------------------------------------------------------
 	@VelocityMethod(text={	
 			"Returns a file object for the given file path"
 		},
@@ -1004,9 +892,9 @@ public class FnInContext {
 		},
 		since = "3.3.0"
 		)
-	public FileInContext file (String filePath) throws Exception {
-		File file = getFileFromPath(filePath) ;
-		return new FileInContext(file);
+	public FileInContext file (String filePath) {
+		FnFileUtil f = new FnFileUtil("file", generatorContext);
+		return f.file(filePath);
 	}
 	
 	@VelocityMethod(text={
@@ -1016,16 +904,14 @@ public class FnInContext {
 			"filePath : the file path (in the current bundle folder)"
 			},
 		example = {
-			"#set( $file = $fn.file('myfile.csv') )",
-			"#set( $file = $fn.file('dir/foo.txt') )"
+			"#set( $file = $fn.fileFromBundle('myfile.csv') )",
+			"#set( $file = $fn.fileFromBundle('dir/foo.txt') )"
 		},
 		since = "3.3.0"
 		)
-	public FileInContext fileFromBundle(String filePath) throws Exception {
-		String dir = getBundleLocationFullPath();
-		String fullPath = FileUtil.buildFilePath(dir, filePath);
-		File file = new File(fullPath) ;
-		return new FileInContext(file);
+	public FileInContext fileFromBundle(String filePath) {
+		FnFileUtil f = new FnFileUtil("fileFromBundle", generatorContext);
+		return f.fileFromBundle(filePath);
 	}
 
 	@VelocityMethod(text={
@@ -1035,115 +921,24 @@ public class FnInContext {
 			"filePath : the file path (in the current model folder)"
 			},
 		example = {
-			"#set( $file = $fn.file('myfile.csv') )",
-			"#set( $file = $fn.file('dir/foo.txt') )"
+			"#set( $file = $fn.fileFromModel('myfile.csv') )",
+			"#set( $file = $fn.fileFromModel('dir/foo.txt') )"
 		},
 		since = "3.3.0"
 		)
-	public FileInContext fileFromModel(String filePath) throws Exception {
-		String dir = getModelLocationFullPath();
-		String fullPath = FileUtil.buildFilePath(dir, filePath);
-		File file = new File(fullPath) ;
-		return new FileInContext(file);
+	public FileInContext fileFromModel(String filePath) {
+		FnFileUtil f = new FnFileUtil("fileFromModel", generatorContext);
+		return f.fileFromModel(filePath);
 	}
 
 	//-------------------------------------------------------------------------------------
+	// TEST / THROW EXCEPTION ( v 3.3.0 )
 	//-------------------------------------------------------------------------------------
-	/**
-	 * Returns a File for the given path, if path is relative the project location is used as root path 
-	 * @param filePath
-	 * @return
-	 * @throws Exception
-	 */
-	private File getFileFromPath(String filePath) throws Exception {
-		File file = new File(filePath) ;
-		if ( file.isAbsolute()) {
-			return file;
-		}
-		else {
-			String dir = getProjectLocationFullPath();
-			String fullPath = FileUtil.buildFilePath(dir, filePath);
-			return new File(fullPath) ;
-		}
+	public void cancelGeneration(String message) throws GenerationCancellationException {
+		throw new GenerationCancellationException(message);
 	}
-	
-	private ProjectInContext getProjectFromGeneratorContext() throws Exception {
-		Object o = generatorContext.get(ContextName.PROJECT);
-		if ( o != null ) {
-			return (ProjectInContext) o ;
-		}
-		else {
-			throw new Exception("Cannot found 'project' in generator context");
-		}
-	}
-	
-	private BundleInContext getBundleFromGeneratorContext() throws Exception {
-		Object o = generatorContext.get(ContextName.BUNDLE);
-		if ( o != null ) {
-			return (BundleInContext) o ;
-		}
-		else {
-			throw new Exception("Cannot found 'bundle' in generator context");
-		}
-	}
-	
-	private ModelInContext getModelFromGeneratorContext() throws Exception {
-		Object o = generatorContext.get(ContextName.MODEL);
-		if ( o != null ) {
-			return (ModelInContext) o ;
-		}
-		else {
-			throw new Exception("Cannot found 'model' in generator context");
-		}
-	}
-	
-	private String getProjectLocationFullPath() throws Exception {
-		ProjectInContext project = getProjectFromGeneratorContext() ;
-		return project.getLocationFullPath();
-	}
-	
-	private String getBundleLocationFullPath() throws Exception {
-		ProjectInContext project = getProjectFromGeneratorContext() ;
-		BundleInContext bundle = getBundleFromGeneratorContext() ;
-		return FileUtil.buildFilePath(project.getTemplatesFolderFullPath(), bundle.getName());
-	}
-	
-	private String getModelLocationFullPath() throws Exception {
-		ProjectInContext project = getProjectFromGeneratorContext() ;
-		String projectModelsFolderFullPath = project.getModelsFolderFullPath();
-		
-		ModelInContext model = getModelFromGeneratorContext() ;
-		String modelFolderName = model.getFolderName();
-		
-		if ( StrUtil.nullOrVoid(modelFolderName) ) {
-			return projectModelsFolderFullPath ;
-		}
-		else {
-			return FileUtil.buildFilePath(projectModelsFolderFullPath, modelFolderName);
-		}
+	public void throwGeneratorException(String message) throws GeneratorException{
+		throw new GeneratorException(message);
 	}
 
-	/***
-	private String loadFileContent (File file) throws Exception {
-		if ( ! file.exists() ) {
-			throw new Exception("Load file error (file not found) : " + file.getAbsolutePath());
-		}
-		if ( ! file.isFile() ) {
-			throw new Exception("Load file error (not a file) : " + file.getAbsolutePath());
-		}
-		try {
-			StringBuilder sb = new StringBuilder();
-			// Read all lines from a file.  
-			// Bytes from the file are decoded into characters using the UTF-8 charset.
-			List<String> lines = Files.readAllLines(file.toPath());
-			for ( String s : lines ) {
-				sb.append(s);
-				sb.append("\n");
-			}
-			return sb.toString();
-		} catch (IOException e) {
-			throw new Exception("Load file error (IOException) : " + file.getAbsolutePath());
-		}
-	}
-	***/
 }

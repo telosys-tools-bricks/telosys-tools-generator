@@ -42,7 +42,6 @@ import org.telosys.tools.generator.engine.events.InvalidReferenceException;
  */
 public class ErrorReport {
 
-//	private final String    errorType ;
 	private final String    errorMessage ;
 	private final Throwable exception ;
 	private final List<String> errorDetails ;
@@ -54,7 +53,6 @@ public class ErrorReport {
 	 */
 	public ErrorReport( String errorMessage) {
 		super();
-//		this.errorType = errorType != null ? errorType : "(no error type)";
 		this.errorMessage   = errorMessage != null ? errorMessage : "(no error message)";
 		this.exception = null;
 		this.errorDetails = null;
@@ -68,22 +66,12 @@ public class ErrorReport {
 	 */
 	public ErrorReport(Throwable exception, String templateName, String entityName) {
 		super();
-//		this.errorType = buildErrorType(exception) ;
 		this.errorMessage = buildErrorMessage(exception);
 		this.exception = exception; 
 		this.errorDetails = buildErrorDetails(exception, templateName, entityName);
 	}
 
 	//--------------------------------------------------------------------------------------
-//	/**
-//	 * Returns the error type (exception class name or type set specifically) <br>
-//	 * Never null
-//	 * @return
-//	 */
-//	public String getErrorType() {
-//		return errorType;
-//	}
-
 	/**
 	 * Returns the error message (exception message or message set specifically) <br>
 	 * Never null
@@ -110,26 +98,21 @@ public class ErrorReport {
 		return errorDetails;
 	}
 
-//	private String buildErrorType(Throwable exception) {
-//		return exception.getClass().getSimpleName();
-//	}
-
 	private String buildErrorMessage(Throwable exception) {
 		return exception.getMessage();
 	}
 	
 	private List<String> buildErrorDetails(Throwable exception, String templateName, String entityName) {
 		List<String> list = new LinkedList<>();
-		String s = buildTemplateAndEntity(list, templateName, entityName);
+		String s = buildTemplateAndEntity(templateName, entityName);
 		if ( s != null ) {
 			list.add(s);
 		}
-		//list.add("");
 		addAllExceptionsDetails(list, exception);
 		return list;
 	}
 	
-	private String buildTemplateAndEntity(List<String> list, String templateName, String entityName) {
+	private String buildTemplateAndEntity(String templateName, String entityName) {
 		if ( templateName != null || entityName != null ) {
 			StringBuilder sb = new StringBuilder();
 			if ( templateName != null ) {
@@ -147,15 +130,28 @@ public class ErrorReport {
 	}
 	
 	private void addAllExceptionsDetails(List<String> list, Throwable exception) {
+		// Dive in exceptions stack ...
 		Throwable e = exception;
 		while ( e != null ) {
 			// Exception name 
 			list.add("-> " +  e.getClass().getCanonicalName() + " : " ) ;
 			// Exception message
-			list.add(e.getMessage() ) ;
+			addExceptionMessage(list, e);
 			// Exception details if any
 			addExceptionDetails(list, e);
 			e = e.getCause() ;
+		}
+	}
+	
+	/**
+	 * Add exception message if usefull 
+	 * @param list
+	 * @param exception
+	 */
+	private void addExceptionMessage(List<String> list, Throwable exception) {
+		if ( ! ( exception instanceof MethodInvocationException ) ) {
+			// No message for Velocity MethodInvocationException (message useless and too long)
+			list.add(exception.getMessage() ) ;
 		}
 	}
 	
@@ -179,7 +175,7 @@ public class ErrorReport {
 			// nothing special
 		}
 		else if ( exception instanceof InvalidReferenceException ) {
-			addTelosysInvalidReferenceException(list, (InvalidReferenceException) exception);
+			// no more information (message is explicit enough)
 		}
 		//--- Velocity exceptions
 		else if ( exception instanceof ParseException ) { // Velocity Checked Exceptions
@@ -188,11 +184,6 @@ public class ErrorReport {
 		else if ( exception instanceof VelocityException ) { // Velocity Runtime Exceptions
 			addVelocityException(list, (VelocityException) exception);
 		}
-//		else if ( exception instanceof RuntimeException ) { // Telosys Runtime Exceptions
-//			RuntimeException runtimeException = (RuntimeException) exception ;
-//			String msg = processRuntimeException(runtimeException, templateName, entityName);
-//			return new ErrorReport( "Generator error (RuntimeException)", msg, runtimeException);
-//		}
 	}
 
 	//---------------------------------------------------------------------------------------------
@@ -219,12 +210,6 @@ public class ErrorReport {
 	private void addTelosysDirectiveException(List<String> list, DirectiveException e) {
 		list.add("Directive error : '#" + e.getDirectiveName() + "'");
 		list.add(inTemplate(e.getTemplateName(), e.getLineNumber(), -1 ));
-	}
-
-	private void addTelosysInvalidReferenceException(List<String> list, InvalidReferenceException e) {
-		// useless (message is explicit enough)
-//		list.add("Invalid reference (object/attribute/method doesn't exist)");
-//		list.add(inTemplate(e.getTemplateName(), e.getLineNumber(), -1 ));
 	}
 
 	/**
@@ -294,8 +279,9 @@ public class ErrorReport {
 			list.add("Velocity method invocation error");
 			MethodInvocationException e = (MethodInvocationException) velocityException ;
 			list.add(inTemplate(e.getTemplateName(), e.getLineNumber(), e.getColumnNumber() ));
-			list.add(" reference name : '" + e.getReferenceName() + "'" );
-			list.add(" method name : '" + e.getMethodName() + "'" );
+			list.add(" '" + e.getReferenceName() + "." + e.getMethodName() +  "()' "); 
+			list.add(" ( reference name : '" + e.getReferenceName() + "'" 
+					+ " method name : '" + e.getMethodName() + "' )" );
 		}
 		else if ( velocityException instanceof ParseErrorException ) {
 			/*
@@ -352,12 +338,20 @@ public class ErrorReport {
 	private String inTemplate(String templateName, int lineNumber, int columnNumber) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("in template '").append(templateName).append("'");
-		if ( lineNumber > -1 ) {
-			sb.append(" line ").append(lineNumber);
+		if ( lineNumber > -1 || columnNumber > -1) {
+			sb.append(" [ " );
+			if ( lineNumber > -1 ) {
+				sb.append("line ").append(lineNumber);
+			}
+			if ( lineNumber > -1 && columnNumber > -1) {
+				sb.append(", " );
+			}
+			if ( columnNumber > -1 ) {
+				sb.append("column ").append(columnNumber);
+			}
+			sb.append(" ]" );
 		}
-		if ( columnNumber > -1 ) {
-			sb.append(" column ").append(columnNumber);
-		}
+		
 		return sb.toString();
 	}
 }
