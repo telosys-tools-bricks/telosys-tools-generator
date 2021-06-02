@@ -15,8 +15,6 @@
  */
 package org.telosys.tools.generator.task;
 
-import org.telosys.tools.generator.task.ITaskMonitor;
-
 /**
  * Default ITaskMonitor implementation
  * 
@@ -33,10 +31,12 @@ public class DefaultTaskMonitor implements ITaskMonitor {
 
 	@Override
 	public void beginTask(String arg0, int arg1) {
+		// Nothing to do 
 	}
 
 	@Override
 	public void done() {
+		// Nothing to do 
 	}
 
 	@Override
@@ -51,14 +51,17 @@ public class DefaultTaskMonitor implements ITaskMonitor {
 
 	@Override
 	public void setTaskName(String arg0) {
+		// Nothing to do 
 	}
 
 	@Override
 	public void subTask(String arg0) {
+		// Nothing to do 
 	}
 
 	@Override
 	public void worked(int arg0) {
+		// Nothing to do 
 	}
 
 }

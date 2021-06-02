@@ -43,21 +43,20 @@ import org.telosys.tools.generic.model.Model;
  */
 public abstract class AbstractGenerationTask
 {
-	private final static String ENTITY_NONE = "(no entity)" ;
-	private final static String NO_TEMPLATE = "(no template)" ;
+	private static final String ENTITY_NONE = "(no entity)" ;
+	private static final String NO_TEMPLATE = "(no template)" ;
 	
-	private final List<String>            _selectedEntities ;
-	private final List<TargetDefinition>  _selectedTargets ;
-	private final List<TargetDefinition>  _resourcesTargets ;
-	private final Model                   _model ;
-	private final TelosysToolsCfg         _telosysToolsCfg ; // v 3.0.0
-	private final String                  _bundleName ;
-	private final TelosysToolsLogger      _logger ;
+	private final List<String>            selectedEntities ;
+	private final List<TargetDefinition>  selectedTargets ;
+	private final List<TargetDefinition>  resourcesTargets ;
+	private final Model                   model ;
+	private final TelosysToolsCfg         telosysToolsCfg ;
+	private final String                  bundleName ;
+	private final TelosysToolsLogger      logger ;
+	private final GenerationTaskResult    genTaskResult  ;
 	
-	private Target                _currentTarget = null ;
-	
-	private final GenerationTaskResult  _result  ;
-	
+	private Target                currentTarget = null ;
+
 	//--------------------------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -70,7 +69,7 @@ public abstract class AbstractGenerationTask
 	 * @param logger
 	 * @throws TelosysToolsException
 	 */
-	public AbstractGenerationTask(
+	protected AbstractGenerationTask(
 			Model                     model,
 			List<String>              selectedEntities, 
 			String                    bundleName, // v 3.0.0
@@ -90,16 +89,16 @@ public abstract class AbstractGenerationTask
 		if ( telosysToolsCfg  == null ) throw new TelosysToolsException("TelosysToolsCfg param is null ");
 		if ( logger  == null )  throw new TelosysToolsException("logger param is null ");
 
-		_model            = model;
-		_selectedEntities = selectedEntities ;
-		_selectedTargets  = selectedTargets ;
-		_resourcesTargets = resourcesTargets ; // can be null
-		_telosysToolsCfg  = telosysToolsCfg ; // v 3.0.0
-		_bundleName       = bundleName ;  // v 3.0.0
-		_logger           = logger ;
+		this.model            = model;
+		this.selectedEntities = selectedEntities ;
+		this.selectedTargets  = selectedTargets ;
+		this.resourcesTargets = resourcesTargets ; // can be null
+		this.telosysToolsCfg  = telosysToolsCfg ; // v 3.0.0
+		this.bundleName       = bundleName ;  // v 3.0.0
+		this.logger           = logger ;
 		
-		_logger.log(this, "Task created");
-		_result = new GenerationTaskResult();
+		this.logger.log(this, "Task created");
+		this.genTaskResult = new GenerationTaskResult();
 	}
 	
 	//--------------------------------------------------------------------------------------------------
@@ -122,13 +121,13 @@ public abstract class AbstractGenerationTask
 	
 	//--------------------------------------------------------------------------------------------------
 	protected void log(String msg) {
-		if ( _logger != null ) {
-			_logger.log(this, msg);
+		if ( logger != null ) {
+			logger.log(this, msg);
 		}
 	}
 	
 	private Variable[] getAllProjectVariables() {
-		return _telosysToolsCfg.getAllVariables() ;
+		return telosysToolsCfg.getAllVariables() ;
 	}
 	
 	/**
@@ -159,12 +158,12 @@ public abstract class AbstractGenerationTask
 	 */
 	private void copyResourcesIfAny(OverwriteChooser overwriteChooser, CopyHandler copyHandler) 
 			throws InterruptedException { 
-		_logger.info("----- Copy static resources if any " );
-		List<TargetDefinition> resourcesTargetsDefinitions = this._resourcesTargets ;
+		logger.info("----- Copy static resources if any " );
+		List<TargetDefinition> resourcesTargetsDefinitions = this.resourcesTargets ;
 		if ( resourcesTargetsDefinitions != null ) {
-			_logger.log(this, "run : copy resources " );
+			logger.log(this, "run : copy resources " );
 			
-			BundleResourcesManager resourcesManager = new BundleResourcesManager( _telosysToolsCfg, _bundleName, _logger);
+			BundleResourcesManager resourcesManager = new BundleResourcesManager( telosysToolsCfg, bundleName, logger);
 			int numberOfResourcesCopied = 0 ;
 			try {
 				numberOfResourcesCopied = resourcesManager.copyTargetsResourcesInProject(
@@ -174,12 +173,12 @@ public abstract class AbstractGenerationTask
 				ErrorReport errorReport = new ErrorReport(e, null, null); // v 3.3.0
 				manageError(errorReport); // throws InterruptedException if 'canceled'
 			}
-			_result.setNumberOfResourcesCopied(numberOfResourcesCopied);
-			_logger.info(numberOfResourcesCopied + " resource(s) copied" );
+			genTaskResult.setNumberOfResourcesCopied(numberOfResourcesCopied);
+			logger.info(numberOfResourcesCopied + " resource(s) copied" );
 		}
 		else {
-			_logger.log(this, "run : no resources to copy" );
-			_logger.info("No resources to copy" );
+			logger.log(this, "run : no resources to copy" );
+			logger.info("No resources to copy" );
 		}
 	}
 	
@@ -196,7 +195,7 @@ public abstract class AbstractGenerationTask
 		//--- Separate targets in 2 list : "ONCE" and "ENTITY"
 		List<TargetDefinition> onceTargets   = new LinkedList<>() ; 
 		List<TargetDefinition> entityTargets = new LinkedList<>() ; 
-		for ( TargetDefinition targetDefinition : _selectedTargets ) {
+		for ( TargetDefinition targetDefinition : selectedTargets ) {
 			if ( targetDefinition.isOnce() ) {
 				onceTargets.add(targetDefinition); 
 			}
@@ -206,16 +205,15 @@ public abstract class AbstractGenerationTask
 		}
 		
 		//--- Number of generations expected
-		int totalWorkTasks = ( _selectedEntities.size() * entityTargets.size() ) + onceTargets.size() ;
+		int totalWorkTasks = ( selectedEntities.size() * entityTargets.size() ) + onceTargets.size() ;
 
 		progressMonitor.beginTask("Generation in progress", totalWorkTasks ); 
 				
 		//--- For each entity
-		for ( String entityName : _selectedEntities ) {
+		for ( String entityName : selectedEntities ) {
 			
-			//_logger.log(this, "run : entity " + entityName );
-			_logger.info("----- Generation for entity " + entityName );
-			Entity entity = _model.getEntityByClassName(entityName);
+			logger.info("----- Generation for entity " + entityName );
+			Entity entity = model.getEntityByClassName(entityName);
 			if ( entity != null ) {
 				//--- For each "entity target" 
 				for ( TargetDefinition targetDefinition : entityTargets ) {
@@ -223,25 +221,25 @@ public abstract class AbstractGenerationTask
 					//--- Get a specialized target for the current entity
 					Target target = new Target( targetDefinition, entity, variables ); // v 3.0.0
 					
-					generateTarget(progressMonitor, target, _selectedEntities); // throws InterruptedException if error + 'cancel'
+					generateTarget(progressMonitor, target, selectedEntities); // throws InterruptedException if error + 'cancel'
 				}
 				//--- One TARGET done 
 			}
 			else {
 				String msg = "Generation error : entity '" + entityName + "' not found in the repository";
 				ErrorReport errorReport = new ErrorReport(msg);
-				_logger.error("Entity '" + entityName + "' not found in the repository") ;
+				logger.error("Entity '" + entityName + "' not found in the repository") ;
 				manageError(errorReport); // throws InterruptedException if 'canceled'
 			}
 			//--- One ENTITY done
 		} // end of "For each entity"
 		
 		//--- Finally, generate the "ONCE" targets ( NEW in version 2.0.3 / Feb 2013 )
-		_logger.info("----- Generation without entity" );
+		logger.info("----- Generation without entity" );
 		for ( TargetDefinition targetDefinition : onceTargets ) {
 			//--- Target without current entity
 			Target target = new Target( targetDefinition, variables ); // v 3.0.0
-			generateTarget(progressMonitor, target, _selectedEntities);  // throws InterruptedException if error + 'cancel'
+			generateTarget(progressMonitor, target, selectedEntities);  // throws InterruptedException if error + 'cancel'
 		}
 		
 		//--- Notifies that the work is done; that is, either the main task is completed or the user canceled it.
@@ -264,34 +262,34 @@ public abstract class AbstractGenerationTask
 	private void generateTarget(ITaskMonitor progressMonitor, Target target, List<String> selectedEntitiesNames) 
 			throws InterruptedException
 	{
-		_logger.log(this, "Generate TARGET : entity name '" + target.getEntityName() + "' - target file '" + target.getFile() + "' ");
+		logger.log(this, "Generate TARGET : entity name '" + target.getEntityName() + "' - target file '" + target.getFile() + "' ");
 		
-		_currentTarget = target ;
+		currentTarget = target ;
 		
 		progressMonitor.subTask("Entity '" + target.getEntityName() + "' : target file '" + target.getFile() + "' ");
 		
 		//--- Possible multiple generated targets for one main target (with embedded generator)
-		LinkedList<Target> generatedTargets = new LinkedList<Target>();
+		LinkedList<Target> generatedTargets = new LinkedList<>();
 		
-		Generator generator = new Generator( _telosysToolsCfg, _bundleName, _logger); // v 3.0.0
+		Generator generator = new Generator( telosysToolsCfg, bundleName, logger); // v 3.0.0
 		try {
-			generator.generateTarget(target, _model, selectedEntitiesNames, generatedTargets);
+			generator.generateTarget(target, model, selectedEntitiesNames, generatedTargets);
 		} catch (GeneratorException e) {
-			_result.addGenerationError(target);
+			genTaskResult.addGenerationError(target);
 			ErrorReport errorReport = buildErrorReportForGeneratorException(e);
 			manageError(errorReport); // throws InterruptedException if 'canceled'
 		}
 
 		//--- After normal end of generation : refresh the generated files and update count
 		for ( Target generatedTarget : generatedTargets ) {
-			_logger.log(this, "generated target : " + generatedTarget.getFile() );
+			logger.log(this, "generated target : " + generatedTarget.getFile() );
 
-			String generatedFileAbsolutePath = generatedTarget.getOutputFileNameInFileSystem(_telosysToolsCfg.getDestinationFolderAbsolutePath());
+			String generatedFileAbsolutePath = generatedTarget.getOutputFileNameInFileSystem(telosysToolsCfg.getDestinationFolderAbsolutePath());
 			
 			//--- One more file : increment result count
-			_result.incrementNumberOfFilesGenerated();
+			genTaskResult.incrementNumberOfFilesGenerated();
 
-			_logger.log(this, "Call afterFileGeneration(" + generatedFileAbsolutePath + ")...");
+			logger.log(this, "Call afterFileGeneration(" + generatedFileAbsolutePath + ")...");
 			afterFileGeneration(generatedTarget, generatedFileAbsolutePath); // Abstract method
 		}
 		
@@ -308,8 +306,8 @@ public abstract class AbstractGenerationTask
 	 * @return
 	 */
 	private String getCurrentEntityName() {
-		if ( _currentTarget == null ) return ENTITY_NONE ;
-		String entityName = _currentTarget.getEntityName() ;
+		if ( currentTarget == null ) return ENTITY_NONE ;
+		String entityName = currentTarget.getEntityName() ;
 		if ( entityName == null ) {
 			return ENTITY_NONE ;
 		}
@@ -327,8 +325,8 @@ public abstract class AbstractGenerationTask
 	 * @return
 	 */
 	private String getCurrentTemplateName() {
-		if ( _currentTarget == null ) return NO_TEMPLATE ;
-		return _currentTarget.getTemplate() ;
+		if ( currentTarget == null ) return NO_TEMPLATE ;
+		return currentTarget.getTemplate() ;
 	}
 	
 	//--------------------------------------------------------------------------------------------------
@@ -337,7 +335,7 @@ public abstract class AbstractGenerationTask
 	 * @return
 	 */
 	protected GenerationTaskResult getResult() {
-		return _result != null ? _result : new GenerationTaskResult() ;
+		return genTaskResult != null ? genTaskResult : new GenerationTaskResult() ;
 	}
 	
 	//--------------------------------------------------------------------------------------------------
@@ -349,11 +347,11 @@ public abstract class AbstractGenerationTask
 	 * @throws InterruptedException 
 	 */
 	private void manageError( ErrorReport errorReport ) throws InterruptedException {
-		_result.addError(errorReport);
+		genTaskResult.addError(errorReport);
 		//--- Open the dialog box (the user can choose to continue or to cancel)
 		boolean continueTask = onError(errorReport);
 		//--- If 'cancel' : throw InterruptedException
-		if ( continueTask == false ) {
+		if ( ! continueTask ) {
 			throw new InterruptedException("Generation task cancelled");
 		}
 	}
@@ -370,7 +368,7 @@ public abstract class AbstractGenerationTask
 		String templateName = this.getCurrentTemplateName();	
 		//ErrorReport errorReport = ErrorProcessor.buildErrorReport(exception, entityName, templateName); // v 3.0.0
 		ErrorReport errorReport = new ErrorReport(exception, templateName, entityName); // v 3.3.0
-		_result.addError(errorReport);
+		genTaskResult.addError(errorReport);
 		return errorReport ;
 	}
 	//--------------------------------------------------------------------------------------------------

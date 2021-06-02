@@ -27,8 +27,6 @@ public interface ITaskMonitor {
 	  
 	  public abstract void done();
 	  
-	  //public abstract void internalWorked(double arg0);
-	  
 	  public abstract boolean isCanceled();
 	  
 	  public abstract void setCanceled(boolean arg0);
