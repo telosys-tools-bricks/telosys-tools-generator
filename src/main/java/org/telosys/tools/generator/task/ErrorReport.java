@@ -30,7 +30,6 @@ import org.apache.velocity.runtime.parser.ParseException;
 import org.apache.velocity.runtime.parser.TemplateParseException;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.GeneratorContextException;
-import org.telosys.tools.generator.engine.GeneratorEngineException;
 import org.telosys.tools.generator.engine.directive.DirectiveException;
 import org.telosys.tools.generator.engine.events.InvalidReferenceException;
 
@@ -171,9 +170,9 @@ public class ErrorReport {
 		else if ( exception instanceof GeneratorException ) { // Telosys Generator Exception (without cause)
 			// nothing special
 		}
-		else if ( exception instanceof GeneratorEngineException ) { // Telosys GeneratorEngineException
-			// nothing special
-		}
+//		else if ( exception instanceof GeneratorEngineException ) { // Telosys GeneratorEngineException
+//			// nothing special
+//		}
 		else if ( exception instanceof InvalidReferenceException ) {
 			// no more information (message is explicit enough)
 		}

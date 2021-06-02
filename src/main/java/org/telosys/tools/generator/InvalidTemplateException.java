@@ -16,38 +16,21 @@
 package org.telosys.tools.generator;
 
 /**
- * Exception thrown if an error occurs when using the Generator
+ * Exception thrown when the template is invalid
  * 
  * @author Laurent GUERIN
+ * @since  3.3.0
  * 
  */
-public class GeneratorException extends Exception 
+public class InvalidTemplateException extends RuntimeException 
 {
 	private static final long serialVersionUID = 1L;
-
-	/**
-     * Constructor
-     * @param message
+	
+    /**
+     * @param cause
      */
-    public GeneratorException(String message) {
+    public InvalidTemplateException(String message) {
         super(message);
     }
 
-    /**
-     * Constructor
-     * @param message
-     * @param cause
-     */
-    public GeneratorException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-//    /**
-//     * Constructor 
-//     * Transforms a GeneratorEngineException to GeneratorException
-//     * @param engineException
-//     */
-//    public GeneratorException(GeneratorEngineException engineException) {
-//        super(engineException.getMessage(), engineException.getCause());
-//    }
 }

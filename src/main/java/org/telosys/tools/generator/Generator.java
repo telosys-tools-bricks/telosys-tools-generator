@@ -31,8 +31,8 @@ import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generator.engine.GeneratorContext;
 import org.telosys.tools.generator.engine.GeneratorEngine;
-import org.telosys.tools.generator.engine.GeneratorEngineException;
 import org.telosys.tools.generator.engine.GeneratorTemplate;
+import org.telosys.tools.generator.engine.directive.CancelDirectiveException;
 import org.telosys.tools.generic.model.Model;
 
 /**
@@ -78,7 +78,7 @@ public class Generator {
 	//========================================================================
 	// TEMPLATE MANAGEMENT
 	//========================================================================
-	private GeneratorTemplate loadTemplate(Target target) throws GeneratorException {
+	private GeneratorTemplate loadTemplate(Target target) { //throws GeneratorException {
 		
 		String templateFileName  = target.getTemplate();
 		String templateDirectory = telosysToolsCfg.getTemplatesFolderAbsolutePath(); // v 3.0.0
@@ -93,20 +93,20 @@ public class Generator {
 		return new GeneratorTemplate(bundleFolderAbsolutePath, templateFileName) ;
 	}
 	
-	private File checkTemplate(String sTemplateDirectory, String sTemplateFileName) throws GeneratorException {
+	private File checkTemplate(String sTemplateDirectory, String sTemplateFileName) { // throws GeneratorException {
 		if (sTemplateDirectory == null) {
-			throw new GeneratorException("Template directory is null !");
+			throw new InvalidTemplateException("Template directory is null !");
 		}
 		if (sTemplateFileName == null) {
-			throw new GeneratorException("Template file name is null !");
+			throw new InvalidTemplateException("Template file name is null !");
 		}
 		File dir = new File(sTemplateDirectory);
 		if (!dir.exists()) {
-			throw new GeneratorException("Template directory '"
+			throw new InvalidTemplateException("Template directory '"
 					+ sTemplateDirectory + "' doesn't exist !");
 		}
 		if (!dir.isDirectory()) {
-			throw new GeneratorException("Template directory '"
+			throw new InvalidTemplateException("Template directory '"
 					+ sTemplateDirectory + "' is not a directory !");
 		}
 
@@ -121,10 +121,10 @@ public class Generator {
 		//--- Check template file existence 
 		File file = new File(sTemplateFullPath);
 		if (!file.exists()) {
-			throw new GeneratorException("Template file '" + sTemplateFullPath + "' doesn't exist !");
+			throw new InvalidTemplateException("Template file '" + sTemplateFullPath + "' doesn't exist !");
 		}
 		if (!file.isFile()) {
-			throw new GeneratorException("Template file '" + sTemplateFullPath + "' is not a file !");
+			throw new InvalidTemplateException("Template file '" + sTemplateFullPath + "' is not a file !");
 		}
 		return file ;
 	}
@@ -134,7 +134,7 @@ public class Generator {
 	 * @return
 	 * @throws GeneratorException
 	 */
-	private InputStream generateInMemory(Target target, GeneratorContext generatorContext) throws GeneratorException
+	private InputStream generateInMemory(Target target, GeneratorContext generatorContext) //throws GeneratorException
 	{
 		log("generateInMemory()...");
 		
@@ -152,11 +152,12 @@ public class Generator {
 			//--- Create a new GENERATOR ENGINE
 			GeneratorEngine generatorEngine = new GeneratorEngine();
 			//--- GENERATION 
-			try {
-				result = generatorEngine.generate(generatorTemplate, generatorContext );
-			} catch (GeneratorEngineException generatorEngineException) {
-				throw new GeneratorException(generatorEngineException);
-			}
+//			try {
+//				result = generatorEngine.generate(generatorTemplate, generatorContext );
+//			} catch (GeneratorEngineException generatorEngineException) {
+//				throw new GeneratorException(generatorEngineException);
+//			}
+			result = generatorEngine.generate(generatorTemplate, generatorContext );
 			//------------------------------------------------------------------
 		}
 		finally {
@@ -202,27 +203,39 @@ public class Generator {
 				generatedTargets);
 
 		//---------- ((( GENERATION ))) 
-		InputStream is;
+		CancelDirectiveException cancelException = null ;
+		InputStream is = null;
 		try {
 			is = generateInMemory(target, generatorContext);
-		} catch (Exception e) {
-			//_logger.error( ExceptionUtil.getStackTraceAsString(e) ); // Useless : "ASTMethod.handleInvocationException"
+			logger.log("Generation OK (no exception)");
+		} catch (CancelDirectiveException e) {
+			// generation has been canceled with #cancel directive
+			logger.log("catch(CancelDirectiveException) ");
+			cancelException = e ;
+		} catch (Exception e) { // All exceptions 
+			logger.log("catch(Exception) ");
 			String msg = "Entity '" + target.getEntityName() + "' - Template '" + target.getTemplate() + "'" ;
 			logger.error(msg);
 			logger.error(e.getMessage());
 			throw new GeneratorException(msg + " : " + e.getMessage(), e);
 		} // Generate the target in memory
-		logger.log("Generation OK.");
 
-		//---------- Save the result in the file
-		String outputFileName = target.getOutputFileNameInFileSystem( telosysToolsCfg.getDestinationFolderAbsolutePath() ); // v 3.0.0
-		logger.log("Saving target file : " + outputFileName );
-		saveStreamInFile(is, outputFileName, true );
-		logger.info("OK :  " + target.getOutputFileNameInProject() );
-		
-		//---------- Add the generated target in the list if any
-		if ( generatedTargets != null ) {
-			generatedTargets.add(target);
+		if ( cancelException != null ) {
+			//--- GENERATION CANCELED 
+			logger.info("CANCELED : " + cancelException.getMessage() );
+		}
+		else {
+			//--- GENERATION OK : Save generation result in the destiantion file
+			String outputFileName = target.getOutputFileNameInFileSystem( 
+					telosysToolsCfg.getDestinationFolderAbsolutePath() ); // v 3.0.0
+			logger.log("Saving target file : " + outputFileName );
+			saveStreamInFile(is, outputFileName, true );
+			logger.info("OK :  " + target.getOutputFileNameInProject() );
+			
+			//--- Add the generated target in the list if any
+			if ( generatedTargets != null ) {
+				generatedTargets.add(target);
+			}
 		}
 	}
 	
