@@ -1,0 +1,15 @@
+
+Generation date/time : $now.date  $now.time
+
+Entity name : "${entity.name}" 
+
+Test UTF-8 :  à é ê è 
+
+
+Attributes :
+#foreach( $attrib in $entity.attributes )
+- name : $attrib.name
+  . type : $attrib.type
+  . databaseName : $attrib.databaseName
+  . databaseType : $attrib.databaseType
+#end

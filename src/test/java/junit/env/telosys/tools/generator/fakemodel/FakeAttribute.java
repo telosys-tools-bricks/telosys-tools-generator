@@ -15,7 +15,6 @@
  */
 package junit.env.telosys.tools.generator.fakemodel;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,18 +27,12 @@ import org.telosys.tools.generic.model.DateType;
 import org.telosys.tools.generic.model.ForeignKeyPart;
 
 /**
- * Column of a table/entity in the Repository Model <br>
- * 
- * A column contains the database informations and the mapped Java attribute
- * informations
+ * Fake attribute for fake entity <br>
  * 
  * @author Laurent Guerin
  *
  */
-public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, Serializable, Attribute {
-	private static final long serialVersionUID = 1L;
-
-	public final static String SPECIAL_LONG_TEXT_TRUE = "true";
+public class FakeAttribute implements Attribute {
 
 	// ----- DATABASE -----
 
@@ -115,11 +108,17 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 
 	private boolean isTransient = false; // v 3.3.0
 
-	// -----------------------------------------------------------------------------
-	public AttributeInFakeModel(String name, String neutralType) {
+	/**
+	 * Constructor
+	 * @param name
+	 * @param neutralType
+	 * @param keyElement
+	 */
+	public FakeAttribute(String name, String neutralType, boolean keyElement) {
 		super();
 		this._sName = name;
 		this._sNeutralType = neutralType;
+		this._bKeyElement = keyElement ;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -133,11 +132,6 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 	}
 
 	// -----------------------------------------------------------------------------
-
-	public void setKeyElement(boolean b) { // v 3.0.0
-		_bKeyElement = b;
-	}
-
 	@Override
 	public boolean isKeyElement() { // v 3.0.0
 		return _bKeyElement;
@@ -551,11 +545,6 @@ public class AttributeInFakeModel implements Comparable<AttributeInFakeModel>, S
 		setMinLength(null);
 		setMaxLength(null);
 		setPattern(null);
-	}
-
-	@Override
-	public int compareTo(AttributeInFakeModel other) {
-		return 0;
 	}
 
 	@Override

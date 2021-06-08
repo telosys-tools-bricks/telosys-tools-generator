@@ -6,10 +6,16 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.telosys.tools.fake.generic.model.FakeAttribute;
-import org.telosys.tools.fake.generic.model.FakeEntity;
+import org.telosys.tools.generator.GeneratorException;
+import org.telosys.tools.generic.model.Attribute;
+import org.telosys.tools.generic.model.Entity;
+
+import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
+import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
 
 public class FnInContextForJavaTest {
+	
+	private static final List<AttributeInContext> ATTRIBUTES_VOID_LIST = new LinkedList<>();
 	
 	@Test
 	public void testBackslash() {
@@ -76,7 +82,7 @@ public class FnInContextForJavaTest {
 	}
 
 	@Test
-	public void testIsVoid() throws Exception {
+	public void testIsVoid() {
 		FnInContext fn = new FnInContext(null, null);
 		String[] a = {} ;
 		Assert.assertTrue( fn.isVoid(a) );
@@ -92,7 +98,7 @@ public class FnInContextForJavaTest {
 	}
 
 	@Test
-	public void testQuote() throws Exception {
+	public void testQuote() {
 		FnInContext fn = new FnInContext(null, null);
 		Assert.assertEquals("\"a\"", fn.quote("a") );
 		Assert.assertEquals("\"abcd\"", fn.quote("abcd") );
@@ -101,7 +107,7 @@ public class FnInContextForJavaTest {
 	}
 
 	@Test
-	public void testUnquote() throws Exception {
+	public void testUnquote() {
 		FnInContext fn = new FnInContext(null, null);
 		Assert.assertEquals("a", fn.unquote("\"a\"") );
 		Assert.assertEquals("abcd", fn.unquote("\"abcd\"") );
@@ -115,12 +121,21 @@ public class FnInContextForJavaTest {
 		Assert.assertEquals(" \"abcd\" ", fn.unquote(" \"abcd\" ") ); // Unchanged
 	}
 
+	private AttributeInContext buildAttribute(EntityInContext entityInContext, String name, String type, EnvInContext envInContext) {
+		Attribute attribute = new FakeAttribute(name, type, false);
+		return new AttributeInContext(entityInContext, 
+				attribute, 
+				null, 
+				envInContext ) ;
+	}
 	private List<AttributeInContext> buildAttributes(EnvInContext envInContext) {
-		EntityInContext entityInContext = new EntityInContext(new FakeEntity(), null, null, envInContext);
+		//EntityInContext entityInContext = new EntityInContext(new FakeEntity(), null, null, envInContext);
+		Entity entity = new FakeEntity("Foo", "FOO");
+		EntityInContext entityInContext = new EntityInContext(entity, null, null, envInContext);
 		List<AttributeInContext> attributes = new LinkedList<>();
-		attributes.add( new AttributeInContext(entityInContext, new FakeAttribute("id", "int"), null, envInContext ) );
-		attributes.add( new AttributeInContext(entityInContext, new FakeAttribute("name", "string"), null, envInContext ) );
-		attributes.add( new AttributeInContext(entityInContext, new FakeAttribute("flag", "boolean"), null, envInContext ) );
+		attributes.add( buildAttribute(entityInContext, "id", "int", envInContext) );
+		attributes.add( buildAttribute(entityInContext, "name", "string", envInContext ) );
+		attributes.add( buildAttribute(entityInContext, "flag", "boolean", envInContext ) );
 		return attributes;
 	}
 
@@ -128,7 +143,7 @@ public class FnInContextForJavaTest {
 	// fn.argumentsList
 	//-----------------------------------------------------------------------------------
 	@Test
-	public void testArgumentsList_Default() throws Exception { // Default = Java
+	public void testArgumentsListForDefault() { // Default = Java
 		EnvInContext envInContext = new EnvInContext();
 		Assert.assertEquals("JAVA", envInContext.getLanguage().toUpperCase() );
 		Assert.assertTrue(envInContext.languageIsJava());
@@ -137,10 +152,10 @@ public class FnInContextForJavaTest {
 		FnInContext fn = new FnInContext(null, envInContext);
 		Assert.assertEquals("id, name, flag", fn.argumentsList(attributes) );
 		Assert.assertEquals("", fn.argumentsList(null) );
-		Assert.assertEquals("", fn.argumentsList(new LinkedList<AttributeInContext>()) );
+		Assert.assertEquals("", fn.argumentsList(ATTRIBUTES_VOID_LIST) );
 	}
 	@Test
-	public void testArgumentsList_CSharp() throws Exception { // C#
+	public void testArgumentsListForCSharp() throws GeneratorException { // C#
 		EnvInContext envInContext = new EnvInContext();
 		envInContext.setLanguage("C#");
 		
@@ -148,10 +163,10 @@ public class FnInContextForJavaTest {
 		FnInContext fn = new FnInContext(null, envInContext);
 		Assert.assertEquals("id, name, flag", fn.argumentsList(attributes) );
 		Assert.assertEquals("", fn.argumentsList(null) );
-		Assert.assertEquals("", fn.argumentsList(new LinkedList<AttributeInContext>()) );
+		Assert.assertEquals("", fn.argumentsList(ATTRIBUTES_VOID_LIST) );
 	}
 	@Test
-	public void testArgumentsList_GoLang() throws Exception { // Go
+	public void testArgumentsListForGoLang() throws GeneratorException { // Go
 		EnvInContext envInContext = new EnvInContext();
 		envInContext.setLanguage("Go");
 		Assert.assertTrue(envInContext.languageIsGo());
@@ -161,115 +176,113 @@ public class FnInContextForJavaTest {
 		FnInContext fn = new FnInContext(null, envInContext);
 		Assert.assertEquals("id, name, flag", fn.argumentsList(attributes) );
 		Assert.assertEquals("", fn.argumentsList(null) );
-		Assert.assertEquals("", fn.argumentsList(new LinkedList<AttributeInContext>()) );
+		Assert.assertEquals("", fn.argumentsList(ATTRIBUTES_VOID_LIST) );
 	}
 
 	//-----------------------------------------------------------------------------------	
 	// fn.argumentsListWithType
 	//-----------------------------------------------------------------------------------
 	@Test
-	public void testArgumentsListWithType_Default() throws Exception { // Java : standard
+	public void testArgumentsListWithTypeForDefault() { // Java : standard
 		EnvInContext envInContext = new EnvInContext();
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
 		Assert.assertEquals("Integer id, String name, Boolean flag", fn.argumentsListWithType(attributes) );
 		Assert.assertEquals("", fn.argumentsListWithType(null) );
-		Assert.assertEquals("", fn.argumentsListWithType(new LinkedList<AttributeInContext>()) );
+		Assert.assertEquals("", fn.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
 	}
 	@Test
-	public void testArgumentsListWithType_CSharp() throws Exception { // C# : standard
+	public void testArgumentsListWithTypeForCSharp() throws GeneratorException { // C# : standard
 		EnvInContext envInContext = new EnvInContext();
 		envInContext.setLanguage("C#");
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
 		Assert.assertEquals("int id, string name, bool flag", fn.argumentsListWithType(attributes) );
 		Assert.assertEquals("", fn.argumentsListWithType(null) );
-		Assert.assertEquals("", fn.argumentsListWithType(new LinkedList<AttributeInContext>()) );
+		Assert.assertEquals("", fn.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
 	}
 	@Test
-	public void testArgumentsListWithType_TypeScript() throws Exception { // TypeScript
+	public void testArgumentsListWithTypeForTypeScript() throws GeneratorException { // TypeScript
 		EnvInContext envInContext = new EnvInContext();
 		envInContext.setLanguage("TypeScript");
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
 		Assert.assertEquals("number id, string name, boolean flag", fn.argumentsListWithType(attributes) );
 		Assert.assertEquals("", fn.argumentsListWithType(null) );
-		Assert.assertEquals("", fn.argumentsListWithType(new LinkedList<AttributeInContext>()) );
+		Assert.assertEquals("", fn.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
 	}
 	@Test
-	public void testArgumentsListWithType_GoLang() throws Exception { // Go : inversion 
+	public void testArgumentsListWithTypeForGoLang() throws GeneratorException { // Go : inversion 
 		EnvInContext envInContext = new EnvInContext();
 		envInContext.setLanguage("Go");
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
 		Assert.assertEquals("id int32, name string, flag bool", fn.argumentsListWithType(attributes) );
 		Assert.assertEquals("", fn.argumentsListWithType(null) );
-		Assert.assertEquals("", fn.argumentsListWithType(new LinkedList<AttributeInContext>()) );
+		Assert.assertEquals("", fn.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
 	}
 
 	//-----------------------------------------------------------------------------------
 	// fn.argumentsListWithGetter
 	//-----------------------------------------------------------------------------------	
 	@Test
-	public void testArgumentsListWithGetter_Default() throws Exception { // Default = Java
+	public void testArgumentsListWithGetterForDefault() { // Default = Java
 		EnvInContext envInContext = new EnvInContext();
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
 		Assert.assertEquals("obj.getId(), obj.getName(), obj.getFlag()", fn.argumentsListWithGetter("obj", attributes) );
 		Assert.assertEquals("", fn.argumentsListWithGetter("obj", null) );
-		Assert.assertEquals("", fn.argumentsListWithGetter("obj", new LinkedList<AttributeInContext>()) );
+		Assert.assertEquals("", fn.argumentsListWithGetter("obj", ATTRIBUTES_VOID_LIST) );
 	}
 	@Test
-	public void testArgumentsListWithGetter_GoLang() throws Exception {  // Go : no change
+	public void testArgumentsListWithGetterForGoLang() throws GeneratorException {  // Go : no change
 		EnvInContext envInContext = new EnvInContext();
 		envInContext.setLanguage("Go");
-		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
-		//Assert.assertEquals("obj.getId(), obj.getName(), obj.getFlag()", fn.argumentsListWithGetter("obj", attributes) );
 		Assert.assertEquals("", fn.argumentsListWithGetter("obj", null) );
-		Assert.assertEquals("", fn.argumentsListWithGetter("obj", new LinkedList<AttributeInContext>()) );
+		Assert.assertEquals("", fn.argumentsListWithGetter("obj", ATTRIBUTES_VOID_LIST) );
 	}
 
 	//-----------------------------------------------------------------------------------	
 	// fn.argumentsListWithWrapperType
 	//-----------------------------------------------------------------------------------	
 	@Test
-	public void testArgumentsListWithWrapperType_Default() throws Exception { 
+	public void testArgumentsListWithWrapperTypeForDefault() { 
 		EnvInContext envInContext = new EnvInContext();
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
 		Assert.assertEquals("Integer id, String name, Boolean flag", fn.argumentsListWithWrapperType(attributes) );
 		Assert.assertEquals("", fn.argumentsListWithWrapperType(null) );
-		Assert.assertEquals("", fn.argumentsListWithWrapperType(new LinkedList<AttributeInContext>()) );
+		Assert.assertEquals("", fn.argumentsListWithWrapperType(ATTRIBUTES_VOID_LIST) );
 	}
 	@Test
-	public void testArgumentsListWithWrapperType_CSharp() throws Exception { // C#
+	public void testArgumentsListWithWrapperTypeForCSharp() throws GeneratorException { // C#
 		EnvInContext envInContext = new EnvInContext();
 		envInContext.setLanguage("C#");
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
 		Assert.assertEquals("System.Int32 id, System.String name, System.Boolean flag", fn.argumentsListWithWrapperType(attributes) );
 		Assert.assertEquals("", fn.argumentsListWithWrapperType(null) );
-		Assert.assertEquals("", fn.argumentsListWithWrapperType(new LinkedList<AttributeInContext>()) );
+		Assert.assertEquals("", fn.argumentsListWithWrapperType(ATTRIBUTES_VOID_LIST) );
 	}
 	@Test
-	public void testArgumentsListWithWrapperType_TypeScript() throws Exception { // TypeScript // TODO ????
+	public void testArgumentsListWithWrapperTypeForTypeScript() throws GeneratorException { // TypeScript
 		EnvInContext envInContext = new EnvInContext();
 		envInContext.setLanguage("TypeScript");
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
 		Assert.assertEquals("Number id, String name, Boolean flag", fn.argumentsListWithWrapperType(attributes) );
 		Assert.assertEquals("", fn.argumentsListWithWrapperType(null) );
-		Assert.assertEquals("", fn.argumentsListWithWrapperType(new LinkedList<AttributeInContext>()) );
+		Assert.assertEquals("", fn.argumentsListWithWrapperType(ATTRIBUTES_VOID_LIST) );
 	}
 	@Test
-	public void testArgumentsListWithWrapperType_GoLang() throws Exception { // Go
+	public void testArgumentsListWithWrapperTypeForGoLang() throws GeneratorException { // Go
 		EnvInContext envInContext = new EnvInContext();
 		envInContext.setLanguage("Go");
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
 		Assert.assertEquals("id int32, name string, flag bool", fn.argumentsListWithWrapperType(attributes) );
 		Assert.assertEquals("", fn.argumentsListWithWrapperType(null) );
-		Assert.assertEquals("", fn.argumentsListWithWrapperType(new LinkedList<AttributeInContext>()) );
+		Assert.assertEquals("", fn.argumentsListWithWrapperType(ATTRIBUTES_VOID_LIST) );
 	}
 }

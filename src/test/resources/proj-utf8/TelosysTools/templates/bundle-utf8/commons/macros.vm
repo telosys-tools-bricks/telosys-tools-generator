@@ -1,0 +1,72 @@
+## ----------------------------------------------------------
+## Set 2 variables from the given attribute neutral type:
+## . $openApiType
+## . $openApiFormat
+## ----------------------------------------------------------
+## OpenAPI defines the following basic types:
+##  . string  / format : date, date-time, password, byte, binary (+ any other specific formats)
+##  . number  / format : 'float' or 'double' (or no format)
+##  . integer / format : 'int32' (Signed 32-bit) or 'int64' (long type)
+##  . boolean
+##  . array
+##  . object
+## ----------------------------------------------------------
+#macro( setOpenApiTypeAndFormat  $attrib )
+##--- Default values :
+#set($openApiType = $attrib.neutralType)
+#set($openApiFormat = "")  
+##--- "short" type
+#if ( $attrib.neutralType == "short" )
+#set ( $openApiType = "integer")
+#end
+##--- "int" type
+#if ( $attrib.neutralType == "int" )
+#set ( $openApiType = "integer")
+#set ( $openApiFormat = "int32")   
+#end
+##--- "long" type
+#if ( $attrib.neutralType == "long" )
+#set ( $openApiType = "integer")
+#set ( $openApiFormat = "int64")   
+#end
+##--- "float" type
+#if ( $attrib.neutralType == "float" )
+#set ( $openApiType = "number")
+#set ( $openApiFormat = "float")   
+#end
+##--- "double" type
+#if ( $attrib.neutralType == "double" )
+#set ( $openApiType = "number")
+#set ( $openApiFormat = "double")   
+#end
+##--- "date" type
+#if ( $attrib.neutralType == "date" )
+#set ( $openApiType = "string")
+#set ( $openApiFormat = "date")   
+#end
+##--- "time" type
+#if ( $attrib.neutralType == "time" )
+#set ( $openApiType = "string")
+#set ( $openApiFormat = "time")## specific format
+#end
+##--- "timestamp" type
+#if ( $attrib.neutralType == "timestamp" )
+#set ( $openApiType = "string")
+#set ( $openApiFormat = "date-time")
+#end
+##--- "timestamp" type
+#if ( $attrib.neutralType == "binary" )
+#set ( $openApiType = "string")
+#set ( $openApiFormat = "binary")
+#end
+##--- Force specific type with tag defined in model
+#if ( $attrib.hasTag("OpenAPIType") )  
+#set($openApiType = $attrib.tagValue("OpenAPIType"))
+#end
+##--- Force specific format with tag defined in model
+#if ( $attrib.hasTag("OpenAPIFormat") )  
+#set($openApiFormat = $attrib.tagValue("OpenAPIFormat"))
+#end
+##---
+#end
+## ----------------------------------------------------------

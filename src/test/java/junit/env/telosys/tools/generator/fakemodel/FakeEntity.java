@@ -15,9 +15,10 @@
  */
 package junit.env.telosys.tools.generator.fakemodel;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,50 +28,41 @@ import org.telosys.tools.generic.model.ForeignKey;
 import org.telosys.tools.generic.model.Link;
 
 /**
- * "Entity" model class ( a Database Table mapped to a Java Class ) <br>
+ * "Entity" model class <br>
  * An entity contains : <br>
  * - 1..N columns <br>
  * - 0..N foreign keys <br>
  * - 0..N links <br>
  * 
- * This class is "Comparable" ( based on the entity name )
- * 
  * @author Laurent Guerin
  *
  */
-public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Serializable, Entity
+public class FakeEntity implements Entity
 {
-	private static final long serialVersionUID = 1L;
-
 	
-	private String className ; // v 3.0.0
+	private final String className ; 
 	
-	private Hashtable<String,Attribute>  attributes  = new Hashtable<String,Attribute>() ; 
-
-	private Hashtable<String,ForeignKey> foreignKeys = new Hashtable<String,ForeignKey>() ;
-
-	private Hashtable<String,Link>       links       = new Hashtable<String,Link>() ;
-
-	private String databaseTable ;
+	private final String databaseTable ;
+	
 	private String databaseCatalog ; 
-	private String databaseSchema ;  // v 3.0.0
-	private String databaseType ; // v 2.0.7 #LGU
-	private String databaseComment = "" ; // v 3.0.3
+	private String databaseSchema ;  
+	private String databaseType ; 
+	private String databaseComment = "" ; 
 	
-	/**
-	 * Default constructor 
-	 */
-	public EntityInFakeModel() {
-		super();
-	}
+	private List<Attribute> attributes = new ArrayList<>();
+
+	private HashMap<String,ForeignKey> foreignKeys = new HashMap<>() ;
+	private HashMap<String,Link>       links       = new HashMap<>() ;
 
 	/**
 	 * Constructor 
-	 * @param name
+	 * @param className
+	 * @param databaseTable
 	 */
-	public EntityInFakeModel(String name) {
+	public FakeEntity(String className, String databaseTable) {
 		super();
-		this.databaseTable = name;
+		this.className = className ;
+		this.databaseTable = databaseTable;
 	}
 
 	/**
@@ -82,30 +74,23 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 	 * 
 	 * @return
 	 */
-	public boolean isJoinTable() 
-	{
+	public boolean isJoinTable() {
 		//--- Check if there are 2 FK
 		if ( foreignKeys.size() != 2 ) {
 			return false;
 		} 
-				
 		//--- Check if all the columns are in the Primary Key
-		for ( Attribute column : getAttributesArray() ) {
-			//if ( ! column.isPrimaryKey() ) {
-			if ( ! column.isKeyElement() ) { // v 3.0.0
+		for ( Attribute a : getAttributes() ) {
+			if ( ! a.isKeyElement() ) { 
 				return false ;
 			}
 		}
-		
 		//--- Check if all the columns are in a Foreign Key
-		for ( Attribute column : getAttributesArray() ) {
-			//if ( ! column.isForeignKey() ) {
-			//if ( ! column.isUsedInForeignKey() ) {
-			if ( ! column.isFK() ) {
+		for ( Attribute a : getAttributes() ) {
+			if ( ! a.isFK() ) {
 				return false ;
 			}
 		}
-
 		return true ;
 	}
 
@@ -114,9 +99,6 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 	@Override
 	public String getDatabaseTable() {
 		return this.databaseTable;
-	}
-	public void setDatabaseTable(String s) {
-		this.databaseTable = s;
 	}
 	
 	//--------------------------------------------------------------------------
@@ -190,9 +172,6 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 	public String getClassName() {
 		return this.className;
 	}
-	public void setClassName(String className) {
-		this.className = className;
-	}
 
 	@Override
 	public String getPackageName() {
@@ -210,48 +189,8 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 	// ATTRIBUTES ( ex COLUMNS )  management
 	//--------------------------------------------------------------------------
 	
-	/**
-	 * Returns an array containing all the columns of the entity<br>
-	 * The columns are sorted by ordinal position (the original database order).
-	 * 
-	 * @return
-	 */
-	public Attribute[] getAttributesArray()
-	{
-		//return (Column[]) columns.values().toArray(new Column[columns.size()]);
-		Attribute[] cols = (Attribute[]) ( attributes.values().toArray( new Attribute[attributes.size()] ) );
-		Arrays.sort(cols); // sort using the "Comparable" implementation
-		return cols ;
-	}
-
-//	/**
-//	 * Returns a collection of all the columns of the entity.<br>
-//	 * The columns are sorted by ordinal position (the original database order).
-//	 * 
-//	 * @return
-//	 */
-//	public Collection<Attribute> getColumnsCollection()
-//	{
-//		//return this.columns.values();
-//		Attribute[] cols = getColumns();
-//		return Arrays.asList(cols);
-//	}
-	
-//	public void storeColumn(Attribute column)
-	public void storeAttribute(Attribute attribute)  // renamed in v 3.0.0
-	{
-		attributes.put(attribute.getDatabaseName(), attribute);
-	}
-
-	public Attribute getAttributeByColumnName(String name)
-	{
-		return (Attribute) attributes.get(name);
-	}
-
-//	public void removeColumn(Attribute column)
-	public void removeAttribute(Attribute attribute) // renamed in v 3.0.0
-	{
-		attributes.remove(attribute.getDatabaseName());
+	public void storeAttribute(Attribute attribute) {
+		attributes.add(attribute);
 	}
 
 	//--------------------------------------------------------------------------
@@ -259,9 +198,8 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 	//--------------------------------------------------------------------------
 	@Override
 	public List<Attribute> getAttributes() {
-		//Attribute[] attributes = getAttributesArray() ;
-		Attribute[] attributes = getAttributesArray();
-		LinkedList<Attribute> attributesList = new LinkedList<Attribute>();
+
+		LinkedList<Attribute> attributesList = new LinkedList<>();
 		for ( Attribute a : attributes ) {
 			attributesList.add(a);
 		}
@@ -271,34 +209,10 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 	//--------------------------------------------------------------------------
 	// FOREIGN KEYS management
 	//--------------------------------------------------------------------------
-	
-	/**
-	 * Returns an array of all the foreign keys of the entity (table).<br>
-	 * The foreign keys are sorted by name.
-	 * @return
-	 */
-	public ForeignKey[] getForeignKeys()
-	{
-		ForeignKey[] array = (ForeignKey[]) foreignKeys.values().toArray(new ForeignKey[foreignKeys.size()]);
-		Arrays.sort(array);
-		return array ;
-	}
-	
-	public void storeForeignKey(ForeignKey foreignKey)
-	{
+	public void storeForeignKey(ForeignKey foreignKey){
 		foreignKeys.put(foreignKey.getName(), foreignKey);
 	}
 	
-	public ForeignKey getForeignKey(String name)
-	{
-		return (ForeignKey) foreignKeys.get(name);
-	}
-	
-	public void removeForeignKey(ForeignKey foreignKey)
-	{
-		foreignKeys.remove(foreignKey.getName() );
-	}
-
 	//--------------------------------------------------------------------------
 	// FOREIGN KEYS exposed as "GENERIC MODEL FOREIGN KEYS" 
 	//--------------------------------------------------------------------------
@@ -308,7 +222,7 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 		ForeignKey[] foreignKeysArray = (ForeignKey[]) foreignKeys.values().toArray( new ForeignKey[foreignKeys.size()] );
 		Arrays.sort(foreignKeysArray); // sort using the "Comparable" implementation		
 		//--- Build a List from the array
-		LinkedList<ForeignKey> foreignKeysList = new LinkedList<ForeignKey>();
+		LinkedList<ForeignKey> foreignKeysList = new LinkedList<>();
 		for ( ForeignKey fk : foreignKeysArray ) {
 			foreignKeysList.add(fk);
 		}
@@ -318,99 +232,24 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 	//--------------------------------------------------------------------------
 	// LINKS management
 	//--------------------------------------------------------------------------
-	
-	/**
-	 * Returns all the links of the entity
-	 * @return
-	 */
-	//public Link[] getLinks()
-	public Link[] getLinksArray()
-	{
-		return (Link[]) links.values().toArray(new Link[links.size()]);
-	}
 
 	@Override
-	public List<Link> getLinks()
-	{
+	public List<Link> getLinks() {
 		Link[] linksArray = links.values().toArray(new Link[links.size()]);
 		return Arrays.asList(linksArray);
 	}
 
 	/**
-	 * Returns all the links referencing the given entity name
-	 * @return
-	 * @since 2.1.1
-	 */
-	public List<Link> getLinksTo(String entityName)
-	{
-		LinkedList<Link> selectedLinks = new LinkedList<Link>();
-		for ( Link link : links.values() ) {
-			if ( link.getTargetTableName().equals(entityName) ) {
-				selectedLinks.add(link);
-			}
-		}
-		return selectedLinks;
-	}
-	
-	/**
 	 * Store (add or update the given link)
 	 * @param link
 	 */
-	public void storeLink(Link link)
-	{
+	public void storeLink(Link link) {
 		links.put(link.getId(), link);
 	}
 	
-	/**
-	 * Get a link by its id
-	 * @param id
-	 * @return
-	 */
-	public Link getLink(String id)
-	{
-		return (Link) links.get(id);
-	}
-	
-	/**
-	 * Remove the given link from the entity
-	 * @param link
-	 */
-	public int removeLink(Link link)
-	{
-		Link linkRemoved = links.remove( link.getId() );
-		return linkRemoved != null ? 1 : 0 ;
-	}
-
-	/**
-	 * Remove all the links from the entity
-	 */
-	public void removeAllLinks()
-	{
-		links.clear();
-	}
-
-	//--------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(T)
-	 */
-	@Override
-	public int compareTo(EntityInFakeModel other) {
-		if ( other != null ) {
-//			String sThisName = this.getName() ;
-//			String sOtherName = other.getName();
-			String sThisName = this.getDatabaseTable() ;
-			String sOtherName = other.getDatabaseTable();
-			if ( sThisName != null && sOtherName != null ) {
-				return this.databaseTable.compareTo(other.getDatabaseTable());
-			}
-		}
-		return 0;
-	}
-
 	@Override
 	public List<String> getWarnings() {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.emptyList();
 	}
 
 	@Override
@@ -420,9 +259,9 @@ public class EntityInFakeModel implements Comparable<EntityInFakeModel>, Seriali
 				+ "|" + databaseCatalog 
 				+ "|" + databaseSchema 
 				+ "|" + databaseType
-				+ "|columns=" + attributes.size()
-				+ "|foreignKeys=" + foreignKeys.size() 
-				+ "|links=" + links.size() 
+				+ "|attributes.size=" + attributes.size()
+				+ "|foreignKeys.size=" + foreignKeys.size() 
+				+ "|links.size=" + links.size() 
 				;
 	}
 

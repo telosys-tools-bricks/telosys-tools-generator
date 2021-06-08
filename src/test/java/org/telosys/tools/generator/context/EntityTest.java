@@ -11,8 +11,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import junit.env.telosys.tools.generator.fakemodel.AttributeInFakeModel;
-import junit.env.telosys.tools.generator.fakemodel.EntityInFakeModel;
+import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
+import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
 
 
 public class EntityTest {
@@ -34,8 +34,8 @@ public class EntityTest {
 		EntityInContext entity = buildCarEntityInContext();
 		checkCarEntityInContext(entity);
 
-		assertEquals("id,desc,name", entity.attributesNamesAsString(","));
-		assertEquals("id, desc, name", entity.attributesNamesAsString(", "));
+		assertEquals("id,name,desc", entity.attributesNamesAsString(","));
+		assertEquals("id, name, desc", entity.attributesNamesAsString(", "));
 	}
 
 	@Test
@@ -43,18 +43,18 @@ public class EntityTest {
 		EntityInContext entity = buildCarEntityInContext();
 		checkCarEntityInContext(entity);
 		
-		assertEquals("desc,name", entity.nonKeyAttributesNamesAsString(","));
-		assertEquals("desc, name", entity.nonKeyAttributesNamesAsString(", "));
-		assertEquals("$desc, $name", entity.nonKeyAttributesNamesAsString(", ", "$", ""));
-		assertEquals("$desc@, $name@", entity.nonKeyAttributesNamesAsString(", ", "$", "@"));
-		assertEquals("{{desc}}, {{name}}", entity.nonKeyAttributesNamesAsString(", ", "{{", "}}"));
+		assertEquals("name,desc", entity.nonKeyAttributesNamesAsString(","));
+		assertEquals("name, desc", entity.nonKeyAttributesNamesAsString(", "));
+		assertEquals("$name, $desc", entity.nonKeyAttributesNamesAsString(", ", "$", ""));
+		assertEquals("$name@, $desc@", entity.nonKeyAttributesNamesAsString(", ", "$", "@"));
+		assertEquals("{{name}}, {{desc}}", entity.nonKeyAttributesNamesAsString(", ", "{{", "}}"));
 	}
 
 	//---------------------------------------------------------------------------
 	// Test with 'Foo1' entity : only 1 attribute (key element)
 	//---------------------------------------------------------------------------
 	@Test
-	public void keyAttributesNamesAsStringFoo1() throws GeneratorException {
+	public void keyAttributesNamesAsStringFoo1() {
 		EntityInContext entityInContext = buildFoo1EntityInContext();
 		
 		assertEquals("id", entityInContext.keyAttributesNamesAsString(","));
@@ -65,7 +65,7 @@ public class EntityTest {
 	}
 
 	@Test
-	public void attributesNamesAsStringFoo1() throws GeneratorException {
+	public void attributesNamesAsStringFoo1() {
 		EntityInContext entityInContext = buildFoo1EntityInContext();
 		
 		assertEquals("id", entityInContext.attributesNamesAsString(","));
@@ -76,7 +76,7 @@ public class EntityTest {
 	}
 
 	@Test
-	public void nonKeyAttributesNamesAsStringFoo1() throws GeneratorException {
+	public void nonKeyAttributesNamesAsStringFoo1() {
 		EntityInContext entityInContext = buildFoo1EntityInContext();
 		
 		assertEquals("", entityInContext.nonKeyAttributesNamesAsString(","));
@@ -112,32 +112,27 @@ public class EntityTest {
 	}
 	
 	private Entity buildCarEntity() { 
-		EntityInFakeModel entity = new EntityInFakeModel();
-		entity.setDatabaseTable("CAR");
-		entity.setClassName("Car");
+		FakeEntity entity = new FakeEntity("Car", "CAR");
 		entity.storeAttribute(buildCarIdAttribute());
 		entity.storeAttribute(buildCarNameAttribute());
 		entity.storeAttribute(buildCarDescAttribute());
 		return entity ;
 	}
-	private AttributeInFakeModel buildCarIdAttribute() { 
-		AttributeInFakeModel a = new AttributeInFakeModel("id", NeutralType.INTEGER);
+	private FakeAttribute buildCarIdAttribute() { 
+		FakeAttribute a = new FakeAttribute("id", NeutralType.INTEGER, true);
 		a.setDatabaseName("ID");
-		a.setKeyElement(true);
 		a.setNotNull(true);
 		return a ;
 	}
-	private AttributeInFakeModel buildCarNameAttribute() { 
-		AttributeInFakeModel a = new AttributeInFakeModel("name", NeutralType.STRING);
+	private FakeAttribute buildCarNameAttribute() { 
+		FakeAttribute a = new FakeAttribute("name", NeutralType.STRING, false);
 		a.setDatabaseName("NAME");
-		a.setKeyElement(false);
 		a.setMaxLength(60);
 		return a ;
 	}
-	private AttributeInFakeModel buildCarDescAttribute() { 
-		AttributeInFakeModel a = new AttributeInFakeModel("desc", NeutralType.STRING);
+	private FakeAttribute buildCarDescAttribute() { 
+		FakeAttribute a = new FakeAttribute("desc", NeutralType.STRING, false);
 		a.setDatabaseName("DESC");
-		a.setKeyElement(false);
 		a.setMaxLength(60);
 		return a ;
 	}
@@ -163,16 +158,13 @@ public class EntityTest {
 		return entityInContext ;
 	}
 	private Entity buildFoo1Entity() { 
-		EntityInFakeModel entity = new EntityInFakeModel();
-		entity.setDatabaseTable("FOO1");
-		entity.setClassName("Foo1");
+		FakeEntity entity = new FakeEntity("Foo1", "FOO1");
 		entity.storeAttribute(buildFooIdAttribute());
 		return entity ;
 	}
-	private AttributeInFakeModel buildFooIdAttribute() { 
-		AttributeInFakeModel a = new AttributeInFakeModel("id", NeutralType.INTEGER);
+	private FakeAttribute buildFooIdAttribute() { 
+		FakeAttribute a = new FakeAttribute("id", NeutralType.INTEGER, true);
 		a.setDatabaseName("ID");
-		a.setKeyElement(true);
 		a.setNotNull(true);
 		return a ;
 	}

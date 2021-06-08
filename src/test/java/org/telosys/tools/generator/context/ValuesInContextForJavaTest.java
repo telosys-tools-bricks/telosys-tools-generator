@@ -1,23 +1,20 @@
 package org.telosys.tools.generator.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.env.telosys.tools.generator.fakemodel.AttributeInFakeModel;
-
 import org.junit.Assert;
 import org.junit.Test;
-import org.telosys.tools.fake.generic.model.FakeAttribute;
-import org.telosys.tools.generator.context.AttributeInContext;
-import org.telosys.tools.generator.context.ValuesInContext;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.DateType;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
 
 public class ValuesInContextForJavaTest {
 	
@@ -288,7 +285,8 @@ public class ValuesInContextForJavaTest {
 		attributes.add( buildAttributeInContext("date2",     "date"      ) );
 		attributes.add( buildAttributeInContext("time1",     "time"      ) );
 		
-		FakeAttribute attrib = new FakeAttribute("time3", "time");
+//		FakeAttribute attrib = new FakeAttribute("time3", "time");
+		FakeAttribute attrib = new FakeAttribute("time3", "time", false);
 		attrib.setDateType(DateType.TIME_ONLY);
 //		attrib.setSqlTypeExpected(true);
 //		AttributeInContext attrib = buildAttributeInContext("time2",     "time"      ) ;
@@ -396,7 +394,7 @@ public class ValuesInContextForJavaTest {
 	}
 	//------------------------
 	private Attribute buildAttribute(String attributeName, String neutralType, int maxLength, boolean notNull) {
-		AttributeInFakeModel attribute = new AttributeInFakeModel(attributeName, neutralType );
+		FakeAttribute attribute = new FakeAttribute(attributeName, neutralType, false );
 //		attribute.setName(attributeName);
 //		attribute.setFullType(javaType);
 		attribute.setMaxLength(maxLength);

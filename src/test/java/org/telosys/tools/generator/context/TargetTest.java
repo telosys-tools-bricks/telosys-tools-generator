@@ -7,7 +7,7 @@ import org.telosys.tools.generic.model.Entity;
 
 import static org.junit.Assert.assertEquals;
 
-import junit.env.telosys.tools.generator.fakemodel.EntityInFakeModel;
+import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
 
 public class TargetTest {
 
@@ -76,10 +76,10 @@ public class TargetTest {
 		System.out.println(" . template = " + target.getTemplate() );
 	}
 	
-	private Entity buildEntity(String tableName, String className) { // v 3.0.0
-		EntityInFakeModel entity = new EntityInFakeModel();
-		entity.setDatabaseTable(tableName);
-		entity.setClassName(className);
+	private Entity buildEntity(String tableName, String className) { 
+		FakeEntity entity = new FakeEntity(className, tableName );
+//		entity.setDatabaseTable(tableName);
+//		entity.setClassName(className);
 		return entity ;
 	}
 }
