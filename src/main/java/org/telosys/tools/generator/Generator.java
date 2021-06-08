@@ -134,7 +134,8 @@ public class Generator {
 	 * @return
 	 * @throws GeneratorException
 	 */
-	private InputStream generateInMemory(Target target, GeneratorContext generatorContext) //throws GeneratorException
+	//private InputStream generateInMemory(Target target, GeneratorContext generatorContext) //throws GeneratorException
+	private String generateInMemory(Target target, GeneratorContext generatorContext)
 	{
 		log("generateInMemory()...");
 		
@@ -167,7 +168,8 @@ public class Generator {
 		// End of Workaround for Velocity error in OSGi environment
 		//------------------------------------------------------------------
 			
-		return new ByteArrayInputStream(result.getBytes());
+//		return new ByteArrayInputStream(result.getBytes());
+		return result;
 	}
 
 	//================================================================================================
@@ -204,9 +206,11 @@ public class Generator {
 
 		//---------- ((( GENERATION ))) 
 		CancelDirectiveException cancelException = null ;
-		InputStream is = null;
+		String result = null; // v 3.3.0
+//		InputStream is = null;
 		try {
-			is = generateInMemory(target, generatorContext);
+//			is = generateInMemory(target, generatorContext);
+			result = generateInMemory(target, generatorContext); // v 3.3.0
 			logger.log("Generation OK (no exception)");
 		} catch (CancelDirectiveException e) {
 			// generation has been canceled with #cancel directive
@@ -229,7 +233,8 @@ public class Generator {
 			String outputFileName = target.getOutputFileNameInFileSystem( 
 					telosysToolsCfg.getDestinationFolderAbsolutePath() ); // v 3.0.0
 			logger.log("Saving target file : " + outputFileName );
-			saveStreamInFile(is, outputFileName, true );
+//			saveStreamInFile(is, outputFileName, true );
+			saveResultInFile(result, outputFileName, true); // v 3.0.0
 			logger.info("OK :  " + target.getOutputFileNameInProject() );
 			
 			//--- Add the generated target in the list if any
@@ -239,7 +244,8 @@ public class Generator {
 		}
 	}
 	
-	private void saveStreamInFile(InputStream is, String fileName, boolean bCreateDir) throws GeneratorException
+	//private void saveStreamInFile(InputStream is, String fileName, boolean bCreateDir) throws GeneratorException
+	private void saveResultInFile(String result, String fileName, boolean bCreateDir) throws GeneratorException
 	{
 		File file = new File(fileName);
 		
@@ -263,16 +269,17 @@ public class Generator {
 		}
 		
 		//--- Write the file
-		try ( OutputStream out = new FileOutputStream(file) ) {
-			byte[] buf = new byte[1024];
-			int len;
-			while ((len = is.read(buf)) > 0) {
-				out.write(buf, 0, len);
-			}
-			is.close();
-		} catch (IOException e) {
-			throw new GeneratorException("Cannot save file "+fileName, e);
-		}
+//		try ( OutputStream out = new FileOutputStream(file) ) {
+//			byte[] buf = new byte[1024];
+//			int len;
+//			while ((len = is.read(buf)) > 0) {
+//				out.write(buf, 0, len);
+//			}
+//			is.close();
+//		} catch (IOException e) {
+//			throw new GeneratorException("Cannot save file "+fileName, e);
+//		}
+		GeneratorFileWriter.writeGenerationResult(result, file);
 	}
 	
 }

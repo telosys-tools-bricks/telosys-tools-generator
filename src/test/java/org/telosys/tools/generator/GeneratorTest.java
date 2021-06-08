@@ -70,6 +70,11 @@ public class GeneratorTest {
 	}
 
 	@Test
+	public void testOpenapiYaml() throws GeneratorException {
+		launchGeneration("openapi_yaml.vm", "openapi.yaml");
+	}
+
+	@Test
 	public void testOpenapiYamlTxt() throws GeneratorException {
 		launchGeneration("openapi_yaml.vm", "openapi_yaml.txt");
 	}
