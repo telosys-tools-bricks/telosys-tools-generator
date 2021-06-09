@@ -10,12 +10,57 @@ import org.telosys.tools.generic.model.types.NeutralType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 
 import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
 import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
 
 
 public class EntityTest {
+
+	@Test
+	public void carEntityTest() throws GeneratorException {
+		EntityInContext entityInContext = buildCarEntityInContext();
+		checkCarEntityInContext(entityInContext);
+		
+		assertEquals("Car", entityInContext.getName() );
+		assertEquals("org.bean", entityInContext.getPackage() );
+		assertEquals("org.bean.Car", entityInContext.getFullName() );
+		
+		// Primary Key
+		assertTrue(entityInContext.hasPrimaryKey() );
+		assertFalse(entityInContext.hasCompositePrimaryKey() );
+		assertFalse(entityInContext.hasAutoIncrementedKey());
+		assertNull(entityInContext.getAutoincrementedKeyAttribute() );
+		
+		// Database info 
+		assertEquals("CAR", entityInContext.getDatabaseTable() );
+		assertEquals("", entityInContext.getDatabaseCatalog());
+		assertEquals("", entityInContext.getDatabaseComment());
+		assertEquals("", entityInContext.getDatabaseSchema());
+		assertEquals("", entityInContext.getDatabaseType()); // "TABLE" or "VIEW"
+		assertFalse(entityInContext.isTableType());
+		assertFalse(entityInContext.isViewType());
+		
+		
+		assertEquals(3, entityInContext.getAttributesCount() );
+		assertEquals(3, entityInContext.getAttributes().size() );
+		
+		assertEquals(1, entityInContext.getKeyAttributesCount());
+		assertEquals(1, entityInContext.getKeyAttributes().size());
+
+		assertEquals(2, entityInContext.getNonKeyAttributesCount());
+		assertEquals(2, entityInContext.getNonKeyAttributes().size());
+		
+		assertEquals(0, entityInContext.getDatabaseForeignKeysCount());
+		assertEquals(0, entityInContext.getDatabaseForeignKeys().size());
+		
+		assertEquals(0, entityInContext.getLinks().size());
+		assertEquals(0, entityInContext.referencedEntityTypes().size());
+
+		assertNotNull(entityInContext.getAttributeByColumnName("ID"));
+	}
 
 	@Test
 	public void keyAttributesNamesAsString() throws GeneratorException {

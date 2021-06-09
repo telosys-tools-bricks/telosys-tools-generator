@@ -66,28 +66,26 @@ public class EntityInContext
 	private static final List<ForeignKeyInContext> VOID_FOREIGN_KEYS_LIST  = new LinkedList<>();
 	private static final List<LinkInContext>       VOID_LINKS_LIST         = new LinkedList<>();
 	
-	private final String     _sClassName ;
-	private final String     _sPackage ;
+	private final String     className ;
+	private final String     packageName ;
 	
-    private final String     _sDatabaseTable    ; // Table name this class is mapped with
-    private final String     _sDatabaseCatalog  ; // The table's catalog 
-    private final String     _sDatabaseSchema   ; // The table's schema 
-    private final String     _sDatabaseType     ; // The table's type "table" or "view" 
-    private final String     _sDatabaseComment  ; // The table's database comment  (since ver 3.1.0 )
+    private final String     databaseTable    ; // Table name this class is mapped with
+    private final String     databaseCatalog  ; // The table's catalog 
+    private final String     databaseSchema   ; // The table's schema 
+    private final String     databaseType     ; // The table's type "table" or "view" 
+    private final String     databaseComment  ; // The table's database comment  (since ver 3.1.0 )
     
-	private final LinkedList<AttributeInContext> _attributes ; // The attributes for this class ( ALL ATTRIBUTES )
-	private LinkedList<AttributeInContext>  _keyAttributes     = null ; // The KEY attributes for this class
-	private LinkedList<AttributeInContext>  _nonKeyAttributes  = null ; // The NON KEY attributes for this class
+	private final List<AttributeInContext> attributes ; // The attributes for this class ( ALL ATTRIBUTES )
+	private final List<AttributeInContext> keyAttributes ;   // The KEY attributes for this class
+	private final List<AttributeInContext> nonKeyAttributes; // The NON KEY attributes for this class
 
-	private final LinkedList<ForeignKeyInContext>  _foreignKeys ; // The database FOREIGN KEYS attributes for this entity ( v 2.0.7)
+	private final List<ForeignKeyInContext> foreignKeys ; // The database FOREIGN KEYS attributes for this entity ( v 2.0.7)
 	
-	//--- JPA specific
-	private final LinkedList<LinkInContext> _links ; // The links for this class ( ALL ATTRIBUTES )
+	private final List<LinkInContext> links ; // The links for this class ( ALL LINKS )
 	
-	// private final EntitiesManager _entitiesManager ; // removed in v 3.0.0
-	private final ModelInContext _modelInContext ;  // v 3.0.0
+	private final ModelInContext modelInContext ;  // v 3.0.0
 	
-	private final EnvInContext    _env ; // ver 2.1.0
+	private final EnvInContext   env ; // ver 2.1.0
 	
 	//-----------------------------------------------------------------------------------------------
 	/**
@@ -102,42 +100,48 @@ public class EntityInContext
 							final ModelInContext modelInContext, // v 3.0.0
 							final EnvInContext env ) 
 	{
-		_sClassName = entity.getClassName();  // v 3.0.0
+		this.className = entity.getClassName();  // v 3.0.0
 		
-		_sPackage = StrUtil.notNull(entityPackage);
+		this.packageName = StrUtil.notNull(entityPackage);
 		
-		_modelInContext = modelInContext ; // v 3.0.0
-		_env = env ;
+		this.modelInContext = modelInContext ; // v 3.0.0
+		this.env = env ;
 		
-		_sDatabaseTable   = StrUtil.notNull(entity.getDatabaseTable());
-		_sDatabaseCatalog = StrUtil.notNull(entity.getDatabaseCatalog()); // v 3.0.0
+		this.databaseTable   = StrUtil.notNull(entity.getDatabaseTable());
+		this.databaseCatalog = StrUtil.notNull(entity.getDatabaseCatalog()); // v 3.0.0
 		
-		_sDatabaseSchema  = StrUtil.notNull(entity.getDatabaseSchema()); // v 3.0.0
+		this.databaseSchema  = StrUtil.notNull(entity.getDatabaseSchema()); // v 3.0.0
 		
-		_sDatabaseType    = StrUtil.notNull(entity.getDatabaseType()); // ver 2.0.7
+		this.databaseType    = StrUtil.notNull(entity.getDatabaseType()); // ver 2.0.7
 
-		_sDatabaseComment   = StrUtil.notNull(entity.getDatabaseComment()); // v 3.1.0
+		this.databaseComment = StrUtil.notNull(entity.getDatabaseComment()); // v 3.1.0
 		
 		//--- Initialize all the ATTRIBUTES for the current entity
-		_attributes = new LinkedList<>();
+		this.attributes = new LinkedList<>();
 		for ( Attribute attribute : entity.getAttributes() ) { // v 3.0.0
-			AttributeInContext attributeInContext = new AttributeInContext(this, attribute, _modelInContext, _env);
-			_attributes.add(attributeInContext);
+			AttributeInContext attributeInContext = new AttributeInContext(this, attribute, this.modelInContext, this.env);
+			this.attributes.add(attributeInContext);
 		}
 
 		//--- Initialize all the LINKS for the current entity
-		_links = new LinkedList<>();
+		this.links = new LinkedList<>();
 		for ( Link link : entity.getLinks() ) { // v 3.0.0
-			LinkInContext linkInContext = new LinkInContext(this, link, _modelInContext, _env ); // v 3.0.0
-			_links.add(linkInContext);
+			LinkInContext linkInContext = new LinkInContext(this, link, this.modelInContext, this.env ); // v 3.0.0
+			this.links.add(linkInContext);
 		}
 		
 		//--- Init all the DATABASE FOREIGN KEYS  ( v 2.0.7 )
-		_foreignKeys = new LinkedList<>();
+		this.foreignKeys = new LinkedList<>();
 		for ( ForeignKey fk : entity.getDatabaseForeignKeys() ) {
-			_foreignKeys.add( new ForeignKeyInContext(fk ) );
+			this.foreignKeys.add( new ForeignKeyInContext(fk ) );
 		}
 		
+		//--- Build the list of the "KEY" attributes
+		this.keyAttributes = selectAttributesIfKeyElement(true);
+		
+		//--- Build the list of the "NON KEY" attributes
+		this.nonKeyAttributes = selectAttributesIfKeyElement(false); 
+
 		//--- Post processing : import resolution
 		endOfAttributesDefinition();
 	}
@@ -154,15 +158,15 @@ public class EntityInContext
 	)
 	public String getName()
 	{
-		if ( _env != null ) {
+		if ( env != null ) {
 			StringBuilder sb = new StringBuilder();
-			sb.append( _env.getEntityClassNamePrefix() ) ; // Never null ( "" if not set )
-			sb.append( _sClassName ) ; // Never null ( "" if not set )
-			sb.append( _env.getEntityClassNameSuffix() ) ; // Never null ( "" if not set )
+			sb.append( env.getEntityClassNamePrefix() ) ; // Never null ( "" if not set )
+			sb.append( className ) ; // Never null ( "" if not set )
+			sb.append( env.getEntityClassNameSuffix() ) ; // Never null ( "" if not set )
 			return sb.toString();
 		}
 		else {
-			return _sClassName ;
+			return className ;
 		}
 	}
 	
@@ -177,7 +181,7 @@ public class EntityInContext
 	)
 	public String getPackage()
     {
-        return _sPackage ;
+        return packageName ;
     }
 	
 	/**
@@ -191,7 +195,7 @@ public class EntityInContext
 	)
 	public String getFullName()
     {
-		return _sPackage + "." + getName();
+		return packageName + "." + getName();
     }
 	
 	/* (non-Javadoc)
@@ -240,9 +244,9 @@ public class EntityInContext
 	@VelocityReturnType("List of 'attribute' objects")
 	public List<AttributeInContext> getAttributes() 
 	{
-		if ( _attributes != null )
+		if ( attributes != null )
 		{
-			return _attributes ;
+			return attributes ;
 		}
 		return VOID_ATTRIBUTES_LIST ;
 	}
@@ -256,9 +260,9 @@ public class EntityInContext
 	)
 	public int getAttributesCount() 
 	{
-		if ( _attributes != null )
+		if ( attributes != null )
 		{
-			return _attributes.size() ;
+			return attributes.size() ;
 		}
 		return 0 ;
 	}
@@ -276,8 +280,8 @@ public class EntityInContext
 	@VelocityReturnType("List of 'link' objects")
 	public List<LinkInContext> getLinks() 
 	{
-		if ( _links != null && ! _links.isEmpty() ) {
-			return _links ;
+		if ( links != null && ! links.isEmpty() ) {
+			return links ;
 		}
 		return VOID_LINKS_LIST ;
 	}
@@ -295,10 +299,10 @@ public class EntityInContext
 	@VelocityReturnType("List of 'link' objects")
 	public List<LinkInContext> getSelectedLinks() 
 	{
-		if ( _links != null && ! _links.isEmpty() )
+		if ( links != null && ! links.isEmpty() )
 		{
-			LinkedList<LinkInContext> selectedLinks = new LinkedList<LinkInContext>();
-			for ( LinkInContext link : _links ) {
+			LinkedList<LinkInContext> selectedLinks = new LinkedList<>();
+			for ( LinkInContext link : links ) {
 				if ( link.isSelected() ) {
 					selectedLinks.add(link) ;
 				}
@@ -380,7 +384,7 @@ public class EntityInContext
 		
 		LinkedList<AttributeInContext> selectedAttributes = new LinkedList<>();
 		
-		for ( AttributeInContext attribute : _attributes ) {
+		for ( AttributeInContext attribute : attributes ) {
 			Boolean selectedByKey  = null ;
 			Boolean selectedByText = null ;
 			Boolean selectedByLink = null ;
@@ -422,19 +426,19 @@ public class EntityInContext
 			int selected = 0 ;
 			if ( selectedByKey != null ) {
 				criteriaCount++ ;
-				if ( selectedByKey ) selected++ ;
+				if ( Boolean.TRUE.equals(selectedByKey) ) selected++ ;
 			}
 			if ( selectedByText != null ) {
 				criteriaCount++ ;
-				if ( selectedByText ) selected++ ;
+				if ( Boolean.TRUE.equals(selectedByText) ) selected++ ;
 			}
 			if ( selectedByLink != null ) {
 				criteriaCount++ ;
-				if ( selectedByLink ) selected++ ;
+				if ( Boolean.TRUE.equals(selectedByLink) ) selected++ ;
 			}
 			if ( selectedBySelectedLink != null ) {
 				criteriaCount++ ;
-				if ( selectedBySelectedLink ) selected++ ;
+				if ( Boolean.TRUE.equals(selectedBySelectedLink) ) selected++ ;
 			}
 
 			logDebug("getAttributesByAddedCriteria(" + criteria + ") : " + attribute.getName() + " : " + criteriaCount + " :: " + selected );
@@ -445,11 +449,16 @@ public class EntityInContext
 			}
 			
 		} // for each ...
-		if ( selectedAttributes.size() > 0 ) {
+//		if ( selectedAttributes.size() > 0 ) {
+//			return selectedAttributes ;
+//		}
+//		return VOID_ATTRIBUTES_LIST ;
+		if ( selectedAttributes.isEmpty() ) {
+			return VOID_ATTRIBUTES_LIST ;
+		}
+		else {
 			return selectedAttributes ;
 		}
-		
-		return VOID_ATTRIBUTES_LIST ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -463,10 +472,9 @@ public class EntityInContext
 		}
 	)
 	@VelocityReturnType("List of 'attribute' objects")
-	public List<AttributeInContext> getKeyAttributes() 
-	{
-		if ( _keyAttributes != null ) {
-			return _keyAttributes ;
+	public List<AttributeInContext> getKeyAttributes() {
+		if ( keyAttributes != null ) {
+			return keyAttributes ;
 		}
 		return VOID_ATTRIBUTES_LIST ;
 	}
@@ -486,18 +494,18 @@ public class EntityInContext
 	public AttributeInContext getKeyAttribute() throws GeneratorException 
 	{
 		if ( this.hasPrimaryKey() ) {
-			List<AttributeInContext> keyAttributes = this.getKeyAttributes() ;
-			if ( keyAttributes.size() == 1 ) {
+			List<AttributeInContext> keyAttributesList = this.getKeyAttributes() ;
+			if ( keyAttributesList.size() == 1 ) {
 				// The PK is composed of a single attribute 
-				return keyAttributes.get(0);
+				return keyAttributesList.get(0);
 			}
-			else if ( keyAttributes.size() > 1 ){
+			else if ( keyAttributesList.size() > 1 ){
 				throw new GeneratorException("Cannot get 'keyAttribute' : this entity has a composite Primary Key ("
-							+ keyAttributes.size() + " attributes)");
+							+ keyAttributesList.size() + " attributes)");
 			} 
 			else {
 				throw new GeneratorException("Cannot get 'keyAttribute' : "
-						+ keyAttributes.size() + " attributes in Primary Key");
+						+ keyAttributesList.size() + " attributes in Primary Key");
 			}
 		}
 		else {
@@ -657,8 +665,8 @@ public class EntityInContext
 	)
 	public int getKeyAttributesCount() 
 	{
-		if ( _keyAttributes != null ) {
-			return _keyAttributes.size() ;
+		if ( keyAttributes != null ) {
+			return keyAttributes.size() ;
 		}
 		return 0 ;
 	}
@@ -674,10 +682,9 @@ public class EntityInContext
 		}
 	)
 	@VelocityReturnType("List of 'attribute' objects")
-	public List<AttributeInContext> getNonKeyAttributes() 
-	{
-		if ( _nonKeyAttributes != null ) {
-			return _nonKeyAttributes ;
+	public List<AttributeInContext> getNonKeyAttributes() {
+		if ( nonKeyAttributes != null ) {
+			return nonKeyAttributes ;
 		}
 		return VOID_ATTRIBUTES_LIST ;
 	}
@@ -691,10 +698,9 @@ public class EntityInContext
 		},
 		since="2.0.7"
 	)
-	public int getNonKeyAttributesCount() 
-	{
-		if ( _nonKeyAttributes != null ) {
-			return _nonKeyAttributes.size() ;
+	public int getNonKeyAttributesCount() {
+		if ( nonKeyAttributes != null ) {
+			return nonKeyAttributes.size() ;
 		}
 		return 0 ;
 	}
@@ -705,9 +711,8 @@ public class EntityInContext
 		},
 		example="$entity.databaseTable"
 	)
-	public String getDatabaseTable() 
-	{
-		return _sDatabaseTable ;
+	public String getDatabaseTable() {
+		return databaseTable ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -716,9 +721,8 @@ public class EntityInContext
 		},
 		example="$entity.databaseCatalog"
 	)
-	public String getDatabaseCatalog() 
-	{
-		return _sDatabaseCatalog ;
+	public String getDatabaseCatalog() {
+		return databaseCatalog ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -727,9 +731,8 @@ public class EntityInContext
 		},
 		example="$entity.databaseSchema"
 	)
-	public String getDatabaseSchema() 
-	{
-		return _sDatabaseSchema ;
+	public String getDatabaseSchema() {
+		return databaseSchema ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -744,11 +747,9 @@ public class EntityInContext
 		since="2.0.7"		
 	)
 	@VelocityReturnType("List of 'foreign keys' objects")
-	public List<ForeignKeyInContext> getDatabaseForeignKeys() 
-	{
-		if ( _foreignKeys != null )
-		{
-			return _foreignKeys ;
+	public List<ForeignKeyInContext> getDatabaseForeignKeys() {
+		if ( foreignKeys != null ) {
+			return foreignKeys ;
 		}
 		return VOID_FOREIGN_KEYS_LIST ;
 	}
@@ -764,11 +765,9 @@ public class EntityInContext
 		example="$entity.databaseForeignKeysCount",
 		since="2.0.7"		
 	)
-	public int getDatabaseForeignKeysCount() 
-	{
-		if ( _foreignKeys != null )
-		{
-			return _foreignKeys.size() ;
+	public int getDatabaseForeignKeysCount() {
+		if ( foreignKeys != null ) {
+			return foreignKeys.size() ;
 		}
 		return 0 ;
 	}
@@ -781,9 +780,8 @@ public class EntityInContext
 		example="$entity.databaseType",
 		since="2.0.7"
 	)
-	public String getDatabaseType() 
-	{
-		return _sDatabaseType ;
+	public String getDatabaseType() {
+		return databaseType ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -798,10 +796,9 @@ public class EntityInContext
 		},
 		since="2.0.7"
 	)
-	public boolean isTableType() 
-	{
-		if ( _sDatabaseType != null ) {
-			return "TABLE".equalsIgnoreCase( _sDatabaseType.trim() ) ;
+	public boolean isTableType() {
+		if ( databaseType != null ) {
+			return "TABLE".equalsIgnoreCase( databaseType.trim() ) ;
 		}
 		return false;
 	}
@@ -818,10 +815,9 @@ public class EntityInContext
 			},
 		since="2.0.7"
 	)
-	public boolean isViewType() 
-	{
-		if ( _sDatabaseType != null ) {
-			return "VIEW".equalsIgnoreCase( _sDatabaseType.trim() ) ;
+	public boolean isViewType() {
+		if ( databaseType != null ) {
+			return "VIEW".equalsIgnoreCase( databaseType.trim() ) ;
 		}
 		return false;
 	}
@@ -834,9 +830,8 @@ public class EntityInContext
 		example="$entity.databaseComment",
 		since="3.1.0"
 	)
-	public String getDatabaseComment() 
-	{
-		return _sDatabaseComment ;
+	public String getDatabaseComment() {
+		return databaseComment ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -851,9 +846,8 @@ public class EntityInContext
 		}
 	)
 	@VelocityReturnType("List of 'attribute' objects")
-	public List<AttributeInContext> getNonTextAttributes() 
-	{
-		return buildTextAttributesList ( false ); // NOT LONG TEXT
+	public List<AttributeInContext> getNonTextAttributes() {
+		return selectAttributesIfLongText ( false ); // NOT LONG TEXT
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -868,9 +862,8 @@ public class EntityInContext
 		}
 	)
 	@VelocityReturnType("List of 'attribute' objects")
-	public List<AttributeInContext> getTextAttributes() 
-	{
-		return buildTextAttributesList ( true ); // Special "LONG TEXT"
+	public List<AttributeInContext> getTextAttributes() {
+		return selectAttributesIfLongText ( true ); // Special "LONG TEXT"
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -883,14 +876,13 @@ public class EntityInContext
 			"#end"
 		}
 	)
-	public boolean hasTextAttribute() 
-	{
-    	if ( _attributes != null )
+	public boolean hasTextAttribute() {
+    	if ( attributes != null )
     	{
-    		int n = _attributes.size();
+    		int n = attributes.size();
         	for ( int i = 0 ; i < n ; i++ )        		
         	{
-        		AttributeInContext attribute = _attributes.get(i);
+        		AttributeInContext attribute = attributes.get(i);
                 if ( attribute.isLongText() ) 
                 {
                 	return true ;
@@ -911,10 +903,9 @@ public class EntityInContext
 			"#end"
 		}
 	)
-	public boolean hasCompositePrimaryKey() 
-	{
-		if ( _keyAttributes != null ) {
-			return _keyAttributes.size() > 1 ;
+	public boolean hasCompositePrimaryKey() {
+		if ( keyAttributes != null ) {
+			return keyAttributes.size() > 1 ;
 		}
 		return false ; // No key attributes
 	}
@@ -931,10 +922,9 @@ public class EntityInContext
 		},
 		since="2.0.7"
 	)
-	public boolean hasPrimaryKey() 
-	{
-		if ( _keyAttributes != null ) {
-			return _keyAttributes.size() > 0 ;
+	public boolean hasPrimaryKey() {
+		if ( keyAttributes != null ) {
+			return ! keyAttributes.isEmpty() ; // At least 1 key attribute
 		}
 		return false ; // No key attributes
 	}
@@ -950,10 +940,9 @@ public class EntityInContext
 			"#end"
 		}
 	)
-	public boolean hasAutoIncrementedKey() 
-	{
-		if ( _keyAttributes != null ) {
-			for ( AttributeInContext keyAttribute : _keyAttributes ) {
+	public boolean hasAutoIncrementedKey() {
+		if ( keyAttributes != null ) {
+			for ( AttributeInContext keyAttribute : keyAttributes ) {
 				if ( keyAttribute.isAutoIncremented() ) {
 					return true ; 
 				}
@@ -977,11 +966,11 @@ public class EntityInContext
 	@VelocityReturnType("'attribute' object")
 	public AttributeInContext getAutoincrementedKeyAttribute() 
 	{
-		List<AttributeInContext> keyAttributes = getKeyAttributes();
-    	if ( keyAttributes != null && keyAttributes.size() == 1 )
+		List<AttributeInContext> keyAttributesList = getKeyAttributes();
+    	if ( keyAttributesList != null && keyAttributesList.size() == 1 )
     	{
 			// Only one attribute in the PK
-			AttributeInContext attribute = keyAttributes.get(0);
+			AttributeInContext attribute = keyAttributesList.get(0);
 			if ( attribute != null && attribute.isAutoIncremented() ) {
             	// This unique PK field is auto-incremented => return it
             	return attribute ; 
@@ -1011,7 +1000,7 @@ public class EntityInContext
 				if( link.isOwningSide() && link.usesAttribute(attribute) ) {
 					String referencedEntityType = link.getTargetEntitySimpleType() ;
 					//--- Found => add it in the list
-					if ( referencedEntityTypes.contains(referencedEntityType) == false ) {
+					if ( ! referencedEntityTypes.contains(referencedEntityType) ) {
 						//--- Not already in the list => add it
 						referencedEntityTypes.add( link.getTargetEntitySimpleType() );
 					}
@@ -1038,7 +1027,7 @@ public class EntityInContext
 			if ( link.isOwningSide() ) {
 				String referencedEntityType = link.getTargetEntitySimpleType() ;
 				//--- Found => add it in the list
-				if ( referencedEntityTypes.contains(referencedEntityType) == false ) {
+				if ( ! referencedEntityTypes.contains(referencedEntityType) ) {
 					//--- Not already in the list => add it
 					referencedEntityTypes.add( referencedEntityType );
 				}
@@ -1048,48 +1037,21 @@ public class EntityInContext
     }
 
 	//-------------------------------------------------------------------------------------------------
-	//-------------------------------------------------------------------------------------------------
-	private LinkedList<AttributeInContext> buildAttributesList ( boolean bKeyAttribute ) 
-	{
-		LinkedList<AttributeInContext> attributesList = new LinkedList<>();
-    	if ( _attributes != null )
-    	{
-    		int n = _attributes.size();
-        	for ( int i = 0 ; i < n ; i++ )        		
-        	{
-        		AttributeInContext attribute = _attributes.get(i);
-                if ( attribute.isKeyElement() == bKeyAttribute ) 
-                {
-                	attributesList.add(attribute);
-                }        		
-        	}
-    	}
-		return attributesList ;
-	}
-
 	//-----------------------------------------------------------------------------------------------
 	/**
 	 * This method closes the definition of the class (when all the attributes have been added) <br>
-	 * 
-	 * It build the "KEY" and "NON KEY" attributes 
 	 * 
 	 * It determines if there is import types collision ( eg "java.util.Date" with "java.sql.Date" ) <br>
 	 * and managed the imports list and attributes declarations types to avoid imports error
 	 *  
 	 */
 	private void endOfAttributesDefinition() {
-		if ( _attributes == null ) return ;
+		if ( attributes == null ) return ;
 		
-		//--- Build the list of the "KEY" attributes
-		_keyAttributes = buildAttributesList ( true );
-		
-		//--- Build the list of the "NON KEY" attributes
-		_nonKeyAttributes = buildAttributesList ( false ); 
-
 		//--- Duplicated short types detection
-		AmbiguousTypesDetector duplicatedTypesDetector = new AmbiguousTypesDetector(_attributes);
+		AmbiguousTypesDetector duplicatedTypesDetector = new AmbiguousTypesDetector(attributes);
 		List<String> ambiguousTypes = duplicatedTypesDetector.getAmbiguousTypes();
-		for ( AttributeInContext attribute : _attributes ) {
+		for ( AttributeInContext attribute : attributes ) {
 			//--- Is this attribute's type ambiguous ?
 			if ( ambiguousTypes.contains( attribute.getFullType() ) ) {
 				//--- Yes => force this attribute to use its "full type" for variable declaration
@@ -1098,28 +1060,34 @@ public class EntityInContext
 		}
 	}
 	
+	//-------------------------------------------------------------------------------------------------
+	private List<AttributeInContext> selectAttributesIfKeyElement(boolean bKeyAttribute) {
+		LinkedList<AttributeInContext> attributesList = new LinkedList<>();
+    	if ( attributes != null ) {
+            for ( AttributeInContext attribute : attributes ) {
+                if ( attribute.isKeyElement() == bKeyAttribute ) {
+                	attributesList.add(attribute);
+                }        		
+            }
+    	}
+		return attributesList ;
+	}
+	
 	/**
 	 * "Text" or "non Text" attributes
 	 * @param bLongText
 	 * @return
 	 */
-	private LinkedList<AttributeInContext> buildTextAttributesList ( boolean bLongText ) 
-	{
-    	if ( _attributes != null )
-    	{
-			LinkedList<AttributeInContext> list = new LinkedList<>();
-    		int n = _attributes.size();
-        	for ( int i = 0 ; i < n ; i++ )        		
-        	{
-        		AttributeInContext attribute = _attributes.get(i);
-                if ( attribute.isLongText() == bLongText ) 
-                {
+	private List<AttributeInContext> selectAttributesIfLongText(boolean bLongText) {
+		LinkedList<AttributeInContext> list = new LinkedList<>();
+    	if ( attributes != null ) {
+            for ( AttributeInContext attribute : attributes ) {
+                if ( attribute.isLongText() == bLongText ) {
                 	list.add(attribute);
                 }        		
-        	}
-    		return list ;
+            }
     	}
-    	return null ;
+		return list ;
 	}
 
 	private final void logDebug(String s) {
