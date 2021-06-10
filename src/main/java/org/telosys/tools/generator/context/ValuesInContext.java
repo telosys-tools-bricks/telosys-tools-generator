@@ -62,9 +62,8 @@ public class ValuesInContext {
 	private static final String JSON_SEPARATOR1 = "\n  " ;
 	private static final String JSON_SEPARATOR2 = "\n" ;
 			
-	private final LiteralValuesProvider  literalValuesProvider ;
-	private final LinkedList<String>     attributeNames ; // to keep the original list order
-//	private final Map<String, String>    values ; // attribute name --> java literal value
+	private final LiteralValuesProvider     literalValuesProvider ;
+	private final LinkedList<String>        attributeNames ; // to keep the original list order
 	private final Map<String, LiteralValue> values ; // attribute name --> literal value
 	
 	private final String                 nullLiteral ;
@@ -87,7 +86,6 @@ public class ValuesInContext {
 			// Generates and stores the literal value
 			LanguageType languageType = attrib.getLanguageType() ;
 			int maxLength = StrUtil.getInt(attrib.getMaxLength(), 1) ;
-			//String literalValue = literalValuesProvider.generateLiteralValue(languageType, maxLength, step);
 			LiteralValue literalValue = literalValuesProvider.generateLiteralValue(languageType, maxLength, step);
 			values.put ( attrib.getName(), literalValue ) ;
 			// Keep the attribute name
@@ -123,13 +121,6 @@ public class ValuesInContext {
 		since = "3.0.0"
 	)
 	public String getValue(String attributeName) {
-//		String value = values.get(attributeName) ;
-//		if ( value != null ) {
-//			return value;
-//		}
-//		else {
-//			return nullLiteral ;
-//		}
 		LiteralValue literalValue = values.get(attributeName) ;
 		if ( literalValue != null ) {
 			return literalValue.getCurrentLanguageValue();
@@ -446,7 +437,6 @@ public class ValuesInContext {
 		sb.append( attribute.getGetter() ) ;
 		sb.append( "()" ) ;
 		
-//		String value = values.get( attribute.getName() ) ; // Value for the given attribute		
 		LiteralValue literalValue = values.get( attribute.getName() ) ; // Value for the given attribute
 		String value = literalValue.getCurrentLanguageValue();
 		
@@ -455,6 +445,5 @@ public class ValuesInContext {
 		sb.append( equalsStatement ) ;
 		
 		return sb.toString();
-
 	}
 }

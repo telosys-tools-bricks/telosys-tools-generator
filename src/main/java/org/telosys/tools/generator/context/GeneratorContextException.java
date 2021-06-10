@@ -44,15 +44,6 @@ public class GeneratorContextException extends RuntimeException
         templateName = "" ;
     }
 
-//    /**
-//     * @param message
-//     * @param cause
-//     */
-//    public GeneratorContextException(String message, Throwable cause)
-//    {
-//        super(message, cause);
-//    }
-
     /**
      * @param message
      * @param introspectionInfo

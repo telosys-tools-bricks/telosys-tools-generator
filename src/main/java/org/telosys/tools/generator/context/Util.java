@@ -22,6 +22,12 @@ import org.telosys.tools.commons.JavaTypeUtil;
 
 public class Util {
 
+	/**
+	 * Private constructor
+	 */
+	private Util() {
+	}
+	
 	public static String bigDecimalToString(BigDecimal value, String defaultValue) {
 		if ( value != null ) {
 			return value.toString();
@@ -79,7 +85,6 @@ public class Util {
      * @return
      */
     public static String buildSetter(String attributeName) {
-		// return "set" + attName.substring(0, 1).toUpperCase()+attName.substring(1, attName.length());
 		return "set" + transformAttributeName(attributeName) ;
 	}
 
@@ -92,6 +97,7 @@ public class Util {
 		return attributeName.substring(0, 1).toUpperCase() + attributeName.substring(1, attributeName.length());
 	}
 
+/*** UNUSED
     private static boolean inList (String sLongType, LinkedList<String> fullNames) 
     {
     	for ( String s : fullNames ) {
@@ -105,12 +111,6 @@ public class Util {
     	}
     	return false ; // Not found
     }    
-    /**
-     * Determines the shortest type to use according with the given "not imported types" list
-     * @param sLongType
-     * @param notImportedTypes
-     * @return
-     */
     public static String shortestType(String sLongType, LinkedList<String> notImportedTypes) 
     {
     	if ( notImportedTypes != null )
@@ -124,7 +124,8 @@ public class Util {
 		//return JavaClassUtil.shortName(sLongType);
 		return JavaTypeUtil.shortType(sLongType); // v 3.3.0
 	}
-
+UNUSED ***/
+    
     /**
      * Trim the given string, returns the default value is the string is null
      * @param s

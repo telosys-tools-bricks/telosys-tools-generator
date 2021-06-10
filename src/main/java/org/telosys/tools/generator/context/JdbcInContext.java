@@ -108,7 +108,6 @@ public class JdbcInContext {
 	)
 	public String getSqlSelectCountWherePK()
     {
-		//return this.sqlCRUDRequests.getSqlExists();
 		return this.requests.getSqlSelectCountWherePK();
     }
 

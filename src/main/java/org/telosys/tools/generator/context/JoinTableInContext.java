@@ -16,6 +16,7 @@
 package org.telosys.tools.generator.context;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
@@ -48,36 +49,35 @@ import org.telosys.tools.generic.model.JoinTable;
 public class JoinTableInContext
 {
 
-	private final String _name ;
-
-	private final String _schema ;
-
-	private final String _catalog ;
+	private final String name ;
+	private final String schema ;
+	private final String catalog ;
+	private final LinkedList<JoinColumnInContext>  joinColumns ;
+	private final LinkedList<JoinColumnInContext>  inverseJoinColumns ;
 	
-	private final LinkedList<JoinColumnInContext>  _joinColumns ;
-
-	private final LinkedList<JoinColumnInContext>  _inverseJoinColumns ;
-	
-	
+	/**
+	 * Constructor
+	 * @param joinTable
+	 */
 	public JoinTableInContext(JoinTable joinTable) {
 		super();
-		_name    = joinTable.getName();
-		_schema  = joinTable.getSchema();
-		_catalog = joinTable.getCatalog();
+		name    = joinTable.getName();
+		schema  = joinTable.getSchema();
+		catalog = joinTable.getCatalog();
 		
 		//--- Build the list of "join columns"
-		_joinColumns = new LinkedList<JoinColumnInContext>();
+		joinColumns = new LinkedList<>();
 		if ( joinTable.getJoinColumns() != null ) {
 			for ( JoinColumn jc : joinTable.getJoinColumns() ) {
-				_joinColumns.add( new JoinColumnInContext(jc) ) ;
+				joinColumns.add( new JoinColumnInContext(jc) ) ;
 			}
 		}
 
 		//--- Build the list of "inverse join columns"
-		_inverseJoinColumns = new LinkedList<JoinColumnInContext>();
+		inverseJoinColumns = new LinkedList<>();
 		if ( joinTable.getInverseJoinColumns() != null ) {
 			for ( JoinColumn jc : joinTable.getInverseJoinColumns() ) {
-				_inverseJoinColumns.add( new JoinColumnInContext(jc) ) ;
+				inverseJoinColumns.add( new JoinColumnInContext(jc) ) ;
 			}
 		}
 	}
@@ -89,7 +89,7 @@ public class JoinTableInContext
 			}
 	)
 	public String getName() {
-		return _name;
+		return name;
 	}
 
 	//--------------------------------------------------------------------------
@@ -99,44 +99,44 @@ public class JoinTableInContext
 			}
 	)
 	public String getSchema() {
-		return _schema;
+		return schema;
 	}
 
 	//--------------------------------------------------------------------------
 	@VelocityMethod(
-			text={	
-				"Returns the table catalog if any "
-				}
-		)
+		text={	
+			"Returns the table catalog if any "
+			}
+	)
 	public String getCatalog() {
-		return _catalog;
+		return catalog;
 	}
 
 	//--------------------------------------------------------------------------
 	@VelocityMethod(
-			text={	
-				"Returns the join columns"
-				}
-		)
-	public LinkedList<JoinColumnInContext> getJoinColumns()
+		text={	
+			"Returns the join columns"
+			}
+	)
+	public List<JoinColumnInContext> getJoinColumns()
 	{
-		return _joinColumns ;
+		return joinColumns ;
 	}
 	
 	//--------------------------------------------------------------------------
 	@VelocityMethod(
-			text={	
-				"Returns the inverse join columns"
-				}
-		)
-	public LinkedList<JoinColumnInContext> getInverseJoinColumns()
+		text={	
+			"Returns the inverse join columns"
+			}
+	)
+	public List<JoinColumnInContext> getInverseJoinColumns()
 	{
-		return _inverseJoinColumns ; 
+		return inverseJoinColumns ; 
 	}
 	
 	//-------------------------------------------------------------------------------------
 	@Override
 	public String toString() {
-		return _name ;
+		return name ;
 	}
 }

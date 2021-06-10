@@ -35,7 +35,7 @@ public class SqlTypeProvider {
 	private static final String POSTGRESQL = "POSTGRESQL";
 	private static final String MYSQL      = "MYSQL";
 	
-	private final static Map<String,Map<String,String>> maps = new HashMap<>(); 
+	private static final Map<String,Map<String,String>> maps = new HashMap<>(); 
 	{
 		maps.put(ANSI,       typesANSI());
 		maps.put(ORACLE,     typesORACLE() );
@@ -94,7 +94,7 @@ public class SqlTypeProvider {
 	//  TYPES MAPPINGS
 	//------------------------------------------------------------------------------------
 	private static Map<String, String> typesANSI() {
-	    Map<String,String> map = new HashMap<String,String>();
+	    Map<String,String> map = new HashMap<>();
 	    map.put(NeutralType.STRING,  "VARCHAR(%)");
 	    
 	    map.put(NeutralType.SHORT,   "SMALLINT"); 
@@ -117,7 +117,7 @@ public class SqlTypeProvider {
 	}
 	
 	private static Map<String, String> typesPOSTGRESQL() {
-	    Map<String,String> map = new HashMap<String,String>();
+	    Map<String,String> map = new HashMap<>();
 	    map.put(NeutralType.STRING,  "varchar(%)");
 	    
 	    map.put(NeutralType.SHORT,   "smallint"); // 2 bytes
@@ -140,7 +140,7 @@ public class SqlTypeProvider {
 	}
 	
 	private static Map<String, String> typesMYSQL() {
-	    Map<String,String> map = new HashMap<String,String>();
+	    Map<String,String> map = new HashMap<>();
 	    map.put(NeutralType.STRING,  "VARCHAR(%)");
 	    
 	    map.put(NeutralType.SHORT,   "SMALLINT"); // SMALLINT[(M)] [UNSIGNED] [ZEROFILL]
@@ -178,7 +178,7 @@ public class SqlTypeProvider {
 	}
 	
 	private static Map<String, String> typesORACLE() {
-	    Map<String,String> map = new HashMap<String,String>();
+	    Map<String,String> map = new HashMap<>();
 	    map.put(NeutralType.STRING,  "VARCHAR2(%)");
 	    
 	    map.put(NeutralType.SHORT,   "SMALLINT"); // alias for "SMALLINT" ANSI data type = NUMBER(38)

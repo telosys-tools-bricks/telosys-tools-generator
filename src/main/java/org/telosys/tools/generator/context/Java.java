@@ -36,7 +36,7 @@ import org.telosys.tools.generator.context.tools.LinesBuilder;
 //-------------------------------------------------------------------------------------
 public class Java {
 
-	private final static List<String> VOID_STRINGS_LIST = new LinkedList<String>();
+	private static final List<String> VOID_STRINGS_LIST = new LinkedList<>();
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -86,7 +86,7 @@ public class Java {
 		lb.append(indent, "if ( obj == null ) return false ;");
 		lb.append(indent, "if ( this.getClass() != obj.getClass() ) return false ; ");
 		
-		// Cast, ie : MyClass other = (MyClass) obj;
+		// Cast obj to the given className 
 		lb.append( indent, className + " other = (" + className + ") obj; ");
 		
 		if ( fieldsList != null ) {
@@ -112,8 +112,7 @@ public class Java {
 						lb.append(indent, "if ( " + attributeName + " != other." + attributeName + " ) return false ; ");
 					}
 				}
-				//else if ( attribute.isArrayType() ) {
-				else if ( isArray(attribute) ) { // v 3.0.0
+				else if ( isArray(attribute) ) {
 					// char[], byte[], String[], ...
 					lb.append(indent, "if ( ! Arrays.equals(" + attributeName + ", other." + attributeName + ") ) return false ; ");
 				}
@@ -149,7 +148,7 @@ public class Java {
 			since = "2.0.7"
 				)
 	public String hashCodeMethod( String className, List<AttributeInContext> fieldsList ) {
-		return hashCodeMethod( className , fieldsList, new LinesBuilder() ); 
+		return hashCodeMethod(fieldsList, new LinesBuilder() ); 
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -167,16 +166,16 @@ public class Java {
 			since = "2.0.7"
 				)
 	public String hashCodeMethod( String className, List<AttributeInContext> fieldsList, int indentSpaces ) {
-		return hashCodeMethod( className , fieldsList, new LinesBuilder(indentSpaces) ); 
+		return hashCodeMethod(fieldsList, new LinesBuilder(indentSpaces) ); 
 	}
 	
 	//-------------------------------------------------------------------------------------
-	private String hashCodeMethod( String className, List<AttributeInContext> fieldsList, LinesBuilder lb ) {
+	private String hashCodeMethod(List<AttributeInContext> fieldsList, LinesBuilder lb ) {
 
 		int indent = 1 ;
 		lb.append(indent, "public int hashCode() { ");
 
-		boolean long_temp = false ;
+		boolean longtempVarDefined = false ;
 		indent++;
 			lb.append(indent, "final int prime = 31; ");
 			lb.append(indent, "int result = 1; ");
@@ -204,9 +203,9 @@ public class Java {
 						}
 						else if ( attribute.isDoubleType() ) {
 							// double
-							if ( long_temp == false ) {
+							if ( ! longtempVarDefined ) {
 								lb.append(indent, "long temp;");
-								long_temp = true ;
+								longtempVarDefined = true ;
 							}
 							lb.append(indent, "temp = Double.doubleToLongBits(" + attributeName + ");");
 							lb.append(indent, "result = prime * result + (int) (temp ^ (temp >>> 32));");
@@ -216,8 +215,7 @@ public class Java {
 							lb.append(indent, "result = prime * result + " + attributeName + ";");
 						}
 					}
-					//else if ( attribute.isArrayType() ) {
-					else if ( isArray(attribute) ) { // v 3.0.0
+					else if ( isArray(attribute) ) { 
 						// char[], byte[], String[], ...
 						lb.append(indent, "result = prime * result + Arrays.hashCode(" + attributeName + ");");
 					}
@@ -258,9 +256,6 @@ public class Java {
 				// register the type to be imported if necessary
 				imports.declareType( attribute.getFullType() ); 
 			}
-//			List<String> resultList = imports.getList();
-//			java.util.Collections.sort(resultList);
-//			return resultList ;
 			return imports.getFinalImportsList();			
 		}
 		return VOID_STRINGS_LIST ;
@@ -505,10 +500,8 @@ public class Java {
      * @param sType
      * @return
      */
-    private boolean usableInToString( AttributeInContext attribute ) 
-    {
+    private boolean usableInToString( AttributeInContext attribute ) {
     	if ( attribute.isBinaryType() ) return false ;
-    	// if ( attribute.isArrayType() ) return false ;
     	if ( isArray(attribute) ) return false ;
     	if ( attribute.isLongText() ) return false ;
     	

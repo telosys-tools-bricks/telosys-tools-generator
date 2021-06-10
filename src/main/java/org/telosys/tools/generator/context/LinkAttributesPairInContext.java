@@ -45,8 +45,8 @@ import org.telosys.tools.generator.context.names.ContextName;
 //-------------------------------------------------------------------------------------
 public class LinkAttributesPairInContext {
 	
-	private final AttributeInContext  _originAttribute;
-	private final AttributeInContext  _targetAttribute;
+	private final AttributeInContext  originAttribute;
+	private final AttributeInContext  targetAttribute;
 
 	//-------------------------------------------------------------------------------------
 	/**
@@ -55,10 +55,10 @@ public class LinkAttributesPairInContext {
 	 * @param targetAttribute
 	 */
 	public LinkAttributesPairInContext(
-			final AttributeInContext originAttribute, final AttributeInContext targetAttribute ) 
+			AttributeInContext originAttribute, AttributeInContext targetAttribute ) 
 	{
-		this._originAttribute = originAttribute;
-		this._targetAttribute = targetAttribute;		
+		this.originAttribute = originAttribute;
+		this.targetAttribute = targetAttribute;		
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ public class LinkAttributesPairInContext {
 	)
 	public AttributeInContext getOriginAttribute() 
     {
-        return _originAttribute ;
+        return originAttribute ;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -82,6 +82,6 @@ public class LinkAttributesPairInContext {
 	)
 	public AttributeInContext getTargetAttribute() 
     {
-        return _targetAttribute ;
+        return targetAttribute ;
     }
 }

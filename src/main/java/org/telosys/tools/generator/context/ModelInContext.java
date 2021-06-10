@@ -30,7 +30,7 @@ import org.telosys.tools.generic.model.Model;
 import org.telosys.tools.generic.model.ModelType;
 
 /**
- * This class give access to the entire repository model
+ * This class gives access to the entire model
  *  
  * @author Laurent GUERIN
  *
@@ -44,22 +44,23 @@ import org.telosys.tools.generic.model.ModelType;
 //-------------------------------------------------------------------------------------
 public class ModelInContext
 {
-	private final String    _modelName ;
-	private final String    _modelFolderName ;
-	private final String    _modelVersion ;
-	private final ModelType _modelType ;
+	private final String    modelName ;
+	private final String    modelFolderName ;
+	private final String    modelVersion ;
+	private final ModelType modelType ;
 	
-	private final String   _modelTitle ;
-	private final String   _modelDescription ;
-	private final int      _databaseId ;
-	private final String   _databaseProductName ;
+	private final String   modelTitle ;
+	private final String   modelDescription ;
+	private final int      databaseId ;
+	private final String   databaseProductName ;
 	
-	private final List<EntityInContext>       _allEntities ;
-	private final Map<String,EntityInContext> _entitiesByTableName ;
-	private final Map<String,EntityInContext> _entitiesByClassName ;
+	private final List<EntityInContext>       allEntities ;
+	private final Map<String,EntityInContext> entitiesByTableName ;
+	private final Map<String,EntityInContext> entitiesByClassName ;
 	
 	//-------------------------------------------------------------------------------------
 	/**
+	 * Constructor
 	 * @param model
 	 * @param telosysToolsCfg
 	 * @param env
@@ -69,54 +70,54 @@ public class ModelInContext
 		super();
 		if ( model == null ) throw new IllegalArgumentException("Model is null");
 		
-		_modelName = model.getName();  // MANDATORY
-		_modelFolderName = model.getFolderName();  // MANDATORY
-		_modelVersion = model.getVersion(); // MANDATORY
-		_modelType = model.getType(); // MANDATORY
+		this.modelName = model.getName();  // MANDATORY
+		this.modelFolderName = model.getFolderName();  // MANDATORY
+		this.modelVersion = model.getVersion(); // MANDATORY
+		this.modelType = model.getType(); // MANDATORY
 		// check validity 
-		if ( _modelName == null ) throw new IllegalArgumentException("Model name is null");
-		if ( _modelFolderName == null ) throw new IllegalArgumentException("Model folder name is null");
-		if ( _modelVersion == null ) throw new IllegalArgumentException("Model version is null");
-		if ( _modelType == null ) throw new IllegalArgumentException("Model type is null");
+		if ( this.modelName == null ) throw new IllegalArgumentException("Model name is null");
+		if ( this.modelFolderName == null ) throw new IllegalArgumentException("Model folder name is null");
+		if ( this.modelVersion == null ) throw new IllegalArgumentException("Model version is null");
+		if ( this.modelType == null ) throw new IllegalArgumentException("Model type is null");
 		
-		_modelTitle = model.getTitle() != null ? model.getTitle() : "" ;
-		_modelDescription = model.getDescription() != null ? model.getDescription() : "" ;
+		this.modelTitle = model.getTitle() != null ? model.getTitle() : "" ;
+		this.modelDescription = model.getDescription() != null ? model.getDescription() : "" ;
 		
 		//--- All the entities (the original model order is kept)
-		_allEntities = new LinkedList<EntityInContext>(); // v 3.0.0
+		this.allEntities = new LinkedList<>(); // v 3.0.0
 		for ( Entity entity : model.getEntities() ) { // v 3.0.0
 			//_allEntities.add( new EntityInContext(entity, entitiesPackage, this, env) );// v 3.0.0
-			_allEntities.add( 
+			this.allEntities.add( 
 					new EntityInContext(entity, 
 							telosysToolsCfg.getEntityPackage(),  // v 3.3.0
 							this, env) );
 		}
 		
 		//--- Entities by TABLE NAME
-		_entitiesByTableName = new HashMap<String,EntityInContext>();
-		for ( EntityInContext entity : _allEntities ) {
+		this.entitiesByTableName = new HashMap<>();
+		for ( EntityInContext entity : this.allEntities ) {
 			// The table name is unique 
-			_entitiesByTableName.put(entity.getDatabaseTable(), entity);
+			this.entitiesByTableName.put(entity.getDatabaseTable(), entity);
 		}
 		
 		//--- Entities by CLASS NAME
-		_entitiesByClassName = new HashMap<String,EntityInContext>();
-		for ( EntityInContext entity : _allEntities ) {
+		this.entitiesByClassName = new HashMap<>();
+		for ( EntityInContext entity : this.allEntities ) {
 			// The class name is supposed to be unique 
-			_entitiesByClassName.put(entity.getName(), entity);
+			this.entitiesByClassName.put(entity.getName(), entity);
 		}
 		
 		if ( model.getDatabaseId() != null ) {
-			_databaseId          = model.getDatabaseId();
+			this.databaseId          = model.getDatabaseId();
 		}
 		else {
-			_databaseId = -1;
+			this.databaseId = -1;
 		}
 		if ( model.getDatabaseProductName() != null ) {
-			_databaseProductName = model.getDatabaseProductName();
+			this.databaseProductName = model.getDatabaseProductName();
 		}
 		else {
-			_databaseProductName = "";
+			this.databaseProductName = "";
 		}
 	}
 	
@@ -129,7 +130,7 @@ public class ModelInContext
 	)
     public String getName()
     {
-        return _modelName ;
+        return modelName ;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -141,7 +142,7 @@ public class ModelInContext
 	)
     public String getFolderName()
     {
-        return _modelFolderName ;
+        return modelFolderName ;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -153,7 +154,7 @@ public class ModelInContext
 	)
     public String getVersion()
     {
-        return _modelVersion ;
+        return modelVersion ;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -165,7 +166,7 @@ public class ModelInContext
 	)
     public String getType()
     {
-        switch ( _modelType ) {
+        switch ( modelType ) {
         case DOMAIN_SPECIFIC_LANGUAGE : 
         	return "DSL-MODEL" ;
         case DATABASE_SCHEMA : 
@@ -184,7 +185,7 @@ public class ModelInContext
 	)
     public String getTitle()
     {
-        return _modelTitle ;
+        return modelTitle ;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -196,7 +197,7 @@ public class ModelInContext
 	)
     public String getDescription()
     {
-        return _modelDescription ;
+        return modelDescription ;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -207,7 +208,7 @@ public class ModelInContext
 	)
     public int getNumberOfEntities()
     {
-        return _allEntities.size() ;
+        return allEntities.size() ;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -218,7 +219,7 @@ public class ModelInContext
 	)
     public List<EntityInContext> getAllEntites()
     {
-		return _allEntities ;
+		return allEntities ;
     }
 	
 	//---------------------------------------------------------------------------------------------------
@@ -230,10 +231,10 @@ public class ModelInContext
 	 */
 	public List<EntityInContext> getEntities( List<String> entitiesNames ) throws GeneratorException
 	{
-		List<EntityInContext> selectedEntities = new LinkedList<EntityInContext>();
+		List<EntityInContext> selectedEntities = new LinkedList<>();
 		if ( entitiesNames != null ) {
 			for ( String entityName : entitiesNames ) {
-				EntityInContext entity = _entitiesByClassName.get(entityName);
+				EntityInContext entity = entitiesByClassName.get(entityName);
 				if ( entity != null ) {
 					selectedEntities.add(entity);
 				}
@@ -257,7 +258,7 @@ public class ModelInContext
 	)
     public EntityInContext getEntityByTableName( String name )
     {
-		return _entitiesByTableName.get(name);
+		return entitiesByTableName.get(name);
     }
 
 	//-------------------------------------------------------------------------------------
@@ -272,7 +273,7 @@ public class ModelInContext
 	)
     public EntityInContext getEntityByClassName( String entityClassName )
     {
-		return _entitiesByClassName.get(entityClassName);
+		return entitiesByClassName.get(entityClassName);
     }
 
 	//-------------------------------------------------------------------------------------
@@ -287,7 +288,7 @@ public class ModelInContext
 	)
     public boolean hasEntityWithTableName( String name )
     {
-		return ( _entitiesByTableName.get(name) != null ) ;
+		return ( entitiesByTableName.get(name) != null ) ;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -302,7 +303,7 @@ public class ModelInContext
 	)
     public boolean hasEntityWithClassName( String name )
     {
-		return ( _entitiesByClassName.get(name) != null ) ;
+		return ( entitiesByClassName.get(name) != null ) ;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -315,7 +316,7 @@ public class ModelInContext
 	)
     public int getDatabaseId()
     {
-		return _databaseId ;
+		return databaseId ;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -328,7 +329,7 @@ public class ModelInContext
 	)
     public String getDatabaseProductName()
     {
-		return _databaseProductName ;
+		return databaseProductName ;
     }
 
 }

@@ -41,8 +41,6 @@ import org.telosys.tools.generic.model.FetchType;
 //-------------------------------------------------------------------------------------
 public class Jpa {
 
-//	private static final List<String> VOID_STRINGS_LIST = new LinkedList<>();
-	
 	private boolean   genTargetEntity = false ;
 	private String    collectionType  = "List" ;
 	
@@ -183,85 +181,12 @@ public class Jpa {
 		since = "2.0.7"
 	)
 	@VelocityReturnType("List of 'String'")
-	public List<String> imports(EntityInContext entity) throws GeneratorException {
-//		JavaImportsList imports = new JavaImportsList();
-//		//--- Get all the basic attributes types
-//		List<String> basicAttributeTypes = new LinkedList<>();
-//		for ( AttributeInContext attribute : entity.getAttributes() ) {
-//			basicAttributeTypes.add(attribute.getFullType() ); 
-//		}
-//		//--- Get all the link attributes types
-//		List<String> linkAttributeTypes = new LinkedList<>();
-//		for ( LinkInContext link : entity.getLinks() ) {
-//			if ( link.isCardinalityOneToMany() || link.isCardinalityManyToMany() ) {
-//				// collection types used for JPA link
-////				linkAttributeTypes.add( fieldType(link) );
-//				linkAttributeTypes.add( link.getFieldType() );
-//			}
-//		}
-//		// Build all imports 
-//		imports.buildImports(basicAttributeTypes, linkAttributeTypes);
-//		List<String> list = imports.getFinalImportsList();
-//		if ( ! list.isEmpty() ) {
-//			list.add("");
-//		}
+	public List<String> imports(EntityInContext entity) {
 		List<String> list = new LinkedList<>();
 		list.add("javax.persistence.*");
 		return list;
 	}
 	
-//	private JavaImportsList buildJpaImportsList() {
-//		JavaImportsList jpaImports = new JavaImportsList();
-//
-//		jpaImports.declareType("javax.persistence.*");
-//		
-//		/*
-//		jpaImports.declareType("javax.persistence.Entity");
-//		jpaImports.declareType("javax.persistence.Table");
-//		jpaImports.declareType("javax.persistence.Id");
-//		
-//		jpaImports.declareType("javax.persistence.UniqueConstraint");
-//		jpaImports.declareType("javax.persistence.EmbeddedId");
-//		jpaImports.declareType("javax.persistence.Embeddable");
-//		jpaImports.declareType("javax.persistence.AttributeOverride");
-//		jpaImports.declareType("javax.persistence.AttributeOverrides");
-//
-//		jpaImports.declareType("javax.persistence.OneToOne");
-//		jpaImports.declareType("javax.persistence.ManyToMany");
-//		jpaImports.declareType("javax.persistence.ManyToOne");
-//		jpaImports.declareType("javax.persistence.OneToMany");
-//
-//		jpaImports.declareType("javax.persistence.GeneratedValue");
-//		jpaImports.declareType("javax.persistence.GenerationType");
-//		jpaImports.declareType("javax.persistence.SequenceGenerator");
-//		jpaImports.declareType("javax.persistence.TableGenerator");
-//		*/
-//		return jpaImports ;
-//	}
-	
-//	// WIP :
-//	// $jpa.fieldType($link)
-//	// $jpa.formattedFieldType($link, 10)
-//	public String fieldType(LinkInContext link) throws GeneratorException {
-//		String targetEntityClassName = link.getTargetEntitySimpleType() ; 
-//		if ( link.isCardinalityOneToMany() || link.isCardinalityManyToMany() ) {
-//			// Collection : List<Student>, Set<Book>, etc
-//			return this.collectionType + "<" + targetEntityClassName + ">" ; 
-//		} else {
-//			// Basic type : Student, Book, etc
-//			return targetEntityClassName ;
-//		}
-//	}
-//	public String formattedFieldType(LinkInContext link, int expectedLength) throws GeneratorException
-//    {
-//		String currentType = fieldType(link);
-//        int delta = expectedLength - currentType.length();
-//        if (delta > 0) { // if trailing blanks needed
-//            return currentType + GeneratorUtil.blanks(delta);
-//        }
-//        return currentType;
-//    }
-
 	//-------------------------------------------------------------------------------------
 	// ENTITY JPA ANNOTATIONS
 	//-------------------------------------------------------------------------------------
@@ -861,12 +786,12 @@ public class Jpa {
 		if ( joinTable != null ) {
 			annotations.addLine("@JoinTable(name=\"" + joinTable.getName() + "\", " );
 			
-			LinkedList<JoinColumnInContext> joinColumns = joinTable.getJoinColumns();
+			List<JoinColumnInContext> joinColumns = joinTable.getJoinColumns();
 			if ( joinColumns != null ) {
 				processJoinTableColumns(annotations, link, joinColumns, "joinColumns", "," );
 			}
 			
-			LinkedList<JoinColumnInContext> inverseJoinColumns = joinTable.getInverseJoinColumns();
+			List<JoinColumnInContext> inverseJoinColumns = joinTable.getInverseJoinColumns();
 			if ( inverseJoinColumns != null ) 
 			{
 				processJoinTableColumns(annotations, link, inverseJoinColumns, "inverseJoinColumns", "" );

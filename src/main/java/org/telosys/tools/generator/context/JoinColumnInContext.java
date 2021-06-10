@@ -44,17 +44,17 @@ import org.telosys.tools.generic.model.JoinColumn;
 //-------------------------------------------------------------------------------------
 public class JoinColumnInContext {
 	
-	private final String  _name;
+	private final String  name;
  
-	private final String  _referencedColumnName;
+	private final String  referencedColumnName;
 
-	private final boolean _unique ;
+	private final boolean unique ;
 
-	private final boolean _nullable ;
+	private final boolean nullable ;
 
-	private final boolean _updatable ; 
+	private final boolean updatable ; 
 
-	private final boolean _insertable ; 
+	private final boolean insertable ; 
 
 
 	//-------------------------------------------------------------------------------------
@@ -70,13 +70,13 @@ public class JoinColumnInContext {
 			throw new GeneratorContextException("Referenced name is null in 'Join Column'");
 		}
 
-		this._name                 = joinColumn.getName();		 
-		this._referencedColumnName = joinColumn.getReferencedColumnName();
+		this.name                 = joinColumn.getName();		 
+		this.referencedColumnName = joinColumn.getReferencedColumnName();
 		
-		this._unique     = joinColumn.isUnique();
-		this._nullable   = joinColumn.isNullable();
-		this._updatable  = joinColumn.isUpdatable() ; 
-		this._insertable = joinColumn.isInsertable() ; 
+		this.unique     = joinColumn.isUnique();
+		this.nullable   = joinColumn.isNullable();
+		this.updatable  = joinColumn.isUpdatable() ; 
+		this.insertable = joinColumn.isInsertable() ; 
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ public class JoinColumnInContext {
 			}
 	)
 	public String getName() {
-		return _name;
+		return name;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ public class JoinColumnInContext {
 			}
 	)
 	public String getReferencedColumnName() {
-		return _referencedColumnName;
+		return referencedColumnName;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ public class JoinColumnInContext {
 			}
 	)
 	public boolean isUnique() {
-		return _unique;
+		return unique;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -116,7 +116,7 @@ public class JoinColumnInContext {
 			}
 	)
 	public boolean isNullable() {
-		return _nullable;
+		return nullable;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ public class JoinColumnInContext {
 			}
 	)
 	public boolean isUpdatable() {
-		return _updatable;
+		return updatable;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -136,13 +136,13 @@ public class JoinColumnInContext {
 			}
 	)
 	public boolean isInsertable() {
-		return _insertable;
+		return insertable;
 	}
 
 	//-------------------------------------------------------------------------------------
 	@Override
 	public String toString() {
-		return _name ;
+		return name ;
 	}
 
 }

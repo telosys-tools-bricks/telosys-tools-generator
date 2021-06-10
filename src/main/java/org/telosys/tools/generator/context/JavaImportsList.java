@@ -29,7 +29,7 @@ import org.telosys.tools.commons.JavaTypeUtil;
  */
 public class JavaImportsList {
 
-	private LinkedList<String> _list = new LinkedList<String>() ; // List of Java "full types" to import ( eg : "java.math.BigDecimal" )
+	private final LinkedList<String> imports = new LinkedList<>() ; // List of Java "full types" to import ( eg : "java.math.BigDecimal" )
 	
 	/**
 	 * Constructor
@@ -37,45 +37,27 @@ public class JavaImportsList {
 	public JavaImportsList() {
 		super();
 	}
-
-//	public List<String> getList() {
-//		return _list ;
-//	}
-	
-//	/**
-//	 * Returns true if the given type is already declared ( stored in the list )
-//	 * @param type
-//	 * @return
-//	 */
-//	private boolean isDeclared(String type) {
-//		if ( type != null ) {
-//			return _list.contains(type);
-//		}
-//		return false ;
-//	}
 	
 	/**
 	 * Declare the given type : stored only if needed ( requires import and not yet stored )
 	 * @param fullTypeName 
 	 */
 	public void declareType(String fullTypeName ) {
-		if ( JavaTypeUtil.needsImport(fullTypeName) ) {
-			if ( ! _list.contains(fullTypeName) ) {
-				_list.add(fullTypeName);
-			}
+		if ( JavaTypeUtil.needsImport(fullTypeName) && ( ! imports.contains(fullTypeName) ) ) {
+			imports.add(fullTypeName);
 		}
 	}
 	
-	private final static String JAVA_UTIL_DATE = "java.util.Date" ;
-	private final static String JAVA_SQL_DATE  = "java.sql.Date" ;
+	private static final String JAVA_UTIL_DATE = "java.util.Date" ;
+	private static final String JAVA_SQL_DATE  = "java.sql.Date" ;
 	/**
 	 * Removes the "collided types" <br>
 	 * e.g. it's impossible to import both "java.util.Date" and "java.sql.Date" 
 	 */
 	private void removeCollidedTypes() {
-		if ( _list.contains(JAVA_UTIL_DATE) && _list.contains(JAVA_SQL_DATE) ) {
-			_list.remove(JAVA_UTIL_DATE) ;
-			_list.remove(JAVA_SQL_DATE) ;
+		if ( imports.contains(JAVA_UTIL_DATE) && imports.contains(JAVA_SQL_DATE) ) {
+			imports.remove(JAVA_UTIL_DATE) ;
+			imports.remove(JAVA_SQL_DATE) ;
 		}		
 	}
 	
@@ -86,8 +68,8 @@ public class JavaImportsList {
 	 */
 	public List<String> getFinalImportsList() {
 		removeCollidedTypes();
-		java.util.Collections.sort(_list);
-		return _list ;		
+		java.util.Collections.sort(imports);
+		return imports ;		
 	}
 
 	private static final Class<?>[] COLLECTIONS = {
@@ -115,15 +97,6 @@ public class JavaImportsList {
 			java.util.TreeMap.class
 			};
 	
-//	private void declareCollectionType(String type) {
-//		for ( Class<?> clazz : COLLECTIONS ) {
-//			// "Collection<Type>", "List<Type>", "Set<Type>"
-//			if ( type.contains(clazz.getSimpleName()) && type.contains("<") && type.contains(">") ) {
-//				declareType(clazz.getCanonicalName());
-//			} 
-//		}
-//	}
-	
 	private void declareLinkType(String inputType) {
 		String type = inputType.trim();
 		if ( type.contains("<") && type.endsWith(">") ) {
@@ -136,7 +109,7 @@ public class JavaImportsList {
 		}
 	}
 	
-	public void buildImports( List<String> basicAttributeTypes, List<String> linkAttributeTypes) { //throws GeneratorException {
+	public void buildImports( List<String> basicAttributeTypes, List<String> linkAttributeTypes) {
 		for ( String type : basicAttributeTypes ) {
 			declareType(type); 
 		}
