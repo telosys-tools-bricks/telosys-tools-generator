@@ -16,6 +16,7 @@ import org.telosys.tools.generic.model.Model;
 import junit.env.telosys.tools.generator.LoggerProvider;
 import junit.env.telosys.tools.generator.TestsEnv;
 import junit.env.telosys.tools.generator.fakemodel.FakeModelProvider;
+import junit.env.telosys.tools.generator.fakemodel.entities.Employee;
 
 
 public class GeneratorTest {
@@ -58,7 +59,7 @@ public class GeneratorTest {
 		Generator generator = getGenerator("bundle-utf8");
 		
 		Model model = FakeModelProvider.buildModel();
-		Entity entity = model.getEntityByClassName(FakeModelProvider.EMPLOYEE_CLASS_NAME);
+		Entity entity = model.getEntityByClassName(Employee.ENTITY_NAME);
 		Target target = getTarget(templateFile, generatedFile, entity);
 		List<String> selectedEntitiesNames = getSelectedEntities();
 		generator.generateTarget(target, model, selectedEntitiesNames, null);

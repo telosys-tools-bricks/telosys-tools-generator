@@ -28,11 +28,7 @@ import org.telosys.tools.generic.model.ForeignKey;
 import org.telosys.tools.generic.model.Link;
 
 /**
- * "Entity" model class <br>
- * An entity contains : <br>
- * - 1..N columns <br>
- * - 0..N foreign keys <br>
- * - 0..N links <br>
+ * Fake "Entity" for tests
  * 
  * @author Laurent Guerin
  *
@@ -44,10 +40,10 @@ public class FakeEntity implements Entity
 	
 	private final String databaseTable ;
 	
-	private String databaseCatalog ; 
-	private String databaseSchema ;  
-	private String databaseType ; 
-	private String databaseComment = "" ; 
+	private String databaseCatalog = null; 
+	private String databaseSchema = null;  
+	private String databaseType = null; 
+	private String databaseComment = null ; 
 	
 	private List<Attribute> attributes = new ArrayList<>();
 
@@ -63,35 +59,6 @@ public class FakeEntity implements Entity
 		super();
 		this.className = className ;
 		this.databaseTable = databaseTable;
-	}
-
-	/**
-	 * Returns true if the entity can be considered as a "Join Table" <br>
-	 * Conditions : <br>
-	 * . the entity has 2 Foreign Keys <br>
-	 * . all the columns are in the Primary Key <br>
-	 * . all the columns are in a Foreign Key <br>
-	 * 
-	 * @return
-	 */
-	public boolean isJoinTable() {
-		//--- Check if there are 2 FK
-		if ( foreignKeys.size() != 2 ) {
-			return false;
-		} 
-		//--- Check if all the columns are in the Primary Key
-		for ( Attribute a : getAttributes() ) {
-			if ( ! a.isKeyElement() ) { 
-				return false ;
-			}
-		}
-		//--- Check if all the columns are in a Foreign Key
-		for ( Attribute a : getAttributes() ) {
-			if ( ! a.isFK() ) {
-				return false ;
-			}
-		}
-		return true ;
 	}
 
 	//--------------------------------------------------------------------------
@@ -209,7 +176,7 @@ public class FakeEntity implements Entity
 	//--------------------------------------------------------------------------
 	// FOREIGN KEYS management
 	//--------------------------------------------------------------------------
-	public void storeForeignKey(ForeignKey foreignKey){
+	public void storeForeignKey(ForeignKey foreignKey) {
 		foreignKeys.put(foreignKey.getName(), foreignKey);
 	}
 	
@@ -218,15 +185,7 @@ public class FakeEntity implements Entity
 	//--------------------------------------------------------------------------
 	@Override
 	public List<ForeignKey> getDatabaseForeignKeys() {
-		//--- Build a sorted array
-		ForeignKey[] foreignKeysArray = (ForeignKey[]) foreignKeys.values().toArray( new ForeignKey[foreignKeys.size()] );
-		Arrays.sort(foreignKeysArray); // sort using the "Comparable" implementation		
-		//--- Build a List from the array
-		LinkedList<ForeignKey> foreignKeysList = new LinkedList<>();
-		for ( ForeignKey fk : foreignKeysArray ) {
-			foreignKeysList.add(fk);
-		}
-		return foreignKeysList ;		
+		return new LinkedList<>(foreignKeys.values()); // Not sorted 
 	}
 	
 	//--------------------------------------------------------------------------

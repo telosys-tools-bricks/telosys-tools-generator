@@ -27,11 +27,11 @@ public class FakeModel implements Model
 {
 	private final String name ;
 	
-	private final String description = "Fake model" ;
+	private final String description ;
 	
-	private final int    databaseId = 1 ; 
+	private final int    databaseId ; 
 
-	private final String databaseProductName = "Fake database"; 
+	private final String databaseProductName ; 
 	
 	private final List<Entity> entities = new ArrayList<>();
 
@@ -43,6 +43,9 @@ public class FakeModel implements Model
 	public FakeModel(String modelName) {
 		super();
 		this.name = modelName;
+		this.description = "Fake model" ;
+		this.databaseId = 1 ; 
+		this.databaseProductName = "Fake database"; 
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -126,7 +129,7 @@ public class FakeModel implements Model
 		return null;
 	}
 
-	public void addEntity(FakeEntity entity) {
+	public void addEntity(Entity entity) {
 		entities.add(entity);
 	}
 }

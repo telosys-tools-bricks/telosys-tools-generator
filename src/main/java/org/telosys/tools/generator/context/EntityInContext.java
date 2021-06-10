@@ -59,8 +59,6 @@ import org.telosys.tools.generic.model.Link;
 //-------------------------------------------------------------------------------------
 public class EntityInContext 
 {
-	private static final String GET_ATTR_BY_CRITERIA = "getAttributesByCriteria";
-	
 	//--- Static void lists
 	private static final List<AttributeInContext>  VOID_ATTRIBUTES_LIST    = new LinkedList<>();
 	private static final List<ForeignKeyInContext> VOID_FOREIGN_KEYS_LIST  = new LinkedList<>();
@@ -145,7 +143,28 @@ public class EntityInContext
 		//--- Post processing : import resolution
 		endOfAttributesDefinition();
 	}
-	
+	//-----------------------------------------------------------------------------------------------
+	/**
+	 * This method closes the definition of the class (when all the attributes have been added) <br>
+	 * 
+	 * It determines if there is import types collision ( eg "java.util.Date" with "java.sql.Date" ) <br>
+	 * and managed the imports list and attributes declarations types to avoid imports error
+	 *  
+	 */
+	private void endOfAttributesDefinition() {
+		if ( attributes == null ) return ;
+		//--- Duplicated short types detection
+		AmbiguousTypesDetector duplicatedTypesDetector = new AmbiguousTypesDetector(attributes);
+		List<String> ambiguousTypes = duplicatedTypesDetector.getAmbiguousTypes();
+		for ( AttributeInContext attribute : attributes ) {
+			//--- Is this attribute's type ambiguous ?
+			if ( ambiguousTypes.contains( attribute.getFullType() ) ) {
+				//--- Yes => force this attribute to use its "full type" for variable declaration
+				attribute.useFullType() ; 
+			}
+		}
+	}
+
 	//-----------------------------------------------------------------------------------------------	
 	/**
 	 * Returns the Java class name without the package ( ie : "MyClass" )
@@ -242,10 +261,8 @@ public class EntityInContext
 		example="$entity.attributes"
 	)
 	@VelocityReturnType("List of 'attribute' objects")
-	public List<AttributeInContext> getAttributes() 
-	{
-		if ( attributes != null )
-		{
+	public List<AttributeInContext> getAttributes() {
+		if ( attributes != null ) {
 			return attributes ;
 		}
 		return VOID_ATTRIBUTES_LIST ;
@@ -258,10 +275,8 @@ public class EntityInContext
 		example="$entity.attributesCount",
 		since="2.0.7"
 	)
-	public int getAttributesCount() 
-	{
-		if ( attributes != null )
-		{
+	public int getAttributesCount() {
+		if ( attributes != null ) {
 			return attributes.size() ;
 		}
 		return 0 ;
@@ -278,8 +293,7 @@ public class EntityInContext
 		}
 	)
 	@VelocityReturnType("List of 'link' objects")
-	public List<LinkInContext> getLinks() 
-	{
+	public List<LinkInContext> getLinks() {
 		if ( links != null && ! links.isEmpty() ) {
 			return links ;
 		}
@@ -297,8 +311,7 @@ public class EntityInContext
 		}
 	)
 	@VelocityReturnType("List of 'link' objects")
-	public List<LinkInContext> getSelectedLinks() 
-	{
+	public List<LinkInContext> getSelectedLinks() {
 		if ( links != null && ! links.isEmpty() )
 		{
 			LinkedList<LinkInContext> selectedLinks = new LinkedList<>();
@@ -325,7 +338,6 @@ public class EntityInContext
 	@VelocityNoDoc
 	public List<AttributeInContext> getAttributesByCriteria( int c1  ) 
 	{
-		logDebug(GET_ATTR_BY_CRITERIA + "(" + c1 + ")" );
 		checkCriterion(c1);
 		return getAttributesByAddedCriteria(c1);
 	}
@@ -333,7 +345,6 @@ public class EntityInContext
 	@VelocityNoDoc
 	public List<AttributeInContext> getAttributesByCriteria( int c1, int c2 ) 
 	{
-		logDebug(GET_ATTR_BY_CRITERIA + "(" + c1 + "," + c2 + ")" );
 		checkCriterion(c1);
 		checkCriterion(c2);
 		return getAttributesByAddedCriteria(c1 + c2);
@@ -342,7 +353,6 @@ public class EntityInContext
 	@VelocityNoDoc
 	public List<AttributeInContext> getAttributesByCriteria( int c1, int c2, int c3 ) 
 	{
-		logDebug(GET_ATTR_BY_CRITERIA + "(" + c1 + "," + c2 + "," + c3 + ")" );
 		checkCriterion(c1);
 		checkCriterion(c2);
 		checkCriterion(c3);
@@ -369,7 +379,6 @@ public class EntityInContext
 	@VelocityReturnType("List of 'attribute' objects")
 	public List<AttributeInContext> getAttributesByCriteria( int c1, int c2, int c3, int c4 ) 
 	{
-		logDebug(GET_ATTR_BY_CRITERIA + "(" + c1 + "," + c2 + "," + c3 + "," + c4 + ")" );
 		checkCriterion(c1);
 		checkCriterion(c2);
 		checkCriterion(c3);
@@ -380,8 +389,6 @@ public class EntityInContext
 	//-------------------------------------------------------------------------------------
 	private List<AttributeInContext> getAttributesByAddedCriteria( int criteria ) 
 	{
-		logDebug("getAttributesByAddedCriteria(" + criteria + ")" );
-		
 		LinkedList<AttributeInContext> selectedAttributes = new LinkedList<>();
 		
 		for ( AttributeInContext attribute : attributes ) {
@@ -441,8 +448,6 @@ public class EntityInContext
 				if ( Boolean.TRUE.equals(selectedBySelectedLink) ) selected++ ;
 			}
 
-			logDebug("getAttributesByAddedCriteria(" + criteria + ") : " + attribute.getName() + " : " + criteriaCount + " :: " + selected );
-			
 			if ( ( criteriaCount > 0 ) && ( selected == criteriaCount ) ) {	
 				// All criteria verified ( "AND" ) => keep this attribute
 				selectedAttributes.add(attribute) ;
@@ -1037,30 +1042,6 @@ public class EntityInContext
     }
 
 	//-------------------------------------------------------------------------------------------------
-	//-----------------------------------------------------------------------------------------------
-	/**
-	 * This method closes the definition of the class (when all the attributes have been added) <br>
-	 * 
-	 * It determines if there is import types collision ( eg "java.util.Date" with "java.sql.Date" ) <br>
-	 * and managed the imports list and attributes declarations types to avoid imports error
-	 *  
-	 */
-	private void endOfAttributesDefinition() {
-		if ( attributes == null ) return ;
-		
-		//--- Duplicated short types detection
-		AmbiguousTypesDetector duplicatedTypesDetector = new AmbiguousTypesDetector(attributes);
-		List<String> ambiguousTypes = duplicatedTypesDetector.getAmbiguousTypes();
-		for ( AttributeInContext attribute : attributes ) {
-			//--- Is this attribute's type ambiguous ?
-			if ( ambiguousTypes.contains( attribute.getFullType() ) ) {
-				//--- Yes => force this attribute to use its "full type" for variable declaration
-				attribute.useFullType() ; // v 2.0.7
-			}
-		}
-	}
-	
-	//-------------------------------------------------------------------------------------------------
 	private List<AttributeInContext> selectAttributesIfKeyElement(boolean bKeyAttribute) {
 		LinkedList<AttributeInContext> attributesList = new LinkedList<>();
     	if ( attributes != null ) {
@@ -1089,8 +1070,37 @@ public class EntityInContext
     	}
 		return list ;
 	}
-
-	private final void logDebug(String s) {
-		// Log here if necessary
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns TRUE if the entity is a 'join entity' ",
+			"( typically if the entity is a 'join table' in the database )",
+			"An entity is considered as a 'join entity' if : ",
+			" - the entity has 2 Foreign Keys",
+			" - all attributes are part of the Primary Key ",
+			" - all attributes are part of a Foreign Key"
+		},
+		example= {
+				"#if ( $entity.isJoinEntity() )",
+				"...",
+				"#end"
+			},
+		since="3.3.0"
+	)
+	public boolean isJoinEntity() {
+		//--- Check if entity has 2 Foreign Keys
+		if ( foreignKeys.size() != 2 ) {
+			return false;
+		} 
+		//--- Check if all attributes are in the PK and in a FK
+		for ( AttributeInContext a : attributes) {
+			if ( ! a.isKeyElement() ) { 
+				return false ; // at least one attribute is not in PK 
+			}
+			if ( ! a.isFK() ) {
+				return false ; // at least one attribute is not in FK
+			}
+		}
+		return true ;
 	}
 }
