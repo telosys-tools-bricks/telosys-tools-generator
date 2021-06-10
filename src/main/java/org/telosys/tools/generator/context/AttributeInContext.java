@@ -64,20 +64,20 @@ public class AttributeInContext {
 	
     private static final String VOID_STRING  = "" ;
     
-	private final EnvInContext     envInContext ; // ver 3.0.0
+	private final EnvInContext     envInContext ;
 
     private final EntityInContext  entityInContext ; // The entity 
     
-	private final ModelInContext   modelInContext ;  // v 3.0.0
+	private final ModelInContext   modelInContext ;  
 
 	private boolean       mustUseFullType = false ; 
 
-	private final boolean selected ; // v 2.1.1 #LGU
+	private final boolean selected ;
     
 	//--- Basic minimal attribute info ---------------------------------
 	private final String  name ;  // attribute name 
-	private final String  neutralType ;  // attribute neutral type v 3.0.0
-	private final AttributeTypeInfo attributeTypeInfo ; // v 3.0.0
+	private final String  neutralType ;  // attribute neutral type
+	private final AttributeTypeInfo attributeTypeInfo ; 
 	private final String  initialValue ; 
 	private final String  defaultValue ; 
 
@@ -87,7 +87,7 @@ public class AttributeInContext {
 	private final String  inputType ;
 
     //--- Further info for STRING ------------------------------------
-    private final boolean isLongText ;  // True if must be stored as a separate tag in the XML flow
+    private final boolean isLongText ;
     private final boolean isNotEmpty ;
     private final boolean isNotBlank ;
     private final String  minLength ;
@@ -122,41 +122,41 @@ public class AttributeInContext {
     private final String  jdbcTypeName    ;  // JDBC type name 
     
 	//--- FOREIGN KEYS  -------------------------------------------------
-    private final boolean isForeignKey          ; // v 3.0.0
-    private final boolean isForeignKeySimple    ; // v 3.0.0
-    private final boolean isForeignKeyComposite ; // v 3.0.0
+    private final boolean isForeignKey          ; 
+    private final boolean isForeignKeySimple    ; 
+    private final boolean isForeignKeyComposite ; 
     private final String  referencedEntityClassName ; // v 3.0.0 (NOT RELIABLE!)
     private final List<ForeignKeyPartInContext> fkParts = new LinkedList<>(); // v 3.3.0
 
     //--- Further info for BOOLEAN -----------------------------------
-    private final String  _sBooleanTrueValue  ; // eg "1", ""Yes"", ""true""
-    private final String  _sBooleanFalseValue ; // eg "0", ""No"",  ""false""
+    private final String  booleanTrueValue  ; // eg "1", ""Yes"", ""true""
+    private final String  booleanFalseValue ; // eg "0", ""No"",  ""false""
     
 	//--- JPA KEY Generation infos -------------------------------------------------
-    private final boolean _bGeneratedValue ;  // True if GeneratedValue ( annotation "@GeneratedValue" )
-	private final String  _sGeneratedValueStrategy ; // "AUTO", "IDENTITY", "SEQUENCE", "TABLE" 
-	private final String  _sGeneratedValueGenerator ;
+    private final boolean isGeneratedValue ;  // True if GeneratedValue ( annotation "@GeneratedValue" )
+	private final String  generatedValueStrategy ; // "AUTO", "IDENTITY", "SEQUENCE", "TABLE" 
+	private final String  generatedValueGenerator ;
 	
-    private final boolean _bSequenceGenerator  ;  // True if SequenceGenerator ( annotation "@SequenceGenerator" )
-	private final String  _sSequenceGeneratorName     ;
-	private final String  _sSequenceGeneratorSequenceName   ;
-	private final int     _iSequenceGeneratorAllocationSize ;
+    private final boolean hasSequenceGenerator  ;  // True if SequenceGenerator ( annotation "@SequenceGenerator" )
+	private final String  sequenceGeneratorName     ;
+	private final String  sequenceGeneratorSequenceName   ;
+	private final int     sequenceGeneratorAllocationSize ;
 
-    private final boolean _bTableGenerator ;  // True if TableGenerator ( annotation "@TableGenerator" )
-	private final String  _sTableGeneratorName  ;
-	private final String  _sTableGeneratorTable           ;
-	private final String  _sTableGeneratorPkColumnName     ;
-	private final String  _sTableGeneratorValueColumnName  ;
-	private final String  _sTableGeneratorPkColumnValue   ;
+    private final boolean hasTableGenerator;  // True if TableGenerator ( annotation "@TableGenerator" )
+	private final String  tableGeneratorName;
+	private final String  tableGeneratorTable;
+	private final String  tableGeneratorPkColumnName;
+	private final String  tableGeneratorValueColumnName;
+	private final String  tableGeneratorPkColumnValue;
 
-	private final boolean _bIsUsedInLinks ; // v 3.0.0 #LGU
-	private final boolean _bIsUsedInSelectedLinks ; // v 3.0.0 #LGU
+	private final boolean isUsedInLinks ; 
+	private final boolean isUsedInSelectedLinks ; 
 	
 	//--- TAGS (added in v 3.3.0)
 	private final Map<String, String> tagsMap ; // All tags defined for the attribute (0..N) 
 
-    private final BooleanValue  _insertable ; // Added in v 3.3.0
-    private final BooleanValue  _updatable  ; // Added in v 3.3.0
+    private final BooleanValue  insertable ; // Added in v 3.3.0
+    private final BooleanValue  updatable  ; // Added in v 3.3.0
     
     private final String sqlType ; // Added in v 3.3.0
 
@@ -172,41 +172,41 @@ public class AttributeInContext {
 	 */
 	public AttributeInContext(final EntityInContext entity, 
 			final Attribute attribute, 
-			final ModelInContext modelInContext, // v 3.0.0
-			final EnvInContext env) // v 3.0.0
+			final ModelInContext modelInContext, 
+			final EnvInContext env) 
 	{
-		this.envInContext = env ; // v 3.0.0
-		this.modelInContext = modelInContext ; // v 3.0.0
+		this.envInContext = env ; 
+		this.modelInContext = modelInContext ; 
 		this.entityInContext = entity ;
 		//--------------------------------------------------
-		this.selected        = attribute.isSelected(); // v 3.0.0
+		this.selected        = attribute.isSelected(); 
 		//--------------------------------------------------
 		
-		this.name   = attribute.getName(); // v 3.0.0		
-		this.neutralType     = attribute.getNeutralType() ; // v 3.0.0
-		this.attributeTypeInfo = new AttributeTypeInfo(attribute) ; // v 3.0.0
-		this.initialValue    = StrUtil.notNull( attribute.getInitialValue() ); // v 3.0.0
-		this.defaultValue    = StrUtil.notNull( attribute.getDefaultValue() ); // v 3.0.0
+		this.name   = attribute.getName(); 		
+		this.neutralType     = attribute.getNeutralType() ; 
+		this.attributeTypeInfo = new AttributeTypeInfo(attribute) ; 
+		this.initialValue    = StrUtil.notNull( attribute.getInitialValue() ); 
+		this.defaultValue    = StrUtil.notNull( attribute.getDefaultValue() );
 		
 		//--- Further info for ALL
-        this.isNotNull   = attribute.isNotNull();  // v 3.0.0
+        this.isNotNull   = attribute.isNotNull();
         this.label     = StrUtil.notNull( attribute.getLabel() ) ;
         this.inputType = StrUtil.notNull( attribute.getInputType() );
         
 		//--- Further info for STRING 
-	    this.isLongText  = attribute.isLongText() ; // v 3.0.0
-	    this.isNotEmpty  = attribute.isNotEmpty(); // v 3.0.0
-	    this.isNotBlank  = attribute.isNotBlank(); // v 3.0.0
-	    this.maxLength = Util.integerToString(attribute.getMaxLength(), VOID_STRING); // v 3.0.0
-	    this.minLength = Util.integerToString(attribute.getMinLength(), VOID_STRING); // v 3.0.0
+	    this.isLongText  = attribute.isLongText() ;
+	    this.isNotEmpty  = attribute.isNotEmpty();
+	    this.isNotBlank  = attribute.isNotBlank();
+	    this.maxLength = Util.integerToString(attribute.getMaxLength(), VOID_STRING);
+	    this.minLength = Util.integerToString(attribute.getMinLength(), VOID_STRING);
 	    this.pattern   = StrUtil.notNull( attribute.getPattern() );
 	    
 		//--- Further info for NUMBER 
-		this.minValue = Util.bigDecimalToString(attribute.getMinValue(), VOID_STRING ) ; // v 3.0.0
-	    this.maxValue = Util.bigDecimalToString(attribute.getMaxValue(), VOID_STRING ) ; // v 3.0.0 
+		this.minValue = Util.bigDecimalToString(attribute.getMinValue(), VOID_STRING ) ;
+	    this.maxValue = Util.bigDecimalToString(attribute.getMaxValue(), VOID_STRING ) ;
 	    
 		//--- Further info for DATE/TIME 
-	    this.dateType = ( attribute.getDateType() != null ?  attribute.getDateType() : DateType.UNDEFINED ); // v 3.0.0
+	    this.dateType = ( attribute.getDateType() != null ?  attribute.getDateType() : DateType.UNDEFINED );
 	    this.isDateInThePast   = attribute.isDatePast();
 	    this.isDateInTheFuture = attribute.isDateFuture();
 	    // this._bDateBefore = attribute.isDateBefore();  // Removed in v 3.3.0
@@ -216,18 +216,18 @@ public class AttributeInContext {
         
 		//--- Database info
 		this.databaseName     = StrUtil.notNull( attribute.getDatabaseName() ) ;
-        this.databaseType     = StrUtil.notNull( attribute.getDatabaseType() ) ; // v 3.0.0
-        this.jdbcTypeCode     = attribute.getJdbcTypeCode() != null ? attribute.getJdbcTypeCode() : 0 ; // v 3.0.0
+        this.databaseType     = StrUtil.notNull( attribute.getDatabaseType() ) ;
+        this.jdbcTypeCode     = attribute.getJdbcTypeCode() != null ? attribute.getJdbcTypeCode() : 0 ;
         this.jdbcTypeName     = StrUtil.notNull( attribute.getJdbcTypeName() );
-        this.isKeyElement     = attribute.isKeyElement(); // v 3.0.0
+        this.isKeyElement     = attribute.isKeyElement();
         // TODO
         this.sqlType = "" ; // v 3.3.0 
         
 		//--- Foreign Keys / references
-        this.isForeignKey          = attribute.isFK() ; // v 3.0.0
-        this.isForeignKeySimple    = attribute.isFKSimple() ; // v 3.0.0
-        this.isForeignKeyComposite = attribute.isFKComposite() ; // v 3.0.0
-        this.referencedEntityClassName = attribute.getReferencedEntityClassName() ;  // v 3.0.0
+        this.isForeignKey          = attribute.isFK() ;
+        this.isForeignKeySimple    = attribute.isFKSimple() ;
+        this.isForeignKeyComposite = attribute.isFKComposite() ;
+        this.referencedEntityClassName = attribute.getReferencedEntityClassName() ;
         // Build "Foreign Key Parts" if any ( v 3.3.0 )
         for ( ForeignKeyPart fkPart : attribute.getFKParts() ) {
         	this.fkParts.add(new ForeignKeyPartInContext(fkPart)); // v 3.3.0
@@ -240,68 +240,68 @@ public class AttributeInContext {
         this.isDatabaseNotNull  = attribute.isDatabaseNotNull();
         
 		//--- Further info for BOOLEAN 
-        _sBooleanTrueValue   = Util.trim(attribute.getBooleanTrueValue(), VOID_STRING) ; 
-		_sBooleanFalseValue  = Util.trim(attribute.getBooleanFalseValue(), VOID_STRING) ;
+        this.booleanTrueValue   = Util.trim(attribute.getBooleanTrueValue(), VOID_STRING) ; 
+        this.booleanFalseValue  = Util.trim(attribute.getBooleanFalseValue(), VOID_STRING) ;
 		
         
 		//--- Further info for JPA         
         if ( attribute.isAutoIncremented() ) {
-		    _bGeneratedValue = true ;
-			_sGeneratedValueStrategy  = VOID_STRING ; // "AUTO" is the default strategy 
-			_sGeneratedValueGenerator = VOID_STRING ;
+        	this.isGeneratedValue = true ;
+        	this.generatedValueStrategy  = VOID_STRING ; // "AUTO" is the default strategy 
+        	this.generatedValueGenerator = VOID_STRING ;
         } 
         else {
-        	if (attribute.isGeneratedValue() ) { // v 3.0.0
-			    _bGeneratedValue = true ;
-				_sGeneratedValueStrategy  = StrUtil.notNull( attribute.getGeneratedValueStrategy() ); // v 3.0.0
-				_sGeneratedValueGenerator = StrUtil.notNull( attribute.getGeneratedValueGenerator() ); // v 3.0.0
+        	if (attribute.isGeneratedValue() ) {
+        		this.isGeneratedValue = true ;
+        		this.generatedValueStrategy  = StrUtil.notNull( attribute.getGeneratedValueStrategy() );
+        		this.generatedValueGenerator = StrUtil.notNull( attribute.getGeneratedValueGenerator() ); 
 			}
 			else {
-				_bGeneratedValue = false;
-				_sGeneratedValueStrategy  = VOID_STRING;
-				_sGeneratedValueGenerator = VOID_STRING;
+				this.isGeneratedValue = false;
+				this.generatedValueStrategy  = VOID_STRING;
+				this.generatedValueGenerator = VOID_STRING;
 			}
         }
 			        
-		if ( attribute.hasTableGenerator() ) { // v 3.0.0
-		    _bTableGenerator = true ;
-			_sTableGeneratorName = StrUtil.notNull(attribute.getTableGeneratorName()); // v 3.0.0
-			_sTableGeneratorTable = StrUtil.notNull(attribute.getTableGeneratorTable()); // v 3.0.0
-			_sTableGeneratorPkColumnName = StrUtil.notNull(attribute.getTableGeneratorPkColumnName()); // v 3.0.0
-			_sTableGeneratorValueColumnName = StrUtil.notNull(attribute.getTableGeneratorValueColumnName()); // v 3.0.0
-			_sTableGeneratorPkColumnValue = StrUtil.notNull(attribute.getTableGeneratorPkColumnValue()); // v 3.0.0
+		if ( attribute.hasTableGenerator() ) {
+			this.hasTableGenerator = true ;
+			this.tableGeneratorName = StrUtil.notNull(attribute.getTableGeneratorName());
+			this.tableGeneratorTable = StrUtil.notNull(attribute.getTableGeneratorTable());
+			this.tableGeneratorPkColumnName = StrUtil.notNull(attribute.getTableGeneratorPkColumnName()); 
+			this.tableGeneratorValueColumnName = StrUtil.notNull(attribute.getTableGeneratorValueColumnName());
+			this.tableGeneratorPkColumnValue = StrUtil.notNull(attribute.getTableGeneratorPkColumnValue());
 		}
 		else {
-		    _bTableGenerator = false ;
-			_sTableGeneratorName = VOID_STRING ;
-			_sTableGeneratorTable = VOID_STRING ;
-			_sTableGeneratorPkColumnName = VOID_STRING ;
-			_sTableGeneratorValueColumnName = VOID_STRING;
-			_sTableGeneratorPkColumnValue = VOID_STRING;
+			this.hasTableGenerator = false ;
+			this.tableGeneratorName = VOID_STRING ;
+			this.tableGeneratorTable = VOID_STRING ;
+			this.tableGeneratorPkColumnName = VOID_STRING ;
+			this.tableGeneratorValueColumnName = VOID_STRING;
+			this.tableGeneratorPkColumnValue = VOID_STRING;
 		}
 
 		if (attribute.hasSequenceGenerator() ) {
-		    _bSequenceGenerator = true;
-			_sSequenceGeneratorName = attribute.getSequenceGeneratorName();
-			_sSequenceGeneratorSequenceName = attribute.getSequenceGeneratorSequenceName();
-			_iSequenceGeneratorAllocationSize = Util.intValue(attribute.getSequenceGeneratorAllocationSize(), 0);
+			this.hasSequenceGenerator = true;
+			this.sequenceGeneratorName = attribute.getSequenceGeneratorName();
+			this.sequenceGeneratorSequenceName = attribute.getSequenceGeneratorSequenceName();
+			this.sequenceGeneratorAllocationSize = Util.intValue(attribute.getSequenceGeneratorAllocationSize(), 0);
 		}
 		else {
-		    _bSequenceGenerator = false;
-			_sSequenceGeneratorName = VOID_STRING;
-			_sSequenceGeneratorSequenceName = VOID_STRING;
-			_iSequenceGeneratorAllocationSize = -1;
+			this.hasSequenceGenerator = false;
+			this.sequenceGeneratorName = VOID_STRING;
+			this.sequenceGeneratorSequenceName = VOID_STRING;
+			this.sequenceGeneratorAllocationSize = -1;
 		}
 		
-		_bIsUsedInLinks         = attribute.isUsedInLinks(); // v 3.0.0 #LGU
-		_bIsUsedInSelectedLinks = attribute.isUsedInSelectedLinks(); // v 3.0.0 #LGU
+		this.isUsedInLinks         = attribute.isUsedInLinks(); 
+		this.isUsedInSelectedLinks = attribute.isUsedInSelectedLinks();
 		
 		this.tagsMap = attribute.getTagsMap();
 		
-		_insertable = attribute.getInsertable(); // v 3.3.0
-		_updatable  = attribute.getUpdatable();  // v 3.3.0
+		this.insertable = attribute.getInsertable(); // v 3.3.0
+		this.updatable  = attribute.getUpdatable();  // v 3.3.0
 
-		isTransient  = attribute.isTransient();  // v 3.3.0
+		this.isTransient  = attribute.isTransient();  // v 3.3.0
 	}
 
 	protected final LanguageType getLanguageType() {
@@ -386,7 +386,6 @@ public class AttributeInContext {
 			}
 	)
 	public String getType() {
-		// v 3.0.0
 		LanguageType type = getLanguageType();
 		if ( mustUseFullType ) {
 			return type.getFullType() ;
@@ -542,8 +541,8 @@ public class AttributeInContext {
 			"Returns the value to use for a boolean when is TRUE (eg to be stored in a database) "
 			}
 	)
-	public String getBooleanTrueValue() { // TODO : rename "DatabaseTrueValue" ???
-		return _sBooleanTrueValue;
+	public String getBooleanTrueValue() {
+		return booleanTrueValue;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -552,8 +551,8 @@ public class AttributeInContext {
 			"Returns the value to use for a boolean when is FALSE (eg to be stored in a database) "
 			}
 	)
-	public String getBooleanFalseValue() { // TODO : rename "DatabaseFalseValue" ???
-		return _sBooleanFalseValue ;
+	public String getBooleanFalseValue() {
+		return booleanFalseValue ;
 	}
 	
 	//----------------------------------------------------------------------
@@ -738,7 +737,7 @@ public class AttributeInContext {
 		"( it can be an 'Simple FK' or a 'Composite FK' or both )" },
 	since="3.0.0"
 	)
-    public boolean isFK() { // v 3.0.0
+    public boolean isFK() { 
         return isForeignKey ;
     }
 
@@ -748,7 +747,7 @@ public class AttributeInContext {
 		   "( the FK is based only on this single attribute ) " },
 	since="3.0.0"
 	)
-    public boolean isFKSimple() { // v 3.0.0
+    public boolean isFKSimple() { 
         return isForeignKeySimple ;
     }
 
@@ -758,16 +757,16 @@ public class AttributeInContext {
 		   "( the FK is based on many attributes including this attribute ) " },
 	since="3.0.0"
 	)
-    public boolean isFKComposite() { // v 3.0.0
+    public boolean isFKComposite() { 
         return isForeignKeyComposite ;
     }
 
 	//----------------------------------------------------------------------
-	public boolean isUsedInLinks() { // v 3.0.0 #LGU
-		return _bIsUsedInLinks ;
+	public boolean isUsedInLinks() {
+		return isUsedInLinks ;
 	}
-	public boolean isUsedInSelectedLinks() { // v 3.0.0 #LGU
-		return _bIsUsedInSelectedLinks ;
+	public boolean isUsedInSelectedLinks() {
+		return isUsedInSelectedLinks ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -1069,7 +1068,7 @@ public class AttributeInContext {
 		}
 	)
 	public boolean isPrimitiveType() {
-		LanguageType type = getLanguageType(); // v 3.0.0
+		LanguageType type = getLanguageType(); 
 		return type.isPrimitiveType() ;		
 	}
 
@@ -1195,7 +1194,7 @@ public class AttributeInContext {
 	since="3.0.0"
 	)
 	public boolean isDateType() {
-		return NeutralType.DATE.equals(this.neutralType ) ; // v 3.0.0
+		return NeutralType.DATE.equals(this.neutralType ) ; 
 	}
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -1205,7 +1204,7 @@ public class AttributeInContext {
 	since="3.0.0"
 	)
 	public boolean isTimeType() {
-		return NeutralType.TIME.equals(this.neutralType ) ; // v 3.0.0
+		return NeutralType.TIME.equals(this.neutralType ) ; 
 	}
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -1215,7 +1214,7 @@ public class AttributeInContext {
 	since="3.0.0"
 	)
 	public boolean isTimestampType() {
-		return NeutralType.TIMESTAMP.equals(this.neutralType ) ; // v 3.0.0
+		return NeutralType.TIMESTAMP.equals(this.neutralType ) ; 
 	}
 	
 	//------------------------------------------------------------------------------------------
@@ -1227,8 +1226,11 @@ public class AttributeInContext {
 	since="2.0.7"
 	)
 	public boolean isTemporalType() {
+		/***
     	if ( isDateType() || isTimeType() || isTimestampType() ) return true ;
     	return false ;
+    	***/
+		return isDateType() || isTimeType() || isTimestampType() ;
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -1239,7 +1241,7 @@ public class AttributeInContext {
 	since="3.0.0"
 	)
 	public boolean isBinaryType() {
-		return NeutralType.BINARY.equals(this.neutralType )  ; // v 3.0.0
+		return NeutralType.BINARY.equals(this.neutralType )  ; 
 	}
 
 	//-----------------------------------------------------------------------------------------
@@ -1254,7 +1256,7 @@ public class AttributeInContext {
 		}
 	)
 	public boolean isGeneratedValue() {
-		return _bGeneratedValue;
+		return isGeneratedValue;
 	}
 
 	/**
@@ -1270,7 +1272,7 @@ public class AttributeInContext {
 			}
 	)
 	public String getGeneratedValueStrategy() {
-		return _sGeneratedValueStrategy;
+		return generatedValueStrategy;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -1286,7 +1288,7 @@ public class AttributeInContext {
 			}
 	)
 	public String getGeneratedValueGenerator() {
-		return _sGeneratedValueGenerator;
+		return generatedValueGenerator;
 	}
 
 	//-----------------------------------------------------------------------------------------
@@ -1303,7 +1305,7 @@ public class AttributeInContext {
 			}
 	)
 	public boolean hasSequenceGenerator() {
-		return _bSequenceGenerator;
+		return hasSequenceGenerator;
 	}
 
 	//-----------------------------------------------------------------------------------------
@@ -1318,7 +1320,7 @@ public class AttributeInContext {
 			}
 	)
 	public String getSequenceGeneratorName() {
-		return _sSequenceGeneratorName;
+		return sequenceGeneratorName;
 	}
 
 	//-----------------------------------------------------------------------------------------
@@ -1333,7 +1335,7 @@ public class AttributeInContext {
 			}
 	)
 	public String getSequenceGeneratorSequenceName() {
-		return _sSequenceGeneratorSequenceName;
+		return sequenceGeneratorSequenceName;
 	}
 
 	//-----------------------------------------------------------------------------------------
@@ -1348,7 +1350,7 @@ public class AttributeInContext {
 			}
 	)
 	public int getSequenceGeneratorAllocationSize() {
-		return _iSequenceGeneratorAllocationSize;
+		return sequenceGeneratorAllocationSize;
 	}
 
 	//-----------------------------------------------------------------------------------------
@@ -1361,7 +1363,7 @@ public class AttributeInContext {
 			}
 	)
 	public boolean hasTableGenerator() {
-		return _bTableGenerator;
+		return hasTableGenerator;
 	}
 
 	//-----------------------------------------------------------------------------------------
@@ -1372,7 +1374,7 @@ public class AttributeInContext {
 			}
 	)
 	public String getTableGeneratorName() {
-		return _sTableGeneratorName;
+		return tableGeneratorName;
 	}
 
 	//-----------------------------------------------------------------------------------------
@@ -1383,7 +1385,7 @@ public class AttributeInContext {
 			}
 	)
 	public String getTableGeneratorTable() {
-		return _sTableGeneratorTable;
+		return tableGeneratorTable;
 	}
 
 	//-----------------------------------------------------------------------------------------
@@ -1394,7 +1396,7 @@ public class AttributeInContext {
 			}
 	)
 	public String getTableGeneratorPkColumnName() {
-		return _sTableGeneratorPkColumnName;
+		return tableGeneratorPkColumnName;
 	}
 
 	//-----------------------------------------------------------------------------------------
@@ -1405,7 +1407,7 @@ public class AttributeInContext {
 			}
 	)
 	public String getTableGeneratorValueColumnName() {
-		return _sTableGeneratorValueColumnName;
+		return tableGeneratorValueColumnName;
 	}
 
 	//-----------------------------------------------------------------------------------------
@@ -1417,7 +1419,7 @@ public class AttributeInContext {
 		}
 	)
 	public String getTableGeneratorPkColumnValue() {
-		return _sTableGeneratorPkColumnValue;
+		return tableGeneratorPkColumnValue;
 	}
 	
 	//------------------------------------------------------------------------------------------
@@ -1501,7 +1503,7 @@ public class AttributeInContext {
 	// "insertable" / "updatable"  ( v 3.3.0 )
 	//-------------------------------------------------------------------------------------
 	public BooleanValue getInsertableFlag() {
-		return this._insertable;
+		return this.insertable;
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -1516,9 +1518,9 @@ public class AttributeInContext {
 	)
 	public boolean insertableIs(boolean value) {
 		if ( value ) {
-			return this._insertable == BooleanValue.TRUE ;
+			return this.insertable == BooleanValue.TRUE ;
 		} else {
-			return this._insertable == BooleanValue.FALSE ;
+			return this.insertable == BooleanValue.FALSE ;
 		}
 	}
 	//-------------------------------------------------------------------------------------
@@ -1530,12 +1532,12 @@ public class AttributeInContext {
 		since="3.3.0"
 	)
     public String getInsertable() {
-        return this._insertable.getText();
+        return this.insertable.getText();
     }
 	
 	//-------------------------------------------------------------------------------------
 	public BooleanValue getUpdatableFlag() {
-		return this._updatable;
+		return this.updatable;
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -1550,9 +1552,9 @@ public class AttributeInContext {
 	)
 	public boolean updatableIs(boolean value) {
 		if ( value ) {
-			return this._updatable == BooleanValue.TRUE ;
+			return this.updatable == BooleanValue.TRUE ;
 		} else {
-			return this._updatable == BooleanValue.FALSE ;
+			return this.updatable == BooleanValue.FALSE ;
 		}
 	}
 	//-------------------------------------------------------------------------------------
@@ -1564,7 +1566,7 @@ public class AttributeInContext {
 		since="3.3.0"
 	)
     public String getUpdatable() {
-        return this._updatable.getText();
+        return this.updatable.getText();
     }
 	
 	//-------------------------------------------------------------------------------------

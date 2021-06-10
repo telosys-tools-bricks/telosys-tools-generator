@@ -45,7 +45,7 @@ public class AttributeSqlType {
 	}
 	
 	private static Map<String, String> initDefaultTypes() {
-	    Map<String,String> myMap = new HashMap<String,String>();
+	    Map<String,String> myMap = new HashMap<>();
 	    myMap.put(NeutralType.STRING,  "VARCHAR%");
 	    
 	    myMap.put(NeutralType.SHORT,   "smallint"); 
@@ -68,7 +68,7 @@ public class AttributeSqlType {
 	}
 	
 	private static Map<String, String> initPostgresqlTypes() {
-	    Map<String,String> myMap = new HashMap<String,String>();
+	    Map<String,String> myMap = new HashMap<>();
 	    myMap.put(NeutralType.STRING,  "varchar%");
 	    
 	    myMap.put(NeutralType.SHORT,   "smallint"); // 2 bytes
@@ -91,7 +91,7 @@ public class AttributeSqlType {
 	}
 	
 	private static Map<String, String> initOracleTypes() {
-	    Map<String,String> myMap = new HashMap<String,String>();
+	    Map<String,String> myMap = new HashMap<>();
 	    myMap.put(NeutralType.STRING,  "VARCHAR");
 	    
 	    myMap.put(NeutralType.SHORT,   "NUMBER");
