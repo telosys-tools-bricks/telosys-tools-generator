@@ -26,7 +26,7 @@ public class TelosysProject {
 	}
 
 	public String initProject() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("Project initialization \n");
 		sb.append("Project folder : '" + projectFolderAbsolutePath + "' \n");
 		sb.append("\n");
@@ -38,7 +38,7 @@ public class TelosysProject {
 	//-----------------------------------------------------------------------------------------------------
 	// Project initialization
 	//-----------------------------------------------------------------------------------------------------
-	public void initProject(StringBuffer sb) {
+	public void initProject(StringBuilder sb) {
 		EnvironmentManager em = new EnvironmentManager( projectFolderAbsolutePath );
 		// Init environment files
 		em.initEnvironment(sb);
