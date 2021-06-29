@@ -180,6 +180,9 @@ public class ValuesInContext {
 			"e.g. : '/12/ABC",
 			" "
 		},
+		parameters = { 
+			"attributes : list of attributes to be put in the URI string "
+		},
 		example = {
 			"$values.toURI( $entity.keyAttributes ) " 
 		},

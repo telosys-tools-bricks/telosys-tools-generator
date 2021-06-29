@@ -23,6 +23,7 @@ import java.util.Map;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
+import org.telosys.tools.generator.context.doc.VelocityNoDoc;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.Entity;
@@ -65,7 +66,6 @@ public class ModelInContext
 	 * @param telosysToolsCfg
 	 * @param env
 	 */
-	// public ModelInContext( Model model, String entitiesPackage, EnvInContext env ) {
 	public ModelInContext( Model model, TelosysToolsCfg telosysToolsCfg, EnvInContext env ) { // v 3.3.0
 		super();
 		if ( model == null ) throw new IllegalArgumentException("Model is null");
@@ -229,6 +229,7 @@ public class ModelInContext
 	 * @return
 	 * @throws GeneratorException
 	 */
+	@VelocityNoDoc
 	public List<EntityInContext> getEntities( List<String> entitiesNames ) throws GeneratorException
 	{
 		List<EntityInContext> selectedEntities = new LinkedList<>();

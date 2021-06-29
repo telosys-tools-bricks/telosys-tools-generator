@@ -333,7 +333,7 @@ public class EnvInContext {
 			"Returns the current specific collection type"
 			},
 		example={ 
-			"$env.language" 
+			"$env.collectionType" 
 			},
 		since = "3.3.0"
 			)

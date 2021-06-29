@@ -27,6 +27,7 @@ import org.telosys.tools.commons.XmlUtil;
 import org.telosys.tools.generator.GenerationCancellationException;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
+import org.telosys.tools.generator.context.doc.VelocityNoDoc;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.exceptions.GeneratorFunctionException;
@@ -430,6 +431,18 @@ public class FnInContext {
 	}
 
 	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the class name (CanonicalName) for the given object (or 'null' if undefined)"
+		},
+		parameters = { 
+			"object : object reference for which to get the class name"
+		},
+		example = {
+			"$fn.className($var)" 
+		},
+		since = "3.3.0"
+		)
 	public String className(Object o) { 
 		if ( o != null ) {
 			return o.getClass().getCanonicalName();
@@ -934,9 +947,11 @@ public class FnInContext {
 	//-------------------------------------------------------------------------------------
 	// TEST / THROW EXCEPTION ( v 3.3.0 )
 	//-------------------------------------------------------------------------------------
+	@VelocityNoDoc
 	public void cancelGeneration(String message) throws GenerationCancellationException {
 		throw new GenerationCancellationException(message);
 	}
+	@VelocityNoDoc
 	public void throwGeneratorException(String message) throws GeneratorException{
 		throw new GeneratorException(message);
 	}

@@ -21,6 +21,7 @@ import java.util.List;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
+import org.telosys.tools.generator.context.doc.VelocityNoDoc;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
@@ -41,8 +42,8 @@ import org.telosys.tools.generic.model.FetchType;
 //-------------------------------------------------------------------------------------
 public class Jpa {
 
-	private boolean   genTargetEntity = false ;
-	private String    collectionType  = "List" ;
+	private boolean   genTargetEntity = false ; // v 3.3.0
+	private String    collectionType  = "List" ; // next ver after v 3.3.0
 	
 	private FetchType linkManyToOneFetchType  = FetchType.UNDEFINED; // v 3.3.0
 	private FetchType linkOneToOneFetchType   = FetchType.UNDEFINED; // v 3.3.0
@@ -61,50 +62,108 @@ public class Jpa {
 	}
 	
 	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+		"Defines if 'targetEntity' must be generated in @ManyToMany, @OneToMany, etc",
+		"Can be set to 'true' or 'false' (default value is 'false') "
+		},
+	example={ 
+		"#set( $jpa.genTargetEntity = true )"
+		},
+	since = "3.3.0"
+		)
 	public boolean getGenTargetEntity() {
 		return genTargetEntity;
 	}
+
+	@VelocityNoDoc // just the setter for 'genTargetEntity'
 	public void setGenTargetEntity(boolean v) {
 		this.genTargetEntity = v;
 	}
 
 	//-------------------------------------------------------------------------------------
+	@VelocityNoDoc  // for future use  ( currently $env.collectionType is used )
 	public String getCollectionType() {
 		return collectionType;
 	}
+	@VelocityNoDoc  // for future use ( currently $env.collectionType is used )
 	public void setCollectionType(String v) {
 		this.collectionType = v;
 	}
 
 	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+		"Defines default FETCH-TYPE ('LAZY' or 'EAGER') for 'ManyToOne' cardinality "
+		},
+	example={ 
+		"#set( $jpa.manyToOneFetchType = 'LAZY' )"
+		},
+	since = "3.3.0"
+		)
 	public FetchType getManyToOneFetchType() {
 		return this.linkManyToOneFetchType;
 	}
+	@VelocityNoDoc // just the setter 
 	public void setManyToOneFetchType(String s) {
 		this.linkManyToOneFetchType = getFetchType(s);
 	}
 
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+		"Defines default FETCH-TYPE ('LAZY' or 'EAGER') for 'OneToOne' cardinality "
+		},
+	example={ 
+		"#set( $jpa.oneToOneFetchType = 'LAZY' )"
+		},
+	since = "3.3.0"
+		)
 	public FetchType getOneToOneFetchType() {
 		return this.linkOneToOneFetchType;
 	}
+	@VelocityNoDoc // just the setter 
 	public void setOneToOneFetchType(String s) {
 		this.linkOneToOneFetchType = getFetchType(s);
 	}
 
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+		"Defines default FETCH-TYPE ('LAZY' or 'EAGER') for 'OneToMany' cardinality "
+		},
+	example={ 
+		"#set( $jpa.oneToManyFetchType = 'EAGER' )"
+		},
+	since = "3.3.0"
+		)
 	public FetchType getOneToManyFetchType() {
 		return this.linkOneToManyFetchType;
 	}
+	@VelocityNoDoc // just the setter 
 	public void setOneToManyFetchType(String s) {
 		this.linkOneToManyFetchType = getFetchType(s);
 	}
 
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+		"Defines default FETCH-TYPE ('LAZY' or 'EAGER') for 'ManyToMany' cardinality "
+		},
+	example={ 
+		"#set( $jpa.manyToManyFetchType = 'EAGER' )"
+		},
+	since = "3.3.0"
+		)
 	public FetchType getManyToManyFetchType() {
 		return this.linkManyToManyFetchType;
 	}
+	@VelocityNoDoc // just the setter 
 	public void setManyToManyFetchType(String s) {
 		this.linkManyToManyFetchType = getFetchType(s);
 	}
 
+	//-------------------------------------------------------------------------------------
 	private FetchType getFetchType(String s) {
 		if ( ! StrUtil.nullOrVoid(s) ) {
 			String ft = s.toUpperCase();
@@ -120,22 +179,47 @@ public class Jpa {
 	}
 
 	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+		"Defines the value for 'insertable' attribute in '@JoinColumn' annotation",
+		"Can be set to 'true' or 'false' (default value is 'nothing') "
+		},
+	example={ 
+		"#set( $jpa.joinColumnInsertable = true )"
+		},
+	since = "3.3.0"
+		)
 	public String getJoinColumnInsertable() {
 		return this.joinColumnInsertable.getText() ;
 	}
+	@VelocityNoDoc // just the setter
 	public void setJoinColumnInsertable(String s) {
 		this.joinColumnInsertable = getBooleanValue(s);
 	}
+	@VelocityNoDoc // just the setter
 	public void setJoinColumnInsertable(boolean b) {
 		this.joinColumnInsertable = getBooleanValue(b);
 	}
 
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+		"Defines the value for 'updatable' attribute in '@JoinColumn' annotation",
+		"Can be set to 'true' or 'false' (default value is 'nothing') "
+		},
+	example={ 
+		"#set( $jpa.joinColumnUpdatable = true )"
+		},
+	since = "3.3.0"
+		)
 	public String getJoinColumnUpdatable() {
 		return this.joinColumnUpdatable.getText() ;
 	}
+	@VelocityNoDoc // just the setter
 	public void setJoinColumnUpdatable(String s) {
 		this.joinColumnUpdatable = getBooleanValue(s);
 	}
+	@VelocityNoDoc // just the setter
 	public void setJoinColumnUpdatable(boolean b) {
 		this.joinColumnUpdatable = getBooleanValue(b);
 	}

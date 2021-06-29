@@ -25,6 +25,7 @@ import org.telosys.tools.commons.jdbctypes.JdbcTypesManager;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.GeneratorUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
+import org.telosys.tools.generator.context.doc.VelocityNoDoc;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
@@ -762,9 +763,12 @@ public class AttributeInContext {
     }
 
 	//----------------------------------------------------------------------
+	@VelocityNoDoc  // internal usage	
 	public boolean isUsedInLinks() {
 		return isUsedInLinks ;
 	}
+
+	@VelocityNoDoc  // internal usage	
 	public boolean isUsedInSelectedLinks() {
 		return isUsedInSelectedLinks ;
 	}
@@ -1466,6 +1470,12 @@ public class AttributeInContext {
 		text={	
 			"Returns TRUE if the attribute has a tag with the given name"
 		},
+		parameters = { 
+			"tagName : name of the tag for which to check the existence" 
+		},
+		example= {
+			"$attrib.hasTag('mytag') "
+		},
 		since="3.3.0"
 	)
 	public boolean hasTag(String tagName) {
@@ -1484,7 +1494,10 @@ public class AttributeInContext {
 	@VelocityMethod(
 		text={	
 			"Returns the value held by the given tag name",
-			"If the tag is not defined the returned value is a void string"
+			"If the tag is undefined or has no value, the returned value is an empty string"
+		},
+		parameters = { 
+			"tagName : name of the tag for which to get the value" 
 		},
 		example= {
 			"$attrib.tagValue('mytag') "
@@ -1502,6 +1515,7 @@ public class AttributeInContext {
 	//-------------------------------------------------------------------------------------
 	// "insertable" / "updatable"  ( v 3.3.0 )
 	//-------------------------------------------------------------------------------------
+	@VelocityNoDoc  // internal usage
 	public BooleanValue getInsertableFlag() {
 		return this.insertable;
 	}
@@ -1536,6 +1550,7 @@ public class AttributeInContext {
     }
 	
 	//-------------------------------------------------------------------------------------
+	@VelocityNoDoc  // internal usage
 	public BooleanValue getUpdatableFlag() {
 		return this.updatable;
 	}
