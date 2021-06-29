@@ -42,7 +42,7 @@ import org.telosys.tools.generator.context.names.ContextName;
 				"Can be used to load a specific Java Class tool in the Velocity Context",
 				"Allows users to create their own classes and to use them in the templates"
 		},
-		since = ""
+		since = "2.0.3"
  )
 //-------------------------------------------------------------------------------------
 public class Loader {

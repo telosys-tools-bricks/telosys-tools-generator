@@ -40,7 +40,7 @@ import org.telosys.tools.generic.model.ModelType;
 @VelocityObject(
 		contextName= ContextName.MODEL ,
 		text = "Object giving access to the current model ",
-		since = ""
+		since = "2.0.0"
  )
 //-------------------------------------------------------------------------------------
 public class ModelInContext

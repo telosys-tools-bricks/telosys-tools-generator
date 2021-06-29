@@ -41,7 +41,8 @@ import org.telosys.tools.generic.model.Entity;
 				"",
 				"Example when using $generator : ",
 				"$generator.generate($target.entityName, \"${beanClass.name}Key.java\", $target.folder, \"jpa_bean_pk.vm\"  )"
-		}
+		},
+		since = "2.0.3"
  )
 //-------------------------------------------------------------------------------------
 public class Target 

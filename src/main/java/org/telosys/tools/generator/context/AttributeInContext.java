@@ -52,7 +52,7 @@ import org.telosys.tools.generic.model.types.TypeConverter;
 				"Each attribute is obtained from its entity class ",
 				""
 		},
-		since = "",
+		since = "2.0.0",
 		example= {
 				"",
 				"#foreach( $attribute in $entity.attributes )",

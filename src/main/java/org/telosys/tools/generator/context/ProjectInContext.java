@@ -31,7 +31,7 @@ import org.telosys.tools.generator.context.names.ContextName;
 @VelocityObject(
 		contextName= ContextName.PROJECT ,
 		text = "Current project with configuration parameters ( variables, folders, ... )",
-		since = ""
+		since = "2.0.7"
  )
 //-------------------------------------------------------------------------------------
 public class ProjectInContext
