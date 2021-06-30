@@ -1,10 +1,13 @@
 package junit.env.telosys.tools.generator.fakemodel.entities;
 
 import org.telosys.tools.generic.model.Attribute;
+import org.telosys.tools.generic.model.Cardinality;
+import org.telosys.tools.generic.model.Link;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
 import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
+import junit.env.telosys.tools.generator.fakemodel.FakeLink;
 
 public class Car extends FakeEntity {
 
@@ -15,6 +18,7 @@ public class Car extends FakeEntity {
 		storeAttribute(idAttribute());
 		storeAttribute(nameAttribute());
 		storeAttribute(descAttribute());
+		storeLink(brandLink());
 	}
 	
 	private Attribute idAttribute() {
@@ -36,5 +40,10 @@ public class Car extends FakeEntity {
 		a.setDatabaseName("DESC");
 		a.setMaxLength(60);
 		return a ;
+	}
+
+	private Link brandLink() { 
+		FakeLink link = new FakeLink("brand", "Brand", Cardinality.MANY_TO_ONE);
+		return link ;
 	}
 }

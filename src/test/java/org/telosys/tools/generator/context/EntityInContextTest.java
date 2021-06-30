@@ -59,7 +59,28 @@ public class EntityInContextTest {
 		assertTrue( entityInContext.getAttributeByColumnName("ID").isKeyElement() );
 
 	}
-
+	
+	
+	@Test
+	public void employeeEntityTest() throws GeneratorException {
+		Employee e = new Employee();
+		EntityInContext entityInContext = buildEntityInContext(e);
+		checkEntityInContext(entityInContext, e);
+		
+		// Attributes
+		assertEquals(3, entityInContext.getAttributesCount());
+		// Key attributes
+		assertEquals(1, entityInContext.getKeyAttributesCount());
+		assertEquals(1, entityInContext.getKeyAttributes().size());
+		// Non Key attributes
+		assertEquals(2, entityInContext.getNonKeyAttributesCount());
+		assertEquals(2, entityInContext.getNonKeyAttributes().size());
+		// Links
+		assertEquals(0, entityInContext.getLinks().size());
+		assertFalse(entityInContext.hasLinks());
+		assertEquals(0, entityInContext.getLinksCount());
+	}
+	
 	@Test
 	public void carEntityTest() throws GeneratorException {
 		Car car = new Car();
@@ -93,15 +114,19 @@ public class EntityInContextTest {
 		assertEquals(2, entityInContext.getNonKeyAttributesCount());
 		assertEquals(2, entityInContext.getNonKeyAttributes().size());
 				
-		assertEquals(0, entityInContext.getLinks().size());
-		assertEquals(0, entityInContext.referencedEntityTypes().size());
-
 		assertFalse(entityInContext.isJoinEntity());
 		
 		// Attributes
 		assertTrue( entityInContext.getAttributeByColumnName("ID").isKeyElement() );
 		assertFalse( entityInContext.getAttributeByColumnName("NAME").isKeyElement() );
 		assertFalse( entityInContext.getAttributeByColumnName("DESC").isKeyElement() );
+
+		// Links
+		assertEquals(1, entityInContext.getLinks().size());
+		assertTrue(entityInContext.hasLinks());
+		assertEquals(1, entityInContext.getLinksCount());
+//		assertEquals(0, entityInContext.referencedEntityTypes().size());
+
 	}
 	
 	@Test

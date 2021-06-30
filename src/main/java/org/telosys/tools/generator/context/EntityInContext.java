@@ -284,6 +284,35 @@ public class EntityInContext
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
+			"Returns the number of links defined in the entity"
+		},
+		example="$entity.linksCount",
+		since="3.3.0"
+	)
+	public int getLinksCount() {
+		if ( links != null ) {
+			return links.size() ;
+		}
+		return 0 ;
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns TRUE if this entity has at least one link "
+		},
+		example= {
+			"#if ( $entity.hasLinks() )",
+			"...",
+			"#end"
+		}
+	)
+	public boolean hasLinks() {
+		return ( links != null && ! links.isEmpty() ) ;
+	}
+	
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
 			"Returns a list of all the links defined for the current entity"
 		},
 		example={	
