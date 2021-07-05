@@ -1436,17 +1436,21 @@ public class AttributeInContext {
 	since="3.0.0"
 	)
 	public EntityInContext getReferencedEntity() throws GeneratorException {
-		if ( ! StrUtil.nullOrVoid(referencedEntityClassName) ) {
-			EntityInContext entity = this.modelInContext.getEntityByClassName(referencedEntityClassName);
-			if ( entity != null ) {
-				return entity ;
-			}
-			else {
-				throw new IllegalStateException("getReferencedEntityType() : Cannot get Entity for '" + referencedEntityClassName + "'");				
-			}
+		// entityName.attributeName
+		String attribName = entityInContext.getName() + "." + this.name ;
+		if ( ! this.isFK() ) {
+			throw new GeneratorException("Attribute '" + attribName + "' is not a Foreign Key");
+		}
+		if ( StrUtil.nullOrVoid(referencedEntityClassName) ) {
+			throw new GeneratorException("No entity referenced by attribute '" + attribName + "'");
+		}
+		// OK : try to get referenced entity
+		EntityInContext entity = this.modelInContext.getEntityByClassName(referencedEntityClassName);
+		if ( entity != null ) {
+			return entity ;
 		}
 		else {
-			throw new GeneratorException("No entity referenced by this attribute (" + name + ")");
+			throw new IllegalStateException("getReferencedEntityType() : Cannot get Entity for '" + referencedEntityClassName + "'");				
 		}
 	}
 

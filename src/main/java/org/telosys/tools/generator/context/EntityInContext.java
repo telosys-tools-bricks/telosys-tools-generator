@@ -527,6 +527,7 @@ public class EntityInContext
 	@VelocityReturnType("Instance of 'attribute' ")
 	public AttributeInContext getKeyAttribute() throws GeneratorException 
 	{
+		String msg = "Cannot get 'keyAttribute' for entity '" + this.className + "' : ";
 		if ( this.hasPrimaryKey() ) {
 			List<AttributeInContext> keyAttributesList = this.getKeyAttributes() ;
 			if ( keyAttributesList.size() == 1 ) {
@@ -534,16 +535,18 @@ public class EntityInContext
 				return keyAttributesList.get(0);
 			}
 			else if ( keyAttributesList.size() > 1 ){
-				throw new GeneratorException("Cannot get 'keyAttribute' : this entity has a composite Primary Key ("
+				throw new GeneratorException(msg 
+							+ "this entity has a composite Primary Key ("
 							+ keyAttributesList.size() + " attributes)");
 			} 
 			else {
-				throw new GeneratorException("Cannot get 'keyAttribute' : "
-						+ keyAttributesList.size() + " attributes in Primary Key");
+				throw new GeneratorException(msg
+							+ keyAttributesList.size() + " attributes in Primary Key");
 			}
 		}
 		else {
-			throw new GeneratorException("Cannot get 'keyAttribute' : no Primary Key for this entity");
+			throw new GeneratorException(msg
+						+ "no Primary Key for this entity");
 		}
 	}
 	
