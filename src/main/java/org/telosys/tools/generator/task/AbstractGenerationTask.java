@@ -219,7 +219,8 @@ public abstract class AbstractGenerationTask
 				for ( TargetDefinition targetDefinition : entityTargets ) {
 					
 					//--- Get a specialized target for the current entity
-					Target target = new Target( targetDefinition, entity, variables ); // v 3.0.0
+					//Target target = new Target( targetDefinition, entity, variables ); // v 3.0.0
+					Target target = new Target( telosysToolsCfg, targetDefinition, entity ); // v 3.3.0
 					
 					generateTarget(progressMonitor, target, selectedEntities); // throws InterruptedException if error + 'cancel'
 				}
@@ -238,7 +239,8 @@ public abstract class AbstractGenerationTask
 		logger.info("----- Generation without entity" );
 		for ( TargetDefinition targetDefinition : onceTargets ) {
 			//--- Target without current entity
-			Target target = new Target( targetDefinition, variables ); // v 3.0.0
+			//Target target = new Target( targetDefinition, variables ); // v 3.0.0
+			Target target = new Target( telosysToolsCfg, targetDefinition ); // v 3.3.0
 			generateTarget(progressMonitor, target, selectedEntities);  // throws InterruptedException if error + 'cancel'
 		}
 		

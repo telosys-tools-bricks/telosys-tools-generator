@@ -71,7 +71,7 @@ public class LinkInContext {
 	private final String       _fieldName ;
 	// private final String       _fieldType ;
 	private final String       _targetTableName ;
-	private final String       _mappedBy ;
+	private final String       mappedBy ;
 	private final boolean      _selected ;
 	private final boolean      _owningSide ;
 	
@@ -123,7 +123,7 @@ public class LinkInContext {
 		// _fieldType = link.getFieldType(); // removed in v 3.3.0
 		_targetTableName = link.getTargetTableName();
 		_selected = link.isSelected();
-		_mappedBy = link.getMappedBy();
+		this.mappedBy = link.getMappedBy(); // keep null if not defined
 		_owningSide = link.isOwningSide();
 		
 		_cardinality = link.getCardinality();
@@ -248,7 +248,8 @@ public class LinkInContext {
 	@VelocityMethod(
 		text={	
 			"Returns the name of the 'join table' for the link ",
-			"NB : can be null if the link doesn't have a 'join table'"
+			"NB : can be null if the link doesn't have a 'join table'",
+			"check existence before with 'hasJoinTable()' "
 			}
 	)
 	public String getJoinTableName() {
@@ -264,7 +265,8 @@ public class LinkInContext {
 	@VelocityMethod(
 		text={	
 			"Returns the 'join table' object for the link ",
-			"NB : can be null if the link doesn't have a 'join table' "
+			"NB : can be null if the link doesn't have a 'join table' ",
+			"check existence before with 'hasJoinTable()' "			
 			}
 	)
 	public JoinTableInContext getJoinTable() {
@@ -498,12 +500,26 @@ public class LinkInContext {
 	@VelocityMethod(
 		text={	
 			"Returns the name of the link in the 'owning side' ",
-			"Typically for JPA 'mappedBy'"
+			"Typically for JPA 'mappedBy'",
+			"NB : can be null if 'mappedBy' is not defined ",
+			"check existence before with 'hasMappedBy()' "			
 			}
 	)
 	public String getMappedBy() {
-		return _mappedBy;
+		return mappedBy;
 	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns TRUE if 'mappedBy' is defined"
+			},
+		since="3.3.0"
+	)
+	public boolean hasMappedBy() {
+		return mappedBy != null ;
+	}
+	
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(

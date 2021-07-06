@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 import org.telosys.tools.commons.FileUtil;
 import org.telosys.tools.commons.bundles.TargetDefinition;
-import org.telosys.tools.commons.variables.Variable;
+import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.variables.VariablesManager;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityNoDoc;
@@ -45,67 +45,107 @@ import org.telosys.tools.generic.model.Entity;
 		since = "2.0.3"
  )
 //-------------------------------------------------------------------------------------
-public class Target 
-{
+public class Target {
+
+	private final TelosysToolsCfg  telosysToolsCfg ;
 	private final VariablesManager variablesManager ;
 	
-	private final String    targetName ;
+	private final String    targetName ; // Col 1
+	private final String    originalFileDefinition ; // Col 2
+	private final String    originalFolderDefinition; // Col 3
+	private final String    template ; // Col 4
 	
-	private final String    originalFileDefinition ;
-	
-	private final String    folder ;
-	
-	private final String    template ;
-
 	private final String    entityName ;
-
 	private String forcedEntityName = null ;
+
+	private final String    folder ; // folder after variable substitution
+
 	
-	/**
-	 * Constructor for a generation with an entity and a template
-	 * @param targetDefinition
-	 * @param entity
-	 * @param variables
-	 */
-	public Target( TargetDefinition targetDefinition, Entity entity, Variable[] variables ) {
+	private Target(TelosysToolsCfg telosysToolsCfg, TargetDefinition targetDefinition, String entityName ) {
 		super();
-		//--- Generic target informations
+		this.telosysToolsCfg = telosysToolsCfg ;
+		this.variablesManager = new VariablesManager( telosysToolsCfg.getAllVariables() ); 
+		
+		//--- Keep target definition
 		this.targetName = targetDefinition.getName();
+		this.originalFileDefinition   = targetDefinition.getFile() ;
+		this.originalFolderDefinition = targetDefinition.getFolder();
 		this.template = targetDefinition.getTemplate();
 		
 		//--- Specialization for the given entity
-		this.entityName = entity.getClassName() ;
+		this.entityName = entityName ;
 		this.forcedEntityName = null ;
 
-		//--- Replace the "$" variables in _sFile and _sFolder
-		this.variablesManager = new VariablesManager( variables ); 
-		this.originalFileDefinition = targetDefinition.getFile() ;
+		//--- Replace the "$" variables in folder
 		
 		this.variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
 		this.folder = replaceVariables( targetDefinition.getFolder(), variablesManager );
 	}
-
+	
+	/**
+	 * Constructor for a generation with an entity and a template
+	 * @param telosysToolsCfg
+	 * @param targetDefinition
+	 * @param entity
+	 */
+	public Target(TelosysToolsCfg telosysToolsCfg, TargetDefinition targetDefinition, Entity entity) {
+		this(telosysToolsCfg, targetDefinition, entity.getClassName());
+	}
+	
 	/**
 	 * Constructor for a 'ONCE' target or a 'RESOURCE' target ( resource copy )
+	 * @param telosysToolsCfg
 	 * @param targetDefinition
-	 * @param variables
 	 */
-	public Target( TargetDefinition targetDefinition, Variable[] variables ) {
-		super();
-		//--- Generic target informations
-		this.targetName = targetDefinition.getName();
-		this.template = targetDefinition.getTemplate();
-		
-		//--- No current entity 
-		this.entityName = "" ;
-
-		//--- Replace the "$" variables in _sFile and _sFolder
-		this.variablesManager = new VariablesManager( variables ); 
-		this.originalFileDefinition = targetDefinition.getFile() ;
-		
-		this.variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
-		this.folder = replaceVariables( targetDefinition.getFolder(), variablesManager );
+	public Target(TelosysToolsCfg telosysToolsCfg, TargetDefinition targetDefinition) {
+		this(telosysToolsCfg, targetDefinition, "");
 	}
+	
+//	/**
+//	 * Constructor for a generation with an entity and a template
+//	 * @param targetDefinition
+//	 * @param entity
+//	 * @param variables
+//	 */
+//	public Target( TargetDefinition targetDefinition, Entity entity, Variable[] variables ) {
+//		super();
+//		//--- Generic target informations
+//		this.targetName = targetDefinition.getName();
+//		this.template = targetDefinition.getTemplate();
+//		
+//		//--- Specialization for the given entity
+//		this.entityName = entity.getClassName() ;
+//		this.forcedEntityName = null ;
+//
+//		//--- Replace the "$" variables in _sFile and _sFolder
+//		this.variablesManager = new VariablesManager( variables ); 
+//		this.originalFileDefinition = targetDefinition.getFile() ;
+//		
+//		this.variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
+//		this.folder = replaceVariables( targetDefinition.getFolder(), variablesManager );
+//	}
+
+//	/**
+//	 * Constructor for a 'ONCE' target or a 'RESOURCE' target ( resource copy )
+//	 * @param targetDefinition
+//	 * @param variables
+//	 */
+//	public Target( TargetDefinition targetDefinition, Variable[] variables ) {
+//		super();
+//		//--- Generic target informations
+//		this.targetName = targetDefinition.getName();
+//		this.template = targetDefinition.getTemplate();
+//		
+//		//--- No current entity 
+//		this.entityName = "" ;
+//
+//		//--- Replace the "$" variables in _sFile and _sFolder
+//		this.variablesManager = new VariablesManager( variables ); 
+//		this.originalFileDefinition = targetDefinition.getFile() ;
+//		
+//		this.variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
+//		this.folder = replaceVariables( targetDefinition.getFolder(), variablesManager );
+//	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -127,7 +167,19 @@ public class Target
 	public String getOriginalFileDefinition() {
 		return originalFileDefinition ;
 	}
-
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the original folder definition for the generation in progress ",
+			"(the folder as defined in the bundle, before variables substitution) "
+			},
+		since="3.3.0"
+	)
+	public String getOriginalFolderDefinition() {
+		return originalFolderDefinition ;
+	}
+	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -135,6 +187,7 @@ public class Target
 			}
 	)
 	public String getFile() {
+		// Keep variable substitution here to use 'forcedEntityName' if defined
 		return replaceVariables( originalFileDefinition, variablesManager );
 	}
 
@@ -168,6 +221,7 @@ public class Target
 		return entityName ;
 	}
 	
+	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text = {
 			"Forces the entity name (to change dynamically the entity name)",
@@ -183,6 +237,7 @@ public class Target
 		return "" ;
 	}
 
+	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Returns the 'forced entity name' (or '' if none)"
@@ -192,7 +247,6 @@ public class Target
 		return forcedEntityName != null ? forcedEntityName : "" ;
 	}
 		
-	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text = {	
@@ -228,7 +282,27 @@ public class Target
 			return "error.folder.not.started.with.the.given.src.folder" ;
 		}
 	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text = {	
+			"Returns the full path of the file that will be generated",
+			"(it uses the 'SpecificDestinationFolder' if defined in configuration)",
+			" "
+		},
+		since = "3.3.0"
+		)
+	public String getOutputFileFullPath() {
+		return FileUtil.buildFilePath(
+				telosysToolsCfg.getDestinationFolderAbsolutePath(),
+				getOutputFileNameInProject()) ;
+	}
 
+	
+	//-------------------------------------------------------------------------------------
+	// END OF VELOCITY METHODS
+	//-------------------------------------------------------------------------------------
+	
 	private String removeFirstSlashIfAny(String s) {
 		if ( s.startsWith("/") ) {
 			return s.substring(1);

@@ -66,11 +66,12 @@ public class BundleResourcesManager {
 	private List<Target> getResourcesTargets(List<TargetDefinition> targetsDefinitions ) {
 		log("getResourcesTargets()... " );
 		
-		Variable[] projectVariables = telosysToolsCfg.getAllVariables();
+//		Variable[] projectVariables = telosysToolsCfg.getAllVariables(); // v 3.3.0
 		LinkedList<Target> targets = new LinkedList<>();
 		if ( targetsDefinitions != null ) {
 			for ( TargetDefinition targetDefinition : targetsDefinitions ) {
-				Target target = new Target ( targetDefinition, projectVariables ); // v 3.0.0
+//				Target target = new Target ( targetDefinition, projectVariables ); // v 3.0.0
+				Target target = new Target (telosysToolsCfg, targetDefinition); // v 3.3.0
 				targets.add(target);
 			}
 		}

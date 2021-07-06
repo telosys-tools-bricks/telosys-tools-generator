@@ -20,7 +20,6 @@ import java.util.List;
 import org.telosys.tools.commons.TelosysToolsLogger;
 import org.telosys.tools.commons.bundles.TargetDefinition;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
-import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generator.Generator;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.GeneratorVersion;
@@ -45,27 +44,27 @@ import org.telosys.tools.generic.model.Model;
 //-------------------------------------------------------------------------------------
 public class EmbeddedGenerator {
 
-	private final Model              _model ;
-	private final TelosysToolsCfg    _telosysToolsCfg ; // v 3.0.0
-	private final String             _bundleName ; // v 3.0.0
+	private final Model              model ;
+	private final TelosysToolsCfg    telosysToolsCfg ; // v 3.0.0
+	private final String             bundleName ; // v 3.0.0
 	
-	private final TelosysToolsLogger _logger ;
-	private final List<String>       _selectedEntitiesNames;	
-	private final boolean            _canGenerate ;
-	private final List<Target>       _generatedTargets ;
+	private final TelosysToolsLogger logger ;
+	private final List<String>       selectedEntitiesNames;	
+	private final boolean            canGenerate ;
+	private final List<Target>       generatedTargets ;
 	
 	/**
 	 * Constructor for limited embedded generator without generation capabilities
 	 */
 	public EmbeddedGenerator() {
 		super();
-		this._model = null ;
-		this._telosysToolsCfg = null ; // v 3.0.0
-		this._bundleName = null ; // v 3.0.0
-		this._logger = null ;
-		this._selectedEntitiesNames = null ;
-		this._canGenerate = false ;
-		this._generatedTargets = null ;
+		this.model = null ;
+		this.telosysToolsCfg = null ; // v 3.0.0
+		this.bundleName = null ; // v 3.0.0
+		this.logger = null ;
+		this.selectedEntitiesNames = null ;
+		this.canGenerate = false ;
+		this.generatedTargets = null ;
 	}
 
 	/**
@@ -87,19 +86,19 @@ public class EmbeddedGenerator {
 			List<Target> generatedTargets) {
 		super();
 		// this.generatorConfig = generatorConfig; // v 3.0.0
-		this._telosysToolsCfg = telosysToolsCfg ; // v 3.0.0
-		this._bundleName = bundleName ; // v 3.0.0
-		this._logger = logger;
+		this.telosysToolsCfg = telosysToolsCfg ; // v 3.0.0
+		this.bundleName = bundleName ; // v 3.0.0
+		this.logger = logger;
 		
-		this._model = model;
-		this._selectedEntitiesNames = selectedEntitiesNames ;
-		this._generatedTargets = generatedTargets ;
+		this.model = model;
+		this.selectedEntitiesNames = selectedEntitiesNames ;
+		this.generatedTargets = generatedTargets ;
 
-		if ( model != null && telosysToolsCfg != null && _bundleName != null && logger != null ) {
-			this._canGenerate = true ;
+		if ( this.model != null && this.telosysToolsCfg != null && this.bundleName != null && this.logger != null ) {
+			this.canGenerate = true ;
 		}
 		else {
-			this._canGenerate = false ;
+			this.canGenerate = false ;
 		}
 	}
 
@@ -152,7 +151,7 @@ public class EmbeddedGenerator {
 	{
 		String err = "Error in embedded generator ";
 		
-		if ( _canGenerate != true ) {
+		if ( ! canGenerate ) {
 			throw new GeneratorException( err + "(embedded generator is not able to generate, environment is not available)");
 		}
 		if ( null == entityClassName ) {
@@ -169,24 +168,21 @@ public class EmbeddedGenerator {
 		}
 		
 		//--- Search the entity in the model
-		Entity entity = _model.getEntityByClassName(entityClassName.trim());
+		Entity entity = model.getEntityByClassName(entityClassName.trim());
 		if ( null == entity ) {
 			throw new GeneratorException( err + "(entity '" + entityClassName + "' not found in repository)");
 		}
 		
-//		Variable[] allVariables = generatorConfig.getTelosysToolsCfg().getAllVariables(); // v 2.1.0
-		Variable[] allVariables = this._telosysToolsCfg.getAllVariables(); // v 2.1.0
+		// Variable[] allVariables = this._telosysToolsCfg.getAllVariables(); // v 3.3.0
 		
 		TargetDefinition genericTarget = new TargetDefinition("Dynamic target", outputFile, outputFolder, templateFile, "");
 		
-		//Target target = new Target( genericTarget, entity.getName(), entity.getBeanJavaClass(), allVariables ); // v 2.1.0
-		Target target = new Target( genericTarget, entity, allVariables ); // v 3.0.0
+		//Target target = new Target( genericTarget, entity, allVariables ); // v 3.0.0
+		Target target = new Target( telosysToolsCfg, genericTarget, entity ); // v 3.3.0
 		
-		//Generator generator = new Generator(target, generatorConfig, model, logger); // v 2.0.7
-//		Generator generator = new Generator(generatorConfig, logger); // v 3.0.0
-		Generator generator = new Generator(this._telosysToolsCfg, _bundleName, _logger); // v 3.0.0
+		Generator generator = new Generator(this.telosysToolsCfg, this.bundleName, logger); // v 3.0.0
 		
-		generator.generateTarget(target, _model, _selectedEntitiesNames, this._generatedTargets);
+		generator.generateTarget(target, model, selectedEntitiesNames, this.generatedTargets);
 	}
 	
 }

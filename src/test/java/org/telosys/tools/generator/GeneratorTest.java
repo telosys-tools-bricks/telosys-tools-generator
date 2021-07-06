@@ -3,6 +3,7 @@ package org.telosys.tools.generator;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import org.junit.Test;
 import org.telosys.tools.commons.TelosysToolsLogger;
@@ -21,22 +22,28 @@ import junit.env.telosys.tools.generator.fakemodel.entities.Employee;
 
 public class GeneratorTest {
 
-	private Generator getGenerator(String bundleName) {
+	private TelosysToolsCfg getTelosysToolsCfg() {
 		File projectFolder = TestsEnv.getTestFolder("proj-utf8");
-		TelosysToolsCfg telosysToolsCfg = TestsEnv.loadTelosysToolsCfg(projectFolder);
-		TelosysToolsLogger logger = LoggerProvider.getLogger();
-		return new Generator(telosysToolsCfg,  bundleName,  logger) ;
+		return TestsEnv.loadTelosysToolsCfg(projectFolder);
 	}
-	private Variable[] getVariables() {
-		Variable[] variables = new Variable[5] ;
-		int i = 0 ;
-		variables[i++] = new Variable("ROOT_PKG",   "org.foo.bar");
-		variables[i++] = new Variable("ENTITY_PKG", "org.foo.bar.bean");
-		variables[i++] = new Variable("VAR1",       "VALUE1");
-		variables[i++] = new Variable("VAR2",       "VALUE2");
-		variables[i++] = new Variable("SRC",        "/src");
-		return variables ;
+	
+	private Generator getGenerator(String bundleName) {
+		//File projectFolder = TestsEnv.getTestFolder("proj-utf8");
+		//TelosysToolsCfg telosysToolsCfg = TestsEnv.loadTelosysToolsCfg(projectFolder);
+		//TelosysToolsLogger logger = LoggerProvider.getLogger();
+		//return new Generator(telosysToolsCfg,  bundleName,  logger) ;
+		return new Generator(getTelosysToolsCfg(), bundleName, LoggerProvider.getLogger()) ;
 	}
+//	private Variable[] getVariables() {
+//		Variable[] variables = new Variable[5] ;
+//		int i = 0 ;
+//		variables[i++] = new Variable("ROOT_PKG",   "org.foo.bar");
+//		variables[i++] = new Variable("ENTITY_PKG", "org.foo.bar.bean");
+//		variables[i++] = new Variable("VAR1",       "VALUE1");
+//		variables[i++] = new Variable("VAR2",       "VALUE2");
+//		variables[i++] = new Variable("SRC",        "/src");
+//		return variables ;
+//	}
 
 	private Target getTarget(String templateFile, String generatedFile, Entity entity) {
 		
@@ -46,7 +53,8 @@ public class GeneratorTest {
 				"generated-files", 
 				templateFile, //"utf8_txt.vm", 
 				"*");
-		return new Target( targetDefinition, entity, getVariables() ); 
+		//return new Target( targetDefinition, entity, getVariables() ); 
+		return new Target( getTelosysToolsCfg(), targetDefinition, entity );  // v 3.3.0
 	}
 	
 	private List<String> getSelectedEntities() {
@@ -57,7 +65,6 @@ public class GeneratorTest {
 	
 	private void launchGeneration(String templateFile, String generatedFile) throws GeneratorException {
 		Generator generator = getGenerator("bundle-utf8");
-		
 		Model model = FakeModelProvider.buildModel();
 		Entity entity = model.getEntityByClassName(Employee.ENTITY_NAME);
 		Target target = getTarget(templateFile, generatedFile, entity);

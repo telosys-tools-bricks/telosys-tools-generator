@@ -237,16 +237,17 @@ public class TestsEnv {
 	 * @return
 	 */
 	public static final TelosysToolsCfg loadTelosysToolsCfg(File projectFolder)  {
-		TelosysToolsCfg telosysToolsCfg = null ;
+//		TelosysToolsCfg telosysToolsCfg = null ;
 		log("Loading configuration from folder : " + projectFolder.getAbsolutePath() );
 		TelosysToolsCfgManager cfgManager = new TelosysToolsCfgManager( projectFolder.getAbsolutePath() );
-		try {
-			telosysToolsCfg = cfgManager.loadTelosysToolsCfg();
-		} catch (TelosysToolsException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot load 'TelosysToolsCfg'", e);
-		}
-		return telosysToolsCfg ;
+//		try {
+//			telosysToolsCfg = cfgManager.loadTelosysToolsCfg();
+//		} catch (TelosysToolsException e) {
+//			e.printStackTrace();
+//			throw new RuntimeException("Cannot load 'TelosysToolsCfg'", e);
+//		}
+//		return telosysToolsCfg ;
+		return cfgManager.loadTelosysToolsCfg();
 	}
 	
 }
