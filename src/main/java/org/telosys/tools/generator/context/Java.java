@@ -355,7 +355,7 @@ public class Java {
 		lb.append(indent, "public String toString() { ");
 		
 		indent++;
-		lb.append(indent, "StringBuffer sb = new StringBuffer(); ");
+		lb.append(indent, "StringBuilder sb = new StringBuilder(); ");
 		//--- All the given attributes 
 		if ( attributes != null ) {
 			toStringForAttributes( attributes, lb, indent );
@@ -419,7 +419,7 @@ public class Java {
 		lb.append(indent, "public String toString() { ");
 		
 		indent++;
-		lb.append(indent, "StringBuffer sb = new StringBuffer(); ");
+		lb.append(indent, "StringBuilder sb = new StringBuilder(); ");
 		
 		int count = 0 ;
 		lb.append(indent, "sb.append(\"[\"); ");

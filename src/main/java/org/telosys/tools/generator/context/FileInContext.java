@@ -39,9 +39,12 @@ import org.telosys.tools.generator.context.names.ContextName;
 		},
 		since = "3.3.0",
 		example= {
-				"",
+				"## Get file instance :",
+				"#set( $file = $fn.file('dir/foo.txt') )",
 				"#set( $file = $fn.fileFromBundle(\"foo.txt\") )",
+				"#set( $file = $fn.fileFromModel('myfile.csv') )",
 				"",
+				"## Use file instance :",
 				"#if( $file.exists() && $file.isFile() )",
 				"#set($content = $file.loadContent() )",
 				"#end",

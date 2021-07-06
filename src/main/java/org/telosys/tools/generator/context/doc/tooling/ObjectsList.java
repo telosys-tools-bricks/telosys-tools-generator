@@ -17,21 +17,25 @@ package org.telosys.tools.generator.context.doc.tooling;
 
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.context.BeanValidation;
+import org.telosys.tools.generator.context.BundleInContext;
 import org.telosys.tools.generator.context.Const;
 import org.telosys.tools.generator.context.DatabaseInContext;
 import org.telosys.tools.generator.context.DatabasesInContext;
 import org.telosys.tools.generator.context.EmbeddedGenerator;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
+import org.telosys.tools.generator.context.FileInContext;
 import org.telosys.tools.generator.context.FnInContext;
 import org.telosys.tools.generator.context.ForeignKeyColumnInContext;
 import org.telosys.tools.generator.context.ForeignKeyInContext;
+import org.telosys.tools.generator.context.ForeignKeyPartInContext;
 import org.telosys.tools.generator.context.H2InContext;
 import org.telosys.tools.generator.context.HtmlInContext;
 import org.telosys.tools.generator.context.Java;
 import org.telosys.tools.generator.context.JdbcFactoryInContext;
 import org.telosys.tools.generator.context.JdbcInContext;
 import org.telosys.tools.generator.context.JoinColumnInContext;
+import org.telosys.tools.generator.context.JoinTableInContext;
 import org.telosys.tools.generator.context.Jpa;
 import org.telosys.tools.generator.context.LinkAttributesPairInContext;
 import org.telosys.tools.generator.context.LinkInContext;
@@ -45,7 +49,9 @@ import org.telosys.tools.generator.context.ValuesInContext;
 
 /**
  * Provides a list of classes for all objects defined in the generator context <br>
- * This list must be updated if an object is added or removed in the generator context.<br>
+ * 
+ * This list is used to generate the reference documentation<br>
+ * so it must be updated if an object is added or removed in the generator context.<br>
  * 
  * @author L. Guerin
  *
@@ -67,6 +73,7 @@ public class ObjectsList {
 		ForeignKeyInContext.class, // ver 2.0.7
 		ForeignKeyColumnInContext.class, // ver 2.0.7
 		JoinColumnInContext.class, // ver 2.1.0
+		JoinTableInContext.class, // ver 2.1.0  (added to list in v 3.3.0)
 		LinkInContext.class,
 		LinkAttributesPairInContext.class, // ver 2.1.0
 		Loader.class,
@@ -84,7 +91,11 @@ public class ObjectsList {
 		HtmlInContext.class, // v 3.0.0
 		ValuesInContext.class, // v 3.0.0
 
-		NowInContext.class // v 3.3.0
+		NowInContext.class, // v 3.3.0
+		BundleInContext.class, // v 3.3.0
+		FileInContext.class, // v 3.3.0
+		ForeignKeyPartInContext.class // v3.3.0
+		
 	};
 
 	public static final Class<?>[] getObjectsClasses() {

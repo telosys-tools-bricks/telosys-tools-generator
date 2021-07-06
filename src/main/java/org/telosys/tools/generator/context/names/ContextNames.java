@@ -110,7 +110,10 @@ public class ContextNames {
 		PREDEFINED_NAMES_LIST.add( ContextName.KEY_VALUES ); // v 3.0.0
 		PREDEFINED_NAMES_LIST.add( ContextName.DATA_VALUES ); // v 3.0.0
 
-		PREDEFINED_NAMES_LIST.add( ContextName.JOIN_TABLE ); // v 3.3.0 (for documentation)
+		PREDEFINED_NAMES_LIST.add( ContextName.JOIN_TABLE ); // v 3.3.0
+		PREDEFINED_NAMES_LIST.add( ContextName.FILE );   // v 3.3.0 
+		PREDEFINED_NAMES_LIST.add( ContextName.FKPART ); // v 3.3.0
+		
 	}
 
 	private static final List<String> RESERVED_NAMES_LIST = new LinkedList<>();

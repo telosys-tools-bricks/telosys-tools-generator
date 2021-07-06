@@ -28,7 +28,7 @@ import org.telosys.tools.generic.model.ForeignKeyPart;
  */
 //-------------------------------------------------------------------------------------
 @VelocityObject(
-		contextName = ContextName.FKCOL ,
+		contextName = ContextName.FKPART ,
 		text = {
 				"This object provides a part of Foreign Key for the current attribute",
 				""

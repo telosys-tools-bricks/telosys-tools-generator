@@ -85,7 +85,10 @@ public class ContextName {
 	public static final String  DATA_VALUES       = "dataValues" ; // ver 3.0.0
 
 	public static final String  FILE              = "file" ; // ver 3.3.0
+	public static final String  FKPART            = "fkPart" ; // ver 3.3.0
 	
-	//---  
+	// Don't forget to also add :
+	//   - the name in "ContextNames"
+	//   - the class in "doc.tooling.ObjectsList"
 	
 }
