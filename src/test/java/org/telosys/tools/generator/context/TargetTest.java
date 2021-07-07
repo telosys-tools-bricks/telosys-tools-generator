@@ -13,10 +13,17 @@ import junit.env.telosys.tools.generator.TestsEnv;
 import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
 
 public class TargetTest {
-
+	
+	private void println(String s) {
+		System.out.println( s );
+	}
+	
 	private TelosysToolsCfg getTelosysToolsCfg() {
 		File projectFolder = TestsEnv.getTestFolder("proj-target-tests");
-		return TestsEnv.loadTelosysToolsCfg(projectFolder);
+		TelosysToolsCfg telosysToolsCfg = TestsEnv.loadTelosysToolsCfg(projectFolder);
+		println( "TelosysToolsCfg loaded from : " + telosysToolsCfg.getCfgFileAbsolutePath() );
+		assertEquals("/src", telosysToolsCfg.getSRC() );
+		return telosysToolsCfg;
 	}
 
 //	private Variable[] getVariables() {
@@ -39,19 +46,16 @@ public class TargetTest {
 				"${SRC}/${ROOT_PKG}/persistence/services", 
 				"bean.vm", 
 				"*");
-		
 //		Target target = new Target( targetDef, buildEntity("AUTHOR", "Author"), getVariables() );  // v 3.0.0
 		TelosysToolsCfg telosysToolsCfg = getTelosysToolsCfg();
-		System.out.println( telosysToolsCfg.getCfgFileAbsolutePath() );
-		assertEquals("/src", telosysToolsCfg.getSRC() );
+		Target target = new Target( telosysToolsCfg, targetDef, buildEntity("AUTHOR", "Author") );  // v 3.3.0
+		print(target);
 		
-		Target target = new Target( telosysToolsCfg, targetDef, buildEntity("AUTHOR", "Author") );  // v 3.0.0
-		
-		print(target);		
 		assertEquals("Target 1",         target.getTargetName());
 		assertEquals("${BEANNAME}.java", target.getOriginalFileDefinition());
 		assertEquals("${SRC}/${ROOT_PKG}/persistence/services", target.getOriginalFolderDefinition());
 		assertEquals("bean.vm",          target.getTemplate());
+		assertEquals("*",                target.getType());
 
 		// current entity :
 		assertEquals("Author",           target.getEntityName());
@@ -62,7 +66,6 @@ public class TargetTest {
 		assertEquals("/src/org/demo/foo/bar/persistence/services", target.getFolder());
 		assertEquals("src/org/demo/foo/bar/persistence/services/Author.java",target.getOutputFileNameInProject());
 
-		System.out.println( target.getOutputFileFullPath() ); // v 3.3.0
 		assertEquals("C:\\FOO\\BAR/src/org/demo/foo/bar/persistence/services/Author.java", target.getOutputFileFullPath());
 		
 		// force entity name :
@@ -84,24 +87,44 @@ public class TargetTest {
 				"${SRC}/${ENTITY_PKG}", 
 				"bean.vm", 
 				"*");
-		
 //		Target target = new Target( targetDef, buildEntity("AUTHOR", "Author"), getVariables() ); // v 3.0.0
-		Target target = new Target( getTelosysToolsCfg(), targetDef, buildEntity("AUTHOR", "Author") ); // v 3.3.0
-		
+		Target target = new Target( getTelosysToolsCfg(), targetDef, buildEntity("BOOK", "Book") ); // v 3.3.0
 		print(target);
 		
-		assertEquals("Author.java", target.getFile());
+		assertEquals("Book.java", target.getFile());
 		assertEquals("/src/org/demo/foo/bar/bean", target.getFolder());
+	}
+
+	@Test
+	public void testTargetCreation3() {
 		
+		TargetDefinition targetDef = new TargetDefinition(
+				"Target 3", 
+				"config.xml", 
+				"${RES}/foo", 
+				"config_xml.vm", 
+				"1");
+		Target target = new Target( getTelosysToolsCfg(), targetDef ); // v 3.3.0
+		print(target);
+		
+		assertEquals("config.xml", target.getFile());
+		assertEquals("src/main/resources/foo", target.getFolder());
+		assertEquals("1", target.getType());
+		assertEquals("C:\\FOO\\BAR/src/main/resources/foo/config.xml", target.getOutputFileFullPath());
 	}
 
 	private void print(Target target) {
-		System.out.println("Target : " );
-		System.out.println(" . targetName = " + target.getTargetName() );
-		System.out.println(" . originalFileDefinition = " + target.getOriginalFileDefinition() );
-		System.out.println(" . file     = " + target.getFile() );
-		System.out.println(" . folder   = " + target.getFolder() );
-		System.out.println(" . template = " + target.getTemplate() );
+		println("Target : " );
+		println(" . targetName               = " + target.getTargetName() );
+		println(" . originalFileDefinition   = " + target.getOriginalFileDefinition() );
+		println(" . originalFolderDefinition = " + target.getOriginalFolderDefinition() );
+		println(" . template                 = " + target.getTemplate() );
+		println(" . type                     = " + target.getType() );
+		println(" . folder    = " + target.getFolder() );
+		println(" . file      = " + target.getFile() );
+		println(" . full path = " + target.getOutputFileFullPath() ); // v 3.3.0
+		println(" . exists ?  = " + target.outputFileExists() ); // v 3.3.0
+
 	}
 	
 	private Entity buildEntity(String tableName, String className) { 

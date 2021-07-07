@@ -15,6 +15,7 @@
  */
 package org.telosys.tools.generator.context;
 
+import java.io.File;
 import java.util.HashMap;
 
 import org.telosys.tools.commons.FileUtil;
@@ -50,10 +51,12 @@ public class Target {
 	private final TelosysToolsCfg  telosysToolsCfg ;
 	private final VariablesManager variablesManager ;
 	
+	// Target definition in templates bundle :
 	private final String    targetName ; // Col 1
 	private final String    originalFileDefinition ; // Col 2
 	private final String    originalFolderDefinition; // Col 3
 	private final String    template ; // Col 4
+	private final String    type ; // Col 5
 	
 	private final String    entityName ;
 	private String forcedEntityName = null ;
@@ -71,6 +74,13 @@ public class Target {
 		this.originalFileDefinition   = targetDefinition.getFile() ;
 		this.originalFolderDefinition = targetDefinition.getFolder();
 		this.template = targetDefinition.getTemplate();
+		if ( targetDefinition.isResource() ) {
+			this.type = "R" ;
+		} else if ( targetDefinition.isOnce() ) {
+			this.type = "1" ;
+		} else {
+			this.type = "*" ;
+		}
 		
 		//--- Specialization for the given entity
 		this.entityName = entityName ;
@@ -298,6 +308,31 @@ public class Target {
 				getOutputFileNameInProject()) ;
 	}
 
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text = {	
+			"Returns true if the file to generate already exists",
+			" "
+		},
+		since = "3.3.0"
+		)
+	public boolean outputFileExists() {
+		File file = new File(getOutputFileFullPath());
+		return file.exists();
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text = {	
+			"Returns the target type as in templates configuration file ",
+			"The type is '*', '1' or 'R'",
+			" "
+		},
+		since = "3.3.0"
+		)
+	public String getType() {
+		return this.type;
+	}
 	
 	//-------------------------------------------------------------------------------------
 	// END OF VELOCITY METHODS
