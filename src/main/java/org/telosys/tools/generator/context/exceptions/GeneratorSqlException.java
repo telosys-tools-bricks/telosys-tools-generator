@@ -13,17 +13,31 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.telosys.tools.generator;
+package org.telosys.tools.generator.context.exceptions;
 
 /**
- * Generator version
+ * Exception thrown by '$fn' object
  * 
- * @author Laurent Guerin
- *  
+ * @author Laurent GUERIN
+ * 
  */
-public class GeneratorVersion {
-
-	public static final String GENERATOR_VERSION = "3.4.0" ;
+public class GeneratorSqlException extends RuntimeException 
+{
+	private static final long serialVersionUID = 1L;
 	
-	private GeneratorVersion() {}
+    /**
+     * @param message
+     */
+    public GeneratorSqlException(String message) {
+        super("$sql : " + message);
+    }
+
+    /**
+     * @param functionName
+     * @param message
+     */
+    public GeneratorSqlException(String functionName, String message) {
+        super("$sql."+functionName + " : " + message);
+    }
+
 }

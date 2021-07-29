@@ -87,6 +87,9 @@ public class ContextName {
 	public static final String  FILE              = "file" ; // ver 3.3.0
 	public static final String  FKPART            = "fkPart" ; // ver 3.3.0
 	
+	public static final String  SQL               = "sql" ;     // ver 3.4.0
+	public static final String  FACTORY           = "factory" ; // ver 3.4.0
+	
 	// Don't forget to also add :
 	//   - the name in "ContextNames"
 	//   - the class in "doc.tooling.ObjectsList"

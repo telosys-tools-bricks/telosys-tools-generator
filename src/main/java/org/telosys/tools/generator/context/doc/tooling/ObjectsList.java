@@ -24,6 +24,7 @@ import org.telosys.tools.generator.context.DatabasesInContext;
 import org.telosys.tools.generator.context.EmbeddedGenerator;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
+import org.telosys.tools.generator.context.FactoryInContext;
 import org.telosys.tools.generator.context.FileInContext;
 import org.telosys.tools.generator.context.FnInContext;
 import org.telosys.tools.generator.context.ForeignKeyColumnInContext;
@@ -43,6 +44,7 @@ import org.telosys.tools.generator.context.Loader;
 import org.telosys.tools.generator.context.ModelInContext;
 import org.telosys.tools.generator.context.NowInContext;
 import org.telosys.tools.generator.context.ProjectInContext;
+import org.telosys.tools.generator.context.SqlInContext;
 import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generator.context.Today;
 import org.telosys.tools.generator.context.ValuesInContext;
@@ -94,8 +96,10 @@ public class ObjectsList {
 		NowInContext.class, // v 3.3.0
 		BundleInContext.class, // v 3.3.0
 		FileInContext.class, // v 3.3.0
-		ForeignKeyPartInContext.class // v3.3.0
+		ForeignKeyPartInContext.class, // v3.3.0
 		
+		SqlInContext.class,    // v3.4.0
+		FactoryInContext.class // v3.4.0
 	};
 
 	public static final Class<?>[] getObjectsClasses() {

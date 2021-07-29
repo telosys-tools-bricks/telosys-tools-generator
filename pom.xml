@@ -13,7 +13,7 @@
 
 	<name>telosys-tools-generator</name>
 	<artifactId>telosys-tools-generator</artifactId>
-	<version>3.3.0</version> <!-- also update version in GeneratorVersion.java  -->
+	<version>3.4.0-SNAPSHOT</version> <!-- also update version in GeneratorVersion.java  -->
 	<packaging>jar</packaging>
 
 	<dependencies>

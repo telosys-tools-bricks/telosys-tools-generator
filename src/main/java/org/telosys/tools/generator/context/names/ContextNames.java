@@ -114,6 +114,9 @@ public class ContextNames {
 		PREDEFINED_NAMES_LIST.add( ContextName.FILE );   // v 3.3.0 
 		PREDEFINED_NAMES_LIST.add( ContextName.FKPART ); // v 3.3.0
 		
+		PREDEFINED_NAMES_LIST.add( ContextName.SQL );     // v 3.4.0
+		PREDEFINED_NAMES_LIST.add( ContextName.FACTORY ); // v 3.4.0
+		
 	}
 
 	private static final List<String> RESERVED_NAMES_LIST = new LinkedList<>();
