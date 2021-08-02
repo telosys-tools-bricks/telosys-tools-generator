@@ -85,6 +85,10 @@ public class ContextNames {
 		GENERATOR_OBJECTS_LIST.add( ContextName.TARGET      );
 		GENERATOR_OBJECTS_LIST.add( ContextName.ENTITY      ); // new name
 		GENERATOR_OBJECTS_LIST.add( ContextName.SELECTED_ENTITIES  );
+		
+		//--- Version 3.4.0
+		GENERATOR_OBJECTS_LIST.add( ContextName.FACTORY ); // v 3.4.0
+
 
 		Collections.sort(GENERATOR_OBJECTS_LIST);
 	}
@@ -114,9 +118,7 @@ public class ContextNames {
 		PREDEFINED_NAMES_LIST.add( ContextName.FILE );   // v 3.3.0 
 		PREDEFINED_NAMES_LIST.add( ContextName.FKPART ); // v 3.3.0
 		
-		PREDEFINED_NAMES_LIST.add( ContextName.SQL );     // v 3.4.0
-		PREDEFINED_NAMES_LIST.add( ContextName.FACTORY ); // v 3.4.0
-		
+		PREDEFINED_NAMES_LIST.add( ContextName.SQL );     // v 3.4.0		
 	}
 
 	private static final List<String> RESERVED_NAMES_LIST = new LinkedList<>();

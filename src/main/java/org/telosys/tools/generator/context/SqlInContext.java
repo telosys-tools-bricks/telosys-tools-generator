@@ -46,6 +46,9 @@ import org.telosys.tools.generator.context.names.ContextName;
 public class SqlInContext {
 	// TODO : see also 	AttributeInContext.getSqlType
 
+	private static final int FK_COL     = 1 ;
+	private static final int FK_REF_COL = 2 ;
+	
 	private static final String CONV_TABLE_NAME  = "conv.tableName";
 	private static final String CONV_COLUMN_NAME = "conv.columnName";
 	
@@ -93,14 +96,14 @@ public class SqlInContext {
 		this.columnNameStyle = getConfigValue(CONV_COLUMN_NAME);
 	}
 	
-	/**
-	 * Constructor
-	 * @param envInContext
-	 */
-	// TODO : keep it or not ?
-	public SqlInContext(EnvInContext envInContext) {
-		this(envInContext.getDatabase());
-	}
+//	/**
+//	 * Constructor
+//	 * @param envInContext
+//	 */
+//	// TODO : keep it or not ?
+//	public SqlInContext(EnvInContext envInContext) {
+//		this(envInContext.getDatabase());
+//	}
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
@@ -156,7 +159,7 @@ public class SqlInContext {
 			""
 		},
 		example={	
-				"$sql.tableName($var)"
+				"$sql.convertToTableName($var)"
 			},
 		since = "3.4.0" 
 	)
@@ -183,16 +186,15 @@ public class SqlInContext {
 		since = "3.4.0"
 	)
 	public String columnName(AttributeInContext attribute) {
-		// Check if the attribute has a specific database name in the model
+		// Use attribute database name (by default = attribute name)
 		String databaseName = attribute.getDatabaseName() ;
 		if ( StrUtil.nullOrVoid(databaseName) ) {
-			// no database name in the model => use standard conversion from attribute name
-			return convertToColumnName(attribute.getName());
+			// no database name for this attribute
+			// => use attribute name as default database name ( not supposed to happen )
+			databaseName = attribute.getName();
 		}
-		else {
-			// database name in the model => use it
-			return databaseName ;
-		}
+		// convert attribute database name to target database naming convention 
+		return convertToColumnName(databaseName);
     }
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
@@ -319,7 +321,69 @@ public class SqlInContext {
 		}
 		return sb.toString();
     }
-		
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns a string containing the names of all the columns composing the primary key",
+			"for the given entity",
+			"Each column name is converted according to the naming rules for the target database",
+			"For example 'id' or 'code, group' ",
+			"Returns an empty string if the entity does not have a primary key"
+		},
+		example={	
+				"$sql.pkColumns($entity)"
+			},
+		since = "3.4.0"
+	)
+	public String pkColumns(EntityInContext entity) {
+		if ( entity.hasPrimaryKey() ) {
+			StringBuilder sb = new StringBuilder();
+			for ( AttributeInContext attribute : entity.getKeyAttributes() ) {
+				if ( sb.length() > 0 ) {
+					sb.append(", ");
+				}
+				sb.append( convertToColumnName(attribute.getName()) );
+			}
+			return sb.toString();
+		}
+		else {
+			return "";
+		}
+    }
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns a string containing the names of all the columns composing the foreign key",
+			"Each column name is converted according to the naming rules for the target database",
+			"For example 'id' or 'code, group' "
+		},
+		example={	
+				"$sql.fkColumns($fk)"
+			},
+		since = "3.4.0"
+	)
+	public String fkColumns(ForeignKeyInContext fk) {
+		return buildColumns(fk, FK_COL);
+    }
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns a string containing the names of all the columns referenced by the foreign key",
+			"Each column name is converted according to the naming rules for the target database",
+			"For example 'id' or 'code, group' "
+		},
+		example={	
+				"$sql.fkReferencedColumns($fk)"
+			},
+		since = "3.4.0"
+	)
+	public String fkReferencedColumns(ForeignKeyInContext fk) {
+		return buildColumns(fk, FK_REF_COL);
+    }
+
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -534,6 +598,22 @@ public class SqlInContext {
 			return sqlType;
 		}
 	}
-	
+
+	private String buildColumns(ForeignKeyInContext fk, int colType) {
+		StringBuilder sb = new StringBuilder();
+		for ( ForeignKeyColumnInContext fkCol : fk.getColumns() ) {
+			if ( sb.length() > 0 ) {
+				sb.append(", ");
+			}
+			if ( colType == FK_COL ) {
+				sb.append( convertToColumnName(fkCol.getColumnName()) );
+			}
+			else {
+				sb.append( convertToColumnName(fkCol.getReferencedColumnName()) );
+			}
+		}
+		return sb.toString();
+    }
+
 	//-------------------------------------------------------------------------------------
 }

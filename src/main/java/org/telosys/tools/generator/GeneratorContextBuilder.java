@@ -31,6 +31,7 @@ import org.telosys.tools.generator.context.DatabasesInContext;
 import org.telosys.tools.generator.context.EmbeddedGenerator;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
+import org.telosys.tools.generator.context.FactoryInContext;
 import org.telosys.tools.generator.context.FnInContext;
 import org.telosys.tools.generator.context.H2InContext;
 import org.telosys.tools.generator.context.HtmlInContext;
@@ -159,6 +160,9 @@ public class GeneratorContextBuilder {
 		BundleInContext bundle = new BundleInContext(bundleName); // v 3.3.0
 		generatorContext.put(ContextName.BUNDLE, bundle); // v 3.0.0
 		
+		//--- Version 3.4.0 ) 
+		generatorContext.put(ContextName.FACTORY, new FactoryInContext());  // v 3.4.0
+
 		return generatorContext ;
 	}
 	

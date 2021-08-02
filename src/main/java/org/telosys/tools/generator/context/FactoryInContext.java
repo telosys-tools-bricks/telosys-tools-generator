@@ -66,7 +66,7 @@ public class FactoryInContext {
 		},
 		parameters = {
 			"targetDbName : target database name ('postgresql', 'mysql', etc ) ",
-			"targetDbConfigFile : target database configuration file in the bundle folder  "
+			"targetDbConfigFile : target database configuration file located in the bundle folder  "
 		},		
 		example = {	
 			"$factory.getSql('postgresql', 'db-postgresql.properties')"
