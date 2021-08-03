@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
 import junit.env.telosys.tools.generator.fakemodel.FakeForeignKey;
+import junit.env.telosys.tools.generator.fakemodel.FakeForeignKeyColumn;
 
 public class SqlInContextTest {
 	
@@ -63,14 +64,30 @@ public class SqlInContextTest {
 		assertEquals("NUMBER(10.2)", sql.replaceVar("NUMBER(%p)", null, new BigDecimal("10.2")) );
 		assertEquals("NUMBER",       sql.replaceVar("NUMBER(%p)", null, null ) );
 		
-		ForeignKeyInContext fk = buidForeignKey();
-		// TODO
-//		assertEquals("xx",    sql.fkColumns(fk) );
-//		assertEquals("xx",    sql.fkReferencedColumns(fk) );
+		//--- Primary Key :
+		assertEquals("pk_foo_bar", sql.convertToPkName("pkFooBar") );
+		assertEquals("pk_foo_bar", sql.convertToPkName("PkFooBar") );
+		assertEquals("pk_foo_bar", sql.convertToPkName("Pk_Foo_Bar") );
+		assertEquals("pk_foo_bar", sql.convertToPkName("PK_foo_BAR") );
 		
+		//--- Foreign Key :
+		assertEquals("fk_foo_bar", sql.convertToFkName("fkFooBar") );
+		assertEquals("fk_foo_bar", sql.convertToFkName("FkFooBar") );
+
+		ForeignKeyInContext fk = buidForeignKey1();
+		assertEquals("fk_driver_car", sql.fkName(fk) );
+		assertEquals("good_driver", sql.fkTable(fk) );
+		assertEquals("special_car", sql.fkReferencedTable(fk) );
+		assertEquals("car_id", sql.fkColumns(fk) );
+		assertEquals("id",     sql.fkReferencedColumns(fk) );
 		
-		assertTrue(true);
-		assertFalse(false);
+		fk = buidForeignKey2();
+		assertEquals("fk_driver_car", sql.fkName(fk) );
+		assertEquals("good_driver", sql.fkTable(fk) );
+		assertEquals("special_car", sql.fkReferencedTable(fk) );
+		assertEquals("car_id1, car_id2",  sql.fkColumns(fk) );
+		assertEquals("my_id1, my_id2",    sql.fkReferencedColumns(fk) );
+		
 	}
 
 	@Test(expected = GeneratorSqlException.class)
@@ -112,9 +129,16 @@ public class SqlInContextTest {
 		return new AttributeInContext(null, fakeAttribute, null, null);
 	}
 	
-	private ForeignKeyInContext buidForeignKey() {
-		FakeForeignKey fakeFK = new FakeForeignKey("FK_DRIVER_CAR", "DRIVER", "CAR");
-		// TODO : fakeFK.addColumn(new );
+	private ForeignKeyInContext buidForeignKey1() {
+		FakeForeignKey fakeFK = new FakeForeignKey("FkDriverCar", "GoodDriver", "SpecialCar");
+		fakeFK.addColumn(new FakeForeignKeyColumn("carId", "id", 1));
+		return new ForeignKeyInContext(fakeFK);
+	}
+
+	private ForeignKeyInContext buidForeignKey2() {
+		FakeForeignKey fakeFK = new FakeForeignKey("FK_DRIVER_CAR", "GOOD_DRIVER", "SPECIAL_CAR");
+		fakeFK.addColumn(new FakeForeignKeyColumn("carId1", "myId1", 1));
+		fakeFK.addColumn(new FakeForeignKeyColumn("carId2", "myId2", 2));
 		return new ForeignKeyInContext(fakeFK);
 	}
 }

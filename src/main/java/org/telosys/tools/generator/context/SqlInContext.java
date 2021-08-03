@@ -51,14 +51,19 @@ public class SqlInContext {
 	
 	private static final String CONV_TABLE_NAME  = "conv.tableName";
 	private static final String CONV_COLUMN_NAME = "conv.columnName";
+	private static final String CONV_PK_NAME     = "conv.pkName";
+	private static final String CONV_FK_NAME     = "conv.fkName";
 	
 	private final NamingStyleConverter converter = new NamingStyleConverter();
 
 	private final String targetDbName ;
 	private final String targetDbConfigFile ;
 	private final Properties targetDbConfig ;
+	
 	private final String tableNameStyle;
 	private final String columnNameStyle;
+	private final String pkNameStyle;
+	private final String fkNameStyle;
 
 	/**
 	 * Constructor
@@ -78,6 +83,8 @@ public class SqlInContext {
 		this.targetDbConfig = loadSpecificConfiguration(targetDbConfigFile);
 		this.tableNameStyle  = getConfigValue(CONV_TABLE_NAME);
 		this.columnNameStyle = getConfigValue(CONV_COLUMN_NAME);
+		this.pkNameStyle     = getConfigValue(CONV_PK_NAME);
+		this.fkNameStyle     = getConfigValue(CONV_FK_NAME);
 	}
 		
 	/**
@@ -94,6 +101,8 @@ public class SqlInContext {
 		this.targetDbConfig = loadStandardConfiguration(targetDbConfigFile);
 		this.tableNameStyle  = getConfigValue(CONV_TABLE_NAME);
 		this.columnNameStyle = getConfigValue(CONV_COLUMN_NAME);
+		this.pkNameStyle     = getConfigValue(CONV_PK_NAME);
+		this.fkNameStyle     = getConfigValue(CONV_FK_NAME);
 	}
 	
 //	/**
@@ -136,21 +145,7 @@ public class SqlInContext {
     }
 	
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod ( 
-		text= { 
-			"Converts the name of the given entity to table naming style",
-			"For example converts 'EmployeeJobs' to 'employee_jobs'",
-			""
-		},
-		example={	
-				"$sql.tableName($entity)"
-			},
-		since = "3.4.0"
-	)
-	public String tableName(EntityInContext entity) {
-		return convertToTableName(entity.getName());
-    }
-	
+	// Conversion from string
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
@@ -170,35 +165,6 @@ public class SqlInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
-			"Returns the database column name for the given attribute ",
-			"For example 'city_code' for an attribute named 'cityCode'",
-			"The database name defined in the model is used in priority",
-			"if no database name is defined then the attribute name is converted to database name",
-			"by applying the target database conventions",
-			""
-		},
-		parameters = { 
-			"attribute : attribute from which to get column name " ,
-		},
-		example={	
-			"$sql.columnName($attribute)"
-		},
-		since = "3.4.0"
-	)
-	public String columnName(AttributeInContext attribute) {
-		// Use attribute database name (by default = attribute name)
-		String databaseName = attribute.getDatabaseName() ;
-		if ( StrUtil.nullOrVoid(databaseName) ) {
-			// no database name for this attribute
-			// => use attribute name as default database name ( not supposed to happen )
-			databaseName = attribute.getName();
-		}
-		// convert attribute database name to target database naming convention 
-		return convertToColumnName(databaseName);
-    }
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod ( 
-		text= { 
 			"Converts the given string to column naming style ",
 			"For example converts 'firstName' to 'first_name' ",
 			""
@@ -214,34 +180,43 @@ public class SqlInContext {
 	public String convertToColumnName(String originalName) {
 		return convertName(originalName, columnNameStyle);
     }
-		
+	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
-			"Converts the attribute neutral type to the corresponding SQL type ",
-			"For example converts 'string' to 'varchar(x)' ",
+			"Converts the given string to primary key naming style ",
+			"For example converts 'PkFirstName' to 'pk_first_name' ",
 			""
 		},
 		parameters = { 
-			"attribute : attribute from which to get column type " ,
+			"originalName : name to be converted " 
 		},
 		example={	
-				"$sql.columnType($attribute)"
-			},
+			"$sql.convertToPkName($var)"
+		},
 		since = "3.4.0"
 	)
-	public String columnType(AttributeInContext attribute) {
-		// Check if the attribute has a specific database type in the model
-		String databaseType = attribute.getDatabaseType() ;
-		if ( StrUtil.nullOrVoid(databaseType) ) {
-			// not defined in the model : try to convert neutral type
-			return convertToColumnType(attribute.getNeutralType(), attribute.isAutoIncremented(),
-								getMaximumSize(attribute), getPrecision(attribute));
-		}
-		else {
-			// defined in the model => use it as is
-			return databaseType ;
-		}
+	public String convertToPkName(String originalName) {
+		return convertName(originalName, pkNameStyle);
+    }
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Converts the given string to foreign key naming style ",
+			"For example converts 'PkFirstName' to 'pk_first_name' ",
+			""
+		},
+		parameters = { 
+			"originalName : name to be converted " 
+		},
+		example={	
+			"$sql.convertToFkName($var)"
+		},
+		since = "3.4.0"
+	)
+	public String convertToFkName(String originalName) {
+		return convertName(originalName, fkNameStyle);
     }
 	
 	//-------------------------------------------------------------------------------------
@@ -275,6 +250,82 @@ public class SqlInContext {
 			return sqlType;
 		}
 	}
+			
+	//-------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Converts the name of the given entity to table naming style",
+			"For example converts 'EmployeeJobs' to 'employee_jobs'",
+			""
+		},
+		example={	
+				"$sql.tableName($entity)"
+			},
+		since = "3.4.0"
+	)
+	public String tableName(EntityInContext entity) {
+		return convertToTableName(entity.getName());
+    }
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns the database column name for the given attribute ",
+			"For example 'city_code' for an attribute named 'cityCode'",
+			"The database name defined in the model is used in priority",
+			"if no database name is defined then the attribute name is converted to database name",
+			"by applying the target database conventions",
+			""
+		},
+		parameters = { 
+			"attribute : attribute from which to get column name " ,
+		},
+		example={	
+			"$sql.columnName($attribute)"
+		},
+		since = "3.4.0"
+	)
+	public String columnName(AttributeInContext attribute) {
+		// Use attribute database name (by default = attribute name)
+		String databaseName = attribute.getDatabaseName() ;
+		if ( StrUtil.nullOrVoid(databaseName) ) {
+			// no database name for this attribute
+			// => use attribute name as default database name ( not supposed to happen )
+			databaseName = attribute.getName();
+		}
+		// convert attribute database name to target database naming convention 
+		return convertToColumnName(databaseName);
+    }
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Converts the attribute neutral type to the corresponding SQL type ",
+			"For example converts 'string' to 'varchar(x)' ",
+			""
+		},
+		parameters = { 
+			"attribute : attribute from which to get column type " ,
+		},
+		example={	
+				"$sql.columnType($attribute)"
+			},
+		since = "3.4.0"
+	)
+	public String columnType(AttributeInContext attribute) {
+		// Check if the attribute has a specific database type in the model
+		String databaseType = attribute.getDatabaseType() ;
+		if ( StrUtil.nullOrVoid(databaseType) ) {
+			// not defined in the model : try to convert neutral type
+			return convertToColumnType(attribute.getNeutralType(), attribute.isAutoIncremented(),
+								getMaximumSize(attribute), getPrecision(attribute));
+		}
+		else {
+			// defined in the model => use it as is
+			return databaseType ;
+		}
+    }
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
@@ -352,6 +403,58 @@ public class SqlInContext {
 		}
     }
 
+	//-------------------------------------------------------------------------------------
+	// Foreign Key
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns the name of the given Foreign Key",
+			"(converts the name to expected naming style if necessary)",
+			"For example converts 'fkFooBar' or 'FK_FOO_BAR' to 'fk_foo_bar'",
+			""
+		},
+		example={	
+				"$sql.fkName($fk)"
+			},
+		since = "3.4.0"
+	)
+	public String fkName(ForeignKeyInContext fk) {
+		return convertToFkName(fk.getName());
+	}
+		
+	@VelocityMethod ( 
+		text= { 
+			"Returns the name of the table for the given Foreign Key",
+			"(converts the name to table naming style if necessary)",
+			"For example converts 'SpecialCar' or 'SPECIAL_CAR' to 'special_car'",
+			""
+		},
+		example={	
+				"$sql.fkTable($fk)"
+			},
+		since = "3.4.0"
+	)
+	public String fkTable(ForeignKeyInContext fk) {
+		return convertToTableName(fk.getTableName());
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Returns the name of the referenced table for the given Foreign Key",
+			"(converts the name to table naming style if necessary)",
+			"For example converts 'SpecialCar' or 'SPECIAL_CAR' to 'special_car'",
+			""
+		},
+		example={	
+				"$sql.fkReferencedTable($fk)"
+			},
+		since = "3.4.0"
+	)
+	public String fkReferencedTable(ForeignKeyInContext fk) {
+		return convertToTableName(fk.getReferencedTableName());
+	}
+		
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
