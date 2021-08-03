@@ -1,5 +1,6 @@
 package org.telosys.tools.generator.context;
 
+import java.io.File;
 import java.math.BigDecimal;
 
 import org.junit.Test;
@@ -7,7 +8,6 @@ import org.telosys.tools.generator.context.exceptions.GeneratorSqlException;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
@@ -114,6 +114,47 @@ public class SqlInContextTest {
 		sql.replaceVar("numeric(%p)", null, new BigDecimal("0"));
 	}
 
+	@Test(expected = GeneratorSqlException.class)
+	public void testInvalidSpecificDbConfigFile() {
+		String fileName = "src/test/resources/" + "target-db/nofile.properties" ;		
+		new SqlInContext("MyDatabase", fileName) ;
+	}
+	
+	@Test
+	public void testSpecificDbConfigFile() {
+		
+		String fileName = "src/test/resources/" + "target-db/test-db.properties" ;
+		
+		SqlInContext sql = new SqlInContext("MyDatabase", fileName) ;
+		
+		assertEquals("MyDatabase", sql.getDatabaseName());
+		assertEquals(fileName, sql.getDatabaseConfigFile());
+		
+		// Name conversion as defined in the file
+		assertEquals("CITY_CODE",   sql.convertToColumnName("cityCode") ) ;
+		assertEquals("EmployeeJob", sql.convertToTableName("employeeJob") ) ;		
+		assertEquals("employeeJob", sql.convertToPkName("EMPLOYEE_JOB") ) ;		
+	}
+	
+	@Test
+	public void testSpecificDbConfigFile2() {
+		
+		String fileName = "src/test/resources/" + "target-db/test-db.properties" ;
+		
+		SqlInContext sql = new SqlInContext("MyDatabase", new File(fileName) );
+		
+		assertEquals("MyDatabase", sql.getDatabaseName());
+		//print(sql.getDatabaseConfigFile());
+		assertTrue(sql.getDatabaseConfigFile().endsWith("test-db.properties"));
+		
+		// Name conversion as defined in the file
+		assertEquals("CITY_CODE",   sql.convertToColumnName("cityCode") ) ;
+		assertEquals("EmployeeJob", sql.convertToTableName("employeeJob") ) ;		
+		assertEquals("employeeJob", sql.convertToPkName("EMPLOYEE_JOB") ) ;		
+	}
+	
+	//------------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	private void print(String s) {
 		System.out.println(s);
 	}

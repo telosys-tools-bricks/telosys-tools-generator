@@ -67,6 +67,10 @@ public class FileInContext {
 		this.file = file ;
 	}
 
+	protected File getFile() {
+		return this.file;
+	}
+	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(text={
 		"Tests whether the file (or directory) exists"

@@ -15,6 +15,8 @@
  */
 package org.telosys.tools.generator.context;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -33,18 +35,20 @@ import org.telosys.tools.generator.context.names.ContextName;
 		text = { 
 				"Object for schema creation in SQL language (for a relational database)",
 				"It manages :",
-				" - table name conversion",
-				" - column name conversion",
+				" - names conversion (table name, column name, pk/fk name)",
 				" - field type conversion (neutral type to SQL column type)",
 				"It is designed to facilitate DDL commands generation",
-				"( CREATE TABLE, FOREIGN KEY, etc) ",
+				"( CREATE TABLE, ADD CONSTRAINT FOREIGN KEY, etc) ",
 				""
 		},
 		since = "3.4.0"
  )
 //-------------------------------------------------------------------------------------
 public class SqlInContext {
-	// TODO : see also 	AttributeInContext.getSqlType
+	// TODO : see also 	:
+	// AttributeInContext : getSqlType(),  getDatabaseName(), etc
+	// and usages, eg :
+	//    JdbcInContext -> JdbcRequets : uses attribute.getDatabaseName()
 
 	private static final int FK_COL     = 1 ;
 	private static final int FK_REF_COL = 2 ;
@@ -56,17 +60,40 @@ public class SqlInContext {
 	
 	private final NamingStyleConverter converter = new NamingStyleConverter();
 
-	private final String targetDbName ;
-	private final String targetDbConfigFile ;
-	private final Properties targetDbConfig ;
+	private String targetDbName ;
+	private String targetDbConfigFile ;
+	private Properties targetDbConfig ;
 	
-	private final String tableNameStyle;
-	private final String columnNameStyle;
-	private final String pkNameStyle;
-	private final String fkNameStyle;
+	private String tableNameStyle;
+	private String columnNameStyle;
+	private String pkNameStyle;
+	private String fkNameStyle;
+
+	private void init(String targetDbName, String targetDbConfigFile, Properties properties) {
+		this.targetDbName = targetDbName;
+		this.targetDbConfigFile = targetDbConfigFile ;
+		this.targetDbConfig = properties;
+		this.tableNameStyle  = getConfigValue(CONV_TABLE_NAME);
+		this.columnNameStyle = getConfigValue(CONV_COLUMN_NAME);
+		this.pkNameStyle     = getConfigValue(CONV_PK_NAME);
+		this.fkNameStyle     = getConfigValue(CONV_FK_NAME);
+	}
 
 	/**
-	 * Constructor
+	 * Constructor for default database configuration (embeded in .jar resources)
+	 * @param targetDbName
+	 */
+	public SqlInContext(String targetDbName) {
+		super();
+		if ( StrUtil.nullOrVoid(targetDbName) ) {
+			throw new GeneratorSqlException("Target database name undefined, cannot create $sql");
+		}
+		String targetDbConfigFile = "target-db/" + targetDbName.trim().toLowerCase() + ".properties" ;
+		init(targetDbName, targetDbConfigFile, loadStandardConfiguration(targetDbConfigFile));
+	}
+	
+	/**
+	 * Constructor for default database configuration file
 	 * @param targetDbName
 	 * @param targetDbConfigFile
 	 */
@@ -78,42 +105,25 @@ public class SqlInContext {
 		if ( StrUtil.nullOrVoid(targetDbConfigFile) ) {
 			throw new GeneratorSqlException("Target database config file undefined, cannot create $sql");
 		}
-		this.targetDbName = targetDbName;
-		this.targetDbConfigFile = targetDbConfigFile ;
-		this.targetDbConfig = loadSpecificConfiguration(targetDbConfigFile);
-		this.tableNameStyle  = getConfigValue(CONV_TABLE_NAME);
-		this.columnNameStyle = getConfigValue(CONV_COLUMN_NAME);
-		this.pkNameStyle     = getConfigValue(CONV_PK_NAME);
-		this.fkNameStyle     = getConfigValue(CONV_FK_NAME);
+		init(targetDbName, targetDbConfigFile, loadSpecificConfiguration(targetDbConfigFile));
 	}
 		
 	/**
-	 * Constructor
+	 * Constructor for default database configuration file
 	 * @param targetDbName
+	 * @param targetDbConfigFile
 	 */
-	public SqlInContext(String targetDbName) {
+	public SqlInContext(String targetDbName, File targetDbConfigFile) {
 		super();
 		if ( StrUtil.nullOrVoid(targetDbName) ) {
 			throw new GeneratorSqlException("Target database name undefined, cannot create $sql");
 		}
-		this.targetDbName = targetDbName;
-		this.targetDbConfigFile = "target-db/" + targetDbName.trim().toLowerCase() + ".properties" ;
-		this.targetDbConfig = loadStandardConfiguration(targetDbConfigFile);
-		this.tableNameStyle  = getConfigValue(CONV_TABLE_NAME);
-		this.columnNameStyle = getConfigValue(CONV_COLUMN_NAME);
-		this.pkNameStyle     = getConfigValue(CONV_PK_NAME);
-		this.fkNameStyle     = getConfigValue(CONV_FK_NAME);
+		if ( targetDbConfigFile == null ) {
+			throw new GeneratorSqlException("Target database config file undefined, cannot create $sql");
+		}
+		init(targetDbName, targetDbConfigFile.getAbsolutePath(), loadSpecificConfiguration(targetDbConfigFile));
 	}
-	
-//	/**
-//	 * Constructor
-//	 * @param envInContext
-//	 */
-//	// TODO : keep it or not ?
-//	public SqlInContext(EnvInContext envInContext) {
-//		this(envInContext.getDatabase());
-//	}
-	
+		
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
@@ -508,8 +518,24 @@ public class SqlInContext {
 	//-------------------------------------------------------------------------------------
 	private Properties loadSpecificConfiguration(String propFileName) {
 		Properties properties = new Properties();
-		// TODO
-		return properties;
+		try ( InputStream inputStream = new FileInputStream(propFileName) ) {
+			properties.load(inputStream);
+		} catch (IOException e) {
+			throw new GeneratorSqlException("Cannot load database config file '" 
+					+ propFileName + "' IOException");
+		}
+	    return properties;
+	}
+	//-------------------------------------------------------------------------------------
+	private Properties loadSpecificConfiguration(File file) {
+		Properties properties = new Properties();
+		try ( InputStream inputStream = new FileInputStream(file) ) {
+			properties.load(inputStream);
+		} catch (IOException e) {
+			throw new GeneratorSqlException("Cannot load database config file '" 
+					+ file.getAbsolutePath() + "' IOException");
+		}
+	    return properties;
 	}
 	//-------------------------------------------------------------------------------------
 	private String getConfigValue(String key) {

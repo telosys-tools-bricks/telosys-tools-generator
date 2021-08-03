@@ -41,15 +41,15 @@ public class FactoryInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
-			"Creates a new instance of SQL tool object",
+			"Creates a new instance of SQL tool object using the default database definition (if any)",
 			"for the given target database name ",
-			"using the default database definition (if any) "
+			" "
 		},
 		parameters = {
-			"targetDbName : target database name ('postgresql', 'mysql', etc ) "
+			"targetDbName : target database name (not case sensitive, eg :'Postgresql', 'MySQL', etc ) "
 		},		
 		example = {	
-			"$factory.getSql('postgresql')"
+			"#set( $sql = $factory.getSql('PostgreSQL') )"
 		},
 		since = "3.4.0"
 	)
@@ -57,25 +57,68 @@ public class FactoryInContext {
 		return new SqlInContext(targetDbName); 
     }
 	
+//	//-------------------------------------------------------------------------------------
+//	@VelocityMethod ( 
+//		text= { 
+//			"Creates a new instance of SQL tool object",
+//			"for the given target database name",
+//			"using the given specific database definition file"
+//		},
+//		parameters = {
+//			"targetDbName : target database name ('postgresql', 'mysql', etc ) ",
+//			"targetDbConfigFile : target database configuration file located in the bundle folder  "
+//		},		
+//		example = {	
+//			"$factory.getSql('postgresql', 'db-postgresql.properties')"
+//		},
+//		since = "3.4.0"
+//	)
+//	public SqlInContext getSql(String targetDbName, String targetDbConfigFile) {
+//		return new SqlInContext(targetDbName, targetDbConfigFile); 
+//    }
+//	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
-			"Creates a new instance of SQL tool object",
+			"Creates a new instance of SQL tool object using a specific database definition file",
 			"for the given target database name",
-			"using the given specific database definition file"
+			""
 		},
 		parameters = {
 			"targetDbName : target database name ('postgresql', 'mysql', etc ) ",
-			"targetDbConfigFile : target database configuration file located in the bundle folder  "
+			"targetDbConfigFile : target database configuration file "
 		},		
 		example = {	
-			"$factory.getSql('postgresql', 'db-postgresql.properties')"
+			"#set( $sql = $factory.getSql('PostgreSQL', $fn.fileFromBundle('db-postgresql.properties') ) )"
 		},
 		since = "3.4.0"
 	)
-	public SqlInContext getSql(String targetDbName, String targetDbConfigFile) {
-		return new SqlInContext(targetDbName, targetDbConfigFile); 
+	public SqlInContext getSql(String targetDbName, FileInContext fileInContext) {
+		return new SqlInContext(targetDbName, fileInContext.getFile()); 
     }
 	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
+			"Creates a new instance of the JDBC tool for the given entity",
+			""
+		},
+		parameters = {
+			"entity : the entity to be used (to create CRUD SQL requests, mapping, etc) ",
+			"useSchema : use schema name in requests if true"
+		},		
+		example={	
+			"#set( $jdbc = $factory.getJdbc($entity, true) )",
+			"#set( $jdbc = $factory.getJdbc($entity, false) )"
+		},
+		since = "3.4.0"
+	)
+	public JdbcInContext getJdbc(EntityInContext entity, boolean useSchema)
+    {
+		if ( entity == null ) {
+			throw new IllegalArgumentException("$jdbcFactory.getInstance($entity) : $entity is null");
+		}
+		return new JdbcInContext(entity, useSchema); 
+    }
 	//-------------------------------------------------------------------------------------
 }
