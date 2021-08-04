@@ -282,6 +282,25 @@ public class SqlInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
+			"Returns the default Primary Key name for the given entity",
+			"The default Primary Key name is 'PK_' followed by the entity name",
+			"It is then converted to the expected naming style",
+			"Examples : 'pk_employee', 'PK_EMPLOYEE' ",
+			""
+		},
+		example={	
+				"$sql.pkName($entity)"
+			},
+		since = "3.4.0"
+	)
+	public String pkName(EntityInContext entity) {
+		String pkName = "PK_" + entity.getName();
+		return convertToPkName(pkName);
+	}
+		
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( 
+		text= { 
 			"Returns the database column name for the given attribute ",
 			"For example 'city_code' for an attribute named 'cityCode'",
 			"The database name defined in the model is used in priority",
@@ -470,7 +489,7 @@ public class SqlInContext {
 		text= { 
 			"Returns a string containing the names of all the columns composing the foreign key",
 			"Each column name is converted according to the naming rules for the target database",
-			"For example 'id' or 'code, group' "
+			"Examples : 'group_id' or 'car_code, group_id' "
 		},
 		example={	
 				"$sql.fkColumns($fk)"

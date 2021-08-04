@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
+import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
 import junit.env.telosys.tools.generator.fakemodel.FakeForeignKey;
 import junit.env.telosys.tools.generator.fakemodel.FakeForeignKeyColumn;
 
@@ -70,6 +71,8 @@ public class SqlInContextTest {
 		assertEquals("pk_foo_bar", sql.convertToPkName("Pk_Foo_Bar") );
 		assertEquals("pk_foo_bar", sql.convertToPkName("PK_foo_BAR") );
 		
+		assertEquals("pk_car", sql.pkName( buildEntity("Car", "CAR")) );
+
 		//--- Foreign Key :
 		assertEquals("fk_foo_bar", sql.convertToFkName("fkFooBar") );
 		assertEquals("fk_foo_bar", sql.convertToFkName("FkFooBar") );
@@ -159,6 +162,11 @@ public class SqlInContextTest {
 		System.out.println(s);
 	}
 
+	private EntityInContext buildEntity(String entityName, String tableName) {
+		FakeEntity fakeEntity = new FakeEntity(entityName, tableName);
+		return new EntityInContext(fakeEntity, null, null, null);
+	}
+	
 	private AttributeInContext buildAttribute(String attribName, String neutralType, String dbName) {
 		FakeAttribute fakeAttribute = new FakeAttribute(attribName, neutralType, false);
 		if ( dbName != null ) {

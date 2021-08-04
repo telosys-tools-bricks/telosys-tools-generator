@@ -310,7 +310,6 @@ public class EntityInContext
 		return ( links != null && ! links.isEmpty() ) ;
 	}
 	
-
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
 			"Returns a list of all the links defined for the current entity"
@@ -965,6 +964,22 @@ public class EntityInContext
 		}
 		return false ; // No key attributes
 	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns TRUE if this entity has at least one Foreign Key "
+		},
+		example= {
+			"#if ( $entity.hasForeignKeys() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean hasForeignKeys() {
+		return ( foreignKeys != null && ! foreignKeys.isEmpty() ) ;
+	}
+	
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
