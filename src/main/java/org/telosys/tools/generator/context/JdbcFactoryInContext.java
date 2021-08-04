@@ -24,7 +24,7 @@ import org.telosys.tools.generator.context.names.ContextName;
 		contextName=ContextName.JDBC_FACTORY,
 		text = { 
 				"Object providing the JDBC factory",
-				""
+				"(!) DEPRECATED : use '$factory' instead "
 		},
 		since = "2.1.1"
  )
@@ -63,6 +63,8 @@ public class JdbcFactoryInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
+			"(!) DEPRECATED : use '$factory.getJdbc' instead ",
+			"",
 			"Creates a new instance of the JDBC tool for the given entity",
 			""
 		},
