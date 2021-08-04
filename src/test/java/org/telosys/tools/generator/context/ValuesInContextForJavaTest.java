@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.DateType;
+import org.telosys.tools.generic.model.types.TypeConverterForJava;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -17,6 +18,8 @@ import static org.junit.Assert.assertTrue;
 import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
 
 public class ValuesInContextForJavaTest {
+	private static final String LOCAL_DATE = "java.time.LocalDate" ;
+	private static final String LOCAL_TIME = "java.time.LocalTime"  ;
 	
 	private void setByte(byte v)   { /* nothing */ } 
 	private void setShort(short v) { /* nothing */ } 
@@ -219,19 +222,31 @@ public class ValuesInContextForJavaTest {
 		assertTrue( flag2.isNotNull() );
 		checkCompareValue(values, "book", flag2,        "book.isFlag2() == true"); 
 		
+		//---- DATE
 		assertEquals("date", date1.getNeutralType() );
-		assertEquals("java.util.Date", date1.getLanguageType().getFullType() );
-		checkValue(values, "date1",     "java.sql.Date.valueOf(\"2001-06-22\")") ;
-		checkCompareValue(values, "book", date1,        "book.getDate1().equals(java.sql.Date.valueOf(\"2001-06-22\"))"); 
+		//assertEquals("java.util.Date", date1.getLanguageType().getFullType() );
+		assertEquals(LOCAL_DATE, date1.getLanguageType().getFullType() ); // v 3.4.0
+		
+		// checkValue(values, "date1",     "java.sql.Date.valueOf(\"2001-06-22\")") ;
+		checkValue(values, "date1",     "java.time.LocalDate.parse(\"2001-06-22\")" ); // v 3.4.0
+		checkCompareValue(values, "book", date1,        
+				"book.getDate1().equals(java.time.LocalDate.parse(\"2001-06-22\"))");  // v 3.4.0
 		
 		assertEquals("date", date2.getNeutralType() );
-		assertEquals("java.util.Date", date2.getLanguageType().getFullType() );
-		checkValue(values, "date2",     "java.sql.Date.valueOf(\"2001-06-22\")") ;
+		//assertEquals("java.util.Date", date2.getLanguageType().getFullType() );
+		assertEquals(LOCAL_DATE, date2.getLanguageType().getFullType() ); // v 3.4.0
+		//checkValue(values, "date2",     "java.sql.Date.valueOf(\"2001-06-22\")") ;
+		checkValue(values, "date2",     "java.time.LocalDate.parse(\"2001-06-22\")") ; // v 3.4.0
 		
+		//---- TIME
 		assertEquals("time", time.getNeutralType() );
-		assertEquals("java.util.Date", time.getLanguageType().getFullType() );
-		checkValue(values, "time",      "java.sql.Time.valueOf(\"01:46:52\")") ;
-		checkCompareValue(values, "book", time,        "book.getTime().equals(java.sql.Time.valueOf(\"01:46:52\"))"); 
+		//assertEquals("java.util.Date", time.getLanguageType().getFullType() );
+		assertEquals(LOCAL_TIME, time.getLanguageType().getFullType() ); // v 3.4.0
+		// checkValue(values, "time",      "java.sql.Time.valueOf(\"01:46:52\")") ;
+		checkValue(values, "time",      "java.time.LocalTime.parse(\"01:46:52\")") ; // v 3.4.0
+		//checkCompareValue(values, "book", time,        "book.getTime().equals(java.sql.Time.valueOf(\"01:46:52\"))"); 
+		checkCompareValue(values, "book", time,
+				"book.getTime().equals(java.time.LocalTime.parse(\"01:46:52\"))");  // v 3.4.0
 		
 		assertEquals("long", num1.getNeutralType() );
 		checkValue(values, "num1",      "Long.valueOf(1000L)") ;
