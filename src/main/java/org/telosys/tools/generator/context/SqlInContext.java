@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Properties;
 
 import org.telosys.tools.commons.NamingStyleConverter;
@@ -88,26 +89,10 @@ public class SqlInContext {
 		if ( StrUtil.nullOrVoid(targetDbName) ) {
 			throw new GeneratorSqlException("Target database name undefined, cannot create $sql");
 		}
-		String targetDbConfigFile = "target-db/" + targetDbName.trim().toLowerCase() + ".properties" ;
-		init(targetDbName, targetDbConfigFile, loadStandardConfiguration(targetDbConfigFile));
+		String fileName = "target-db/" + targetDbName.trim().toLowerCase() + ".properties" ;
+		init(targetDbName, fileName, loadStandardConfiguration(fileName));
 	}
 	
-	/**
-	 * Constructor for default database configuration file
-	 * @param targetDbName
-	 * @param targetDbConfigFile
-	 */
-	public SqlInContext(String targetDbName, String targetDbConfigFile) {
-		super();
-		if ( StrUtil.nullOrVoid(targetDbName) ) {
-			throw new GeneratorSqlException("Target database name undefined, cannot create $sql");
-		}
-		if ( StrUtil.nullOrVoid(targetDbConfigFile) ) {
-			throw new GeneratorSqlException("Target database config file undefined, cannot create $sql");
-		}
-		init(targetDbName, targetDbConfigFile, loadSpecificConfiguration(targetDbConfigFile));
-	}
-		
 	/**
 	 * Constructor for default database configuration file
 	 * @param targetDbName
@@ -242,19 +227,17 @@ public class SqlInContext {
 		parameters = { 
 			"neutralType : neutral type to be converted " ,
 			"autoInc : auto-incremented attribute (true/false)",
-			"size : maximum size (for a variable length string)",
-			"precision : precision and scale (x.y) for a numeric attribute"
+			"size : maximum size (for a variable length string, eg 45 or 8.2  )"
 		},
 		since = "3.4.0"
 	)
-	public String convertToColumnType(String neutralType, boolean autoInc, 
-			Integer size, BigDecimal precision) {
+	public String convertToColumnType(String neutralType, boolean autoInc, BigDecimal size) {
 		// get SQL type from database config
 		String sqlType = getConfigType(neutralType, autoInc);
 		
-		// replace size or precision if any 
+		// replace "size" or "precision,scale" variable if any 
 		if ( sqlType.contains("%") ) {
-			return replaceVar(sqlType, size, precision);
+			return replaceVar(sqlType, size);
 		}
 		else {
 			return sqlType;
@@ -347,8 +330,9 @@ public class SqlInContext {
 		String databaseType = attribute.getDatabaseType() ;
 		if ( StrUtil.nullOrVoid(databaseType) ) {
 			// not defined in the model : try to convert neutral type
-			return convertToColumnType(attribute.getNeutralType(), attribute.isAutoIncremented(),
-								getMaximumSize(attribute), getPrecision(attribute));
+			return convertToColumnType(attribute.getNeutralType(), 
+					attribute.isAutoIncremented(), 
+					attributeSizeAsBigDecimal(attribute) ); // TODO : attribute.getSizeAsBigDecimal
 		}
 		else {
 			// defined in the model => use it as is
@@ -534,17 +518,17 @@ public class SqlInContext {
 		}
 		return properties;
 	}
-	//-------------------------------------------------------------------------------------
-	private Properties loadSpecificConfiguration(String propFileName) {
-		Properties properties = new Properties();
-		try ( InputStream inputStream = new FileInputStream(propFileName) ) {
-			properties.load(inputStream);
-		} catch (IOException e) {
-			throw new GeneratorSqlException("Cannot load database config file '" 
-					+ propFileName + "' IOException");
-		}
-	    return properties;
-	}
+//	//-------------------------------------------------------------------------------------
+//	private Properties loadSpecificConfiguration(String propFileName) {
+//		Properties properties = new Properties();
+//		try ( InputStream inputStream = new FileInputStream(propFileName) ) {
+//			properties.load(inputStream);
+//		} catch (IOException e) {
+//			throw new GeneratorSqlException("Cannot load database config file '" 
+//					+ propFileName + "' IOException");
+//		}
+//	    return properties;
+//	}
 	//-------------------------------------------------------------------------------------
 	private Properties loadSpecificConfiguration(File file) {
 		Properties properties = new Properties();
@@ -589,47 +573,6 @@ public class SqlInContext {
 					"Unknown style '" + styleName + "'");
 		}
     }
-	private BigDecimal toBigDecimal(String s) {
-		if ( s != null ) {
-			String v = s.trim();
-			try {
-				return new BigDecimal(v);
-			} catch (NumberFormatException e) {
-				throw new GeneratorSqlException("invalid attribute size/length '" + v + "' NumberFormatException");
-			}
-		}
-		else {
-			throw new GeneratorSqlException("attribute size/length is null");
-		}
-	}
-	private Integer getMaximumSize(AttributeInContext attribute) {
-		BigDecimal size = null ;
-		// use @DbSize first : eg @DbSize(45)
-		if ( ! StrUtil.nullOrVoid(attribute.getDatabaseSize()) ) {
-			size = toBigDecimal( attribute.getDatabaseSize() );
-		} 
-		// use @SizeMax if any : eg @SizeMax(45)
-		else if ( ! StrUtil.nullOrVoid(attribute.getMaxLength()) ) {
-			size = toBigDecimal( attribute.getMaxLength() );
-		}
-		// @DbSize can contains something like "8.2" => keep int part only 
-		if ( size != null ) {
-			return Integer.valueOf(size.intValue());
-		}
-		return null ;
-	}
-	private BigDecimal getPrecision(AttributeInContext attribute) {
-		// use @DbSize first : eg @DbSize(10.2) or @DbSize(8)
-		if ( ! StrUtil.nullOrVoid(attribute.getDatabaseSize()) ) {
-			return toBigDecimal( attribute.getDatabaseSize() );
-		} 
-		// TODO : add @Precision(xx) annotation ????
-//		else if ( ! StrUtil.nullOrVoid(attribute.getPrecision()) ) {
-//			return toBigDecimal( attribute.getPrecision() );
-//		}
-		return null ;
-	}
-		
 	
 	//-------------------------------------------------------------------------------------
 	
@@ -657,96 +600,72 @@ public class SqlInContext {
 	}
 	
 	//-------------------------------------------------------------------------------------
+	private String getSizeToApply(Number size) {
+		if ( size != null ) {
+			if ( size.intValue() < 0 ) {
+				// Not supposed to happen (checked before)
+				throw new GeneratorSqlException("invalid size " + size);
+			}
+			else if ( size.intValue() == 0 ) {
+				// "0" or "0.2" : considered as no size
+				return null ; 
+			}
+			else {
+				// >= 1
+				return size.toString(); // OK : keep it
+			}
+		}
+		return null ;
+	}
 
-	private void checkSizeValue(String sqlType, Integer size) {
-		if ( size != null && size.intValue() <= 0 ) {
-			throw new GeneratorSqlException("SQL type '" + sqlType + "' : invalid size " + size);
-		}
-	}
-	private void checkPrecisionValue(String sqlType, BigDecimal precision) {
-		if ( precision != null && precision.intValue() <= 0 ) {
-			throw new GeneratorSqlException("SQL type '" + sqlType + "' : invalid precision " + precision);
-		}
-	}
-	
 	/**
-	 * Replaces size parameter (%s) or (%S) for types like 'varchar(..)'
+	 * Replaces size parameter (%s) (%S) (%p) (%P) for SQL types like 'varchar(..)' or 'number(..)'
 	 * @param sqlType
-	 * @param size 
+	 * @param varMandatory variable string to replace : "%S" or "%P"
+	 * @param varOptional  variable string to replace : "%s" or "%p"
+	 * @param size
 	 * @return
 	 */
-	protected String replaceVarSize(String sqlType, Integer size) {
-		if ( sqlType.contains("%S") ) {
+	protected String replaceVarSize(String sqlType, String varMandatory, String varOptional, Number size) {
+		String sizeOK = getSizeToApply(size);
+		if ( sqlType.contains(varMandatory) ) {
 			// SIZE IS MANDATORY 
-			checkSizeValue(sqlType, size);
-			if ( size != null ) {
-				return StrUtil.replaceVar(sqlType, "%S", size.toString());
+			if ( sizeOK != null ) {
+				return StrUtil.replaceVar(sqlType, varMandatory, sizeOK);
 			}
 			else {
 				throw new GeneratorSqlException("SQL type '" + sqlType + "' : size is mandatory");
 			}
 		}
-		else if ( sqlType.contains("%s") ) {
-			checkSizeValue(sqlType, size);
+		else if ( sqlType.contains(varOptional) ) {
 			// SIZE IS OPTIONAL  
-			if ( size != null ) {
-				return StrUtil.replaceVar(sqlType, "%s", size.toString());
+			if ( sizeOK != null ) {
+				return StrUtil.replaceVar(sqlType, varOptional, sizeOK);
 			}
 			else {
-				return StrUtil.replaceVar(sqlType, "(%s)", ""); // remove
+				return StrUtil.replaceVar(sqlType, "("+varOptional+")", ""); // remove "(%s) or (%p)"
 			}
 		}
 		else {
 			throw new GeneratorSqlException("SQL type '" + sqlType + "' : internal error (size var)");
 		}
 	}
-	
-	/**
-	 * Replaces precision (and scale) parameter (%p) or (%P) <br>
-	 * for types like NUMBER(8), NUMBER(8.2), numeric(6.2)
-	 * @param sqlType
-	 * @param precision
-	 * @return
-	 */
-	protected String replaceVarPrecision(String sqlType, BigDecimal precision) {
-		if ( sqlType.contains("%P") ) {
-			// PRECISION IS MANDATORY 
-			checkPrecisionValue(sqlType, precision);
-			if ( precision != null ) {
-				return StrUtil.replaceVar(sqlType, "%P", precision.toString());
-			}
-			else {
-				throw new GeneratorSqlException("SQL type '" + sqlType + "' error : invalid precision " + precision);
-			}
-		}
-		else if ( sqlType.contains("%p") ) {
-			// PRECISION IS OPTIONAL 
-			checkPrecisionValue(sqlType, precision);
-			if ( precision != null ) {
-				return StrUtil.replaceVar(sqlType, "%p", precision.toString());
-			}
-			else {
-				return StrUtil.replaceVar(sqlType, "(%p)", ""); // remove
-			}
-		}
-		else {
-			throw new GeneratorSqlException("SQL type '" + sqlType + "' : internal error (precision var)");
-		}
-	}
-	protected String replaceVar(String sqlType, Integer size, BigDecimal precision) {
+
+	protected String replaceVar(String sqlType, BigDecimal size) {
 		if ( sqlType.contains("%S") || sqlType.contains("%s") ) {
-			// Size,  eg VARCHAR(8)
-			return replaceVarSize(sqlType, size);
+			// Integer size,  eg VARCHAR(8)
+			BigInteger sizeInt = size != null ? size.toBigInteger() : null ;
+			return replaceVarSize(sqlType, "%S", "%s", sizeInt);
 		}
 		else if ( sqlType.contains("%P") || sqlType.contains("%p")) {
 			// Precision [and scale], eg NUMBER(8), NUMBER(8.2), numeric(6.2)
-			return replaceVarPrecision(sqlType, precision);
+			return replaceVarSize(sqlType, "%P", "%p", size);
 		}
 		else {
 			return sqlType;
 		}
 	}
-
+	
 	private String buildColumns(ForeignKeyInContext fk, int colType) {
 		StringBuilder sb = new StringBuilder();
 		for ( ForeignKeyColumnInContext fkCol : fk.getColumns() ) {
@@ -764,4 +683,41 @@ public class SqlInContext {
     }
 
 	//-------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------------
+	// TODO : move to Attribute : getSize()
+	protected String attributeSize(AttributeInContext attribute) {
+		// use @DbSize first : eg @DbSize(45) or @DbSize(10,2)
+		if ( ! StrUtil.nullOrVoid(attribute.getDatabaseSize()) ) {
+			return attribute.getDatabaseSize();
+		} 
+		// TODO : add @Size(xx) annotation (and @DbSize deprecated or keep both ? )
+//		else if ( ! StrUtil.nullOrVoid(attribute.getSize()) ) {
+//			return toBigDecimal( attribute.getSize() );
+//		}
+		// use @SizeMax if any : eg @SizeMax(45)
+		else if ( ! StrUtil.nullOrVoid(attribute.getMaxLength()) ) {
+			return attribute.getMaxLength();
+		}
+		return null ;
+	}
+	// TODO : move to Attribute : getSizeAsBigDecimal()
+	protected BigDecimal attributeSizeAsBigDecimal(AttributeInContext attribute) {
+		return convertSizeToBigDecimal(attributeSize(attribute));
+	}
+	protected BigDecimal convertSizeToBigDecimal(String s) {
+		if ( s != null ) {
+			String v = s.trim();
+			if ( ! v.isEmpty() ) {
+				String v2 = v.replace(',', '.');
+				try {
+					return new BigDecimal(v2);
+				} catch (NumberFormatException e) {
+					throw new GeneratorSqlException("invalid size '" + v + "' NumberFormatException");
+				}
+			}
+		}
+		// No size ( null or empty or blank )
+		return BigDecimal.valueOf(0); 
+	}
+
 }
