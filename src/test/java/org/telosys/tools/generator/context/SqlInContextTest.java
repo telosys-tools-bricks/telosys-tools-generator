@@ -47,20 +47,6 @@ public class SqlInContextTest {
 	}
 	
 	@Test
-	public void testSizeAsBigDecimal() {
-		SqlInContext sql = new SqlInContext("PostgreSQL") ;
-		assertEquals( new BigDecimal("8"), sql.convertSizeToBigDecimal("8") );
-		assertEquals( new BigDecimal("8.2"), sql.convertSizeToBigDecimal("8.2") );
-		assertEquals( new BigDecimal("8.2"), sql.convertSizeToBigDecimal("  8.2") );
-		assertEquals( new BigDecimal("8.2"), sql.convertSizeToBigDecimal("8,2") );
-		assertEquals( new BigDecimal("8.2"), sql.convertSizeToBigDecimal("  8,2  ") );
-
-		assertEquals( new BigDecimal("0"), sql.convertSizeToBigDecimal(null) );
-		assertEquals( new BigDecimal("0"), sql.convertSizeToBigDecimal("") );
-		assertEquals( new BigDecimal("0"), sql.convertSizeToBigDecimal("  ") );
-	}
-	
-	@Test
 	public void testPostgreSQL() {
 		AttributeInContext attribute ;
 		

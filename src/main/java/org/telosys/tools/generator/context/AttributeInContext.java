@@ -15,6 +15,7 @@
  */
 package org.telosys.tools.generator.context;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityNoDoc;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
+import org.telosys.tools.generator.context.exceptions.GeneratorSqlException;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.BooleanValue;
@@ -1619,6 +1621,64 @@ public class AttributeInContext {
 	)
 	public boolean isTransient() {
 		return this.isTransient  ; // v 3.3.0
+	}
+
+	
+	//------------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+			"Returns the attribute size if any.",
+			"Try to get the 'database size' first  ",
+			"if no 'database size' try to get the 'maximum size'.",
+			"The size is returned as a string containing the size as defined in the model",
+			"for example : '45' or '10,2' for precision with scale",
+			"Returns an empty string if no size"
+		},
+	since="3.4.0"
+	)
+	public String getSize() {
+		// use @DbSize first : eg @DbSize(45) or @DbSize(10,2)
+		if ( ! StrUtil.nullOrVoid(this.getDatabaseSize()) ) {
+			return this.getDatabaseSize();
+		} 
+		// EVOLUTION : add @Size(xx) annotation (and @DbSize deprecated or keep both ? )
+//		else if ( ! StrUtil.nullOrVoid(attribute.getSize()) ) {
+//			return toBigDecimal( attribute.getSize() );
+//		}
+		// use @SizeMax if any : eg @SizeMax(45)
+		else if ( ! StrUtil.nullOrVoid(this.getMaxLength()) ) {
+			return this.getMaxLength();
+		}
+		return "" ; 
+	}
+	//------------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+			"Returns the attribute size as decimal value (BigDecimal)",
+			"(same behavior as'size' with conversion to decimal ) ",
+			"Returns 0 if no size",
+			"If the size has a scale it is converted to 'precision.scale' ",
+			"for example : 10.2 for '10,2' "
+		},
+	since="3.4.0"
+	)
+	public BigDecimal getSizeAsDecimal() {
+		return convertSizeToBigDecimal(this.getSize());
+	}
+	private BigDecimal convertSizeToBigDecimal(String s) {
+		if ( s != null ) {
+			String v = s.trim();
+			if ( ! v.isEmpty() ) {
+				String v2 = v.replace(',', '.');
+				try {
+					return new BigDecimal(v2);
+				} catch (NumberFormatException e) {
+					throw new GeneratorSqlException("invalid size '" + v + "' NumberFormatException");
+				}
+			}
+		}
+		// No size ( null or empty or blank ) => return 0
+		return BigDecimal.valueOf(0); 
 	}
 
 }

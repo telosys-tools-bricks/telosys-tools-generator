@@ -63,7 +63,7 @@ public class JdbcFactoryInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
-			"(!) DEPRECATED : use '$factory.getJdbc' instead ",
+			"(!) DEPRECATED : use '$factory' instead ",
 			"",
 			"Creates a new instance of the JDBC tool for the given entity",
 			""

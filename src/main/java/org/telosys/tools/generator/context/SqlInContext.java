@@ -35,7 +35,7 @@ import org.telosys.tools.generator.context.names.ContextName;
 		contextName=ContextName.SQL,
 		text = { 
 				"Object for schema creation in SQL language (for a relational database)",
-				"It manages :",
+				"with functions for :",
 				" - names conversion (table name, column name, pk/fk name)",
 				" - field type conversion (neutral type to SQL column type)",
 				"It is designed to facilitate DDL commands generation",
@@ -222,7 +222,7 @@ public class SqlInContext {
 			""
 		},
 		example={	
-			"$sql.convertToColumnType('string', false, 20, 0)"
+			"$sql.convertToColumnType('string', false, 20)"
 			},
 		parameters = { 
 			"neutralType : neutral type to be converted " ,
@@ -332,7 +332,7 @@ public class SqlInContext {
 			// not defined in the model : try to convert neutral type
 			return convertToColumnType(attribute.getNeutralType(), 
 					attribute.isAutoIncremented(), 
-					attributeSizeAsBigDecimal(attribute) ); // TODO : attribute.getSizeAsBigDecimal
+					attribute.getSizeAsDecimal() );
 		}
 		else {
 			// defined in the model => use it as is
@@ -518,17 +518,6 @@ public class SqlInContext {
 		}
 		return properties;
 	}
-//	//-------------------------------------------------------------------------------------
-//	private Properties loadSpecificConfiguration(String propFileName) {
-//		Properties properties = new Properties();
-//		try ( InputStream inputStream = new FileInputStream(propFileName) ) {
-//			properties.load(inputStream);
-//		} catch (IOException e) {
-//			throw new GeneratorSqlException("Cannot load database config file '" 
-//					+ propFileName + "' IOException");
-//		}
-//	    return properties;
-//	}
 	//-------------------------------------------------------------------------------------
 	private Properties loadSpecificConfiguration(File file) {
 		Properties properties = new Properties();
@@ -684,40 +673,4 @@ public class SqlInContext {
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
-	// TODO : move to Attribute : getSize()
-	protected String attributeSize(AttributeInContext attribute) {
-		// use @DbSize first : eg @DbSize(45) or @DbSize(10,2)
-		if ( ! StrUtil.nullOrVoid(attribute.getDatabaseSize()) ) {
-			return attribute.getDatabaseSize();
-		} 
-		// TODO : add @Size(xx) annotation (and @DbSize deprecated or keep both ? )
-//		else if ( ! StrUtil.nullOrVoid(attribute.getSize()) ) {
-//			return toBigDecimal( attribute.getSize() );
-//		}
-		// use @SizeMax if any : eg @SizeMax(45)
-		else if ( ! StrUtil.nullOrVoid(attribute.getMaxLength()) ) {
-			return attribute.getMaxLength();
-		}
-		return null ;
-	}
-	// TODO : move to Attribute : getSizeAsBigDecimal()
-	protected BigDecimal attributeSizeAsBigDecimal(AttributeInContext attribute) {
-		return convertSizeToBigDecimal(attributeSize(attribute));
-	}
-	protected BigDecimal convertSizeToBigDecimal(String s) {
-		if ( s != null ) {
-			String v = s.trim();
-			if ( ! v.isEmpty() ) {
-				String v2 = v.replace(',', '.');
-				try {
-					return new BigDecimal(v2);
-				} catch (NumberFormatException e) {
-					throw new GeneratorSqlException("invalid size '" + v + "' NumberFormatException");
-				}
-			}
-		}
-		// No size ( null or empty or blank )
-		return BigDecimal.valueOf(0); 
-	}
-
 }
