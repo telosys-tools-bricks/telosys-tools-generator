@@ -248,50 +248,35 @@ public class ModelInContext
 	}
 
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the entity identified by the given database table name",
-			"or null if not found"
-			},
-		parameters={
-			"name : the table name identifying the entity (the table name) "
-		}
-	)
-    public EntityInContext getEntityByTableName( String name )
-    {
-		return entitiesByTableName.get(name);
-    }
-
+	// Entity by class name
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the entity identified by the given class name",
-			"or null if not found"
+			"Returns the entity identified by the given name",
+			"or throws an exception if not found"
 			},
 		parameters={
-			"name : the class name identifying the entity (supposed to be unique) "
+			"name : the name identifying the entity in the model (eg 'Car', 'Student', etc) "
+		},
+		example = {
+			"#if ( $model.hasEntityWithClassName($entityName) )",
+			"#set( $entity = $model.getEntityByClassName($entityName) )",
+			"#else",
+			"#error(\"No entity '$entityName' in model\")",
+			"#end",
+			""
 		}
 	)
     public EntityInContext getEntityByClassName( String entityClassName )
     {
-		return entitiesByClassName.get(entityClassName);
-    }
-
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns TRUE if the model contains an entity identified by the given table name",
-			"else FALSE"
-			},
-		parameters={
-			"name : the table name identifying the entity "
+		EntityInContext entity = entitiesByClassName.get(entityClassName);
+		if ( entity != null ) {
+			return entity;
 		}
-	)
-    public boolean hasEntityWithTableName( String name )
-    {
-		return ( entitiesByTableName.get(name) != null ) ;
+		else {
+			throw new GeneratorContextException("Entity '" + entityClassName +"' not found in model");
+		}
     }
-
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -300,6 +285,12 @@ public class ModelInContext
 			},
 		parameters={
 			"name : the class name identifying the entity "
+		},
+		example = {
+			"#if ( $model.hasEntityWithClassName($entityName) )",
+			"#set( $entity = $model.getEntityByClassName($entityName) )",
+			"#end",
+			""
 		}
 	)
     public boolean hasEntityWithClassName( String name )
@@ -307,6 +298,58 @@ public class ModelInContext
 		return ( entitiesByClassName.get(name) != null ) ;
     }
 
+	//-------------------------------------------------------------------------------------
+	// Entity by table name
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the entity identified by the given database table name",
+			"or throws an exception if not found",
+			"The table name is supposed to be unique in the model"
+			},
+		parameters={
+			"tableName : the name of the table associated with the searched entity "
+		},
+		example = {
+			"#if ( $model.hasEntityWithTableName($tableName) )",
+			"#set( $entity = $model.getEntityByTableName($tableName) )",
+			"#end",
+			""
+		}
+	)
+    public EntityInContext getEntityByTableName( String tableName )
+    {
+		EntityInContext entity = entitiesByTableName.get(tableName);
+		if ( entity != null ) {
+			return entity;
+		}
+		else {
+			throw new GeneratorContextException("Table '" + tableName +"' not found in model");
+		}
+    }
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns TRUE if the model contains an entity identified by the given table name",
+			"else FALSE"
+			},
+		parameters={
+			"tableName : the name of the table associated with the searched entity "
+		},
+		example = {
+			"#if ( $model.hasEntityWithTableName($tableName) )",
+			"#set( $entity = $model.getEntityByTableName($tableName) )",
+			"#end",
+			""
+		}
+	)
+    public boolean hasEntityWithTableName( String tableName )
+    {
+		return ( entitiesByTableName.get(tableName) != null ) ;
+    }
+
+	//-------------------------------------------------------------------------------------
+	// Database info
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
