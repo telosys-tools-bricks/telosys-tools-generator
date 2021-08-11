@@ -86,6 +86,10 @@ public class ContextNames {
 		GENERATOR_OBJECTS_LIST.add( ContextName.ENTITY      ); // new name
 		GENERATOR_OBJECTS_LIST.add( ContextName.SELECTED_ENTITIES  );
 		
+		//--- Version 3.3.0
+		GENERATOR_OBJECTS_LIST.add( ContextName.BUNDLE ); // v 3.3.0 (added in list in v 3.4.0)
+		GENERATOR_OBJECTS_LIST.add( ContextName.NOW ); // v 3.3.0 (added in list in v 3.4.0)
+		
 		//--- Version 3.4.0
 		GENERATOR_OBJECTS_LIST.add( ContextName.FACTORY ); // v 3.4.0
 
