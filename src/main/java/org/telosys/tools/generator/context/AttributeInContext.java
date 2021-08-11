@@ -836,11 +836,12 @@ public class AttributeInContext {
 		
 	@VelocityMethod(
 		text={	
-			"Returns the label for the attribute "
-			}
+			"Returns the label for the attribute ",
+			"(returns a void string if none)"
+		}
 	)
     public String getLabel() {
-        return label ;
+        return voidIfNull(label) ;
     }
     
 	//-------------------------------------------------------------------------------------
@@ -872,10 +873,11 @@ public class AttributeInContext {
      * @return
      */
 	@VelocityMethod(
-			text={	
-				"Returns the maximum length for the attribute (if any, else returns void) "
-				}
-		)
+		text={	
+			"Returns the maximum length for the attribute",
+			"(returns a void string if none)"
+		}
+	)
     public String getMaxLength() {
     	return voidIfNull(maxLength) ;
     }
@@ -884,10 +886,11 @@ public class AttributeInContext {
      * @return
      */
 	@VelocityMethod(
-			text={	
-				"Returns the minimum length for the attribute (if any, else returns void) "
-				}
-		)
+		text={	
+			"Returns the minimum length for the attribute ",
+			"(returns a void string if none)"
+		}
+	)
     public String getMinLength() {
     	return voidIfNull(minLength) ;
     }
@@ -898,10 +901,11 @@ public class AttributeInContext {
      * @return
      */
 	@VelocityMethod(
-			text={	
-				"Returns the Reg Exp pattern defined for the attribute (if any, else returns void) "
-				}
-		)
+		text={	
+			"Returns the Reg Exp pattern defined for the attribute ",
+			"(returns a void string if none)"
+		}
+	)
     public String getPattern() {
     	return voidIfNull(pattern) ;
     }
@@ -913,8 +917,9 @@ public class AttributeInContext {
      */
 	@VelocityMethod(
 			text={	
-				"Returns the minimum value for the attribute (if any, else returns void) "
-				}
+				"Returns the minimum value for the attribute ",
+				"(returns a void string if none)"
+			}
 		)
     public String getMinValue() {
     	return voidIfNull(minValue) ;
@@ -927,7 +932,8 @@ public class AttributeInContext {
      */
 	@VelocityMethod(
 			text={	
-				"Returns the maximum value for the attribute (if any, else returns void) "
+				"Returns the maximum value for the attribute ",
+				"(returns a void string if none)"
 				}
 		)
     public String getMaxValue() {
@@ -966,11 +972,12 @@ public class AttributeInContext {
 	
 	@VelocityMethod(
 		text={	
-			"Returns the 'date before' value (for date validation)"
-			}
+			"Returns the 'date before' value (for date validation)",
+			"(returns a void string if none)"
+		}
 	)
 	public String getDateBeforeValue() {
-		return dateBeforeValue;
+		return voidIfNull(dateBeforeValue) ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -985,11 +992,12 @@ public class AttributeInContext {
 	
 	@VelocityMethod(
 		text={	
-			"Returns the 'date after' value (for date validation)"
-			}
+			"Returns the 'date after' value (for date validation)",
+			"(returns a void string if none)"
+		}
 	)
 	public String getDateAfterValue() {
-		return dateAfterValue;
+		return voidIfNull(dateAfterValue) ;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -1039,11 +1047,12 @@ public class AttributeInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the default value for the attribute"
+			"Returns the default value for the attribute",
+			"(returns a void string if none)"
 			}
 	)
     public String getDefaultValue() {
-    	return defaultValue ;
+    	return voidIfNull(defaultValue) ;
     }
 
 	public String toString() 
