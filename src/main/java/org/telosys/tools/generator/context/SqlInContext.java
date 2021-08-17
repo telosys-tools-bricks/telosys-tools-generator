@@ -32,17 +32,31 @@ import org.telosys.tools.generator.context.names.ContextName;
 
 //-------------------------------------------------------------------------------------
 @VelocityObject(
-		contextName=ContextName.SQL,
-		text = { 
-				"Object for schema creation in SQL language (for a relational database)",
-				"with functions for :",
-				" - names conversion (table name, column name, pk/fk name)",
-				" - field type conversion (neutral type to SQL column type)",
-				"It is designed to facilitate DDL commands generation",
-				"( CREATE TABLE, ADD CONSTRAINT FOREIGN KEY, etc) ",
-				""
-		},
-		since = "3.4.0"
+	contextName=ContextName.SQL,
+	text = { 
+			"Object for schema creation in SQL language (for a relational database)",
+			"with functions for :",
+			" - names conversion (table name, column name, pk/fk name)",
+			" - field type conversion (neutral type to SQL column type)",
+			"It is designed to facilitate DDL commands generation",
+			"( CREATE TABLE, ADD CONSTRAINT FOREIGN KEY, etc) ",
+			"",
+			"Each instance of this object is dedicated to a database type  ",
+			"To get a new instance use : $factory.newSql('DatabaseName') ",
+			"or $factory.newSql('DatabaseName', specificConventionsFileName)",
+			""
+	},
+	example = {	
+			"## Get predefined conventions for a standard database (eg 'PostgreSQL') ",
+			"## Known databases names : 'SQL-ANSI', 'PostgreSQL', 'Oracle', 'SQLServer'",
+			"## Database name is not case sensitive",
+			"#set( $sql = $factory.newSql('PostgreSQL') )",
+			"",
+			"## Get specific conventions using a specific file located in the bundle of templates",
+			"#set( $sql = $factory.newSql('PostgreSQL', $fn.fileFromBundle('postgresql.properties') ) )",
+			""
+		},		
+	since = "3.4.0"
  )
 //-------------------------------------------------------------------------------------
 public class SqlInContext {
