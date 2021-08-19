@@ -24,7 +24,7 @@ public class EmpTeam extends FakeEntity {
 	private Attribute teamCodeAttribute() {
 		FakeAttribute attribute = new FakeAttribute("teamCode", NeutralType.STRING, true);
 		attribute.setDatabaseName("TEAM_CODE");
-		attribute.setDatabaseTypeName("VARCHAR");
+		attribute.setDatabaseType("VARCHAR");
 		attribute.setFKSimple(true);
 		return attribute ;
 	}
@@ -32,7 +32,7 @@ public class EmpTeam extends FakeEntity {
 	private Attribute empIdAttribute() {
 		FakeAttribute attribute = new FakeAttribute("empId", NeutralType.INTEGER, true);
 		attribute.setDatabaseName("EMP_ID");
-		attribute.setDatabaseTypeName("NUMBER");
+		attribute.setDatabaseType("NUMBER");
 		attribute.setFKSimple(true);
 		return attribute ;
 	}

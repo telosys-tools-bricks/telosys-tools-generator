@@ -20,21 +20,21 @@ public class Author extends FakeEntity {
 	private Attribute idAttribute() {
 		FakeAttribute attribute = new FakeAttribute("id", NeutralType.INTEGER, true);
 		attribute.setDatabaseName("ID");
-		attribute.setDatabaseTypeName("NUMBER");
+		attribute.setDatabaseType("NUMBER");
 		return attribute ;
 	}
 
 	private Attribute firstNameAttribute() {
 		FakeAttribute attribute = new FakeAttribute("firstName", NeutralType.STRING, false);
 		attribute.setDatabaseName("FIRST_NAME");
-		attribute.setDatabaseTypeName("VARCHAR");
+		attribute.setDatabaseType("VARCHAR");
 		return attribute ;
 	}
 
 	private Attribute lastNameAttribute() {
 		FakeAttribute attribute = new FakeAttribute("lastName", "string", false);
 		attribute.setDatabaseName("LAST_NAME");
-		attribute.setDatabaseTypeName("VARCHAR");
+		attribute.setDatabaseType("VARCHAR");
 		return attribute ;
 	}
 

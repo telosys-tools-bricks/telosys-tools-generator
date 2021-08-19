@@ -15,8 +15,7 @@
  */
 package org.telosys.tools.generator.context;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.io.File;
 
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
@@ -72,8 +71,11 @@ public class EnvInContext {
 	
 	private String specificCollectionType = null ; // v 3.3.0
 
-	private Map<String,String> databaseTypesMapping = new LinkedHashMap<>() ; // v 3.3.0
-	private String database = "default" ; // v 3.3.0
+	// v 3.4.0
+	//private Map<String,String> databaseTypesMapping = new LinkedHashMap<>() ; // v 3.3.0
+	//private String database = "default" ; // v 3.3.0
+	private String database = "" ; // v 3.4.0
+	private File   databaseConvFile = null ;  // v 3.4.0
 	
 	//-------------------------------------------------------------------------------------
 	// CONSTRUCTOR
@@ -343,13 +345,13 @@ public class EnvInContext {
 	
 	
 	//-------------------------------------------------------------------------------------
-	public void setDatabaseTypesMapping(Map<String,String> map) {
-		this.databaseTypesMapping = map;
-	}
-	
-	public Map<String,String> getDatabaseTypesMapping() {
-		return databaseTypesMapping;
-	}
+//	public void setDatabaseTypesMapping(Map<String,String> map) {
+//		this.databaseTypesMapping = map;
+//	}
+//	
+//	public Map<String,String> getDatabaseTypesMapping() {
+//		return databaseTypesMapping;
+//	}
 
 	//-------------------------------------------------------------------------------------
 	public void setDatabase(String db) {
@@ -357,6 +359,14 @@ public class EnvInContext {
 	}
 	public String getDatabase() {
 		return this.database;
+	}
+	
+	//-------------------------------------------------------------------------------------
+	public void setDatabaseConvFile(File databaseConvFile) {
+		this.databaseConvFile = databaseConvFile;
+	}
+	public File getDatabaseConvFile() {
+		return this.databaseConvFile;
 	}
 	
 }

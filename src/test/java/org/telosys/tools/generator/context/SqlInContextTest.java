@@ -70,10 +70,12 @@ public class SqlInContextTest {
 		
 		// Without explicit db name (attribute name as default )
 		attribute = buildAttribute("firstName", NeutralType.STRING, null); 
-		assertEquals("first_name", sql.columnName(attribute) ) ;
+		assertEquals("", attribute.getDatabaseName() ); 
+		assertEquals("first_name", sql.columnName(attribute) ) ; // converted from attribute name
 		// With explicit db name
-		attribute = buildAttribute("firstName", NeutralType.STRING, "FIRST_NAME"); 
-		assertEquals("first_name", sql.columnName(attribute) ) ; // convert even if explicit db name
+		attribute = buildAttribute("firstName", NeutralType.STRING, "MY_FIRST_NAME"); 
+		assertEquals("MY_FIRST_NAME", attribute.getDatabaseName() ); 
+		assertEquals("MY_FIRST_NAME", sql.columnName(attribute) ) ; // not converted if explicit db name
 
 
 		// Type conversion 
@@ -211,9 +213,10 @@ public class SqlInContextTest {
 			fakeAttribute.setDatabaseName(dbName);
 		}
 		else {
-			fakeAttribute.setDatabaseName(attribName); // as in DSL model default value
+			fakeAttribute.setDatabaseName(""); // no database name
+			// as in DSL model default value
 		}
-		return new AttributeInContext(null, fakeAttribute, null, null);
+		return new AttributeInContext(null, fakeAttribute, null, new EnvInContext() );
 	}
 	
 	private ForeignKeyInContext buidForeignKey1() {

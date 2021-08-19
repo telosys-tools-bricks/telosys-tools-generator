@@ -31,6 +31,7 @@ import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.exceptions.GeneratorSqlException;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generator.context.tools.SqlConverter;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.BooleanValue;
 import org.telosys.tools.generic.model.DateType;
@@ -161,9 +162,11 @@ public class AttributeInContext {
     private final BooleanValue  insertable ; // Added in v 3.3.0
     private final BooleanValue  updatable  ; // Added in v 3.3.0
     
-    private final String sqlType ; // Added in v 3.3.0
+   // private final String sqlType ; // Added in v 3.3.0 // Removed in v 3.4.0
 
     private final boolean isTransient ; // Added in v 3.3.0
+
+    private final SqlConverter sqlConverter ; // Added in v 3.4.0
 	
 	//-----------------------------------------------------------------------------------------------
 	/**
@@ -181,6 +184,7 @@ public class AttributeInContext {
 		this.envInContext = env ; 
 		this.modelInContext = modelInContext ; 
 		this.entityInContext = entity ;
+		this.sqlConverter = new SqlConverter(env); // Added in v 3.4.0
 		//--------------------------------------------------
 		this.selected        = attribute.isSelected(); 
 		//--------------------------------------------------
@@ -223,8 +227,8 @@ public class AttributeInContext {
         this.jdbcTypeCode     = attribute.getJdbcTypeCode() != null ? attribute.getJdbcTypeCode() : 0 ;
         this.jdbcTypeName     = StrUtil.notNull( attribute.getJdbcTypeName() );
         this.isKeyElement     = attribute.isKeyElement();
-        // TODO
-        this.sqlType = "" ; // v 3.3.0 
+
+        // this.sqlType = "" ; // v 3.3.0  // Removed in v 3.4.0
         
 		//--- Foreign Keys / references
         this.isForeignKey          = attribute.isFK() ;
@@ -564,7 +568,8 @@ public class AttributeInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the database name for the attribute",
+			"Returns the database name for the attribute (as defined in the model)",
+			"or an empty string  if none",
 			"Typically the column name for a relational database"
 			}
 	)
@@ -575,19 +580,22 @@ public class AttributeInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the database native type for the attribute",
+			"Returns the database native type for the attribute (as defined in the model)",
+			"or an empty string  if none",
 			"For example : INTEGER, VARCHAR, etc..."
 			}
 	)
     public String getDatabaseType() {
-        return databaseType;
+        return this.databaseType;
     }
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the database native type for the attribute with the size if it makes sens",
-			"For example : INTEGER, VARCHAR(24), NUMBER, CHAR(3), etc..."
+			"Returns the database native type for the attribute with the size if it makes sense",
+			"For example : INTEGER, VARCHAR(24), NUMBER, CHAR(3), etc...",
+			"",
+			"(!) DEPRECATED : do not use (will be removed)"
 			},
 		since="2.0.7"
 	)
@@ -623,13 +631,50 @@ public class AttributeInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the database size for the attribute"
+			"Returns the database size for the attribute (as defined in the model)",
+			"or an empty string  if none",
+			"The 'size' can be a 'length' for char or varchar types ",
+			"or a 'precision' with or without 'scale' for numeric types (precision and scale are separated by a comma).",
+			"Examples : '25', '12', '12,2' ",
+			"If the database size is not define explicitly in the model the value between '(' and ')' ",
+			" will be extrated from the database type if any.",
+			""
 			}
 	)
     public String getDatabaseSize() {
-        return databaseSize ;
+		if ( ! StrUtil.nullOrVoid(this.databaseSize) ) {
+			// Explicitly defined in the model => use it as is
+	        return databaseSize ;
+		}
+		else {
+			// Try to extract the size from database type ( eg "varchar(20)", "number(10,2)" )
+			String size = extractSizeFromType(this.databaseType);
+			return size.trim();
+		}
     }
-
+	private String extractSizeFromType(String dbType) {
+		if ( StrUtil.nullOrVoid(dbType) ) {
+			// No type => no size
+			return "" ; 
+		}
+		StringBuilder sb = new StringBuilder();
+		boolean in = false ;
+		for (char c : dbType.toCharArray()) {
+			switch (c) {
+			case '(' :
+				in = true ;
+				break;
+			case ')' :
+				return sb.toString();
+			default :
+				if (in) {
+					sb.append(c);
+				}
+				break;
+			}
+		}
+		return "";
+	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -676,7 +721,9 @@ public class AttributeInContext {
 	//----------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute must be NOT NULL when stored in the database"
+		"Returns TRUE if the attribute must be NOT NULL when stored in the database",
+		"",
+		"(!) DEPRECATED : use isNotNull() instead "
 		}
 	)
     public boolean isDatabaseNotNull() {
@@ -1599,51 +1646,113 @@ public class AttributeInContext {
         return this.updatable.getText();
     }
 	
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the database SQL type corresponding to the attribute",
-			"for example : INTEGER, VARCHAR(24), NUMBER, CHAR(3), etc...",
-			"Returns the 'sqlType' if explicitly defined or tries to infer it from the neutral type",
-			"The Sql Type inference is based on 'env.database' (PostgreSQL, MySQL, etc)", 
-			"or 'env.databaseTypesMapping' (specific types mapping)"
-			},
-		since="3.3.0"
-	)
-    public String getSqlType() {
-		if ( StrUtil.nullOrVoid(this.sqlType) ) {
-			// not explicitly defined => try to infer SQL type
-	        return SqlTypeProvider.getSqlType(this, this.envInContext);
-		}
-		else {
-			// explicitly defined => return it
-			return this.sqlType;
-		}
-    }
-	
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
-	text={	
+		text={	
 			"Returns TRUE if the attribute is marked as 'transient' "
 		},
-	since="3.3.0"
+		since="3.3.0"
 	)
 	public boolean isTransient() {
 		return this.isTransient  ; // v 3.3.0
 	}
+	
+	//-------------------------------------------------------------------------------------
+// REMOVED in v 3.4.0
+//	@VelocityMethod(
+//		text={	
+//			"Returns the database SQL type corresponding to the attribute",
+//			"for example : INTEGER, VARCHAR(24), NUMBER, CHAR(3), etc...",
+//			"Returns the 'sqlType' if explicitly defined or tries to infer it from the neutral type",
+//			"The Sql Type inference is based on 'env.database' (PostgreSQL, MySQL, etc)", 
+//			"or 'env.databaseTypesMapping' (specific types mapping)"
+//			},
+//		since="3.3.0"
+//	)
+//    public String getSqlType() {
+//		if ( StrUtil.nullOrVoid(this.sqlType) ) {
+//			// not explicitly defined => try to infer SQL type
+//	        return SqlConverter.getSqlType(this, this.envInContext);
+//		}
+//		else {
+//			// explicitly defined => return it
+//			return this.sqlType;
+//		}
+//    }
+//	
 
+	//-------------------------------------------------------------------------------------
+	//  v 3.4.0 : 
+	//  getSize(), getSizeAsDecimal(), 
+	//  getSqlColumnName(), getSqlColumnType(), getSqlColumnConstraints 
+	//-------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+		"Returns TRUE if the attribute is 'unique' ",
+		}
+	)
+    public boolean isUnique() {
+		// TODO
+        return false ; 
+    }
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the SQL database column name for the attribute",
+			"For example 'city_code' for an attribute named 'cityCode'",
+			"The database name defined in the model is used in priority",
+			"if no database name is defined then the attribute name is converted to database name",
+			"by applying the target database conventions (defined in $env)",
+			""
+			},
+		since="3.4.0"
+	)
+	public String getSqlColumnName() {
+		return sqlConverter.getSqlColumnName(this);
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the SQL database column type for the attribute",
+			"For example 'varchar(12)' for an attribute with neutral type 'string'" ,
+			"The database type defined in the model is used in priority",
+			"if no database type is defined then the neutral type is converted to database type",
+			"by applying the target database conventions (defined in $env)",
+			""
+			},
+		since="3.4.0"
+	)
+	public String getSqlColumnType() {
+		return sqlConverter.getSqlColumnType(this);
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the SQL column constraints for the attribute",
+			"For example : NOT NULL DEFAULT 12",
+			""
+			},
+		since="3.4.0"
+	)
+	public String getSqlColumnConstraints() {
+		return sqlConverter.getSqlColumnConstraints(this);
+	}
 	
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
-	text={	
+		text={	
 			"Returns the attribute size if any.",
 			"Try to get the 'database size' first  ",
 			"if no 'database size' try to get the 'maximum size'.",
 			"The size is returned as a string containing the size as defined in the model",
 			"for example : '45' or '10,2' for precision with scale",
 			"Returns an empty string if no size"
-		},
-	since="3.4.0"
+			},
+		since="3.4.0"
 	)
 	public String getSize() {
 		// use @DbSize first : eg @DbSize(45) or @DbSize(10,2)
@@ -1662,14 +1771,14 @@ public class AttributeInContext {
 	}
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
-	text={	
+		text={	
 			"Returns the attribute size as decimal value (BigDecimal)",
-			"(same behavior as'size' with conversion to decimal ) ",
+			"(same behavior as 'size' but with conversion to decimal ) ",
 			"Returns 0 if no size",
 			"If the size has a scale it is converted to 'precision.scale' ",
 			"for example : 10.2 for '10,2' "
 		},
-	since="3.4.0"
+		since="3.4.0"
 	)
 	public BigDecimal getSizeAsDecimal() {
 		return convertSizeToBigDecimal(this.getSize());

@@ -61,7 +61,7 @@ import org.telosys.tools.generator.context.names.ContextName;
 //-------------------------------------------------------------------------------------
 public class SqlInContext {
 	// TODO : see also 	:
-	// AttributeInContext : getSqlType(),  getDatabaseName(), etc
+	// 
 	// and usages, eg :
 	//    JdbcInContext -> JdbcRequets : uses attribute.getDatabaseName()
 
@@ -316,19 +316,24 @@ public class SqlInContext {
 	public String columnName(AttributeInContext attribute) {
 		// Use attribute database name (by default = attribute name)
 		String databaseName = attribute.getDatabaseName() ;
-		if ( StrUtil.nullOrVoid(databaseName) ) {
-			// no database name for this attribute
-			// => use attribute name as default database name ( not supposed to happen )
-			databaseName = attribute.getName();
+		if ( ! StrUtil.nullOrVoid(databaseName) ) {
+			// defined in the model => use it as is
+			return databaseName ;
 		}
-		// convert attribute database name to target database naming convention 
-		return convertToColumnName(databaseName);
+		else {
+			// not defined in the model => convert attribute database name
+			// ( with target database naming convention ) 
+			return convertToColumnName(attribute.getName());
+		}
     }
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
 			"Converts the attribute neutral type to the corresponding SQL type ",
 			"For example converts 'string' to 'varchar(x)' ",
+			"The database type defined in the model is used in priority",
+			"if no database type is defined then the attribute type is converted to database type",
+			"by applying the target database conventions",
 			""
 		},
 		parameters = { 
@@ -342,22 +347,23 @@ public class SqlInContext {
 	public String columnType(AttributeInContext attribute) {
 		// Check if the attribute has a specific database type in the model
 		String databaseType = attribute.getDatabaseType() ;
-		if ( StrUtil.nullOrVoid(databaseType) ) {
-			// not defined in the model : try to convert neutral type
+		if ( ! StrUtil.nullOrVoid(databaseType) ) {
+			// defined in the model => use it as is
+			return databaseType ;
+		}
+		else {
+			// not defined in the model : convert neutral type
+			// ( with target database type convertion rules ) 
 			return convertToColumnType(attribute.getNeutralType(), 
 					attribute.isAutoIncremented(), 
 					attribute.getSizeAsDecimal() );
-		}
-		else {
-			// defined in the model => use it as is
-			return databaseType ;
 		}
     }
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
-			"Returns the column constraintes for the given attribute",
+			"Returns the column constraints for the given attribute",
 			"For example : NOT NULL DEFAULT 12",
 			""
 		},
@@ -373,8 +379,18 @@ public class SqlInContext {
 		StringBuilder sb = new StringBuilder();
 		
 		//--- NOT NULL
-		if ( attribute.isDatabaseNotNull() || attribute.isNotNull() ) {
+		if ( attribute.isNotNull() ) {
+			// 'isDatabaseNotNull' is only for DB-Model (no annotation for DSL-Model)
+			// do not use it 
 			sb.append("NOT NULL");
+		}
+		
+		//--- UNIQUE 
+		if ( attribute.isUnique() ) {
+			if ( sb.length() > 0 ) {
+				sb.append(" ");
+			}
+			sb.append("UNIQUE");
 		}
 		
 		//--- DEFAULT

@@ -258,7 +258,7 @@ public class FakeAttribute implements Attribute {
 		return _sDatabaseTypeName;
 	}
 
-	public void setDatabaseTypeName(String databaseTypeName) {
+	public void setDatabaseType(String databaseTypeName) {
 		_sDatabaseTypeName = databaseTypeName;
 	}
 

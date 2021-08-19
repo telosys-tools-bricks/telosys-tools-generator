@@ -19,14 +19,14 @@ public class Team extends FakeEntity {
 	private Attribute codeAttribute() {
 		FakeAttribute attribute = new FakeAttribute("code", NeutralType.STRING, true);
 		attribute.setDatabaseName("CODE");
-		attribute.setDatabaseTypeName("VARCHAR");
+		attribute.setDatabaseType("VARCHAR");
 		return attribute ;
 	}
 
 	private Attribute nameAttribute() {
 		FakeAttribute attribute = new FakeAttribute("name", NeutralType.STRING, false);
 		attribute.setDatabaseName("NAME");
-		attribute.setDatabaseTypeName("VARCHAR");
+		attribute.setDatabaseType("VARCHAR");
 		return attribute ;
 	}
 

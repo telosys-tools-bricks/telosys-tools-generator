@@ -26,7 +26,7 @@ public class Foo2 extends FakeEntity {
 	private Attribute nameAttribute() {
 		FakeAttribute attribute = new FakeAttribute("name", NeutralType.STRING, false);
 		attribute.setDatabaseName("NAME");
-		attribute.setDatabaseTypeName("VARCHAR");
+		attribute.setDatabaseType("VARCHAR");
 		return attribute ;
 	}
 
