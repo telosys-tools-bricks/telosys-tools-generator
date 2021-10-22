@@ -263,8 +263,11 @@ public class SqlInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 		text= { 
-			"Converts the name of the given entity to table naming style",
-			"For example converts 'EmployeeJobs' to 'employee_jobs'",
+			"Returns the database table name for the given entity ",
+			"If the table name is defined in the model it is used in priority",
+			"if no table name is defined then the entity name is converted to table name",
+			"by applying the target database conventions",
+			"(for example 'student_projects' for an entity named 'StudentProjects')",
 			""
 		},
 		example={	
@@ -273,7 +276,17 @@ public class SqlInContext {
 		since = "3.4.0"
 	)
 	public String tableName(EntityInContext entity) {
-		return convertToTableName(entity.getName());
+		// Use entity database table name if defined in model
+		String tableNameInModel = entity.getDatabaseTable() ;
+		if ( ! StrUtil.nullOrVoid(tableNameInModel) ) {
+			// defined in the model => use it as is
+			return tableNameInModel ;
+		}
+		else {
+			// not defined in the model => convert attribute database name
+			// ( with target database naming convention ) 
+			return convertToTableName(entity.getName());
+		}
     }
 	
 	//-------------------------------------------------------------------------------------

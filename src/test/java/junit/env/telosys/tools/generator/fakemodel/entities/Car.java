@@ -43,7 +43,6 @@ public class Car extends FakeEntity {
 	}
 
 	private Link brandLink() { 
-		FakeLink link = new FakeLink("brand", "Brand", Cardinality.MANY_TO_ONE);
-		return link ;
+		return new FakeLink("brand", "Brand", Cardinality.MANY_TO_ONE);
 	}
 }

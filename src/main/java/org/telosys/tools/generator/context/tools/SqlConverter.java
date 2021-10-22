@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.AttributeInContext;
+import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generator.context.SqlInContext;
 
@@ -28,6 +29,7 @@ import org.telosys.tools.generator.context.SqlInContext;
  * Utility tool to convert model information to SQL database type, name, etc
  *  
  * @author Laurent GUERIN
+ * @since 3.4.0
  */
 
 //-------------------------------------------------------------------------------------
@@ -118,4 +120,14 @@ public class SqlConverter {
 	public String getSqlColumnConstraints(AttributeInContext attribute) {
 		return sqlInContext.columnConstraints(attribute);
 	}
+
+	/**
+	 * Returns the SQL database table name for the given entity
+	 * @param entity
+	 * @return
+	 */
+	public String getSqlTableName(EntityInContext entity) {
+		return sqlInContext.tableName(entity);
+	}
+	
 }

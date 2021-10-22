@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import junit.env.telosys.tools.generator.context.Builder;
 import junit.env.telosys.tools.generator.fakemodel.entities.Car;
 import junit.env.telosys.tools.generator.fakemodel.entities.EmpTeam;
 import junit.env.telosys.tools.generator.fakemodel.entities.Employee;
@@ -88,8 +89,8 @@ public class EntityInContextTest {
 		checkEntityInContext(entityInContext, car);
 		
 		assertEquals("Car", entityInContext.getName() );
-		assertEquals("org.bean", entityInContext.getPackage() );
-		assertEquals("org.bean.Car", entityInContext.getFullName() );
+		assertEquals("org.demo.bean", entityInContext.getPackage() );
+		assertEquals("org.demo.bean.Car", entityInContext.getFullName() );
 		
 		// Primary Key
 		assertTrue(entityInContext.hasPrimaryKey() );
@@ -127,6 +128,12 @@ public class EntityInContextTest {
 		assertEquals(1, entityInContext.getLinksCount());
 //		assertEquals(0, entityInContext.referencedEntityTypes().size());
 
+		// Database info
+//		assertFalse(entityInContext.hasDatabaseTable() );
+//		assertEquals("", entityInContext.getDatabaseTable() );
+
+		// SQL 
+		assertEquals("CAR", entityInContext.getSqlTableName() );
 	}
 	
 	@Test
@@ -211,8 +218,9 @@ public class EntityInContextTest {
 	// Tooling
 	//---------------------------------------------------------------------------
 	private EntityInContext buildEntityInContext(Entity entity) { 
-		EnvInContext env = new EnvInContext();
-		EntityInContext entityInContext = new EntityInContext(entity, "org.bean", null, env);
+		//EnvInContext env = new EnvInContext();
+		//EntityInContext entityInContext = new EntityInContext(entity, "org.bean", null, env);
+		EntityInContext entityInContext = Builder.buildEntityInContext(entity);
 		
 		printAttributes( "getAttributes()", entityInContext.getAttributes() );
 		printAttributes( "getKeyAttributes()", entityInContext.getKeyAttributes() );

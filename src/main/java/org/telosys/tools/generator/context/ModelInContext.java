@@ -69,6 +69,8 @@ public class ModelInContext
 	public ModelInContext( Model model, TelosysToolsCfg telosysToolsCfg, EnvInContext env ) { // v 3.3.0
 		super();
 		if ( model == null ) throw new IllegalArgumentException("Model is null");
+		if ( telosysToolsCfg == null ) throw new IllegalArgumentException("TelosysToolsCfg is null");
+		if ( env == null ) throw new IllegalArgumentException("EnvInContext is null");
 		
 		this.modelName = model.getName();  // MANDATORY
 		this.modelFolderName = model.getFolderName();  // MANDATORY

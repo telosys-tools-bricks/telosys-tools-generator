@@ -354,6 +354,17 @@ public class EnvInContext {
 //	}
 
 	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+			text={	
+				"Define the target database",
+				"The given database name will be used for SQL conversions (types and names)"
+				},
+			example={ 
+				"#set ( $env.database = 'postgresql' )  ",
+				"#set ( $env.database = 'mysql' )  ",
+				},
+			since = "3.4.0"
+				)
 	public void setDatabase(String db) {
 		this.database = db;
 	}
@@ -362,8 +373,19 @@ public class EnvInContext {
 	}
 	
 	//-------------------------------------------------------------------------------------
-	public void setDatabaseConvFile(File databaseConvFile) {
-		this.databaseConvFile = databaseConvFile;
+	@VelocityMethod(
+			text={	
+				"Define the file containing the specific rules to be used for SQL",
+				"(for SQL table name, column name and column type)"
+				},
+			example={ 
+				"#set ( $env.databaseConvFile = $fn.fileFromBundle('oracle.properties') )  ",
+				"#set ( $env.databaseConvFile = $fn.fileFromBundle('mydb.properties') )  ",
+				},
+			since = "3.4.0"
+				)
+	public void setDatabaseConvFile(FileInContext fileInContext) {
+		this.databaseConvFile = fileInContext.getFile();
 	}
 	public File getDatabaseConvFile() {
 		return this.databaseConvFile;

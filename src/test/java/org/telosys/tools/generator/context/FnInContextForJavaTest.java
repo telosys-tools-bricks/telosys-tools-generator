@@ -10,6 +10,7 @@ import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.Entity;
 
+import junit.env.telosys.tools.generator.context.Builder;
 import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
 import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
 
@@ -130,8 +131,10 @@ public class FnInContextForJavaTest {
 	}
 	private List<AttributeInContext> buildAttributes(EnvInContext envInContext) {
 		//EntityInContext entityInContext = new EntityInContext(new FakeEntity(), null, null, envInContext);
-		Entity entity = new FakeEntity("Foo", "FOO");
-		EntityInContext entityInContext = new EntityInContext(entity, null, null, envInContext);
+		//Entity entity = new FakeEntity("Foo", "FOO");
+		//EntityInContext entityInContext = new EntityInContext(entity, null, null, envInContext);
+		//EntityInContext entityInContext = Builder.buildEntityInContext(entity);
+		EntityInContext entityInContext = Builder.buildEntityInContext("Foo", "FOO");
 		List<AttributeInContext> attributes = new LinkedList<>();
 		attributes.add( buildAttribute(entityInContext, "id", "int", envInContext) );
 		attributes.add( buildAttribute(entityInContext, "name", "string", envInContext ) );

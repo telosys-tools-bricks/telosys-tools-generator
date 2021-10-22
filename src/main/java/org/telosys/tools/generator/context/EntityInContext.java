@@ -26,6 +26,7 @@ import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.context.tools.AmbiguousTypesDetector;
+import org.telosys.tools.generator.context.tools.SqlConverter;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.ForeignKey;
@@ -85,6 +86,8 @@ public class EntityInContext
 	
 	private final EnvInContext   env ; // ver 2.1.0
 	
+    private final SqlConverter sqlConverter ; // Added in v 3.4.0
+		
 	//-----------------------------------------------------------------------------------------------
 	/**
 	 * Constructor based on Repository Entity
@@ -98,13 +101,24 @@ public class EntityInContext
 							final ModelInContext modelInContext, // v 3.0.0
 							final EnvInContext env ) 
 	{
+		if ( entity == null ) {
+			throw new IllegalArgumentException("Entity is null");
+		}
 		this.className = entity.getClassName();  // v 3.0.0
 		
 		this.packageName = StrUtil.notNull(entityPackage);
 		
+		if ( modelInContext == null ) {
+			throw new IllegalArgumentException("ModelInContext is null");
+		}
 		this.modelInContext = modelInContext ; // v 3.0.0
-		this.env = env ;
 		
+		if ( env == null ) {
+			throw new IllegalArgumentException("EnvInContext is null");
+		}
+		this.env = env ;
+		this.sqlConverter = new SqlConverter(env); // Added in v 3.4.0
+
 		this.databaseTable   = StrUtil.notNull(entity.getDatabaseTable());
 		this.databaseCatalog = StrUtil.notNull(entity.getDatabaseCatalog()); // v 3.0.0
 		
@@ -750,6 +764,35 @@ public class EntityInContext
 	public String getDatabaseTable() {
 		return databaseTable ;
 	}
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns TRUE if this entity has a database table name explicitly defined in the model"
+		},
+		example= {
+			"#if ( $entity.hasDatabaseTable() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean hasDatabaseTable() {
+		return ! StrUtil.nullOrVoid(databaseTable);
+	}
+		
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod( text={	
+			"Returns the database table name for the given entity ",
+			"If the table name is defined in the model it is used in priority",
+			"if no table name is defined then the entity name is converted to table name",
+			"by applying the target database conventions",
+			"(for example 'student_projects' for an entity named 'StudentProjects')",					
+			""
+			},
+		since="3.4.0"
+	)
+	public String getSqlTableName() {
+		return sqlConverter.getSqlTableName(this);
+	}
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
@@ -913,14 +956,9 @@ public class EntityInContext
 		}
 	)
 	public boolean hasTextAttribute() {
-    	if ( attributes != null )
-    	{
-    		int n = attributes.size();
-        	for ( int i = 0 ; i < n ; i++ )        		
-        	{
-        		AttributeInContext attribute = attributes.get(i);
-                if ( attribute.isLongText() ) 
-                {
+    	if ( attributes != null ) {
+        	for ( AttributeInContext attribute : attributes ) {
+                if ( attribute.isLongText() ) {
                 	return true ;
                 }
         	}
@@ -979,8 +1017,7 @@ public class EntityInContext
 	public boolean hasForeignKeys() {
 		return ( foreignKeys != null && ! foreignKeys.isEmpty() ) ;
 	}
-	
-	
+
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
 			"Returns TRUE if this entity has an 'auto-incremented' key attribute ",

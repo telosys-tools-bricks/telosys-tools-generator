@@ -576,6 +576,21 @@ public class AttributeInContext {
     public String getDatabaseName() {
         return databaseName;
     }
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns TRUE if the attribute has a database name explicitly defined in the model",
+			"(database name not null and not void)"
+		},
+		example= {
+			"#if ( $attribute.hasDatabaseName() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean hasDatabaseName() {
+		return ! StrUtil.nullOrVoid(databaseName);
+	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -588,6 +603,21 @@ public class AttributeInContext {
     public String getDatabaseType() {
         return this.databaseType;
     }
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns TRUE if the attribute has a database type explicitly defined in the model",
+			"(database type not null and not void)"
+		},
+		example= {
+			"#if ( $attribute.hasDatabaseType() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean hasDatabaseType() {
+		return ! StrUtil.nullOrVoid(databaseType);
+	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -678,16 +708,6 @@ public class AttributeInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns TRUE if the attribute has a database comment (not null and not void)"
-		},
-		since="3.3.0"
-	)
-	public boolean hasDatabaseComment() {
-		return ! StrUtil.nullOrVoid(databaseComment);
-    }
-	    
-	@VelocityMethod(
-		text={	
 			"Returns the database comment for the attribute (or a void string if none)"
 			},
 		since="2.1.1"
@@ -695,13 +715,34 @@ public class AttributeInContext {
     public String getDatabaseComment() {
         return databaseComment;
     }
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns TRUE if the attribute has a database comment defined in the model",
+			"(database comment not null and not void)"
+		},
+		example= {
+			"#if ( $attribute.hasDatabaseComment() )",
+			"...",
+			"#end"
+		},
+		since="3.3.0"
+	)
+	public boolean hasDatabaseComment() {
+		return ! StrUtil.nullOrVoid(databaseComment);
+	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns TRUE if the attribute has a database default value (not null and not void)",
-			"If the attribute is auto-incremented then always returns false"
-			}
+			"Returns TRUE if the attribute has a database default value",
+			"(database default value not null and not void)",			
+			"If the attribute is 'auto-incremented' then always returns false"
+		},
+		example= {
+			"#if ( $attribute.hasDatabaseDefaultValue() )",
+			"...",
+			"#end"
+		}
 	)
     public boolean hasDatabaseDefaultValue() {
     	if ( isAutoIncremented ) return false ; // No default value for auto-incremented fields
