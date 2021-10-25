@@ -11,7 +11,8 @@ public class Employee extends FakeEntity {
 	public static final String ENTITY_NAME = "Employee";
 	
 	public Employee() {
-		super(ENTITY_NAME, "EMPLOYEE");
+		//super(ENTITY_NAME, "EMPLOYEE");
+		super(ENTITY_NAME, ""); //no database table
 		storeAttribute(idAttribute());
 		storeAttribute(firstNameAttribute());
 		storeAttribute(lastNameAttribute());
@@ -20,14 +21,16 @@ public class Employee extends FakeEntity {
 	private Attribute idAttribute() {
 		FakeAttribute attribute = new FakeAttribute("id", NeutralType.INTEGER, true);
 		attribute.setDatabaseName("ID");
-		attribute.setDatabaseType("NUMBER");
+		//attribute.setDatabaseType("NUMBER");
+		attribute.setNotNull(true);
 		return attribute ;
 	}
 
 	private Attribute firstNameAttribute() {
 		FakeAttribute attribute = new FakeAttribute("firstName", NeutralType.STRING, false);
-		attribute.setDatabaseName("FIRST_NAME");
-		attribute.setDatabaseType("VARCHAR");
+		//attribute.setDatabaseName("FIRST_NAME");
+		//attribute.setDatabaseType("VARCHAR");
+		attribute.setDatabaseDefaultValue("xy");
 		return attribute ;
 	}
 

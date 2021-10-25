@@ -1,0 +1,73 @@
+<!-- ============================================ -->
+<!--        TELOSYS DATABASES CONFIGURATION       -->
+<!-- ============================================ -->
+
+    <!-- "databases" tag attributes :
+    . maxId       : maximum database id ( 0 to 100 ), default : 10
+    . defaultId   : default database to use when no ID is specified ( 0 to maxId ), default : 0
+    -->
+
+	<!-- "db" tag attributes :
+	. id     : the database id ( from 0 to maxId )
+	
+	. name   : the symbolic name ( anything )
+	
+	. driver : the JDBC driver class name
+	
+	. url    : the JDBC URL for connection
+	
+	. isolationLevel : JDBC values ( see Java Constants in "java.sql.Connection" ) :
+		. "TRANSACTION_NONE" 
+		. "TRANSACTION_READ_UNCOMMITTED"  ( Possible problem : Dirty Read + Unreapatable Read + Phantom Read / Performance : FASTEST )
+		. "TRANSACTION_READ_COMMITTED"    ( Possible problem : Unreapatable Read + Phantom Read              / Performance : FAST )
+		. "TRANSACTION_REPEATABLE_READ"   ( Possible problem : Phantom Read                                  / Performance : MEDIUM )
+		. "TRANSACTION_SERIALIZABLE"      ( Possible problem : none                                          / Performance : SLOW )
+		( Default : TRANSACTION_READ_COMMITTED )
+		
+	. poolSize    : the initial size of the pool for this database 
+	
+	-->
+	
+    <!-- "metadata" tag attributes :
+    . catalog            : the catalog where to search the metadata ( "!" means "null" ) 
+    . schema             : the schema  where to search the metadata ( "!" means "null" )
+    . table-name-pattern : the pattern used as table name filter ( ex : "%", "A%", ... ) 
+    . table-types        : the types to retrieve, separated by blanks ( ex : "TABLE", "TABLE VIEW", ... ) 
+    -->
+
+<!-- ==================================================================================================== -->
+
+<!-- <databases maxId="4" defaultId="0" > -->
+<databases>
+
+<!-- ============================================ -->
+<!--                     DERBY                    -->
+<!-- ============================================ -->
+	<db id = "1" 
+			name   = "DERBY - TelosysBookStore DB" 
+			driver = "org.apache.derby.jdbc.ClientDriver" 
+			url    = "jdbc:derby://localhost:1527/bookstore" 
+			isolationLevel = "TRANSACTION_REPEATABLE_READ" 
+			poolSize       = "10" >
+			    <property name="user"      value="root" />
+				<property name="password"  value="admin" />
+				<metadata catalog="" schema="ROOT" table-name-pattern="%" table-types="TABLE   VIEW  " />
+	</db>
+
+<!-- ============================================ -->
+<!--                    MYSQL                     -->
+<!-- ============================================ -->
+	<db id = "2" 
+		name   = "MySQL - Bookstore" 
+		driver = "com.mysql.jdbc.Driver" 
+		url    = "jdbc:mysql://localhost:3306/bookstore" 
+		isolationLevel = "TRANSACTION_REPEATABLE_READ" 
+		poolSize       = "3" >
+			<property name="user"      value="root" />
+			<property name="password"  value="secret" />
+			<metadata catalog=""  schema=""  table-name-pattern="%"  table-types=" TABLE    " />
+	</db>
+
+	
+	
+</databases>

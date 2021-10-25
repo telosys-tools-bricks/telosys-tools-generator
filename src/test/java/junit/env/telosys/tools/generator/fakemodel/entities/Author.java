@@ -11,7 +11,8 @@ public class Author extends FakeEntity {
 	public static final String ENTITY_NAME = "Author";
 
 	public Author() {
-		super(ENTITY_NAME, "AUTHOR");
+		//super(ENTITY_NAME, "AUTHOR");
+		super(ENTITY_NAME, ""); // no table name
 		storeAttribute(idAttribute());
 		storeAttribute(firstNameAttribute());
 		storeAttribute(lastNameAttribute());
@@ -21,6 +22,10 @@ public class Author extends FakeEntity {
 		FakeAttribute attribute = new FakeAttribute("id", NeutralType.INTEGER, true);
 		attribute.setDatabaseName("ID");
 		attribute.setDatabaseType("NUMBER");
+		//attribute.setDatabaseNotNull(true);
+		attribute.setNotNull(true);
+		//attribute.isUnique(true); // TODO
+		attribute.setDatabaseDefaultValue("0");
 		return attribute ;
 	}
 
@@ -28,6 +33,7 @@ public class Author extends FakeEntity {
 		FakeAttribute attribute = new FakeAttribute("firstName", NeutralType.STRING, false);
 		attribute.setDatabaseName("FIRST_NAME");
 		attribute.setDatabaseType("VARCHAR");
+		attribute.setDatabaseDefaultValue("default-firts-name");
 		return attribute ;
 	}
 

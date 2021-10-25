@@ -551,8 +551,8 @@ public class SqlInContext {
 		ClassLoader classLoader = this.getClass().getClassLoader();
 		try ( InputStream inputStream = classLoader.getResourceAsStream(propFileName)) {
 			if ( inputStream == null ) {
-				throw new GeneratorSqlException("Database config file '" 
-						+ propFileName + "' not found in the classpath");
+				throw new GeneratorSqlException("Unknown database (file '" 
+						+ propFileName + "' not found)");
 			}
 			properties.load(inputStream);
 		} catch (IOException e) {

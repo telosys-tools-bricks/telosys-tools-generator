@@ -24,6 +24,7 @@ import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generator.context.SqlInContext;
+import org.telosys.tools.generator.context.exceptions.GeneratorSqlException;
 
 /**
  * Utility tool to convert model information to SQL database type, name, etc
@@ -75,7 +76,8 @@ public class SqlConverter {
 				}
 				else {
 					// No file & unknown database name => default => ANSI-SQL
-					this.sqlInContext = new SqlInContext(ANSISQL);
+					//this.sqlInContext = new SqlInContext(ANSISQL);
+					throw new GeneratorSqlException("Unknown database '" + database + "'");
 				}
 			}
 		}

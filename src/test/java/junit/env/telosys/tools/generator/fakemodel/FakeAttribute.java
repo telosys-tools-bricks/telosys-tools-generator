@@ -307,7 +307,6 @@ public class FakeAttribute implements Attribute {
 	public boolean isNotNull() { // v 3.0.0
 		return _bNotNull;
 	}
-
 	public void setNotNull(boolean v) { // v 3.0.0
 		_bNotNull = v;
 	}
@@ -317,7 +316,6 @@ public class FakeAttribute implements Attribute {
 	public boolean isNotEmpty() { // v 3.0.0
 		return _bNotEmpty;
 	}
-
 	public void setNotEmpty(boolean v) {
 		_bNotEmpty = v;
 	}

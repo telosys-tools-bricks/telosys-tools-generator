@@ -26,7 +26,6 @@ import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.context.tools.AmbiguousTypesDetector;
-import org.telosys.tools.generator.context.tools.SqlConverter;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.ForeignKey;
@@ -86,7 +85,7 @@ public class EntityInContext
 	
 	private final EnvInContext   env ; // ver 2.1.0
 	
-    private final SqlConverter sqlConverter ; // Added in v 3.4.0
+    //private final SqlConverter sqlConverter ; // Added in v 3.4.0
 		
 	//-----------------------------------------------------------------------------------------------
 	/**
@@ -117,7 +116,7 @@ public class EntityInContext
 			throw new IllegalArgumentException("EnvInContext is null");
 		}
 		this.env = env ;
-		this.sqlConverter = new SqlConverter(env); // Added in v 3.4.0
+		//this.sqlConverter = new SqlConverter(env); // Added in v 3.4.0
 
 		this.databaseTable   = StrUtil.notNull(entity.getDatabaseTable());
 		this.databaseCatalog = StrUtil.notNull(entity.getDatabaseCatalog()); // v 3.0.0
@@ -791,7 +790,8 @@ public class EntityInContext
 		since="3.4.0"
 	)
 	public String getSqlTableName() {
-		return sqlConverter.getSqlTableName(this);
+		SqlInContext sql = this.env.getSql();
+		return sql.tableName(this);
 	}
 	
 	//-------------------------------------------------------------------------------------

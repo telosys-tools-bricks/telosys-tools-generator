@@ -1,0 +1,93 @@
+// Generation date/time : $now.date  $now.time
+
+## #set ( $env.database = "foobar" ) ## ERROR as expected
+//========================================================================
+// PostgreSQL
+//========================================================================
+#set ( $env.database = "postgresql" )
+// Entity name : "${entity.name}" 
+// Target database (env.database) : "${env.database}"
+
+CREATE TABLE $entity.sqlTableName
+(
+#foreach( $attribute in $entity.attributes )
+#if ( ! $attribute.isTransient() )
+  $attribute.sqlColumnName $attribute.sqlColumnType ${attribute.sqlColumnConstraints}#if( $foreach.hasNext() ),#end
+
+#end## if
+#end## foreach
+);
+##--- Primary Key columns
+#* TODO
+#if ( $entity.hasPrimaryKey() ) 
+#set( $PKCOLUMNS = $fn.join( $entity.sqlPrimaryKeyColumns, "," ) )
+ALTER TABLE $entity.sqlTableName ADD CONSTRAINT 
+  pk_${entity.sqlTableName} PRIMARY KEY($PKCOLUMNS);
+#end
+*#
+
+
+//========================================================================
+// ORACLE
+//========================================================================
+#set ( $env.database = "ORacle" )
+// Entity name : "${entity.name}" 
+// Target database (env.database) : "${env.database}"
+
+CREATE TABLE $entity.sqlTableName
+(
+#foreach( $attribute in $entity.attributes )
+#if ( ! $attribute.isTransient() )
+  $attribute.sqlColumnName $attribute.sqlColumnType ${attribute.sqlColumnConstraints}#if( $foreach.hasNext() ),#end
+
+#end## if
+#end## foreach
+);
+
+//========================================================================
+//========================================================================
+## #set($sql = $factory.newSql('postgresql') ) 
+#set($sql = $factory.newSql('PostgreSQL') ) 
+## #set($sql = $factory.newSql('foobar') ) ## ERROR (as expected)
+// sql.databaseName : $sql.databaseName
+
+// sql.tableName : $sql.tableName($entity) 
+// entity.hasDatabaseTable() : $entity.hasDatabaseTable()
+#if ( $entity.hasDatabaseTable() )
+// entity.databaseTable : $entity.databaseTable
+#end
+// sql.convertToTableName($entity.name): $sql.convertToTableName($entity.name)
+
+// COLUMNS :
+#foreach( $attribute in $entity.attributes )
+//-----------------------------------------------------
+// attribute.hasDatabaseName() : $attribute.hasDatabaseName() 
+#if ( $attribute.hasDatabaseName() )
+// attribute.databaseName : $attribute.databaseName
+#end
+//   sql.columnName : $sql.columnName($attribute) 
+
+// attribute.hasDatabaseType() : $attribute.hasDatabaseType() 
+#if ( $attribute.hasDatabaseType() )
+// attribute.databaseType : $attribute.databaseType
+#end
+//   sql.columnType : $sql.columnType($attribute) 
+
+// attribute.hasDatabaseDefaultValue() : $attribute.hasDatabaseDefaultValue() 
+#if ( $attribute.hasDatabaseDefaultValue() )
+// attribute.databaseDefaultValue : $attribute.databaseDefaultValue
+#end
+//   sql.columnConstraints : $sql.columnConstraints($attribute) 
+
+#end## foreach
+
+
+## --- CREATE PRIMARY KEY  
+#*
+#if ( $entity.hasPrimaryKey() ) 
+#buildPrimaryKey($entity )
+ALTER TABLE $TABLE_NAME ADD CONSTRAINT 
+  $PK_NAME PRIMARY KEY($PK_COLUMNS)
+  USING INDEX TABLESPACE ts_index;
+#end
+*#

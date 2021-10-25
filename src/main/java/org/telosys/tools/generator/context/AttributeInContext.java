@@ -166,7 +166,8 @@ public class AttributeInContext {
 
     private final boolean isTransient ; // Added in v 3.3.0
 
-    private final SqlConverter sqlConverter ; // Added in v 3.4.0
+    //private final SqlConverter sqlConverter ; // Added in v 3.4.0
+    private final EnvInContext env; // Added in v 3.4.0
 	
 	//-----------------------------------------------------------------------------------------------
 	/**
@@ -184,7 +185,8 @@ public class AttributeInContext {
 		this.envInContext = env ; 
 		this.modelInContext = modelInContext ; 
 		this.entityInContext = entity ;
-		this.sqlConverter = new SqlConverter(env); // Added in v 3.4.0
+		//this.sqlConverter = new SqlConverter(env); // Added in v 3.4.0
+		this.env = env ; // Added in v 3.4.0
 		//--------------------------------------------------
 		this.selected        = attribute.isSelected(); 
 		//--------------------------------------------------
@@ -1751,7 +1753,8 @@ public class AttributeInContext {
 		since="3.4.0"
 	)
 	public String getSqlColumnName() {
-		return sqlConverter.getSqlColumnName(this);
+		//return sqlConverter.getSqlColumnName(this);
+		return this.env.getSql().columnName(this);
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -1767,7 +1770,8 @@ public class AttributeInContext {
 		since="3.4.0"
 	)
 	public String getSqlColumnType() {
-		return sqlConverter.getSqlColumnType(this);
+		//return sqlConverter.getSqlColumnType(this);
+		return this.env.getSql().columnType(this);
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -1780,7 +1784,8 @@ public class AttributeInContext {
 		since="3.4.0"
 	)
 	public String getSqlColumnConstraints() {
-		return sqlConverter.getSqlColumnConstraints(this);
+		// return sqlConverter.getSqlColumnConstraints(this);
+		return this.env.getSql().columnConstraints(this);
 	}
 	
 	//------------------------------------------------------------------------------------------

@@ -17,10 +17,12 @@ package org.telosys.tools.generator.context;
 
 import java.io.File;
 
+import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generator.context.tools.SqlInContextBuilder;
 import org.telosys.tools.generic.model.types.LiteralValuesProvider;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForCPlusPlus;
 import org.telosys.tools.generic.model.types.LiteralValuesProviderForCSharp;
@@ -76,6 +78,7 @@ public class EnvInContext {
 	//private String database = "default" ; // v 3.3.0
 	private String database = "" ; // v 3.4.0
 	private File   databaseConvFile = null ;  // v 3.4.0
+	private SqlInContext sqlInContext = null;   // v 3.4.0
 	
 	//-------------------------------------------------------------------------------------
 	// CONSTRUCTOR
@@ -343,21 +346,12 @@ public class EnvInContext {
 		return this.specificCollectionType != null ? this.specificCollectionType : "" ;
 	}
 	
-	
-	//-------------------------------------------------------------------------------------
-//	public void setDatabaseTypesMapping(Map<String,String> map) {
-//		this.databaseTypesMapping = map;
-//	}
-//	
-//	public Map<String,String> getDatabaseTypesMapping() {
-//		return databaseTypesMapping;
-//	}
-
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 			text={	
-				"Define the target database",
-				"The given database name will be used for SQL conversions (types and names)"
+				"Define the target database for SQL generation",
+				"The given database name will be used for SQL conversions (types and names)",
+				"(throws an exception if the database is unknown)"
 				},
 			example={ 
 				"#set ( $env.database = 'postgresql' )  ",
@@ -365,8 +359,10 @@ public class EnvInContext {
 				},
 			since = "3.4.0"
 				)
-	public void setDatabase(String db) {
-		this.database = db;
+	public void setDatabase(String dbName) {
+		SqlInContextBuilder.checkDbName(dbName);
+		this.database = dbName;
+		this.sqlInContext = null; // Reset 
 	}
 	public String getDatabase() {
 		return this.database;
@@ -375,8 +371,9 @@ public class EnvInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 			text={	
-				"Define the file containing the specific rules to be used for SQL",
-				"(for SQL table name, column name and column type)"
+				"Define the file containing the specific rules to be used for SQL generation",
+				"The given rules will be used for SQL conversions (types and names)",
+				"(throws an exception if the file cannot be found)"
 				},
 			example={ 
 				"#set ( $env.databaseConvFile = $fn.fileFromBundle('oracle.properties') )  ",
@@ -385,10 +382,33 @@ public class EnvInContext {
 			since = "3.4.0"
 				)
 	public void setDatabaseConvFile(FileInContext fileInContext) {
-		this.databaseConvFile = fileInContext.getFile();
+		File dbFile = fileInContext.getFile();
+		SqlInContextBuilder.checkDbFile(dbFile);
+		this.databaseConvFile = dbFile ;
+		this.sqlInContext = null; // Reset 
 	}
 	public File getDatabaseConvFile() {
 		return this.databaseConvFile;
 	}
 	
+	public SqlInContext getSql() {
+		// the current "sql" is reset whenever the database name/file changes
+		if ( this.sqlInContext == null ) {
+			this.sqlInContext = buildSqlInContext();
+		}
+		return this.sqlInContext;
+    }
+	
+	private SqlInContext buildSqlInContext() {
+		if ( this.databaseConvFile != null ) {
+			// a specific db file has been defined => use it first
+			return SqlInContextBuilder.buildFromDbFile(this.databaseConvFile);
+		}
+		else if ( ! StrUtil.nullOrVoid(this.database) ) {
+			return SqlInContextBuilder.buildFromDbName(this.database);
+		}
+		else {
+			return SqlInContextBuilder.buildDefault();
+		}
+	}
 }
