@@ -3,6 +3,8 @@
 // Entity name : "${entity.name}" 
 // Target database : "${env.database}"
 
+#foreach ( $entity in $model.allEntities )
+//--------------------------------------------------
 CREATE TABLE $entity.sqlTableName
 (
 #foreach( $attribute in $entity.attributes )
@@ -12,13 +14,12 @@ CREATE TABLE $entity.sqlTableName
 #end## if
 #end## foreach
 );
-
-## --- CREATE PRIMARY KEY  
-#*
+// Create Primary Key 
 #if ( $entity.hasPrimaryKey() ) 
-#buildPrimaryKey($entity )
-ALTER TABLE $TABLE_NAME ADD CONSTRAINT 
-  $PK_NAME PRIMARY KEY($PK_COLUMNS)
-  USING INDEX TABLESPACE ts_index;
+#set( $PKCOLUMNS = $fn.join( $entity.sqlPrimaryKeyColumns, "," ) )
+ALTER TABLE $entity.sqlTableName ADD CONSTRAINT 
+  pk_${entity.sqlTableName} PRIMARY KEY($PKCOLUMNS);
 #end
-*#
+
+#end
+

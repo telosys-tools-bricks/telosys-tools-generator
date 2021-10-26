@@ -796,6 +796,28 @@ public class EntityInContext
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
+			"Returns a list of SQL column names for all the attributes making up the Primary Key"
+		},
+		example= {
+			"#foreach( $col in $entity.sqlPrimaryKeyColumns )",
+			"...",
+			"#end"
+		}
+	)
+	@VelocityReturnType("List of strings")
+	public List<String> getSqlPrimaryKeyColumns() {
+		List<String> list = new LinkedList<>();
+		SqlInContext sql = this.env.getSql();
+		if ( keyAttributes != null ) {
+			for ( AttributeInContext attribute : keyAttributes ) {
+				list.add(sql.columnName(attribute));
+			}
+		}
+		return list ;
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
 			"Returns the database catalog of the table mapped with this entity"
 		},
 		example="$entity.databaseCatalog"

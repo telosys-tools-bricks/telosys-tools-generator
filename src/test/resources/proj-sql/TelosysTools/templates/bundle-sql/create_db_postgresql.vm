@@ -8,6 +8,8 @@
 // Entity name : "${entity.name}" 
 // Target database (env.database) : "${env.database}"
 
+#foreach ( $entity in $model.allEntities )
+//--------------------------------------------------
 CREATE TABLE $entity.sqlTableName
 (
 #foreach( $attribute in $entity.attributes )
@@ -18,14 +20,26 @@ CREATE TABLE $entity.sqlTableName
 #end## foreach
 );
 ##--- Primary Key columns
-#* TODO
+#* TODO $entity.sqlPrimaryKeyColumns
 #if ( $entity.hasPrimaryKey() ) 
 #set( $PKCOLUMNS = $fn.join( $entity.sqlPrimaryKeyColumns, "," ) )
 ALTER TABLE $entity.sqlTableName ADD CONSTRAINT 
   pk_${entity.sqlTableName} PRIMARY KEY($PKCOLUMNS);
 #end
 *#
+// Primary Key columns
+#foreach( $col in $entity.sqlPrimaryKeyColumns )
+	// col : $col
+#end
+// Create Primary Key 
+#if ( $entity.hasPrimaryKey() ) 
+#set( $PKCOLUMNS = $fn.join( $entity.sqlPrimaryKeyColumns, "," ) )
+ALTER TABLE $entity.sqlTableName ADD CONSTRAINT 
+  pk_${entity.sqlTableName} PRIMARY KEY($PKCOLUMNS);
+#end
+//------------------------------------------------------------------------
 
+#end ## foreach entity
 
 //========================================================================
 // ORACLE

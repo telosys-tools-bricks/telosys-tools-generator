@@ -19,13 +19,13 @@ public class ProjectSQLTest {
 	private static final String BUNDLE = "bundle-sql";
 	private FakeProject fakeProject = new FakeProject("proj-sql");
 	
-	private Target getTarget(String templateFile, String generatedFile, Entity entity) {
+	private Target getTargetOnce(String templateFile, String generatedFile, Entity entity) {
 		TargetDefinition targetDefinition = new TargetDefinition(
 				"Fake target", 
 				generatedFile, 
 				"generated-files", 
 				templateFile, 
-				"*");
+				"1");
 		return new Target( fakeProject.getTelosysToolsCfg(), targetDefinition, entity );  // v 3.3.0
 	}
 	
@@ -39,19 +39,19 @@ public class ProjectSQLTest {
 		Generator generator = fakeProject.getGenerator(BUNDLE) ;
 		Model model = FakeModelProvider.buildModel();
 		Entity entity = model.getEntityByClassName(Employee.ENTITY_NAME);
-		Target target = getTarget(templateFile, generatedFile, entity);
+		Target target = getTargetOnce(templateFile, generatedFile, entity);
 		List<String> selectedEntitiesNames = getSelectedEntities();
 		generator.generateTarget(target, model, selectedEntitiesNames, null);
 	}
 
 	@Test
 	public void testSqlDefault() throws GeneratorException {
-		launchGeneration("create_table_default.vm", "create_${BEANNAME}_default.sql");
+		launchGeneration("create_db_default.vm", "create_db_default.sql");
 	}
 
 	@Test
 	public void testSqlPostgresql() throws GeneratorException {
-		launchGeneration("create_table_postgresql.vm", "create_${BEANNAME}_postgresql.sql");
+		launchGeneration("create_db_postgresql.vm", "create_db_postgresql.sql");
 	}
 
 

@@ -216,11 +216,29 @@ public class ModelInContext
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns a list containing all the entities defined in the model" 
+			"Returns a list containing all the entities defined in the model",
+			"NB : has a typo, just kept for backward compatibility",
+			"use 'allEntities' instead",
+			"(!) DEPRECATED : do not use (will be removed)"			
 			}
 	)
-    public List<EntityInContext> getAllEntites()
-    {
+    public List<EntityInContext> getAllEntites() { // NB : typo in method name
+		return getAllEntities() ;
+    }
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a list containing all the entities defined in the model",
+		},
+		example = {
+			"#foreach ( $entity in $model.allEntities )",
+			"...",
+			"#end",
+			""
+		}		
+	)
+    public List<EntityInContext> getAllEntities() {
 		return allEntities ;
     }
 	
