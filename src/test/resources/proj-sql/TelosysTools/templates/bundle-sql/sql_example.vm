@@ -1,0 +1,39 @@
+// Generation date/time : $now.date  $now.time
+
+//========================================================================
+## #set($sql = $factory.newSql('postgresql') ) 
+#set($sql = $factory.newSql('PostgreSQL') ) 
+## #set($sql = $factory.newSql('foobar') ) ## ERROR (as expected)
+// sql.databaseName : $sql.databaseName
+
+// sql.tableName : $sql.tableName($entity) 
+// entity.hasDatabaseTable() : $entity.hasDatabaseTable()
+#if ( $entity.hasDatabaseTable() )
+// entity.databaseTable : $entity.databaseTable
+#end
+// sql.convertToTableName($entity.name): $sql.convertToTableName($entity.name)
+
+// COLUMNS :
+#foreach( $attribute in $entity.attributes )
+//-----------------------------------------------------
+// attribute.hasDatabaseName() : $attribute.hasDatabaseName() 
+#if ( $attribute.hasDatabaseName() )
+// attribute.databaseName : $attribute.databaseName
+#end
+//   sql.columnName : $sql.columnName($attribute) 
+
+// attribute.hasDatabaseType() : $attribute.hasDatabaseType() 
+#if ( $attribute.hasDatabaseType() )
+// attribute.databaseType : $attribute.databaseType
+#end
+//   sql.columnType : $sql.columnType($attribute) 
+
+// attribute.hasDatabaseDefaultValue() : $attribute.hasDatabaseDefaultValue() 
+#if ( $attribute.hasDatabaseDefaultValue() )
+// attribute.databaseDefaultValue : $attribute.databaseDefaultValue
+#end
+//   sql.columnConstraints : $sql.columnConstraints($attribute) 
+
+#end## foreach
+
+

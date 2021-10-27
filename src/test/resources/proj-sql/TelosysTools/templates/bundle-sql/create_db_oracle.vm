@@ -1,0 +1,2 @@
+#set ( $env.database = "ORacle" ) ## OK not case sensitive
+#parse("create_db.vm")

@@ -1,0 +1,54 @@
+// Generation date/time : $now.date  $now.time
+
+## #set ( $env.database = "foobar" ) ## ERROR as expected
+//========================================================================
+// PostgreSQL
+//========================================================================
+#set ( $env.database = "postgresql" )
+// Target database (env.database) : "${env.database}"
+
+#foreach ( $entity in $model.allEntities )
+//--------------------------------------------------
+CREATE TABLE $entity.sqlTableName
+(
+#foreach( $attribute in $entity.attributes )
+#if ( ! $attribute.isTransient() )
+  $attribute.sqlColumnName $attribute.sqlColumnType ${attribute.sqlColumnConstraints}#if( $foreach.hasNext() ),#end
+
+#end## if
+#end## foreach
+);
+##--- Primary Key columns
+// Primary Key columns
+#foreach( $col in $entity.sqlPrimaryKeyColumns )
+	// col : $col
+#end
+// Create Primary Key 
+#if ( $entity.hasPrimaryKey() ) 
+## #set( $PKCOLUMNS = $fn.join( $entity.sqlPrimaryKeyColumns, "," ) )
+ALTER TABLE $entity.sqlTableName ADD CONSTRAINT 
+##  pk_${entity.sqlTableName} PRIMARY KEY($PKCOLUMNS);
+  pk_${entity.sqlTableName} PRIMARY KEY($entity.sqlPrimaryKeyColumnsAsString);
+#end
+//------------------------------------------------------------------------
+
+#end ## foreach entity
+
+//========================================================================
+// ORACLE
+//========================================================================
+#set ( $env.database = "ORacle" )
+// Entity name : "${entity.name}" 
+// Target database (env.database) : "${env.database}"
+
+CREATE TABLE $entity.sqlTableName
+(
+#foreach( $attribute in $entity.attributes )
+#if ( ! $attribute.isTransient() )
+  $attribute.sqlColumnName $attribute.sqlColumnType ${attribute.sqlColumnConstraints}#if( $foreach.hasNext() ),#end
+
+#end## if
+#end## foreach
+);
+
+//========================================================================

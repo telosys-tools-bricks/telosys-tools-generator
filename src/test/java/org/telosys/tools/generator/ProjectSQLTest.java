@@ -45,14 +45,23 @@ public class ProjectSQLTest {
 	}
 
 	@Test
-	public void testSqlDefault() throws GeneratorException {
+	public void testSqlExample() throws GeneratorException {
+		launchGeneration("sql_example.vm", "sql_example.sql");
+	}
+
+	@Test
+	public void testCreateDbDefault() throws GeneratorException {
 		launchGeneration("create_db_default.vm", "create_db_default.sql");
 	}
 
 	@Test
-	public void testSqlPostgresql() throws GeneratorException {
+	public void testCreateDbPostgresql() throws GeneratorException {
 		launchGeneration("create_db_postgresql.vm", "create_db_postgresql.sql");
 	}
 
+	@Test
+	public void testCreateDbOracle() throws GeneratorException {
+		launchGeneration("create_db_oracle.vm", "create_db_oracle.sql");
+	}
 
 }

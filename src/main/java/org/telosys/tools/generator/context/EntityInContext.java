@@ -18,6 +18,7 @@ package org.telosys.tools.generator.context;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.telosys.tools.commons.ListUtil;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
@@ -495,10 +496,6 @@ public class EntityInContext
 			}
 			
 		} // for each ...
-//		if ( selectedAttributes.size() > 0 ) {
-//			return selectedAttributes ;
-//		}
-//		return VOID_ATTRIBUTES_LIST ;
 		if ( selectedAttributes.isEmpty() ) {
 			return VOID_ATTRIBUTES_LIST ;
 		}
@@ -796,7 +793,8 @@ public class EntityInContext
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
-			"Returns a list of SQL column names for all the attributes making up the Primary Key"
+			"Returns a list of SQL column names for all the attributes making up the Primary Key",
+			"(returns a void list if no Primary Key)"
 		},
 		example= {
 			"#foreach( $col in $entity.sqlPrimaryKeyColumns )",
@@ -814,6 +812,17 @@ public class EntityInContext
 			}
 		}
 		return list ;
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+		"Returns a string containing SQL column names for all the attributes making up the Primary Key",
+		"the column names are separated by a comma ",
+		"(returns a void string if no Primary Key)"
+	}
+	)
+	public String getSqlPrimaryKeyColumnsAsString() {
+		return ListUtil.join(getSqlPrimaryKeyColumns(), ",");
 	}
 	
 	//-------------------------------------------------------------------------------------
