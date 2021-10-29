@@ -289,24 +289,24 @@ public class SqlInContext {
 		}
     }
 	
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod ( 
-		text= { 
-			"Returns the default Primary Key name for the given entity",
-			"The default Primary Key name is 'PK_' followed by the entity name",
-			"It is then converted to the expected naming style",
-			"Examples : 'pk_employee', 'PK_EMPLOYEE' ",
-			""
-		},
-		example={	
-				"$sql.pkName($entity)"
-			},
-		since = "3.4.0"
-	)
-	public String pkName(EntityInContext entity) {
-		String pkName = "PK_" + entity.getName();
-		return convertToPkName(pkName);
-	}
+//	//-------------------------------------------------------------------------------------
+//	@VelocityMethod ( 
+//		text= { 
+//			"Returns the default Primary Key name for the given entity",
+//			"The default Primary Key name is 'PK_' followed by the entity name",
+//			"It is then converted to the expected naming style",
+//			"Examples : 'pk_employee', 'PK_EMPLOYEE' ",
+//			""
+//		},
+//		example={	
+//				"$sql.pkName($entity)"
+//			},
+//		since = "3.4.0"
+//	)
+//	public String pkName(EntityInContext entity) {
+//		String pkName = "PK_" + entity.getName();
+//		return convertToPkName(pkName);
+//	}
 		
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 

@@ -5,6 +5,7 @@ import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.Model;
 
 import junit.env.telosys.tools.generator.fakemodel.entities.Author;
+import junit.env.telosys.tools.generator.fakemodel.entities.Book;
 import junit.env.telosys.tools.generator.fakemodel.entities.Composite;
 import junit.env.telosys.tools.generator.fakemodel.entities.Employee;
 
@@ -16,6 +17,7 @@ public class FakeModelProvider {
 	public static Model buildModel() {
 		FakeModel model = new FakeModel("FakeModel");
 		model.addEntity( checkEntity( new Employee() ) );
+		model.addEntity( checkEntity( new Book() ) );
 		model.addEntity( checkEntity( new Author() ) );
 		model.addEntity( checkEntity( new Composite() ) );
 		return model ;

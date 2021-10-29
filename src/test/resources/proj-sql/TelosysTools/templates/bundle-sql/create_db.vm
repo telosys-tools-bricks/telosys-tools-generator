@@ -16,6 +16,7 @@ CREATE TABLE $entity.sqlTableName
 #end## if
 #end## foreach
 );
+
 // List of Primary Key columns :
 #foreach( $col in $entity.sqlPrimaryKeyColumns )
 //  - $col
@@ -27,8 +28,25 @@ ALTER TABLE $entity.sqlTableName ADD CONSTRAINT
 ##  pk_${entity.sqlTableName} PRIMARY KEY($PKCOLUMNS);
   pk_${entity.sqlTableName} PRIMARY KEY($entity.sqlPrimaryKeyColumnsAsString);
 #end
-//------------------------------------------------------------------------
 
 #end ## end of foreach entity
 
 //========================================================================
+// FOREIGN KEYS with CREATE INDEX for each FOREIGN KEY
+//========================================================================
+#foreach( $entity in $model.allEntities  )
+-- $entity.name 
+#if ( $entity.hasForeignKeys() ) 
+#foreach( $fk in $entity.databaseForeignKeys )
+---- $fk.name
+ALTER TABLE $fk.sqlTableName // tableName = "$fk.tableName"
+  ADD CONSTRAINT $fk.sqlName // name = "$fk.name"
+  FOREIGN KEY ( $fk.sqlColumnsAsString ) 
+  REFERENCES $fk.sqlReferencedTableName ( $fk.sqlReferencedColumnsAsString ) ;
+
+CREATE INDEX ix_${fk.sqlName} ON $fk.sqlTableName ( $fk.sqlColumnsAsString  ) ;
+
+#end## foreach( $fk )
+#end## if has FK
+#end## foreach( $entity )
+

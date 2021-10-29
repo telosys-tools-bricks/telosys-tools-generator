@@ -145,7 +145,7 @@ public class EntityInContext
 		//--- Init all the DATABASE FOREIGN KEYS  ( v 2.0.7 )
 		this.foreignKeys = new LinkedList<>();
 		for ( ForeignKey fk : entity.getDatabaseForeignKeys() ) {
-			this.foreignKeys.add( new ForeignKeyInContext(fk ) );
+			this.foreignKeys.add( new ForeignKeyInContext(fk, env) );
 		}
 		
 		//--- Build the list of the "KEY" attributes
