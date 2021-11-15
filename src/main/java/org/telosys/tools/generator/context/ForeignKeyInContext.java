@@ -102,9 +102,11 @@ public class ForeignKeyInContext {
 		return this.fkName;
     }
 
+	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns the name of the Foreign Key converted according the SQL conventions "
+		"Returns the name of the Foreign Key.",
+		"The name is converted according to SQL conventions "
 		})
 	public String getSqlName() {
 		SqlInContext sql = this.env.getSql();
@@ -112,20 +114,42 @@ public class ForeignKeyInContext {
     }
 	
 	//-------------------------------------------------------------------------------------
-	public String getSqlReferencedTableName() { // TODO
-		return this.getReferencedTableName(); // TODO
+	@VelocityMethod(
+	text={	
+		"Returns the name of the referenced table (the table referenced by the foreign key).",
+		"The name is converted according to SQL conventions"
+		})
+	public String getSqlReferencedTableName() {
+		SqlInContext sql = this.env.getSql();
+		return sql.convertToTableName(this.getReferencedTableName());
     }
-	public List<String> getSqlReferencedColumns() { // TODO
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+		"Returns a list containing the names of the referenced columns.",
+		"The names are converted according to SQL conventions"
+		},
+	example= {
+		"#foreach( $col in $fk.sqlReferencedColumns ) ",
+		"...",
+		"#end"
+		})
+	public List<String> getSqlReferencedColumns() {
 		List<String> list = new LinkedList<>();
-		//SqlInContext sql = this.env.getSql();
+		SqlInContext sql = this.env.getSql();
 		if ( fkColumns != null ) {
 			for ( ForeignKeyColumnInContext col : fkColumns ) {
-				//list.add(sql.columnName(col));
-				list.add(col.getReferencedColumnName());
+				list.add( sql.convertToColumnName(col.getReferencedColumnName()) );
 			}
 		}
 		return list ;
     }
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+		"Returns all the names of the referenced columns separated by a comma.",
+		"The names are converted according to SQL conventions"
+		})
 	public String getSqlReferencedColumnsAsString() {
 		return ListUtil.join(getSqlReferencedColumns(), ",");
     }
@@ -142,7 +166,8 @@ public class ForeignKeyInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns the name of the table holding the foreign key converted according the SQL conventions"
+		"Returns the name of the table holding the foreign key",
+		"converted according to SQL conventions"		
 		})
 	public String getSqlTableName() {
 		SqlInContext sql = this.env.getSql();

@@ -39,6 +39,12 @@ ALTER TABLE $entity.sqlTableName ADD CONSTRAINT
 #if ( $entity.hasForeignKeys() ) 
 #foreach( $fk in $entity.databaseForeignKeys )
 ---- $fk.name
+#foreach ( $c in $fk.sqlColumns ) 
+-- col :  $c
+#end
+#foreach ( $c in $fk.sqlReferencedColumns ) 
+-- referenced col :  $c
+#end
 ALTER TABLE $fk.sqlTableName // tableName = "$fk.tableName"
   ADD CONSTRAINT $fk.sqlName // name = "$fk.name"
   FOREIGN KEY ( $fk.sqlColumnsAsString ) 
