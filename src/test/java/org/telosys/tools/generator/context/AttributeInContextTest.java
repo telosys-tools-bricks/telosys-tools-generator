@@ -65,37 +65,53 @@ public class AttributeInContextTest {
 	}
 	
 	@Test
-	public void testDatabaseSize() {
+	public void testSizeAndDatabaseSize() {
 		
 		AttributeInContext attribute;
 		
 		attribute = buildAttribute("firstName", "string", "", "varchar( 20)", "");
-		assertEquals("20", attribute.getSize());
+		assertEquals("",   attribute.getSize());
+		assertEquals("20", attribute.getDatabaseSize()); // (!) Deprecated
 
 		attribute = buildAttribute("firstName", "string", "", "varchar( 20)", "40");
 		assertEquals("40", attribute.getSize());
+		assertEquals("20", attribute.getDatabaseSize()); // (!) Deprecated
 
 		attribute = buildAttribute("firstName", "string", "", "varchar", "45");
 		assertEquals("45", attribute.getSize());
+		assertEquals("45", attribute.getDatabaseSize()); 
 
 		attribute = buildAttribute("firstName", "string", "", "varchar", "");
 		assertEquals("", attribute.getSize());
+		assertEquals("", attribute.getDatabaseSize()); 
 
 		attribute = buildAttribute("firstName", "string", "", "varchar(  )", "");
 		assertEquals("", attribute.getSize());
+		assertEquals("", attribute.getDatabaseSize()); 
 
 		attribute = buildAttribute("firstName", "string", "", "varchar  )", "");
 		assertEquals("", attribute.getSize());
+		assertEquals("", attribute.getDatabaseSize()); 
 
-		attribute = buildAttribute("firstName", "string", "", "varchar(((12 )", "");
-		assertEquals("12", attribute.getSize());
-		attribute = buildAttribute("firstName", "string", "", "varchar(12)(43)", "");
-		assertEquals("12", attribute.getSize());
+		attribute = buildAttribute("firstName", "string", "", "varchar(((12 )", " ");
+		assertEquals("", attribute.getSize());
+		assertEquals("12", attribute.getDatabaseSize()); // (!) Deprecated
+
+		attribute = buildAttribute("firstName", "string", "", "varchar(12)(43)", "  ");
+		assertEquals("", attribute.getSize());
+		assertEquals("12", attribute.getDatabaseSize()); // (!) Deprecated
+		
 		attribute = buildAttribute("firstName", "string", "", "varchar(12(43)", "");
-		assertEquals("1243", attribute.getSize());
+		assertEquals("", attribute.getSize());
+		assertEquals("1243", attribute.getDatabaseSize()); // (!) Deprecated
 
-		attribute = buildAttribute("firstName", "string", "", "numeric( 8,2 )", "");
-		assertEquals("8,2", attribute.getSize());
+		attribute = buildAttribute("firstName", "float", "", "numeric( 8,2 )", "");
+		assertEquals("", attribute.getSize());
+		assertEquals("8,2", attribute.getDatabaseSize()); // (!) Deprecated
+
+		attribute = buildAttribute("firstName", "float", "", "numeric( 8,2 )", "10,4");
+		assertEquals("10,4", attribute.getSize());
+		assertEquals("8,2", attribute.getDatabaseSize()); // (!) Deprecated
 	}
 	
 	@Test

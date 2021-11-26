@@ -31,7 +31,6 @@ import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.exceptions.GeneratorSqlException;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.generator.context.tools.SqlConverter;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.BooleanValue;
 import org.telosys.tools.generic.model.DateType;
@@ -89,6 +88,7 @@ public class AttributeInContext {
 	private final boolean isNotNull ;
 	private final String  label ;
 	private final String  inputType ;
+    private final String  size   ;  // Size with precision and scale if necessary (eg "6" or "6,2")
 
     //--- Further info for STRING ------------------------------------
     private final boolean isLongText ;
@@ -116,7 +116,7 @@ public class AttributeInContext {
     
     private final String  databaseName     ;  // Column name in the DB table
     private final String  databaseType      ;  // Column type in the DB table
-    private final String  databaseSize   ;     // Size of this column (if Varchar ) etc..
+    //private final String  databaseSize   ;   // removed in v 3.4.0
     private final String  databaseComment ;     // Comment of this column 
     private final String  databaseDefaultValue ;   
     private final boolean isDatabaseNotNull ;  // True if "not null" in the database
@@ -242,8 +242,10 @@ public class AttributeInContext {
         	this.fkParts.add(new ForeignKeyPartInContext(fkPart)); // v 3.3.0
         }
 
+        // this.databaseSize     = StrUtil.notNull( attribute.getDatabaseSize() ) ; 
+        this.size     = StrUtil.notNull( attribute.getDatabaseSize() ) ; // TODO : attribute.getSize()
+
         this.isAutoIncremented  = attribute.isAutoIncremented();
-        this.databaseSize     = StrUtil.notNull( attribute.getDatabaseSize() ) ; 
         this.databaseComment  = StrUtil.notNull( attribute.getDatabaseComment() ) ; 
         this.databaseDefaultValue = StrUtil.notNull( attribute.getDatabaseDefaultValue() ) ; 
         this.isDatabaseNotNull  = attribute.isDatabaseNotNull();
@@ -622,67 +624,86 @@ public class AttributeInContext {
 	}
 
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the database native type for the attribute with the size if it makes sense",
-			"For example : INTEGER, VARCHAR(24), NUMBER, CHAR(3), etc...",
-			"",
-			"(!) DEPRECATED : do not use (will be removed)"
-			},
-		since="2.0.7"
-	)
-    public String getDatabaseTypeWithSize() {
-		if ( StrUtil.nullOrVoid(databaseType)) {
-			// No database type
-			return "";
-		}
-		if ( isSizeRequired(databaseType) ) {
-			if ( StrUtil.nullOrVoid(databaseSize)) {
-				// no database size 
-				return databaseType;
-			}
-			else {
-				// database size
-				return this.databaseType.trim() + "(" + this.databaseSize.trim() + ")" ;
-			}
-		}
-		else {
-			// no size required
-			return this.databaseType.trim() ;
-		}
-    }
-    private boolean isSizeRequired(String type) {
-		if ( type.contains("VARCHAR") ) return true; // VARCHAR, VARCHAR2
-		if ( type.contains("CHAR") ) return true;
-		if ( type.contains("DECIMAL") ) return true;
-		if ( type.contains("NUMERIC") ) return true;
-		if ( type.contains("NUMBER") ) return true;
-		return false;
-    }
+//	@VelocityMethod(
+//		text={	
+//			"Returns the database native type for the attribute with the size if it makes sense",
+//			"For example : INTEGER, VARCHAR(24), NUMBER, CHAR(3), etc...",
+//			"",
+//			"(!) DEPRECATED : do not use (will be removed)"
+//			},
+//		since="2.0.7"
+//	)
+//    public String getDatabaseTypeWithSize() {
+//		if ( StrUtil.nullOrVoid(databaseType)) {
+//			// No database type
+//			return "";
+//		}
+//		if ( isSizeRequired(databaseType) ) {
+//			//if ( StrUtil.nullOrVoid(databaseSize)) {
+//			if ( StrUtil.nullOrVoid(size)) {
+//				// no database size 
+//				return databaseType;
+//			}
+//			else {
+//				// database size
+//				//return this.databaseType.trim() + "(" + this.databaseSize.trim() + ")" ;
+//				return this.databaseType.trim() + "(" + this.size.trim() + ")" ;
+//			}
+//		}
+//		else {
+//			// no size required
+//			return this.databaseType.trim() ;
+//		}
+//    }
+//    private boolean isSizeRequired(String type) {
+//		if ( type.contains("VARCHAR") ) return true; // VARCHAR, VARCHAR2
+//		if ( type.contains("CHAR") ) return true;
+//		if ( type.contains("DECIMAL") ) return true;
+//		if ( type.contains("NUMERIC") ) return true;
+//		if ( type.contains("NUMBER") ) return true;
+//		return false;
+//    }
     
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the database size for the attribute (as defined in the model)",
-			"or an empty string  if none",
-			"The 'size' can be a 'length' for char or varchar types ",
-			"or a 'precision' with or without 'scale' for numeric types (precision and scale are separated by a comma).",
-			"Examples : '25', '12', '12,2' ",
-			"If the database size is not define explicitly in the model the value between '(' and ')' ",
-			" will be extrated from the database type if any.",
+			"Returns the database size for the attribute",
+			"(for example : '45' or '10,2' for precision with scale)",
+			"or an empty string if none",
+
+			"Try to get the size from the 'database type' first ",
+			"if not found return the standard size if any",
 			""
+//			"",
+//			"(!) DEPRECATED : use 'size' instead "
 			}
 	)
     public String getDatabaseSize() {
-		if ( ! StrUtil.nullOrVoid(this.databaseSize) ) {
+		/*
+		//if ( ! StrUtil.nullOrVoid(this.databaseSize) ) {
+		if ( ! StrUtil.nullOrVoid(this.size) ) {
 			// Explicitly defined in the model => use it as is
-	        return databaseSize ;
+	        //return databaseSize ;
+	        return this.size ;
 		}
 		else {
 			// Try to extract the size from database type ( eg "varchar(20)", "number(10,2)" )
 			String size = extractSizeFromType(this.databaseType);
-			return size.trim();
+			return size;
 		}
+		*/
+		// Try to extract the size from database type ( eg "varchar(20)", "number(10,2)" )
+		String databaseSize = extractSizeFromType(this.databaseType);
+		if ( ! StrUtil.nullOrVoid(databaseSize) ) {
+			return databaseSize;
+		}
+		else {
+			if ( ! StrUtil.nullOrVoid(this.size) ) {
+				// Explicitly defined in the model => use it as is
+		        return this.size ;
+			}
+		}
+		return "";
     }
 	private String extractSizeFromType(String dbType) {
 		if ( StrUtil.nullOrVoid(dbType) ) {
@@ -697,7 +718,7 @@ public class AttributeInContext {
 				in = true ;
 				break;
 			case ')' :
-				return sb.toString();
+				return sb.toString().trim();
 			default :
 				if (in) {
 					sb.append(c);
@@ -766,7 +787,7 @@ public class AttributeInContext {
 	text={	
 		"Returns TRUE if the attribute must be NOT NULL when stored in the database",
 		"",
-		"(!) DEPRECATED : use isNotNull() instead "
+		"(!) DEPRECATED : use 'isNotNull()' instead "
 		}
 	)
     public boolean isDatabaseNotNull() {
@@ -1753,7 +1774,6 @@ public class AttributeInContext {
 		since="3.4.0"
 	)
 	public String getSqlColumnName() {
-		//return sqlConverter.getSqlColumnName(this);
 		return this.env.getSql().columnName(this);
 	}
 
@@ -1770,7 +1790,6 @@ public class AttributeInContext {
 		since="3.4.0"
 	)
 	public String getSqlColumnType() {
-		//return sqlConverter.getSqlColumnType(this);
 		return this.env.getSql().columnType(this);
 	}
 	
@@ -1784,7 +1803,6 @@ public class AttributeInContext {
 		since="3.4.0"
 	)
 	public String getSqlColumnConstraints() {
-		// return sqlConverter.getSqlColumnConstraints(this);
 		return this.env.getSql().columnConstraints(this);
 	}
 	
@@ -1792,8 +1810,8 @@ public class AttributeInContext {
 	@VelocityMethod(
 		text={	
 			"Returns the attribute size if any.",
-			"Try to get the 'database size' first  ",
-			"if no 'database size' try to get the 'maximum size'.",
+			"Try to get the 'explicit size' first  ",
+			"if no 'explicit size' try to get the 'maximum length'.",
 			"The size is returned as a string containing the size as defined in the model",
 			"for example : '45' or '10,2' for precision with scale",
 			"Returns an empty string if no size"
@@ -1801,15 +1819,15 @@ public class AttributeInContext {
 		since="3.4.0"
 	)
 	public String getSize() {
-		// use @DbSize first : eg @DbSize(45) or @DbSize(10,2)
-		if ( ! StrUtil.nullOrVoid(this.getDatabaseSize()) ) {
-			return this.getDatabaseSize();
-		} 
-		// EVOLUTION : add @Size(xx) annotation (and @DbSize deprecated or keep both ? )
-//		else if ( ! StrUtil.nullOrVoid(attribute.getSize()) ) {
-//			return toBigDecimal( attribute.getSize() );
-//		}
-		// use @SizeMax if any : eg @SizeMax(45)
+//		// use @DbSize first : eg @DbSize(45) or @DbSize(10,2)
+//		if ( ! StrUtil.nullOrVoid(this.getDatabaseSize()) ) {
+//			return this.getDatabaseSize();
+//		} 
+		// EVOLUTION : add @Size(xx) annotation ( and @DbSize deprecated )
+		if ( ! StrUtil.nullOrVoid(this.size) ) {
+			return this.size ;
+		}
+		// use maximum length if defined 
 		else if ( ! StrUtil.nullOrVoid(this.getMaxLength()) ) {
 			return this.getMaxLength();
 		}
