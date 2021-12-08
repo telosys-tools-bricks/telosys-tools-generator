@@ -16,6 +16,7 @@
 package junit.env.telosys.tools.generator.fakemodel;
 
 import java.util.List;
+import java.util.Map;
 
 import org.telosys.tools.generic.model.BooleanValue;
 import org.telosys.tools.generic.model.Cardinality;
@@ -298,4 +299,9 @@ public class FakeLink implements Link {
     public void setUpdatable(BooleanValue b) {
         this.updatable = b;
     }
+
+	@Override
+	public Map<String, String> getTagsMap() { // v 3.4.0
+		return null;
+	}
 }

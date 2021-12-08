@@ -17,6 +17,7 @@ package org.telosys.tools.generator.context;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.GeneratorUtil;
@@ -58,6 +59,8 @@ import org.telosys.tools.generic.model.types.TypeConverter;
 //-------------------------------------------------------------------------------------
 public class LinkInContext {
 	
+    private static final String VOID_STRING  = "" ;
+
     private final EntityInContext  _entity ; // the entity to which the link belongs
 
 	private final ModelInContext   _modelInContext ;  // v 3.0.0 (replaces EntitiesManager)
@@ -69,7 +72,6 @@ public class LinkInContext {
 	//--- Added in ver 3.0.0 (to replace reference / Link )
 	private final String       _id ;
 	private final String       _fieldName ;
-	// private final String       _fieldType ;
 	private final String       _targetTableName ;
 	private final String       mappedBy ;
 	private final boolean      _selected ;
@@ -135,6 +137,8 @@ public class LinkInContext {
 		_updatable  = link.getUpdatable();
 		this.isTransient = link.isTransient(); // v 3.3.0
 		this.isEmbedded  = link.isEmbedded(); // v 3.3.0
+		
+		this.tagsMap = link.getTagsMap(); // V 3.4.0
 	}
 	
 	/**
@@ -417,46 +421,6 @@ public class LinkInContext {
 	}
 
 	//-------------------------------------------------------------------------------------
-// REMOVED in v 3.3.0
-//	@VelocityMethod(
-//		text={	
-//			"Returns the field 'full type' for the link ( eg 'java.util.List' ) ",
-//			"for OneToMany/ManyToMany : the collection full type ( 'java.util.List', ...)",
-//			"for ManyToOne/OneToOne : the targeted entity full type ( 'my.package.Person', 'my.package.Customer', ... ) "
-//			}
-//	)
-//	public String getFieldFullType() throws GeneratorException {
-//		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
-//			// Link referencing a collection : the link provides the full type ( java.util.List, java.util.Set, ... )
-//			// return _fieldType ; // use the type as is 
-//			return getCollectionFullType();
-//		} else {
-//			// Link referencing an entity : the link provides the simple type ( Person, Customer, Book, ... )
-//			return this.getTargetEntityFullType() ; // get the 'full type' from the referenced entity // v 2.1.0
-//		}		
-//	}
-
-	//-------------------------------------------------------------------------------------
-// REMOVED in v 3.3.0
-//	@VelocityMethod(
-//		text={	
-//			"Returns the field 'simple type' for the link ",
-//			"for OneToMany/ManyToMany : the collection short type ( 'List', ...)",
-//			"for ManyToOne/OneToOne : the targeted entity short type ( 'Person', 'Customer', ... ) "
-//			}
-//	)
-//	public String getFieldSimpleType() throws GeneratorException {
-//		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
-//			// Link referencing a collection : the link provides the full type ( java.util.List, java.util.Set, ... )
-//			// return JavaClassUtil.shortName( _fieldType ); // return only the 'simple name' ( 'List', 'Set', ... )
-//			return getCollectionSimpleType();
-//		} else {
-//			// Link referencing an entity : the link provides the simple type ( Person, Customer, Book, ... )
-//			return this.getTargetEntitySimpleType() ; // get the 'simple type' from the referenced entity // v 2.1.0
-//		}		
-//	}
-	
-	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Returns the type of the link ",
@@ -464,21 +428,7 @@ public class LinkInContext {
 			}
 	)
 	public String getFieldType() throws GeneratorException {
-		String targetEntityClassName = this.getTargetEntitySimpleType() ; // v 2.1.0
-//		String type = "";
-//		String simpleType = this.getFieldSimpleType();
-//		
-//		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
-//			// List<Xxx>, Set<Xxxx>, ....
-//			type = simpleType + "<" + targetEntityClassName + ">";
-//		} else {
-//			// Xxx
-//			type = targetEntityClassName ;
-//		}
-//		return type;
-		
-		// NEW in v 3.3.0
-//		if ( this.isCardinalityOneToMany() || this.isCardinalityManyToMany() ) {
+		String targetEntityClassName = this.getTargetEntitySimpleType() ;
 		if ( this.isCollectionType() ) {
 			return buildCollectionType(targetEntityClassName);
 		} else {
@@ -862,6 +812,51 @@ public class LinkInContext {
 	)
 	public boolean isTransient() {
 		return this.isTransient  ; // v 3.3.0
+	}
+	
+	//------------------------------------------------------------------------------------------
+	// TAGS since ver 3.4.0
+	//------------------------------------------------------------------------------------------
+	private final Map<String, String> tagsMap ; // All tags defined for the link (0..N) 
+	
+	@VelocityMethod(
+		text={	
+			"Returns TRUE if the link has a tag with the given name"
+		},
+		parameters = { 
+			"tagName : name of the tag for which to check the existence" 
+		},
+		example= {
+			"$link.hasTag('mytag') "
+		},
+		since="3.4.0"
+	)
+	public boolean hasTag(String tagName) {
+		if ( this.tagsMap != null ) {
+			return this.tagsMap.containsKey(tagName);
+		}
+		return false; 
+	}
+
+	@VelocityMethod(
+		text={	
+			"Returns the value held by the given tag name",
+			"If the tag is undefined or has no value, the returned value is an empty string"
+		},
+		parameters = { 
+			"tagName : name of the tag for which to get the value" 
+		},
+		example= {
+			"$link.tagValue('mytag') "
+		},
+		since="3.4.0"
+	)
+	public String tagValue(String tagName) {
+		if ( this.tagsMap != null ) {
+			String v = this.tagsMap.get(tagName);
+			return ( v != null ? v : VOID_STRING );
+		}
+		return VOID_STRING;
 	}
 
 }

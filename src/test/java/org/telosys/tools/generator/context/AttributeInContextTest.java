@@ -145,13 +145,13 @@ public class AttributeInContextTest {
 	}
 	
 	//------------------------------------------------------------------------------------
-	//------------------------------------------------------------------------------------
 	private AttributeInContext buildAttribute(String attribName, String neutralType,
-			String dbName, String dbType, String dbSize) {
+			String dbName, String dbType, String size) {
 		FakeAttribute fakeAttribute = new FakeAttribute(attribName, neutralType, false);
 		fakeAttribute.setDatabaseName(dbName);
 		fakeAttribute.setDatabaseType(dbType);
-		fakeAttribute.setDatabaseSize(dbSize);
+//		fakeAttribute.setDatabaseSize(dbSize);
+		fakeAttribute.setSize(size); // since v 3.4.0 'size' is the reference  (instead of 'dbSize' )
 		return new AttributeInContext(null, fakeAttribute, null, new EnvInContext()  );
 	}
 	//------------------------------------------------------------------------------------

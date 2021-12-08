@@ -36,30 +36,19 @@ public class FakeAttribute implements Attribute {
 
 	// ----- DATABASE -----
 
-	private String _sDatabaseName = null; // dbName=""
+	private String  databaseName = null; 
+	private String  databaseTypeName = null; 
+	private String  databaseSize = null; 
+	private boolean databaseNotNull = false; 
+	private String  databaseDefaultValue = null; 
+	private String  databaseComment = null; 
 
-	private String _sDatabaseTypeName = null; // dbTypeName="INTEGER" -
-												// dbTypeName="VARCHAR"
+	private boolean _bKeyElement = false; 
 
-	private String databaseSize = null; // dbSize=""
+	private boolean _bForeignKeySimple = false; 
+	private boolean _bForeignKeyComposite = false; 
 
-	private boolean _bDatabaseNotNull = false; // dbNotNull="true|false" ( false
-												// by default )
-
-	private boolean _bKeyElement = false; // primaryKey="true|false" ( false by
-											// default ) // v 3.0.0
-
-	private boolean _bForeignKeySimple = false; // ( false by default )
-	private boolean _bForeignKeyComposite = false; // ( false by default )
-
-	private boolean _bAutoIncremented = false; // autoIncremented="true|false" (
-												// false by default )
-
-	private String _sDatabaseDefaultValue = null; // dbDefaultValue="" (
-													// database default value )
-													// #LGU 10/08/2011
-
-	private String _sDatabaseComment = null; // comment=""
+	private boolean _bAutoIncremented = false; 
 
 	// ----- JDBC -----
 
@@ -107,6 +96,9 @@ public class FakeAttribute implements Attribute {
 	private String _sBooleanFalseValue = null; // the special value for FALSE
 
 	private boolean isTransient = false; // v 3.3.0
+	
+    private String  size; // String for size with comma ( eg "8,2" ) // Added in v 3.4.0
+	private boolean isUnique = false ; // Added in v 3.4.0
 
 	/**
 	 * Constructor
@@ -124,11 +116,11 @@ public class FakeAttribute implements Attribute {
 	// -----------------------------------------------------------------------------
 	@Override
 	public String getDatabaseName() {
-		return _sDatabaseName;
+		return databaseName;
 	}
 
 	public void setDatabaseName(String name) {
-		_sDatabaseName = name;
+		databaseName = name;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -175,16 +167,16 @@ public class FakeAttribute implements Attribute {
 	// -----------------------------------------------------------------------------
 
 	public void setDatabaseNotNull(boolean flag) {
-		_bDatabaseNotNull = flag;
+		databaseNotNull = flag;
 	}
 
 	public void setDatabaseNotNull(String flag) {
-		_bDatabaseNotNull = "true".equalsIgnoreCase(flag);
+		databaseNotNull = "true".equalsIgnoreCase(flag);
 	}
 
 	@Override
 	public boolean isDatabaseNotNull() {
-		return _bDatabaseNotNull;
+		return databaseNotNull;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -200,7 +192,7 @@ public class FakeAttribute implements Attribute {
 	// -----------------------------------------------------------------------------
 	@Override
 	public String getDatabaseDefaultValue() { // #LGU 10/08/2011
-		return _sDatabaseDefaultValue;
+		return databaseDefaultValue;
 	}
 
 	/**
@@ -209,23 +201,17 @@ public class FakeAttribute implements Attribute {
 	 * @param v
 	 */
 	public void setDatabaseDefaultValue(String v) { // #LGU 10/08/2011
-		_sDatabaseDefaultValue = v;
+		databaseDefaultValue = v;
 	}
 
 	// -----------------------------------------------------------------------------
 	@Override
 	public String getDatabaseComment() {
-		return _sDatabaseComment;
+		return databaseComment;
 	}
 
-	/**
-	 * Set the column comment
-	 * 
-	 * @param databaseComment
-	 *            comment
-	 */
-	public void setDatabaseComment(String databaseComment) {
-		_sDatabaseComment = databaseComment;
+	public void setDatabaseComment(String s) {
+		databaseComment = s;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -255,11 +241,11 @@ public class FakeAttribute implements Attribute {
 	 */
 	@Override
 	public String getDatabaseType() { // ver 3.0.0
-		return _sDatabaseTypeName;
+		return databaseTypeName;
 	}
 
-	public void setDatabaseType(String databaseTypeName) {
-		_sDatabaseTypeName = databaseTypeName;
+	public void setDatabaseType(String s) {
+		this.databaseTypeName = s;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -695,4 +681,21 @@ public class FakeAttribute implements Attribute {
 	public void setTransient(boolean b) { // v 3.3.0
 		this.isTransient = b;
 	}
+
+	@Override 
+	public String getSize() { // v 3.4.0
+		return size;
+	}
+	public void setSize(String v) { // v 3.4.0
+		this.size = v;
+	}
+
+    @Override
+    public boolean isUnique() { // v 3.4.0
+        return this.isUnique;
+    }
+    public void setUnique(boolean b) { // v 3.4.0
+        this.isUnique = b;
+    }
+
 }

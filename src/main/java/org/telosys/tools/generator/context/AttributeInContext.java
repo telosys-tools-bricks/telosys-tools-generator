@@ -169,7 +169,9 @@ public class AttributeInContext {
     //private final SqlConverter sqlConverter ; // Added in v 3.4.0
     private final EnvInContext env; // Added in v 3.4.0
 	
-	//-----------------------------------------------------------------------------------------------
+    private final boolean isUnique ;  // v 3.4.0
+
+    //-----------------------------------------------------------------------------------------------
 	/**
 	 * Constructor to create an ATTRIBUTE in the generator context
 	 * @param entity
@@ -243,7 +245,8 @@ public class AttributeInContext {
         }
 
         // this.databaseSize     = StrUtil.notNull( attribute.getDatabaseSize() ) ; 
-        this.size     = StrUtil.notNull( attribute.getDatabaseSize() ) ; // TODO : attribute.getSize()
+        // this.size     = StrUtil.notNull( attribute.getDatabaseSize() ) ; // TODO : attribute.getSize()
+        this.size     = attribute.getSize(); // v 3.4.0
 
         this.isAutoIncremented  = attribute.isAutoIncremented();
         this.databaseComment  = StrUtil.notNull( attribute.getDatabaseComment() ) ; 
@@ -313,6 +316,9 @@ public class AttributeInContext {
 		this.updatable  = attribute.getUpdatable();  // v 3.3.0
 
 		this.isTransient  = attribute.isTransient();  // v 3.3.0
+		
+		this.isUnique = attribute.isUnique() ;  // v 3.4.0
+
 	}
 
 	protected final LanguageType getLanguageType() {
@@ -1752,17 +1758,6 @@ public class AttributeInContext {
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
-	text={	
-		"Returns TRUE if the attribute is 'unique' ",
-		}
-	)
-    public boolean isUnique() {
-		// TODO
-        return false ; 
-    }
-
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
 		text={	
 			"Returns the SQL database column name for the attribute",
 			"For example 'city_code' for an attribute named 'cityCode'",
@@ -1861,6 +1856,17 @@ public class AttributeInContext {
 		}
 		// No size ( null or empty or blank ) => return 0
 		return BigDecimal.valueOf(0); 
+	}
+	
+	//------------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+			"Returns TRUE if the attribute is 'unique' "
+		},
+	since="3.4.0"
+	)
+	public boolean isUnique() {
+		return this.isUnique  ; 
 	}
 
 }
