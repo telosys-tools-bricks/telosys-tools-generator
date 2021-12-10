@@ -261,7 +261,7 @@ public class AttributeInContext {
 		//--- Further info for JPA         
         if ( attribute.isAutoIncremented() ) {
         	this.isGeneratedValue = true ;
-        	this.generatedValueStrategy  = VOID_STRING ; // "AUTO" is the default strategy 
+        	this.generatedValueStrategy  = "IDENTITY" ; // "AUTO" is the default strategy 
         	this.generatedValueGenerator = VOID_STRING ;
         } 
         else {

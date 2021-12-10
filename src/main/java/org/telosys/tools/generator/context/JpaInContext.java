@@ -26,7 +26,7 @@ import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.context.tools.AnnotationsBuilder;
-import org.telosys.tools.generator.context.tools.AnnotationsForJPA;
+import org.telosys.tools.generator.context.tools.JpaAnnotations;
 import org.telosys.tools.generic.model.BooleanValue;
 import org.telosys.tools.generic.model.FetchType;
 
@@ -40,7 +40,7 @@ import org.telosys.tools.generic.model.FetchType;
 		since = "2.0.7"
  )
 //-------------------------------------------------------------------------------------
-public class Jpa {
+public class JpaInContext {
 
 	private boolean   genTargetEntity = false ; // v 3.3.0
 	private String    collectionType  = "List" ; // next ver after v 3.3.0
@@ -53,11 +53,12 @@ public class Jpa {
 	private BooleanValue joinColumnInsertable = BooleanValue.UNDEFINED; // v 3.3.0
 	private BooleanValue joinColumnUpdatable  = BooleanValue.UNDEFINED; // v 3.3.0
 	
+	private boolean  genColumnDefinition = false ; // v 3.4.0
 	
 	//-------------------------------------------------------------------------------------
 	// CONSTRUCTOR
 	//-------------------------------------------------------------------------------------
-	public Jpa() {
+	public JpaInContext() {
 		super();
 	}
 	
@@ -79,6 +80,26 @@ public class Jpa {
 	@VelocityNoDoc // just the setter for 'genTargetEntity'
 	public void setGenTargetEntity(boolean v) {
 		this.genTargetEntity = v;
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+		"Defines if 'columnDefinition' must be generated in 'Column' annotation",
+		"Can be set to 'true' or 'false' (default value is 'false') "
+		},
+	example={ 
+		"#set( $jpa.genColumnDefinition = true )"
+		},
+	since = "3.4.0"
+		)
+	public boolean getGenColumnDefinition() { // v 3.4.0
+		return genColumnDefinition;
+	}
+
+	@VelocityNoDoc // just the setter 
+	public void setGenColumnDefinition(boolean v) { // v 3.4.0
+		this.genColumnDefinition = v;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -1052,8 +1073,9 @@ public class Jpa {
 	)
 	public String fieldAnnotations(int iLeftMargin, AttributeInContext attribute )
     {
-		AnnotationsForJPA annotationsJPA = new AnnotationsForJPA(attribute);
-		return annotationsJPA.getJpaAnnotations(iLeftMargin, AnnotationsForJPA.EMBEDDED_ID_FALSE );
+//		JpaAnnotations annotationsJPA = new JpaAnnotations(attribute);
+		JpaAnnotations annotationsJPA = new JpaAnnotations(attribute, genColumnDefinition); // v 3.4.0
+		return annotationsJPA.getJpaAnnotations(iLeftMargin, JpaAnnotations.EMBEDDED_ID_FALSE );
     }
 
 	//-------------------------------------------------------------------------------------------------------------
@@ -1072,8 +1094,9 @@ public class Jpa {
 		)
 	public String embeddedIdAnnotations(int iLeftMargin, AttributeInContext attribute )
     {
-		AnnotationsForJPA annotationsJPA = new AnnotationsForJPA(attribute);
-		return annotationsJPA.getJpaAnnotations(iLeftMargin, AnnotationsForJPA.EMBEDDED_ID_TRUE );
+//		JpaAnnotations annotationsJPA = new JpaAnnotations(attribute);
+		JpaAnnotations annotationsJPA = new JpaAnnotations(attribute, genColumnDefinition); // v 3.4.0
+		return annotationsJPA.getJpaAnnotations(iLeftMargin, JpaAnnotations.EMBEDDED_ID_TRUE );
     }
 	//-------------------------------------------------------------------------------------------------------------
 	

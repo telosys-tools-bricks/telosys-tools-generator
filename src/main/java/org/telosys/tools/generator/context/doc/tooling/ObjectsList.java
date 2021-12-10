@@ -37,7 +37,7 @@ import org.telosys.tools.generator.context.JdbcFactoryInContext;
 import org.telosys.tools.generator.context.JdbcInContext;
 import org.telosys.tools.generator.context.JoinColumnInContext;
 import org.telosys.tools.generator.context.JoinTableInContext;
-import org.telosys.tools.generator.context.Jpa;
+import org.telosys.tools.generator.context.JpaInContext;
 import org.telosys.tools.generator.context.LinkAttributesPairInContext;
 import org.telosys.tools.generator.context.LinkInContext;
 import org.telosys.tools.generator.context.Loader;
@@ -68,7 +68,7 @@ public class ObjectsList {
 		FnInContext.class,
 		// GenerationInContext.class, // ver 2.1.0 // removed in v 3.0.0
 		Java.class, // ver 2.0.7
-		Jpa.class, // ver 2.0.7
+		JpaInContext.class, // ver 2.0.7
 		BeanValidation.class, // ver 2.0.7
 		EntityInContext.class, // replaces JavaBeanClass.class ( ver 2.1.0 )
 		AttributeInContext.class,

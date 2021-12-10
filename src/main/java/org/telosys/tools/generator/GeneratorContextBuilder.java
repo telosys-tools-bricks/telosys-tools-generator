@@ -37,7 +37,7 @@ import org.telosys.tools.generator.context.H2InContext;
 import org.telosys.tools.generator.context.HtmlInContext;
 import org.telosys.tools.generator.context.Java;
 import org.telosys.tools.generator.context.JdbcFactoryInContext;
-import org.telosys.tools.generator.context.Jpa;
+import org.telosys.tools.generator.context.JpaInContext;
 import org.telosys.tools.generator.context.Loader;
 import org.telosys.tools.generator.context.ModelInContext;
 import org.telosys.tools.generator.context.NowInContext;
@@ -136,7 +136,7 @@ public class GeneratorContextBuilder {
 		generatorContext.put(ContextName.CONST,           new Const()); // Constants (static values)
 		generatorContext.put(ContextName.FN,              new FnInContext(generatorContext, env)); // Utility functions
 		generatorContext.put(ContextName.JAVA,            new Java());  // Java utility functions
-		generatorContext.put(ContextName.JPA,             new Jpa());   // JPA utility functions
+		generatorContext.put(ContextName.JPA,             new JpaInContext());   // JPA utility functions
 		generatorContext.put(ContextName.JDBC_FACTORY,    new JdbcFactoryInContext());  // JDBC factory ( ver 2.1.1 )
 		generatorContext.put(ContextName.BEAN_VALIDATION, new BeanValidation()); // Bean Validation utility functions
 		generatorContext.put(ContextName.H2,              new H2InContext());  // JDBC factory ( ver 2.1.1 )

@@ -8,11 +8,12 @@ import org.telosys.tools.generator.context.Const;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.FnInContext;
 import org.telosys.tools.generator.context.Java;
-import org.telosys.tools.generator.context.Jpa;
+import org.telosys.tools.generator.context.JpaInContext;
 import org.telosys.tools.generator.context.Today;
 import org.telosys.tools.generator.context.names.ContextName;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class DocBuilderTest {
 
@@ -85,11 +86,11 @@ public class DocBuilderTest {
 	@Test
 	public void testClassJpa() {
 		DocBuilder docBuilder = new DocBuilder();
-		ClassInfo classInfo = docBuilder.getClassInfo(Jpa.class);
+		ClassInfo classInfo = docBuilder.getClassInfo(JpaInContext.class);
 		print(classInfo);
 
-		assertTrue ( "Jpa".equals( classInfo.getJavaClassName() ) );
-		assertTrue ( ContextName.JPA.equals( classInfo.getContextName() ) );
+		assertEquals("JpaInContext", classInfo.getJavaClassName() );
+		assertEquals( ContextName.JPA, classInfo.getContextName() );
 		//assertTrue ( classInfo.getMethodsCount() == 0 );
 	}
 

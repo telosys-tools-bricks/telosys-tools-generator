@@ -26,7 +26,7 @@ import org.telosys.tools.generic.model.DateType;
  * @author Laurent GUERIN
  *
  */
-public class AnnotationsForJPA 
+public class JpaAnnotations 
 {
     public static final boolean   EMBEDDED_ID_TRUE  = true ;
     public static final boolean   EMBEDDED_ID_FALSE = false ;
@@ -41,15 +41,17 @@ public class AnnotationsForJPA
 	private static final String AUTO     = "auto";
 
 	
-	private AttributeInContext _attribute = null ;
+	private final AttributeInContext attribute ;
+	private final boolean generateColumnDefinition ;
 	
 	/**
 	 * Constructor
 	 * @param attribute
 	 */
-	public AnnotationsForJPA(AttributeInContext attribute) {
+	public JpaAnnotations(AttributeInContext attribute, boolean generateColumnDefinition) {
 		super();
-		this._attribute = attribute;
+		this.attribute = attribute;
+		this.generateColumnDefinition = generateColumnDefinition ;
 	}
 
 	/**
@@ -63,17 +65,16 @@ public class AnnotationsForJPA
 		//--- Reset everything at each call 
 		AnnotationsBuilder annotations = new AnnotationsBuilder(iLeftMargin);
 		
-		String sAttributeFullType = _attribute.getFullType();
+		String sAttributeFullType = attribute.getFullType();
 		
-		if ( _attribute.isKeyElement() ) 
-		{
+		if ( attribute.isKeyElement() ) {
 			if ( ! embeddedId ) {
 				// do not use "@Id" in an Embedded ID
 				annotations.addLine("@Id");
 			}
 
-			if ( _attribute.isGeneratedValue() ) 
-			{
+			if ( attribute.isGeneratedValue() ) {
+/***
 				String sStrategy = _attribute.getGeneratedValueStrategy() ;
 				if ( AUTO.equalsIgnoreCase( sStrategy ) ) 
 				{
@@ -102,26 +103,15 @@ public class AnnotationsForJPA
 					// AUTO is the default strategy ( see JPA doc ) => use it explicitly 
 					annotationGeneratedValue(annotations, "GenerationType.AUTO", null);
 				}
+**/
+				annotationGeneratedValue(annotations); // v 3.4.0
 			}
 		}
 
 		// @Temporal
 		if ( "java.util.Date".equals(sAttributeFullType) || "java.util.Calendar".equals(sAttributeFullType) ) 
 		{
-//			switch ( _attribute.getDateType()  ) 
-//			{
-//			case AttributeInContext.DATE_ONLY :
-//				annotationTemporal(annotations, "DATE");
-//				break;
-//			case AttributeInContext.TIME_ONLY :
-//				annotationTemporal(annotations, "TIME");
-//				break;
-//			case AttributeInContext.DATE_AND_TIME :
-//				annotationTemporal(annotations, "TIMESTAMP");
-//				break;
-//			}
-			// ver 3.0.0
-			int dateTypeValue = _attribute.getDateType() ; // same 'int' value as in Velocity template
+			int dateTypeValue = attribute.getDateType() ; // same 'int' value as in Velocity template
 			if ( dateTypeValue == DateType.DATE_ONLY.getValue() ) {
 				annotationTemporal(annotations, "DATE");
 			}
@@ -146,6 +136,31 @@ public class AnnotationsForJPA
 		return annotations.getAnnotations();
 	}
 	
+	private void annotationGeneratedValue( AnnotationsBuilder annotations ) {
+		String strategy = attribute.getGeneratedValueStrategy() ;
+		if ( AUTO.equalsIgnoreCase( strategy ) ) {
+			annotationGeneratedValue(annotations, "GenerationType.AUTO", null);
+		} 
+		else if ( IDENTITY.equalsIgnoreCase( strategy ) ) {
+			annotationGeneratedValue(annotations, "GenerationType.IDENTITY", null);
+		} 
+		else if ( SEQUENCE.equalsIgnoreCase( strategy ) )	{
+			annotationGeneratedValue( annotations, "GenerationType.SEQUENCE", attribute.getGeneratedValueGenerator() );
+			if (attribute.hasSequenceGenerator() ) {
+				annotationSequenceGenerator(annotations);
+			}
+		} 
+		else if ( TABLE.equalsIgnoreCase( strategy ) ) {
+			annotationGeneratedValue( annotations, "GenerationType.TABLE", attribute.getGeneratedValueGenerator() );
+			if (attribute.hasTableGenerator()) {
+				annotationTableGenerator(annotations);
+			}
+		}
+		else{
+			// AUTO is the default strategy ( see JPA doc ) => use it explicitly 
+			annotationGeneratedValue(annotations, "GenerationType.AUTO", null);
+		}		
+	}
 	/**
 	 * Adds a "@GeneratedValue" annotation
 	 * @param strategy
@@ -178,12 +193,12 @@ public class AnnotationsForJPA
 		// name - String : (Required) 
 		//    A unique generator name that can be referenced by one or more classes 
 		//    to be the generator for primary key values.
-		String s = "@SequenceGenerator(name=\"" + _attribute.getSequenceGeneratorName() + "\"" ; // Required
+		String s = "@SequenceGenerator(name=\"" + attribute.getSequenceGeneratorName() + "\"" ; // Required
 		
 		// sequenceName - String : (Optional)
 		//    The name of the database sequence object from which to obtain primary key values.
-		if ( ! StrUtil.nullOrVoid( _attribute.getSequenceGeneratorSequenceName() ) ) {
-			s = s + ", sequenceName=\"" + _attribute.getSequenceGeneratorSequenceName() + "\"" ;
+		if ( ! StrUtil.nullOrVoid( attribute.getSequenceGeneratorSequenceName() ) ) {
+			s = s + ", sequenceName=\"" + attribute.getSequenceGeneratorSequenceName() + "\"" ;
 		}
 		
 		// allocationSize - int : (Optional) 
@@ -191,8 +206,8 @@ public class AnnotationsForJPA
 		//  If the sequence object already exists in the database, then you must specify the allocationSize 
 		//  to match the INCREMENT value of the database sequence object. For example, if you have a sequence object
 		//  in the database that you defined to INCREMENT BY 5, set the allocationSize to 5 in the sequence generator definition
-		if ( _attribute.getSequenceGeneratorAllocationSize() > 0 ) {
-			s = s + ", allocationSize=" + Integer.toString(_attribute.getSequenceGeneratorAllocationSize()) ;
+		if ( attribute.getSequenceGeneratorAllocationSize() > 0 ) {
+			s = s + ", allocationSize=" + Integer.toString(attribute.getSequenceGeneratorAllocationSize()) ;
 		}
 		s = s + ")" ;
 		annotations.addLine ( s );		
@@ -210,18 +225,18 @@ public class AnnotationsForJPA
 		// . schema
 		// . uniqueConstraints
 
-		String s = "@TableGenerator(name=\"" + _attribute.getTableGeneratorName() + "\"" ; // Required
-		if ( ! StrUtil.nullOrVoid( _attribute.getTableGeneratorTable() ) ) {
-			s = s + ", table=\"" + _attribute.getTableGeneratorTable() + "\"" ;
+		String s = "@TableGenerator(name=\"" + attribute.getTableGeneratorName() + "\"" ; // Required
+		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorTable() ) ) {
+			s = s + ", table=\"" + attribute.getTableGeneratorTable() + "\"" ;
 		}
-		if ( ! StrUtil.nullOrVoid( _attribute.getTableGeneratorPkColumnName() ) ) {
-			s = s + ", pkColumnName=\"" + _attribute.getTableGeneratorPkColumnName() + "\"" ;
+		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorPkColumnName() ) ) {
+			s = s + ", pkColumnName=\"" + attribute.getTableGeneratorPkColumnName() + "\"" ;
 		}
-		if ( ! StrUtil.nullOrVoid( _attribute.getTableGeneratorValueColumnName() ) ) {
-			s = s + ", valueColumnName=\"" + _attribute.getTableGeneratorValueColumnName() + "\"" ;
+		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorValueColumnName() ) ) {
+			s = s + ", valueColumnName=\"" + attribute.getTableGeneratorValueColumnName() + "\"" ;
 		}
-		if ( ! StrUtil.nullOrVoid( _attribute.getTableGeneratorPkColumnValue() ) ) {
-			s = s + ", pkColumnValue=\"" + _attribute.getTableGeneratorPkColumnValue() + "\"" ;
+		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorPkColumnValue() ) ) {
+			s = s + ", pkColumnValue=\"" + attribute.getTableGeneratorPkColumnValue() + "\"" ;
 		}
 		s = s + ")" ;
 		annotations.addLine ( s );				
@@ -237,52 +252,46 @@ public class AnnotationsForJPA
 		//--- name
 		sb.append("name=\"");
 		// sb.append(_attribute.getDatabaseName());
-		sb.append(_attribute.getSqlColumnName()); // v 3.4.0 : apply naming conventions if any
+		sb.append(attribute.getSqlColumnName()); // v 3.4.0 : apply naming conventions if any
 		sb.append("\"");
 		
 		//--- nullable : (Optional) Whether the database column is nullable.
-		if ( _attribute.isDatabaseNotNull() || _attribute.isNotNull() ) {
+		if ( attribute.isDatabaseNotNull() || attribute.isNotNull() ) {
 			sb.append(", nullable=false");
 		}
 		
 		//--- length : (Optional) The column length. 
-		if ( _attribute.isStringType() ) { // v 3.3.0
-			if ( ! StrUtil.nullOrVoid(_attribute.getDatabaseSize()) ) {
+		if ( attribute.isStringType() ) { // v 3.3.0
+			if ( ! StrUtil.nullOrVoid(attribute.getDatabaseSize()) ) {
 				sb.append(", length=");
-				sb.append(_attribute.getDatabaseSize());
+				sb.append(attribute.getDatabaseSize());
 			}
-			else if ( ! StrUtil.nullOrVoid(_attribute.getMaxLength()) ) {
+			else if ( ! StrUtil.nullOrVoid(attribute.getMaxLength()) ) {
 				sb.append(", length=");
-				sb.append(_attribute.getMaxLength());
+				sb.append(attribute.getMaxLength());
 			}
 		}
 
 		//--- unique : (Optional) Whether the column is a unique key.
-		if ( _attribute.isUnique() ) { // v 3.4.0
+		if ( attribute.isUnique() ) { // v 3.4.0
 			sb.append(", unique=true");
 		}
 		
 		// insertable : (Optional) Whether the column is included in SQL INSERT statements generated by the persistence provider.
-		if ( _attribute.getInsertableFlag() == BooleanValue.FALSE ) {
+		if ( attribute.getInsertableFlag() == BooleanValue.FALSE ) {
 			sb.append( ", insertable=false" ); 			
 		}
 		// updatable  : (Optional) Whether the column is included in SQL UPDATE statements generated by the persistence provider.
-		if ( _attribute.getUpdatableFlag() == BooleanValue.FALSE ) {
+		if ( attribute.getUpdatableFlag() == BooleanValue.FALSE ) {
 			sb.append( ", updatable=false" ); 
 		}
 
 		// columnDefinition : (Optional) The SQL fragment that is used when generating the DDL for the column.
-		// TODO
-		/*
-		if ( genColumnDefinition ) {
+		if ( generateColumnDefinition ) {
 			sb.append( ", columnDefinition=\"" );
-			sb.append( _attribute.getSqlDDL() ); // TODO : change  ATTR.getDatabaseTypeWithSize()
-			if ( _attribute.isDatabaseNotNull() || _attribute.isNotNull() ) {
-				sb.append( " NOT NULL" );
-			}
+			sb.append( buildColumnDefinition() );
 			sb.append( "\"" );
 		}
-		*/
 
 		// End of "@Column("
 		sb.append(")");
@@ -293,6 +302,17 @@ public class AnnotationsForJPA
 		// table : (Optional) The name of the table that contains the column.
 		
 		annotations.addLine ( sb.toString() );
+	}
+	
+	private String buildColumnDefinition() { // v 3.4.0
+		// JPA columndefinition examples :
+		//   @Column(columnDefinition = "varchar(255) default 'John Snow'")
+		//   @Column(columnDefinition = "integer default 25")
+		StringBuilder sb = new StringBuilder();
+		sb.append(attribute.getSqlColumnType());
+		sb.append(" ");
+		sb.append(attribute.getSqlColumnConstraints()); // "not null", "unique", "defaut value"
+		return sb.toString();
 	}
 	
 	/**

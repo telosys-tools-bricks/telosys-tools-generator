@@ -95,6 +95,14 @@ public class FakeAttribute implements Attribute {
 	private String _sBooleanTrueValue = null; // the special value for TRUE
 	private String _sBooleanFalseValue = null; // the special value for FALSE
 
+    private boolean isGeneratedValue = false;  // True if GeneratedValue ( annotation "@GeneratedValue" )
+	private String  generatedValueStrategy = null ; // "AUTO", "IDENTITY", "SEQUENCE", "TABLE" 
+	private String  generatedValueGenerator = null ;
+	
+	private boolean hasSequenceGenerator = false;
+	private String  sequenceGeneratorName  = null ;
+	private String  sequenceGeneratorSequenceName  = null ;
+	
 	private boolean isTransient = false; // v 3.3.0
 	
     private String  size; // String for size with comma ( eg "8,2" ) // Added in v 3.4.0
@@ -545,17 +553,26 @@ public class FakeAttribute implements Attribute {
 	// ---------------------------------------------------------------------------------------------------
 	@Override
 	public boolean isGeneratedValue() {
-		return false;
+		return isGeneratedValue ;
+	}
+	public void setGeneratedValue(boolean v) {
+		isGeneratedValue = v;
 	}
 
 	@Override
 	public String getGeneratedValueGenerator() {
-		return null;
+		return generatedValueGenerator ;
+	}
+	public void setGeneratedValueGenerator(String v) {
+		generatedValueGenerator = v;
 	}
 
 	@Override
 	public String getGeneratedValueStrategy() {
-		return null;
+		return generatedValueStrategy ;
+	}
+	public void setGeneratedValueStrategy(String v) {
+		generatedValueStrategy = v ;
 	}
 
 	// ---------------------------------------------------------------------------------------------------
@@ -563,7 +580,10 @@ public class FakeAttribute implements Attribute {
 	// ---------------------------------------------------------------------------------------------------
 	@Override
 	public boolean hasSequenceGenerator() {
-		return false;
+		return hasSequenceGenerator;
+	}
+	public void setHasSequenceGenerator(boolean v) {
+		hasSequenceGenerator = v;
 	}
 
 	@Override
@@ -573,12 +593,18 @@ public class FakeAttribute implements Attribute {
 
 	@Override
 	public String getSequenceGeneratorName() {
-		return null;
+		return sequenceGeneratorName;
+	}
+	public void setSequenceGeneratorName(String v) {
+		sequenceGeneratorName = v ;
 	}
 
 	@Override
 	public String getSequenceGeneratorSequenceName() {
-		return null;
+		return sequenceGeneratorSequenceName;
+	}
+	public void setSequenceGeneratorSequenceName(String v) {
+		sequenceGeneratorSequenceName = v ;
 	}
 
 	// ---------------------------------------------------------------------------------------------------
