@@ -111,6 +111,20 @@ public class JpaInContextTest {
 	}
 
 	@Test 
+	public void testColumnIdUnique() {
+		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
+		attrib.setUnique(true);
+		AttributeInContext attribInCtx = buildAttribute(attrib);
+		// check result
+		assertTrue(attribInCtx.isUnique());
+		assertFalse(attribInCtx.isGeneratedValue());
+		String[] a = fieldAnnotations(attribInCtx);
+		assertEquals(2, a.length);
+		assertEquals("@Id", a[0]);
+		assertEquals("@Column(name=\"id\", unique=true)", a[1]);
+	}
+
+	@Test 
 	public void testColumnIdAutoIncremented() {
 		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
 		// @AutoIncremented
@@ -120,11 +134,10 @@ public class JpaInContextTest {
 		assertTrue(attribInCtx.isAutoIncremented());
 		assertFalse(attribInCtx.isGeneratedValue());
 		String[] a = fieldAnnotations(attribInCtx);
-//		assertEquals(3, a.length);
-		assertEquals(2, a.length);
+		assertEquals(3, a.length);
 		assertEquals("@Id", a[0]);
-//		assertEquals("@GeneratedValue(strategy=GenerationType.IDENTITY)", a[1]);
-		assertEquals("@Column(name=\"id\")", a[1]);
+		assertEquals("@GeneratedValue(strategy=GenerationType.IDENTITY)", a[1]);
+		assertEquals("@Column(name=\"id\")", a[2]);
 	}
 
 	@Test 

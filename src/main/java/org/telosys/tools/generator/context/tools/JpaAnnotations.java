@@ -31,7 +31,11 @@ public class JpaAnnotations
     public static final boolean   EMBEDDED_ID_TRUE  = true ;
     public static final boolean   EMBEDDED_ID_FALSE = false ;
     
-	
+    private static final String GENERATION_TYPE_AUTO     = "GenerationType.AUTO";
+    private static final String GENERATION_TYPE_IDENTITY = "GenerationType.IDENTITY";
+    private static final String GENERATION_TYPE_SEQUENCE = "GenerationType.SEQUENCE";
+    private static final String GENERATION_TYPE_TABLE    = "GenerationType.TABLE"; 
+    
 	private static final String TABLE    = "table";
 
 	private static final String SEQUENCE = "sequence";
@@ -74,37 +78,13 @@ public class JpaAnnotations
 			}
 
 			if ( attribute.isGeneratedValue() ) {
-/***
-				String sStrategy = _attribute.getGeneratedValueStrategy() ;
-				if ( AUTO.equalsIgnoreCase( sStrategy ) ) 
-				{
-					annotationGeneratedValue(annotations, "GenerationType.AUTO", null);
-				} 
-				else if ( IDENTITY.equalsIgnoreCase( sStrategy ) ) 
-				{
-					annotationGeneratedValue(annotations, "GenerationType.IDENTITY", null);
-				} 
-				else if ( SEQUENCE.equalsIgnoreCase( sStrategy ) )
-				{
-					annotationGeneratedValue( annotations, "GenerationType.SEQUENCE", _attribute.getGeneratedValueGenerator() );
-					if (_attribute.hasSequenceGenerator() ) {
-						annotationSequenceGenerator(annotations);
-					}
-				} 
-				else if ( TABLE.equalsIgnoreCase( sStrategy ) ) 
-				{
-					annotationGeneratedValue( annotations, "GenerationType.TABLE", _attribute.getGeneratedValueGenerator() );
-					if (_attribute.hasTableGenerator()) {
-						annotationTableGenerator(annotations);
-					}
+				annotationsForGeneratedValue(annotations); // v 3.4.0
+			}
+			else {
+				if ( attribute.isAutoIncremented() ) {
+					// auto-incremented by database 'identity column' 
+					annotationGeneratedValue(annotations, GENERATION_TYPE_IDENTITY, null);
 				}
-				else
-				{
-					// AUTO is the default strategy ( see JPA doc ) => use it explicitly 
-					annotationGeneratedValue(annotations, "GenerationType.AUTO", null);
-				}
-**/
-				annotationGeneratedValue(annotations); // v 3.4.0
 			}
 		}
 
@@ -136,29 +116,29 @@ public class JpaAnnotations
 		return annotations.getAnnotations();
 	}
 	
-	private void annotationGeneratedValue( AnnotationsBuilder annotations ) {
+	private void annotationsForGeneratedValue( AnnotationsBuilder annotations ) {
 		String strategy = attribute.getGeneratedValueStrategy() ;
 		if ( AUTO.equalsIgnoreCase( strategy ) ) {
-			annotationGeneratedValue(annotations, "GenerationType.AUTO", null);
+			annotationGeneratedValue(annotations, GENERATION_TYPE_AUTO, null);
 		} 
 		else if ( IDENTITY.equalsIgnoreCase( strategy ) ) {
-			annotationGeneratedValue(annotations, "GenerationType.IDENTITY", null);
+			annotationGeneratedValue(annotations, GENERATION_TYPE_IDENTITY, null);
 		} 
 		else if ( SEQUENCE.equalsIgnoreCase( strategy ) )	{
-			annotationGeneratedValue( annotations, "GenerationType.SEQUENCE", attribute.getGeneratedValueGenerator() );
+			annotationGeneratedValue( annotations, GENERATION_TYPE_SEQUENCE, attribute.getGeneratedValueGenerator() );
 			if (attribute.hasSequenceGenerator() ) {
 				annotationSequenceGenerator(annotations);
 			}
 		} 
 		else if ( TABLE.equalsIgnoreCase( strategy ) ) {
-			annotationGeneratedValue( annotations, "GenerationType.TABLE", attribute.getGeneratedValueGenerator() );
+			annotationGeneratedValue( annotations, GENERATION_TYPE_TABLE, attribute.getGeneratedValueGenerator() );
 			if (attribute.hasTableGenerator()) {
 				annotationTableGenerator(annotations);
 			}
 		}
 		else{
 			// AUTO is the default strategy ( see JPA doc ) => use it explicitly 
-			annotationGeneratedValue(annotations, "GenerationType.AUTO", null);
+			annotationGeneratedValue(annotations, GENERATION_TYPE_AUTO, null);
 		}		
 	}
 	/**
