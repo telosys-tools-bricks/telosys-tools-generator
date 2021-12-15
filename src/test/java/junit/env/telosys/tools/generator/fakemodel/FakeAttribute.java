@@ -22,9 +22,10 @@ import java.util.Map;
 
 import org.telosys.tools.commons.jdbctypes.JdbcTypesManager;
 import org.telosys.tools.generic.model.Attribute;
-import org.telosys.tools.generic.model.BooleanValue;
-import org.telosys.tools.generic.model.DateType;
 import org.telosys.tools.generic.model.ForeignKeyPart;
+import org.telosys.tools.generic.model.enums.BooleanValue;
+import org.telosys.tools.generic.model.enums.DateType;
+import org.telosys.tools.generic.model.enums.GeneratedValueStrategy;
 
 /**
  * Fake attribute for fake entity <br>
@@ -95,13 +96,10 @@ public class FakeAttribute implements Attribute {
 	private String _sBooleanTrueValue = null; // the special value for TRUE
 	private String _sBooleanFalseValue = null; // the special value for FALSE
 
-    private boolean isGeneratedValue = false;  // True if GeneratedValue ( annotation "@GeneratedValue" )
-	private String  generatedValueStrategy = null ; // "AUTO", "IDENTITY", "SEQUENCE", "TABLE" 
-	private String  generatedValueGenerator = null ;
-	
-	private boolean hasSequenceGenerator = false;
-	private String  sequenceGeneratorName  = null ;
-	private String  sequenceGeneratorSequenceName  = null ;
+	private GeneratedValueStrategy generatedValueStrategy = GeneratedValueStrategy.UNDEFINED ;
+	private String  generatedValueGeneratorName = null ;
+	private String  generatedValueSequenceName  = null ;
+	private Integer generatedValueAllocationSize = 0;
 	
 	private boolean isTransient = false; // v 3.3.0
 	
@@ -553,92 +551,115 @@ public class FakeAttribute implements Attribute {
 	// ---------------------------------------------------------------------------------------------------
 	@Override
 	public boolean isGeneratedValue() {
-		return isGeneratedValue ;
+//		return isGeneratedValue ;
+		return generatedValueStrategy != GeneratedValueStrategy.UNDEFINED;
 	}
-	public void setGeneratedValue(boolean v) {
-		isGeneratedValue = v;
+//	public void setGeneratedValue(boolean v) {
+//		isGeneratedValue = v;
+//	}
+
+//	@Override
+//	public String getGeneratedValueGenerator() {
+//		return generatedValueGenerator ;
+//	}
+	@Override
+	public String getGeneratedValueGeneratorName() {
+		return generatedValueGeneratorName;
+	}	
+//	public void setGeneratedValueGenerator(String v) {
+	public void setGeneratedValueGeneratorName(String v) {
+		generatedValueGeneratorName = v;
 	}
 
+//	@Override
+//	public String getGeneratedValueStrategy() {
+//		return generatedValueStrategy ;
+//	}
 	@Override
-	public String getGeneratedValueGenerator() {
-		return generatedValueGenerator ;
-	}
-	public void setGeneratedValueGenerator(String v) {
-		generatedValueGenerator = v;
-	}
-
-	@Override
-	public String getGeneratedValueStrategy() {
-		return generatedValueStrategy ;
-	}
-	public void setGeneratedValueStrategy(String v) {
+	public GeneratedValueStrategy getGeneratedValueStrategy() {
+		return generatedValueStrategy;
+	}	
+//	public void setGeneratedValueStrategy(String v) {
+	public void setGeneratedValueStrategy(GeneratedValueStrategy v) {
 		generatedValueStrategy = v ;
 	}
 
 	// ---------------------------------------------------------------------------------------------------
 	// Sequence generator information
 	// ---------------------------------------------------------------------------------------------------
+//	@Override
+//	public boolean hasSequenceGenerator() {
+//		return hasSequenceGenerator;
+//	}
+//	public void setHasSequenceGenerator(boolean v) {
+//		hasSequenceGenerator = v;
+//	}
+
+//	@Override
+//	public Integer getSequenceGeneratorAllocationSize() {
+//		return null;
+//	}
 	@Override
-	public boolean hasSequenceGenerator() {
-		return hasSequenceGenerator;
+	public Integer getGeneratedValueAllocationSize() {
+		return generatedValueAllocationSize;
 	}
-	public void setHasSequenceGenerator(boolean v) {
-		hasSequenceGenerator = v;
+	public void setGeneratedValueAllocationSize(Integer v) {
+		this.generatedValueAllocationSize = v;
 	}
 
-	@Override
-	public Integer getSequenceGeneratorAllocationSize() {
-		return null;
-	}
+//	@Override
+//	public String getSequenceGeneratorName() {
+//		return sequenceGeneratorName;
+//	}
+//	public void setSequenceGeneratorName(String v) {
+//		sequenceGeneratorName = v ;
+//	}
 
+//	@Override
+//	public String getSequenceGeneratorSequenceName() {
+//		return sequenceGeneratorSequenceName;
+//	}
 	@Override
-	public String getSequenceGeneratorName() {
-		return sequenceGeneratorName;
-	}
-	public void setSequenceGeneratorName(String v) {
-		sequenceGeneratorName = v ;
-	}
-
-	@Override
-	public String getSequenceGeneratorSequenceName() {
-		return sequenceGeneratorSequenceName;
-	}
-	public void setSequenceGeneratorSequenceName(String v) {
-		sequenceGeneratorSequenceName = v ;
+	public String getGeneratedValueSequenceName() {
+		return generatedValueSequenceName;
+	}	
+//	public void setSequenceGeneratorSequenceName(String v) {
+	public void setGeneratedValueSequenceName(String v) {
+		generatedValueSequenceName = v ;
 	}
 
 	// ---------------------------------------------------------------------------------------------------
 	// Table generator information
 	// ---------------------------------------------------------------------------------------------------
-	@Override
-	public boolean hasTableGenerator() {
-		return false;
-	}
-
-	@Override
-	public String getTableGeneratorName() {
-		return null;
-	}
-
-	@Override
-	public String getTableGeneratorPkColumnName() {
-		return null;
-	}
-
-	@Override
-	public String getTableGeneratorPkColumnValue() {
-		return null;
-	}
-
-	@Override
-	public String getTableGeneratorTable() {
-		return null;
-	}
-
-	@Override
-	public String getTableGeneratorValueColumnName() {
-		return null;
-	}
+//	@Override
+//	public boolean hasTableGenerator() {
+//		return false;
+//	}
+//
+//	@Override
+//	public String getTableGeneratorName() {
+//		return null;
+//	}
+//
+//	@Override
+//	public String getTableGeneratorPkColumnName() {
+//		return null;
+//	}
+//
+//	@Override
+//	public String getTableGeneratorPkColumnValue() {
+//		return null;
+//	}
+//
+//	@Override
+//	public String getTableGeneratorTable() {
+//		return null;
+//	}
+//
+//	@Override
+//	public String getTableGeneratorValueColumnName() {
+//		return null;
+//	}
 
 	@Override
 	public boolean isObjectTypeExpected() {
@@ -723,5 +744,25 @@ public class FakeAttribute implements Attribute {
     public void setUnique(boolean b) { // v 3.4.0
         this.isUnique = b;
     }
+
+	@Override
+	public String getGeneratedValueTableName() {
+		return null;
+	}
+
+	@Override
+	public String getGeneratedValueTablePkColumnName() {
+		return null;
+	}
+
+	@Override
+	public String getGeneratedValueTablePkColumnValue() {
+		return null;
+	}
+
+	@Override
+	public String getGeneratedValueTableValueColumnName() {
+		return null;
+	}
 
 }

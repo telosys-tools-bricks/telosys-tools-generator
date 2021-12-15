@@ -17,8 +17,8 @@ package org.telosys.tools.generator.context.tools;
 
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.AttributeInContext;
-import org.telosys.tools.generic.model.BooleanValue;
-import org.telosys.tools.generic.model.DateType;
+import org.telosys.tools.generic.model.enums.BooleanValue;
+import org.telosys.tools.generic.model.enums.DateType;
 
 /**
  * This class manages the JPA annotations for a given Java attribute ( a field mapped on a column )
@@ -183,22 +183,23 @@ public class JpaAnnotations
 	/**
 	 * Adds a "@SequenceGenerator" annotation
 	 */
-	private void annotationSequenceGenerator(AnnotationsBuilder annotations) 
-	{
-		// Other JPA attribute in @SequenceGenerator (not supported yet)
-		//  . schema
-		//  . catalog
-		//  . initialValue
+	private void annotationSequenceGenerator(AnnotationsBuilder annotations) {
 		
 		// name - String : (Required) 
 		//    A unique generator name that can be referenced by one or more classes 
 		//    to be the generator for primary key values.
-		String s = "@SequenceGenerator(name=\"" + attribute.getSequenceGeneratorName() + "\"" ; // Required
+		String name = attribute.getSequenceGeneratorName() ;
+		if ( StrUtil.nullOrVoid(name) ) {
+			return; // name is required : if no name => no annotation
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("@SequenceGenerator(name=\"").append(name).append("\"");
 		
 		// sequenceName - String : (Optional)
 		//    The name of the database sequence object from which to obtain primary key values.
 		if ( ! StrUtil.nullOrVoid( attribute.getSequenceGeneratorSequenceName() ) ) {
-			s = s + ", sequenceName=\"" + attribute.getSequenceGeneratorSequenceName() + "\"" ;
+			sb.append(", sequenceName=\"").append(attribute.getSequenceGeneratorSequenceName()).append("\"");
 		}
 		
 		// allocationSize - int : (Optional) 
@@ -207,10 +208,16 @@ public class JpaAnnotations
 		//  to match the INCREMENT value of the database sequence object. For example, if you have a sequence object
 		//  in the database that you defined to INCREMENT BY 5, set the allocationSize to 5 in the sequence generator definition
 		if ( attribute.getSequenceGeneratorAllocationSize() > 0 ) {
-			s = s + ", allocationSize=" + Integer.toString(attribute.getSequenceGeneratorAllocationSize()) ;
+			sb.append(", allocationSize=").append(attribute.getSequenceGeneratorAllocationSize());
 		}
-		s = s + ")" ;
-		annotations.addLine ( s );		
+		
+		// Other JPA attribute in @SequenceGenerator (not supported yet)
+		//  . schema (Optional)
+		//  . catalog (Optional)
+		//  . initialValue (Optional)
+		
+		sb.append(")") ;
+		annotations.addLine ( sb.toString() );
 	}
 
 	/**
@@ -310,8 +317,11 @@ public class JpaAnnotations
 		//   @Column(columnDefinition = "integer default 25")
 		StringBuilder sb = new StringBuilder();
 		sb.append(attribute.getSqlColumnType());
-		sb.append(" ");
-		sb.append(attribute.getSqlColumnConstraints()); // "not null", "unique", "defaut value"
+		String columnConstraints = attribute.getSqlColumnConstraints();
+		if ( ! StrUtil.nullOrVoid(columnConstraints) ) {
+			sb.append(" ");
+			sb.append(columnConstraints); // "not null", "unique", "defaut value"
+		}
 		return sb.toString();
 	}
 	

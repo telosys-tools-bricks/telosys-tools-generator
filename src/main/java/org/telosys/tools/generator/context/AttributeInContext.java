@@ -32,9 +32,10 @@ import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.exceptions.GeneratorSqlException;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.Attribute;
-import org.telosys.tools.generic.model.BooleanValue;
-import org.telosys.tools.generic.model.DateType;
 import org.telosys.tools.generic.model.ForeignKeyPart;
+import org.telosys.tools.generic.model.enums.BooleanValue;
+import org.telosys.tools.generic.model.enums.DateType;
+import org.telosys.tools.generic.model.enums.GeneratedValueStrategy;
 import org.telosys.tools.generic.model.types.AttributeTypeInfo;
 import org.telosys.tools.generic.model.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
@@ -258,54 +259,42 @@ public class AttributeInContext {
         this.booleanFalseValue  = Util.trim(attribute.getBooleanFalseValue(), VOID_STRING) ;
 		
         
-		//--- Further info for JPA         
-        if ( attribute.isAutoIncremented() ) {
-        	this.isGeneratedValue = true ;
-        	this.generatedValueStrategy  = "IDENTITY" ; // "AUTO" is the default strategy 
-        	this.generatedValueGenerator = VOID_STRING ;
-        } 
-        else {
-        	if (attribute.isGeneratedValue() ) {
-        		this.isGeneratedValue = true ;
-        		this.generatedValueStrategy  = StrUtil.notNull( attribute.getGeneratedValueStrategy() );
-        		this.generatedValueGenerator = StrUtil.notNull( attribute.getGeneratedValueGenerator() ); 
-			}
-			else {
-				this.isGeneratedValue = false;
-				this.generatedValueStrategy  = VOID_STRING;
-				this.generatedValueGenerator = VOID_STRING;
-			}
-        }
-			        
-		if ( attribute.hasTableGenerator() ) {
-			this.hasTableGenerator = true ;
-			this.tableGeneratorName = StrUtil.notNull(attribute.getTableGeneratorName());
-			this.tableGeneratorTable = StrUtil.notNull(attribute.getTableGeneratorTable());
-			this.tableGeneratorPkColumnName = StrUtil.notNull(attribute.getTableGeneratorPkColumnName()); 
-			this.tableGeneratorValueColumnName = StrUtil.notNull(attribute.getTableGeneratorValueColumnName());
-			this.tableGeneratorPkColumnValue = StrUtil.notNull(attribute.getTableGeneratorPkColumnValue());
-		}
-		else {
-			this.hasTableGenerator = false ;
-			this.tableGeneratorName = VOID_STRING ;
-			this.tableGeneratorTable = VOID_STRING ;
-			this.tableGeneratorPkColumnName = VOID_STRING ;
-			this.tableGeneratorValueColumnName = VOID_STRING;
-			this.tableGeneratorPkColumnValue = VOID_STRING;
-		}
+//		//--- AutoIncremented is a shortcut for GeneratedValue if not defined
+//        if ( attribute.isAutoIncremented() && 
+//        	 attribute.getGeneratedValueStrategy() == GeneratedValueStrategy.UNDEFINED ) {
+//        	this.isGeneratedValue = true ;
+//        	this.generatedValueStrategy  = GeneratedValueStrategy.AUTO.getText() ; 
+//        	this.generatedValueGenerator = VOID_STRING ;
+//        } 
+//        else {
+//        	if (attribute.isGeneratedValue() ) {
+//        		this.isGeneratedValue = true ;
+//        		this.generatedValueStrategy  = StrUtil.notNull( attribute.getGeneratedValueStrategy() );
+//        		this.generatedValueGenerator = StrUtil.notNull( attribute.getGeneratedValueGenerator() ); 
+//			}
+//			else {
+//				this.isGeneratedValue = false;
+//				this.generatedValueStrategy  = VOID_STRING;
+//				this.generatedValueGenerator = VOID_STRING;
+//			}
+//        }
+        //--- Generated Value  v 3.4.0
+        this.isGeneratedValue = attribute.getGeneratedValueStrategy() != GeneratedValueStrategy.UNDEFINED ;
+		this.generatedValueStrategy = attribute.getGeneratedValueStrategy().getText() ;
+		this.generatedValueGenerator = notNull(attribute.getGeneratedValueGeneratorName());
+		// Generated Value / Sequence  v 3.4.0
+        this.hasSequenceGenerator = attribute.getGeneratedValueStrategy() == GeneratedValueStrategy.SEQUENCE ;
+		this.sequenceGeneratorName = this.generatedValueGenerator; // sequenceGeneratorName : to be removed ?
+		this.sequenceGeneratorSequenceName = notNull(attribute.getGeneratedValueSequenceName());
+		this.sequenceGeneratorAllocationSize = notNull(attribute.getGeneratedValueAllocationSize());
+		// Generated Value / Table  v 3.4.0
+        this.hasTableGenerator    = attribute.getGeneratedValueStrategy() == GeneratedValueStrategy.TABLE ;
+		this.tableGeneratorName = this.generatedValueGenerator; // tableGeneratorName : to be removed ?
+		this.tableGeneratorTable = notNull(attribute.getGeneratedValueTableName());
+		this.tableGeneratorPkColumnName = notNull(attribute.getGeneratedValueTablePkColumnName()); 
+		this.tableGeneratorValueColumnName = notNull(attribute.getGeneratedValueTableValueColumnName());
+		this.tableGeneratorPkColumnValue = notNull(attribute.getGeneratedValueTablePkColumnValue());
 
-		if (attribute.hasSequenceGenerator() ) {
-			this.hasSequenceGenerator = true;
-			this.sequenceGeneratorName = attribute.getSequenceGeneratorName();
-			this.sequenceGeneratorSequenceName = attribute.getSequenceGeneratorSequenceName();
-			this.sequenceGeneratorAllocationSize = Util.intValue(attribute.getSequenceGeneratorAllocationSize(), 0);
-		}
-		else {
-			this.hasSequenceGenerator = false;
-			this.sequenceGeneratorName = VOID_STRING;
-			this.sequenceGeneratorSequenceName = VOID_STRING;
-			this.sequenceGeneratorAllocationSize = -1;
-		}
 		
 		this.isUsedInLinks         = attribute.isUsedInLinks(); 
 		this.isUsedInSelectedLinks = attribute.isUsedInSelectedLinks();
@@ -321,6 +310,13 @@ public class AttributeInContext {
 
 	}
 
+	private String notNull(String s) {
+		return s != null ? s : "" ;
+	}
+	private int notNull(Integer i) {
+		return i != null ? i.intValue() : 0 ;
+	}
+	
 	protected final LanguageType getLanguageType() {
 		TypeConverter typeConverter = envInContext.getTypeConverter();
 		LanguageType languageType = typeConverter.getType(this.attributeTypeInfo);

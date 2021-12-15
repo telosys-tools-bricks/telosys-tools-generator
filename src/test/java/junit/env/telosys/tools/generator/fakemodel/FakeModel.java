@@ -21,7 +21,7 @@ import java.util.List;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.Model;
-import org.telosys.tools.generic.model.ModelType;
+import org.telosys.tools.generic.model.enums.ModelType;
 
 public class FakeModel implements Model
 {

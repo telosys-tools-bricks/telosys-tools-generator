@@ -25,13 +25,13 @@ import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.generic.model.BooleanValue;
-import org.telosys.tools.generic.model.Cardinality;
 import org.telosys.tools.generic.model.CascadeOptions;
-import org.telosys.tools.generic.model.FetchType;
 import org.telosys.tools.generic.model.JoinColumn;
 import org.telosys.tools.generic.model.Link;
-import org.telosys.tools.generic.model.Optional;
+import org.telosys.tools.generic.model.enums.BooleanValue;
+import org.telosys.tools.generic.model.enums.Cardinality;
+import org.telosys.tools.generic.model.enums.FetchType;
+import org.telosys.tools.generic.model.enums.Optional;
 import org.telosys.tools.generic.model.types.TypeConverter;
 
 /**

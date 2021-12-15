@@ -18,14 +18,14 @@ package junit.env.telosys.tools.generator.fakemodel;
 import java.util.List;
 import java.util.Map;
 
-import org.telosys.tools.generic.model.BooleanValue;
-import org.telosys.tools.generic.model.Cardinality;
 import org.telosys.tools.generic.model.CascadeOptions;
-import org.telosys.tools.generic.model.FetchType;
 import org.telosys.tools.generic.model.JoinColumn;
 import org.telosys.tools.generic.model.JoinTable;
 import org.telosys.tools.generic.model.Link;
-import org.telosys.tools.generic.model.Optional;
+import org.telosys.tools.generic.model.enums.BooleanValue;
+import org.telosys.tools.generic.model.enums.Cardinality;
+import org.telosys.tools.generic.model.enums.FetchType;
+import org.telosys.tools.generic.model.enums.Optional;
 
 /**
  * Fake attribute for fake entity <br>

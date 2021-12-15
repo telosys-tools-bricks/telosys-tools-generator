@@ -28,7 +28,7 @@ import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.Model;
-import org.telosys.tools.generic.model.ModelType;
+import org.telosys.tools.generic.model.enums.ModelType;
 
 /**
  * This class gives access to the entire model

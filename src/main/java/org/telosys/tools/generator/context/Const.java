@@ -18,7 +18,7 @@ package org.telosys.tools.generator.context;
 import org.telosys.tools.generator.context.doc.VelocityConstant;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.generic.model.DateType;
+import org.telosys.tools.generic.model.enums.DateType;
 
 /**
  * Constants usable in a Velocity template

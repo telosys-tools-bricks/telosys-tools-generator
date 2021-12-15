@@ -1,8 +1,8 @@
 package junit.env.telosys.tools.generator.fakemodel.entities;
 
 import org.telosys.tools.generic.model.Attribute;
-import org.telosys.tools.generic.model.Cardinality;
 import org.telosys.tools.generic.model.Link;
+import org.telosys.tools.generic.model.enums.Cardinality;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;

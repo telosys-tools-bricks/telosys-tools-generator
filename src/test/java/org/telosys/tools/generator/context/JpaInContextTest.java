@@ -1,11 +1,11 @@
 package org.telosys.tools.generator.context;
 
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.telosys.tools.generic.model.enums.GeneratedValueStrategy;
 
-import org.telosys.tools.generator.context.exceptions.GeneratorSqlException;
-import org.telosys.tools.generic.model.Attribute;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
 import junit.env.telosys.tools.generator.fakemodel.FakeForeignKey;
@@ -13,11 +13,15 @@ import junit.env.telosys.tools.generator.fakemodel.FakeForeignKeyColumn;
 
 public class JpaInContextTest {
 	
-	private String[] fieldAnnotations(AttributeInContext attribute) {
+	private String[] fieldAnnotations(AttributeInContext attribute, boolean withColumnDefinition) {
 		JpaInContext jpa = new JpaInContext() ;
+		jpa.setGenColumnDefinition(withColumnDefinition);
 		String annotations = jpa.fieldAnnotations(0, attribute);
 		print(annotations);
 		return annotations.split("\n");
+	}
+	private String[] fieldAnnotations(AttributeInContext attribute) {
+		return fieldAnnotations(attribute, false);
 	}
 	
 	@Test // (expected = GeneratorSqlException.class)
@@ -26,6 +30,7 @@ public class JpaInContextTest {
 		attrib.setNotNull(true);
 		attrib.setUnique(true);
 		String[] a = fieldAnnotations(buildAttribute(attrib));
+		// check result
 		assertEquals(1, a.length);
 		assertEquals("@Column(name=\"code\", nullable=false, unique=true)", a[0]);
 	}
@@ -35,6 +40,7 @@ public class JpaInContextTest {
 		FakeAttribute attrib = buildFakeAttribute("firstName", "string"); 
 		attrib.setNotNull(true);
 		String[] a = fieldAnnotations(buildAttribute(attrib));
+		// check result
 		assertEquals(1, a.length);
 		assertEquals("@Column(name=\"first_name\", nullable=false)", a[0]);
 	}
@@ -44,6 +50,7 @@ public class JpaInContextTest {
 		FakeAttribute attrib = buildFakeAttribute("firstName", "string"); 
 		attrib.setDatabaseName("FIRST_NAME");
 		String[] a = fieldAnnotations(buildAttribute(attrib));
+		// check result
 		assertEquals(1, a.length);
 		assertEquals("@Column(name=\"FIRST_NAME\")", a[0]);
 	}
@@ -52,38 +59,81 @@ public class JpaInContextTest {
 	public void testColumnId() {
 		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
 		String[] a = fieldAnnotations(buildAttribute(attrib));
+		// check result
 		assertEquals(2, a.length);
 		assertEquals("@Id", a[0]);
 		assertEquals("@Column(name=\"id\")", a[1]);
 	}
 
 	@Test 
+	public void testColumnIdWithColDef() {
+		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
+		String[] a = fieldAnnotations(buildAttribute(attrib), true);
+		// check result
+		assertEquals(2, a.length);
+		assertEquals("@Id", a[0]);
+		assertEquals("@Column(name=\"id\", columnDefinition=\"INT\")", a[1]);
+	}
+
+	@Test 
+	public void testColumnCodeWithColDef() {
+		FakeAttribute attrib = buildFakeAttributeId("code", "string"); 
+		attrib.setSize("20");
+		String[] a = fieldAnnotations(buildAttribute(attrib), true);
+		// check result
+		assertEquals(2, a.length);
+		assertEquals("@Id", a[0]);
+		assertEquals("@Column(name=\"code\", length=20, columnDefinition=\"VARCHAR(20)\")", a[1]);
+	}
+
+	@Test 
+	public void testColumnCodeWithColDefNotNull() {
+		FakeAttribute attrib = buildFakeAttributeId("code", "string"); 
+		attrib.setNotNull(true);
+		attrib.setSize("20");
+		String[] a = fieldAnnotations(buildAttribute(attrib), true);
+		// check result
+		assertEquals(2, a.length);
+		assertEquals("@Id", a[0]);
+		assertEquals("@Column(name=\"code\", nullable=false, length=20, columnDefinition=\"VARCHAR(20) NOT NULL\")", a[1]);
+	}
+
+	@Test 
+	public void testColumnCodeWithColDefUnique() {
+		FakeAttribute attrib = buildFakeAttributeId("code", "string"); 
+		attrib.setUnique(true);
+		attrib.setSize("20");
+		String[] a = fieldAnnotations(buildAttribute(attrib), true);
+		// check result
+		assertEquals(2, a.length);
+		assertEquals("@Id", a[0]);
+		assertEquals("@Column(name=\"code\", length=20, unique=true, columnDefinition=\"VARCHAR(20) UNIQUE\")", a[1]);
+	}
+
+	@Test 
 	public void testColumnIdAutoIncremented() {
 		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		
 		// @AutoIncremented
 		attrib.setAutoIncremented(true);
 		AttributeInContext attribInCtx = buildAttribute(attrib);
-		
+		// check result
 		assertTrue(attribInCtx.isAutoIncremented());
-		assertTrue(attribInCtx.isGeneratedValue());
+		assertFalse(attribInCtx.isGeneratedValue());
 		String[] a = fieldAnnotations(attribInCtx);
-		assertEquals(3, a.length);
+//		assertEquals(3, a.length);
+		assertEquals(2, a.length);
 		assertEquals("@Id", a[0]);
-		assertEquals("@GeneratedValue(strategy=GenerationType.IDENTITY)", a[1]);
-		assertEquals("@Column(name=\"id\")", a[2]);
+//		assertEquals("@GeneratedValue(strategy=GenerationType.IDENTITY)", a[1]);
+		assertEquals("@Column(name=\"id\")", a[1]);
 	}
 
 	@Test 
 	public void testColumnIdGenValAUTO() {
 		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		
 		// @GeneratedValue(AUTO)
-		attrib.setGeneratedValue(true);
-		attrib.setGeneratedValueStrategy("AUTO");
+		attrib.setGeneratedValueStrategy(GeneratedValueStrategy.AUTO);
 		AttributeInContext attribInCtx = buildAttribute(attrib);
-		
-		//assertTrue(attribInCtx.isAutoIncremented());
+		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
 		String[] a = fieldAnnotations(attribInCtx);
 		assertEquals(3, a.length);
@@ -95,13 +145,10 @@ public class JpaInContextTest {
 	@Test 
 	public void testColumnIdGenValIDENTITY() {
 		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		
-		// @GeneratedValue(AUTO)
-		attrib.setGeneratedValue(true);
-		attrib.setGeneratedValueStrategy("IDENTITY");
+		// @GeneratedValue(IDENTITY)
+		attrib.setGeneratedValueStrategy(GeneratedValueStrategy.IDENTITY);
 		AttributeInContext attribInCtx = buildAttribute(attrib);
-		
-		//assertTrue(attribInCtx.isAutoIncremented());
+		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
 		String[] a = fieldAnnotations(attribInCtx);
 		assertEquals(3, a.length);
@@ -113,40 +160,70 @@ public class JpaInContextTest {
 	@Test 
 	public void testColumnIdGenValSEQUENCE() {
 		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		
-		// @GeneratedValue(SEQUENCE, MySeqGenName, MYSEQ ) 
-		// @GeneratedValue(SEQUENCE, MySeqGenName, MYSEQ, allocationSize) 
-		attrib.setGeneratedValue(true);
-		attrib.setGeneratedValueStrategy("SEQUENCE");
-		attrib.setHasSequenceGenerator(true);
-		attrib.setSequenceGeneratorName("MySeqGenName");
-		attrib.setSequenceGeneratorSequenceName("MYSEQ");
-		AttributeInContext attribInCtx = buildAttribute(attrib);
-		// check result
-		assertTrue(attribInCtx.isGeneratedValue());
-		String[] a = fieldAnnotations(attribInCtx);
-		assertEquals(4, a.length);
-		assertEquals("@Id", a[0]);
-		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE)", a[1]);
-		assertEquals("@SequenceGenerator(name=\"MySeqGenName\", sequenceName=\"MYSEQ\")", a[2]);
-		assertEquals("@Column(name=\"id\")", a[3]);
-	}
-		
-	@Test 
-	public void testColumnIdGenValSEQUENCEwithGeneratorName() {
-		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		// @GeneratedValue(SEQUENCE)
-		attrib.setGeneratedValue(true);
-		attrib.setGeneratedValueStrategy("SEQUENCE");
-		attrib.setGeneratedValueGenerator("MyGenerator");
+		// @GeneratedValue(SEQUENCE)  
+		attrib.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
 		AttributeInContext attribInCtx = buildAttribute(attrib);
 		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
 		String[] a = fieldAnnotations(attribInCtx);
 		assertEquals(3, a.length);
 		assertEquals("@Id", a[0]);
-		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=\"MyGenerator\")", a[1]);
+		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE)", a[1]);
 		assertEquals("@Column(name=\"id\")", a[2]);
+	}
+		
+	@Test 
+	public void testColumnIdGenValSEQUENCEwithGeneratorName() {
+		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
+		// @GeneratedValue(SEQUENCE, MyGeneratorName ) 
+		attrib.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
+		attrib.setGeneratedValueGeneratorName("MyGenerator");
+		AttributeInContext attribInCtx = buildAttribute(attrib);
+		// check result
+		assertTrue(attribInCtx.isGeneratedValue());
+		String[] a = fieldAnnotations(attribInCtx);
+		assertEquals(4, a.length);
+		assertEquals("@Id", a[0]);
+		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=\"MyGenerator\")", a[1]);
+		assertEquals("@SequenceGenerator(name=\"MyGenerator\")", a[2]); // only 'name' is required in JPA spec
+		assertEquals("@Column(name=\"id\")", a[3]);
+	}
+
+	@Test 
+	public void testColumnIdGenValSEQUENCEwithGeneratorNameAndSequenceName() {
+		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
+		// @GeneratedValue(SEQUENCE, MyGeneratorName, MYSEQ ) 
+		attrib.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
+		attrib.setGeneratedValueGeneratorName("MyGenerator");
+		attrib.setGeneratedValueSequenceName("MYSEQ");
+		AttributeInContext attribInCtx = buildAttribute(attrib);
+		// check result
+		assertTrue(attribInCtx.isGeneratedValue());
+		String[] a = fieldAnnotations(attribInCtx);
+		assertEquals(4, a.length);
+		assertEquals("@Id", a[0]);
+		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=\"MyGenerator\")", a[1]);
+		assertEquals("@SequenceGenerator(name=\"MyGenerator\", sequenceName=\"MYSEQ\")", a[2]);
+		assertEquals("@Column(name=\"id\")", a[3]);
+	}
+	
+	@Test 
+	public void testColumnIdGenValSEQUENCEwithGeneratorNameAndSequenceNameAndAllocationSize() {
+		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
+		// @GeneratedValue(SEQUENCE, MySeqGenName, MYSEQ, 2) 
+		attrib.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
+		attrib.setGeneratedValueGeneratorName("MyGenerator");
+		attrib.setGeneratedValueSequenceName("MYSEQ");
+		attrib.setGeneratedValueAllocationSize(2);
+		AttributeInContext attribInCtx = buildAttribute(attrib);
+		// check result
+		assertTrue(attribInCtx.isGeneratedValue());
+		String[] a = fieldAnnotations(attribInCtx);
+		assertEquals(4, a.length);
+		assertEquals("@Id", a[0]);
+		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=\"MyGenerator\")", a[1]);
+		assertEquals("@SequenceGenerator(name=\"MyGenerator\", sequenceName=\"MYSEQ\", allocationSize=2)", a[2]);
+		assertEquals("@Column(name=\"id\")", a[3]);
 	}
 	
 	//------------------------------------------------------------------------------------

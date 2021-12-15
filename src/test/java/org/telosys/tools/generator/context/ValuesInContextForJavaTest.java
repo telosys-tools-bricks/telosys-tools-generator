@@ -8,8 +8,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.telosys.tools.generic.model.Attribute;
-import org.telosys.tools.generic.model.DateType;
-import org.telosys.tools.generic.model.types.TypeConverterForJava;
+import org.telosys.tools.generic.model.enums.DateType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
