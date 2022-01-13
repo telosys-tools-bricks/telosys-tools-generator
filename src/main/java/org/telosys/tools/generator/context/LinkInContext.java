@@ -17,7 +17,6 @@ package org.telosys.tools.generator.context;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.GeneratorUtil;
@@ -28,6 +27,7 @@ import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.CascadeOptions;
 import org.telosys.tools.generic.model.JoinColumn;
 import org.telosys.tools.generic.model.Link;
+import org.telosys.tools.generic.model.TagContainer;
 import org.telosys.tools.generic.model.enums.BooleanValue;
 import org.telosys.tools.generic.model.enums.Cardinality;
 import org.telosys.tools.generic.model.enums.FetchType;
@@ -59,35 +59,36 @@ import org.telosys.tools.generic.model.types.TypeConverter;
 //-------------------------------------------------------------------------------------
 public class LinkInContext {
 	
-    private static final String VOID_STRING  = "" ;
+    private final EntityInContext  entity ; // the entity to which the link belongs
 
-    private final EntityInContext  _entity ; // the entity to which the link belongs
+	private final ModelInContext   modelInContext ;  // v 3.0.0 (replaces EntitiesManager)
+	private final EnvInContext     envInContext ; // ver 3.3.0
 
-	private final ModelInContext   _modelInContext ;  // v 3.0.0 (replaces EntitiesManager)
-	private final EnvInContext     _envInContext ; // ver 3.3.0
-
-	private final List<JoinColumnInContext> _joinColumns ; 
-	private final JoinTableInContext        _joinTable ; 
+	private final List<JoinColumnInContext> joinColumns ; 
+	private final JoinTableInContext        joinTable ; 
 
 	//--- Added in ver 3.0.0 (to replace reference / Link )
-	private final String       _id ;
-	private final String       _fieldName ;
-	private final String       _targetTableName ;
+	private final String       id ;
+	private final String       fieldName ;
+	private final String       targetTableName ;
 	private final String       mappedBy ;
-	private final boolean      _selected ;
-	private final boolean      _owningSide ;
+	private final boolean      isSelected ;
+	private final boolean      isOwningSide ;
 	
-	private final Cardinality    _cardinality ;
-	private final FetchType      _fetchType ;
-	private final Optional       _optional ;
-	private final CascadeOptions _cascadeOptions ;
+	private final Cardinality    cardinality ;
+	private final FetchType      fetchType ;
+	private final Optional       optional ;
+	private final CascadeOptions cascadeOptions ;
 	
-    private final BooleanValue  _insertable ; // Added in v 3.3.0
-    private final BooleanValue  _updatable  ; // Added in v 3.3.0
+    private final BooleanValue  isInsertable ; // Added in v 3.3.0
+    private final BooleanValue  isUpdatable  ; // Added in v 3.3.0
 	
     private final boolean isTransient ; // Added in v 3.3.0
     private final boolean isEmbedded ; // Added in v 3.3.0
     
+	private final TagContainer tagContainer ; // All tags defined for the link v 3.4.0
+	
+
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -99,46 +100,46 @@ public class LinkInContext {
 	public LinkInContext(EntityInContext entity, Link link, 
 			ModelInContext modelInContext, EnvInContext envInContext ) 
 	{
-		this._entity = entity ;
-		this._modelInContext = modelInContext ; // v 3.0.0
-		this._envInContext = envInContext ; // v 3.3.0
+		this.entity = entity ;
+		this.modelInContext = modelInContext ; // v 3.0.0
+		this.envInContext = envInContext ; // v 3.3.0
 		
 		//--- Build the list of "join columns"
-		_joinColumns = new LinkedList<>();
+		this.joinColumns = new LinkedList<>();
 		if ( link.getJoinColumns() != null ) {
 			for ( JoinColumn joinColumn : link.getJoinColumns() ) {
-				_joinColumns.add( new JoinColumnInContext(joinColumn) ) ;
+				this.joinColumns.add( new JoinColumnInContext(joinColumn) ) ;
 			}
 		}
 		
 		//--- Set the join table if any
 		if ( link.getJoinTable() != null ) {
-			_joinTable = new JoinTableInContext( link.getJoinTable() ) ;
+			this.joinTable = new JoinTableInContext( link.getJoinTable() ) ;
 		}
 		else {
-			_joinTable = null ;
+			this.joinTable = null ;
 		}
 		
 		//--- Init link information (ver 3.0.0)
-		_id = link.getId() ;
-		_fieldName = link.getFieldName() ;
+		this.id = link.getId() ;
+		this.fieldName = link.getFieldName() ;
 		// _fieldType = link.getFieldType(); // removed in v 3.3.0
-		_targetTableName = link.getTargetTableName();
-		_selected = link.isSelected();
+		this.targetTableName = link.getTargetTableName();
+		this.isSelected = link.isSelected();
 		this.mappedBy = link.getMappedBy(); // keep null if not defined
-		_owningSide = link.isOwningSide();
+		this.isOwningSide = link.isOwningSide();
 		
-		_cardinality = link.getCardinality();
-		_fetchType = link.getFetchType() != null ? link.getFetchType() : FetchType.DEFAULT ;
-		_optional = link.getOptional();
-		_cascadeOptions = link.getCascadeOptions();
+		this.cardinality = link.getCardinality();
+		this.fetchType = link.getFetchType() != null ? link.getFetchType() : FetchType.DEFAULT ;
+		this.optional = link.getOptional();
+		this.cascadeOptions = link.getCascadeOptions();
 		
-		_insertable = link.getInsertable();
-		_updatable  = link.getUpdatable();
+		this.isInsertable = link.getInsertable();
+		this.isUpdatable  = link.getUpdatable();
 		this.isTransient = link.isTransient(); // v 3.3.0
 		this.isEmbedded  = link.isEmbedded(); // v 3.3.0
 		
-		this.tagsMap = link.getTagsMap(); // V 3.4.0
+		this.tagContainer = link.getTagContainer(); // V 3.4.0
 	}
 	
 	/**
@@ -150,7 +151,7 @@ public class LinkInContext {
 	private String buildCollectionType(String className) {
 		// Before v 3.3.0 always return "List<" + className + ">" ; 
 		// get collection type from current target language (added in v 3.3.0 )
-		TypeConverter typeConverter = _envInContext.getTypeConverter();
+		TypeConverter typeConverter = envInContext.getTypeConverter();
 		// get collection type for the current language 
 		String collectionType = typeConverter.getCollectionType(className);
 		if ( collectionType != null ) {
@@ -158,7 +159,7 @@ public class LinkInContext {
 		}
 		else {
 			throw new IllegalStateException("Cannot get collection type (language="
-					+ _envInContext.getLanguage()+")");
+					+ envInContext.getLanguage()+")");
 		}
 	}
 	
@@ -171,7 +172,7 @@ public class LinkInContext {
 		since = "3.3.0"
 	)
 	public EntityInContext getEntity() {
-		return _entity;
+		return entity;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -222,8 +223,7 @@ public class LinkInContext {
 			"Returns the Java getter for the link e.g. 'getPerson' for link 'person' "
 			}
 	)
-	public String getGetter() { // throws GeneratorException  {
-		//return Util.buildGetter(this.getFieldName(), this.getFieldType());
+	public String getGetter() { 
 		// false : a link is never a "boolean"
 		return Util.buildGetter(this.getFieldName(), false); // v 3.3.0
 	}
@@ -245,7 +245,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean hasJoinTable() {
-		return _joinTable != null ;
+		return joinTable != null ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -257,8 +257,8 @@ public class LinkInContext {
 			}
 	)
 	public String getJoinTableName() {
-		if ( _joinTable != null ) {
-			return _joinTable.getName();
+		if ( joinTable != null ) {
+			return joinTable.getName();
 		}
 		else {
 			return null ;
@@ -274,7 +274,7 @@ public class LinkInContext {
 			}
 	)
 	public JoinTableInContext getJoinTable() {
-		return _joinTable ;
+		return joinTable ;
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -283,8 +283,8 @@ public class LinkInContext {
 			}
 	)
 	public boolean hasJoinColumns() {
-		if ( _joinColumns != null ) {
-			return ! _joinColumns.isEmpty() ;
+		if ( joinColumns != null ) {
+			return ! joinColumns.isEmpty() ;
 		}
 		return false ;
 	}
@@ -298,10 +298,10 @@ public class LinkInContext {
 		since="2.1.0"
 	)
 	public boolean hasAttributeInPrimaryKey() throws GeneratorException {
-		if ( _joinColumns != null ) {
-			for ( JoinColumnInContext jc : _joinColumns ) {
+		if ( joinColumns != null ) {
+			for ( JoinColumnInContext jc : joinColumns ) {
 				//--- ORIGIN attribute
-				AttributeInContext attribOrigin = _entity.getAttributeByColumnName(jc.getName());
+				AttributeInContext attribOrigin = entity.getAttributeByColumnName(jc.getName());
 				if ( attribOrigin.isKeyElement() ) {
 					return true ;
 				}
@@ -317,7 +317,7 @@ public class LinkInContext {
 			}
 	)
 	public List<JoinColumnInContext> getJoinColumns() {
-		return _joinColumns ;
+		return joinColumns ;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -328,8 +328,8 @@ public class LinkInContext {
 		since="2.1.0"
 	)
 	public int getAttributesCount() {
-		if ( _joinColumns != null ) {
-			return _joinColumns.size() ;
+		if ( joinColumns != null ) {
+			return joinColumns.size() ;
 		}
 		return 0 ;
 	}
@@ -345,10 +345,10 @@ public class LinkInContext {
 	@VelocityReturnType("List of '$linkAttribute' (origin-target association) ")	
 	public List<LinkAttributesPairInContext> getAttributes() throws GeneratorException {
 		List<LinkAttributesPairInContext> list = new LinkedList<>();
-		if ( _joinColumns != null ) {
-			for ( JoinColumnInContext jc : _joinColumns ) {
+		if ( joinColumns != null ) {
+			for ( JoinColumnInContext jc : joinColumns ) {
 				//--- ORIGIN attribute
-				AttributeInContext attribOrigin = _entity.getAttributeByColumnName(jc.getName());
+				AttributeInContext attribOrigin = entity.getAttributeByColumnName(jc.getName());
 				//--- TARGET attribute
 				EntityInContext referencedEntity = this.getTargetEntity();
 				AttributeInContext attribTarget = referencedEntity.getAttributeByColumnName(jc.getReferencedColumnName());
@@ -369,8 +369,8 @@ public class LinkInContext {
 			}
 	)
 	public boolean usesAttribute(AttributeInContext attribute) {
-		if ( _joinColumns != null ) {
-			for ( JoinColumnInContext jc : _joinColumns ) {
+		if ( joinColumns != null ) {
+			for ( JoinColumnInContext jc : joinColumns ) {
 				if ( attribute.getDatabaseName().equals( jc.getName() ) ) {
 					return true ;
 				}
@@ -387,7 +387,7 @@ public class LinkInContext {
 			}
 	)
 	public String getId() {
-		return _id ;
+		return id ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -397,7 +397,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isSelected() {
-		return _selected ;
+		return isSelected ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -407,7 +407,7 @@ public class LinkInContext {
 			}
 	)
 	public String getTargetTableName() {
-		return _targetTableName ;
+		return targetTableName ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -417,7 +417,7 @@ public class LinkInContext {
 			}
 	)
 	public String getFieldName() {
-		return _fieldName ;
+		return fieldName ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -443,7 +443,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isOwningSide() {
-		return _owningSide ;
+		return isOwningSide ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -480,12 +480,12 @@ public class LinkInContext {
 		since = "2.1.0"
 	)
 	public EntityInContext getTargetEntity() throws GeneratorException {
-		String targetTableName = getTargetTableName();
+//		String targetTableName = getTargetTableName();
 		if ( targetTableName == null ) {
 			throw new GeneratorException("Cannot get target entity. No target table name for link '" + getId() + "'" );
 		}
 		
-		EntityInContext targetEntity = _modelInContext.getEntityByTableName( targetTableName ); // v 3.0.0
+		EntityInContext targetEntity = modelInContext.getEntityByTableName( targetTableName ); // v 3.0.0
 		if ( targetEntity == null ) {
 			throw new GeneratorException("Cannot get target entity. No entity for table name '" + targetTableName + "'" );
 		}
@@ -525,7 +525,7 @@ public class LinkInContext {
 			}
 	)
 	public String getCardinality() { 
-		return _cardinality.getText();
+		return cardinality.getText();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -535,7 +535,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCardinalityOneToOne() {
-		return _cardinality == Cardinality.ONE_TO_ONE ;
+		return cardinality == Cardinality.ONE_TO_ONE ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -545,7 +545,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCardinalityOneToMany() {
-		return _cardinality == Cardinality.ONE_TO_MANY ;
+		return cardinality == Cardinality.ONE_TO_MANY ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -555,7 +555,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCardinalityManyToOne() {
-		return _cardinality == Cardinality.MANY_TO_ONE ;
+		return cardinality == Cardinality.MANY_TO_ONE ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -565,7 +565,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCardinalityManyToMany() {
-		return _cardinality == Cardinality.MANY_TO_MANY ;
+		return cardinality == Cardinality.MANY_TO_MANY ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -576,7 +576,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCollectionType() {
-		return _cardinality == Cardinality.ONE_TO_MANY || _cardinality == Cardinality.MANY_TO_MANY ;
+		return cardinality == Cardinality.ONE_TO_MANY || cardinality == Cardinality.MANY_TO_MANY ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -587,7 +587,7 @@ public class LinkInContext {
 			}
 	)
 	public String getCascade() {
-		return _cascadeOptions.toString();
+		return cascadeOptions.toString();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -597,7 +597,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCascadeALL() {
-		return _cascadeOptions.isCascadeAll();
+		return cascadeOptions.isCascadeAll();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -607,7 +607,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCascadeMERGE() {
-		return _cascadeOptions.isCascadeMerge();
+		return cascadeOptions.isCascadeMerge();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -617,7 +617,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCascadePERSIST() {
-		return _cascadeOptions.isCascadePersist();
+		return cascadeOptions.isCascadePersist();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -627,7 +627,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCascadeREFRESH() {
-		return _cascadeOptions.isCascadeRefresh();
+		return cascadeOptions.isCascadeRefresh();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -637,7 +637,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCascadeREMOVE() {
-		return _cascadeOptions.isCascadeRemove();
+		return cascadeOptions.isCascadeRemove();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -648,7 +648,7 @@ public class LinkInContext {
 			}
 	)
 	public String getFetch() {
-		return _fetchType.getText();
+		return fetchType.getText();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -658,7 +658,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isFetchDEFAULT() {
-		return _fetchType == FetchType.DEFAULT ;
+		return fetchType == FetchType.DEFAULT ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -668,7 +668,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isFetchEAGER() {
-		return _fetchType == FetchType.EAGER ;
+		return fetchType == FetchType.EAGER ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -678,7 +678,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isFetchLAZY() {
-		return _fetchType == FetchType.LAZY ;
+		return fetchType == FetchType.LAZY ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -689,7 +689,7 @@ public class LinkInContext {
 			}
 	)
 	public String getOptional() {
-		return _optional.getText();
+		return optional.getText();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -699,7 +699,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isOptionalUndefined() {
-		return _optional == Optional.UNDEFINED ;
+		return optional == Optional.UNDEFINED ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -709,7 +709,7 @@ public class LinkInContext {
 			}
 	)
 	public boolean isOptionalFalse() {
-		return _optional == Optional.FALSE ;
+		return optional == Optional.FALSE ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -719,14 +719,14 @@ public class LinkInContext {
 			}
 	)
 	public boolean isOptionalTrue() {
-		return _optional == Optional.TRUE ;
+		return optional == Optional.TRUE ;
 	}
 	
 	//-------------------------------------------------------------------------------------
 	// "insertable" / "updatable"
 	//-------------------------------------------------------------------------------------
 	protected BooleanValue getInsertableFlag() {
-		return this._insertable;
+		return this.isInsertable;
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -741,9 +741,9 @@ public class LinkInContext {
 	)
 	public boolean insertableIs(boolean value) {
 		if ( value ) {
-			return this._insertable == BooleanValue.TRUE ;
+			return this.isInsertable == BooleanValue.TRUE ;
 		} else {
-			return this._insertable == BooleanValue.FALSE ;
+			return this.isInsertable == BooleanValue.FALSE ;
 		}
 	}
 	//-------------------------------------------------------------------------------------
@@ -755,12 +755,12 @@ public class LinkInContext {
 		since="3.3.0"
 	)
     public String getInsertable() {
-        return this._insertable.getText();
+        return this.isInsertable.getText();
     }
 	
 	//-------------------------------------------------------------------------------------
 	protected BooleanValue getUpdatableFlag() {
-		return this._updatable;
+		return this.isUpdatable;
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -775,9 +775,9 @@ public class LinkInContext {
 	)
 	public boolean updatableIs(boolean value) {
 		if ( value ) {
-			return this._updatable == BooleanValue.TRUE ;
+			return this.isUpdatable == BooleanValue.TRUE ;
 		} else {
-			return this._updatable == BooleanValue.FALSE ;
+			return this.isUpdatable == BooleanValue.FALSE ;
 		}
 	}
 	//-------------------------------------------------------------------------------------
@@ -789,7 +789,7 @@ public class LinkInContext {
 		since="3.3.0"
 	)
     public String getUpdatable() {
-        return this._updatable.getText();
+        return this.isUpdatable.getText();
     }
 	
 	//------------------------------------------------------------------------------------------
@@ -817,8 +817,6 @@ public class LinkInContext {
 	//------------------------------------------------------------------------------------------
 	// TAGS since ver 3.4.0
 	//------------------------------------------------------------------------------------------
-	private final Map<String, String> tagsMap ; // All tags defined for the link (0..N) 
-	
 	@VelocityMethod(
 		text={	
 			"Returns TRUE if the link has a tag with the given name"
@@ -832,10 +830,7 @@ public class LinkInContext {
 		since="3.4.0"
 	)
 	public boolean hasTag(String tagName) {
-		if ( this.tagsMap != null ) {
-			return this.tagsMap.containsKey(tagName);
-		}
-		return false; 
+		return tagContainer.containsTag(tagName);
 	}
 
 	@VelocityMethod(
@@ -852,11 +847,60 @@ public class LinkInContext {
 		since="3.4.0"
 	)
 	public String tagValue(String tagName) {
-		if ( this.tagsMap != null ) {
-			String v = this.tagsMap.get(tagName);
-			return ( v != null ? v : VOID_STRING );
-		}
-		return VOID_STRING;
+		return tagContainer.getTagValue(tagName);
 	}
 
+	@VelocityMethod(
+		text={	
+			"Returns the value held by the given tag name",
+			"If the tag is undefined or has no value, the default value is returned"
+		},
+		parameters = { 
+			"tagName : name of the tag for which to get the value" ,
+			"defaultValue : default value if no tag or no value"
+		},
+		example= {
+			"$link.tagValue('mytag', 'abc') "
+		},
+		since="3.4.0"
+	)
+	public String tagValue(String tagName, String defaultValue) {
+		return tagContainer.getTagValue(tagName, defaultValue);
+	}
+
+	@VelocityMethod(
+		text={	
+			"Returns the integer value held by the given tag name",
+			"If the tag is undefined or has no value, the default value is returned"
+		},
+		parameters = { 
+			"tagName : name of the tag for which to get the value" ,
+			"defaultValue : default value if no tag or no value"
+		},
+		example= {
+			"$link.tagValueAsInt('mytag', 123) "
+		},
+		since="3.4.0"
+	)
+	public int tagValueAsInt(String tagName, int defaultValue) {
+		return tagContainer.getTagValueAsInt(tagName, defaultValue);
+	}
+
+	@VelocityMethod(
+		text={	
+			"Returns the boolean value held by the given tag name",
+			"If the tag is undefined or has no value, the default value is returned"
+		},
+		parameters = { 
+			"tagName : name of the tag for which to get the value" ,
+			"defaultValue : default value if no tag or no value"
+		},
+		example= {
+			"$link.tagValueAsBoolean('mytag', false) "
+		},
+		since="3.4.0"
+	)
+	public boolean tagValueAsBoolean(String tagName, boolean defaultValue) {
+		return tagContainer.getTagValueAsBoolean(tagName, defaultValue);
+	}
 }

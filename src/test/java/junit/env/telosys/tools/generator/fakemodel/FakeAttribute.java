@@ -18,11 +18,11 @@ package junit.env.telosys.tools.generator.fakemodel;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.telosys.tools.commons.jdbctypes.JdbcTypesManager;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.ForeignKeyPart;
+import org.telosys.tools.generic.model.TagContainer;
 import org.telosys.tools.generic.model.enums.BooleanValue;
 import org.telosys.tools.generic.model.enums.DateType;
 import org.telosys.tools.generic.model.enums.GeneratedValueStrategy;
@@ -105,6 +105,8 @@ public class FakeAttribute implements Attribute {
 	
     private String  size; // String for size with comma ( eg "8,2" ) // Added in v 3.4.0
 	private boolean isUnique = false ; // Added in v 3.4.0
+	
+	private TagContainer tagContainer = new FakeTagContainer();
 
 	/**
 	 * Constructor
@@ -692,8 +694,8 @@ public class FakeAttribute implements Attribute {
 	}
 
 	@Override
-	public Map<String, String> getTagsMap() {
-		return null;
+	public TagContainer getTagContainer() { // v 3.4.0
+		return tagContainer;
 	}
 
 	// ----------------------------------------------------------------

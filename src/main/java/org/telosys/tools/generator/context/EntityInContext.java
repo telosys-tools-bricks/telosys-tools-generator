@@ -31,6 +31,7 @@ import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.ForeignKey;
 import org.telosys.tools.generic.model.Link;
+import org.telosys.tools.generic.model.TagContainer;
 
 /**
  * Specific Java Class for an Entity Java Bean with Object-Relational Mapping (ORM) <br>
@@ -87,7 +88,9 @@ public class EntityInContext
 	private final EnvInContext   env ; // ver 2.1.0
 	
     //private final SqlConverter sqlConverter ; // Added in v 3.4.0
-		
+
+	private final TagContainer tagContainer ; // All tags defined for the entity 
+
 	//-----------------------------------------------------------------------------------------------
 	/**
 	 * Constructor based on Repository Entity
@@ -153,6 +156,8 @@ public class EntityInContext
 		
 		//--- Build the list of the "NON KEY" attributes
 		this.nonKeyAttributes = selectAttributesIfKeyElement(false); 
+
+		this.tagContainer = entity.getTagContainer(); // V 3.4.0
 
 		//--- Post processing : import resolution
 		endOfAttributesDefinition();
@@ -1218,4 +1223,96 @@ public class EntityInContext
 		}
 		return true ;
 	}
+	
+	//------------------------------------------------------------------------------------------
+	// TAGS since ver 3.4.0
+	//------------------------------------------------------------------------------------------
+	
+	@VelocityMethod(
+		text={	
+			"Returns TRUE if a tag is defined with the given name"
+		},
+		parameters = { 
+			"tagName : name of the tag for which to check the existence" 
+		},
+		example= {
+			"$enity.hasTag('mytag') "
+		},
+		since="3.4.0"
+	)
+	public boolean hasTag(String tagName) {
+		return tagContainer.containsTag(tagName);
+	}
+
+	@VelocityMethod(
+		text={	
+			"Returns the value held by the given tag name",
+			"If the tag is undefined or has no value, the returned value is an empty string"
+		},
+		parameters = { 
+			"tagName : name of the tag for which to get the value" 
+		},
+		example= {
+			"$enity.tagValue('mytag') "
+		},
+		since="3.4.0"
+	)
+	public String tagValue(String tagName) {
+		return tagContainer.getTagValue(tagName);
+	}
+
+	@VelocityMethod(
+		text={	
+			"Returns the value held by the given tag name",
+			"If the tag is undefined or has no value, the default value is returned"
+		},
+		parameters = { 
+			"tagName : name of the tag for which to get the value" ,
+			"defaultValue : default value if no tag or no value"
+		},
+		example= {
+			"$enity.tagValue('mytag', 'abc') "
+		},
+		since="3.4.0"
+	)
+	public String tagValue(String tagName, String defaultValue) {
+		return tagContainer.getTagValue(tagName, defaultValue);
+	}
+
+	@VelocityMethod(
+		text={	
+			"Returns the integer value held by the given tag name",
+			"If the tag is undefined or has no value, the default value is returned"
+		},
+		parameters = { 
+			"tagName : name of the tag for which to get the value" ,
+			"defaultValue : default value if no tag or no value"
+		},
+		example= {
+			"$enity.tagValueAsInt('mytag', 123) "
+		},
+		since="3.4.0"
+	)
+	public int tagValueAsInt(String tagName, int defaultValue) {
+		return tagContainer.getTagValueAsInt(tagName, defaultValue);
+	}
+
+	@VelocityMethod(
+		text={	
+			"Returns the boolean value held by the given tag name",
+			"If the tag is undefined or has no value, the default value is returned"
+		},
+		parameters = { 
+			"tagName : name of the tag for which to get the value" ,
+			"defaultValue : default value if no tag or no value"
+		},
+		example= {
+			"$enity.tagValueAsBoolean('mytag', false) "
+		},
+		since="3.4.0"
+	)
+	public boolean tagValueAsBoolean(String tagName, boolean defaultValue) {
+		return tagContainer.getTagValueAsBoolean(tagName, defaultValue);
+	}
+	
 }

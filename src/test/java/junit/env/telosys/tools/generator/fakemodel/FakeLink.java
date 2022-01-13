@@ -16,12 +16,12 @@
 package junit.env.telosys.tools.generator.fakemodel;
 
 import java.util.List;
-import java.util.Map;
 
 import org.telosys.tools.generic.model.CascadeOptions;
 import org.telosys.tools.generic.model.JoinColumn;
 import org.telosys.tools.generic.model.JoinTable;
 import org.telosys.tools.generic.model.Link;
+import org.telosys.tools.generic.model.TagContainer;
 import org.telosys.tools.generic.model.enums.BooleanValue;
 import org.telosys.tools.generic.model.enums.Cardinality;
 import org.telosys.tools.generic.model.enums.FetchType;
@@ -71,6 +71,8 @@ public class FakeLink implements Link {
     
     private BooleanValue insertable = BooleanValue.UNDEFINED; // Added in v 3.3.0
     private BooleanValue updatable  = BooleanValue.UNDEFINED; // Added in v 3.3.0
+    
+	private TagContainer tagContainer = new FakeTagContainer();
 
     /**
      * Constructor
@@ -301,7 +303,7 @@ public class FakeLink implements Link {
     }
 
 	@Override
-	public Map<String, String> getTagsMap() { // v 3.4.0
-		return null;
+	public TagContainer getTagContainer() { // v 3.4.0
+		return tagContainer;
 	}
 }

@@ -18,7 +18,6 @@ package org.telosys.tools.generator.context;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.jdbctypes.JdbcTypes;
@@ -33,6 +32,7 @@ import org.telosys.tools.generator.context.exceptions.GeneratorSqlException;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.ForeignKeyPart;
+import org.telosys.tools.generic.model.TagContainer;
 import org.telosys.tools.generic.model.enums.BooleanValue;
 import org.telosys.tools.generic.model.enums.DateType;
 import org.telosys.tools.generic.model.enums.GeneratedValueStrategy;
@@ -158,7 +158,8 @@ public class AttributeInContext {
 	private final boolean isUsedInSelectedLinks ; 
 	
 	//--- TAGS (added in v 3.3.0)
-	private final Map<String, String> tagsMap ; // All tags defined for the attribute (0..N) 
+//	private final Map<String, String> tagsMap ; // All tags defined for the attribute (0..N) 
+	private final TagContainer tagContainer ; // All tags defined for the attribute 
 
     private final BooleanValue  insertable ; // Added in v 3.3.0
     private final BooleanValue  updatable  ; // Added in v 3.3.0
@@ -299,7 +300,8 @@ public class AttributeInContext {
 		this.isUsedInLinks         = attribute.isUsedInLinks(); 
 		this.isUsedInSelectedLinks = attribute.isUsedInSelectedLinks();
 		
-		this.tagsMap = attribute.getTagsMap();
+//		this.tagsMap = attribute.getTagsMap();
+		this.tagContainer = attribute.getTagContainer(); // v 3.4.0
 		
 		this.insertable = attribute.getInsertable(); // v 3.3.0
 		this.updatable  = attribute.getUpdatable();  // v 3.3.0
@@ -1594,6 +1596,54 @@ public class AttributeInContext {
 	//------------------------------------------------------------------------------------------
 	// TAGS since ver 3.3.0
 	//------------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns TRUE if the attribute has a tag with the given name"
+//		},
+//		parameters = { 
+//			"tagName : name of the tag for which to check the existence" 
+//		},
+//		example= {
+//			"$attrib.hasTag('mytag') "
+//		},
+//		since="3.3.0"
+//	)
+//	public boolean hasTag(String tagName) {
+//		if ( this.tagsMap != null ) {
+//			return this.tagsMap.containsKey(tagName);
+//		}
+//		return false; 
+//	}
+
+//	/**
+//	 * Returns the value held by the tag
+//     * @param tagName
+//	 * @return
+//	 * @since v 3.3.0
+//	 */
+//	@VelocityMethod(
+//		text={	
+//			"Returns the value held by the given tag name",
+//			"If the tag is undefined or has no value, the returned value is an empty string"
+//		},
+//		parameters = { 
+//			"tagName : name of the tag for which to get the value" 
+//		},
+//		example= {
+//			"$attrib.tagValue('mytag') "
+//		},
+//		since="3.3.0"
+//	)
+//	public String tagValue(String tagName) {
+//		if ( this.tagsMap != null ) {
+//			String v = this.tagsMap.get(tagName);
+//			return ( v != null ? v : VOID_STRING );
+//		}
+//		return VOID_STRING;
+//	}
+
+	//------------------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Returns TRUE if the attribute has a tag with the given name"
@@ -1607,18 +1657,9 @@ public class AttributeInContext {
 		since="3.3.0"
 	)
 	public boolean hasTag(String tagName) {
-		if ( this.tagsMap != null ) {
-			return this.tagsMap.containsKey(tagName);
-		}
-		return false; 
+		return tagContainer.containsTag(tagName);
 	}
 
-	/**
-	 * Returns the value held by the tag
-     * @param tagName
-	 * @return
-	 * @since v 3.3.0
-	 */
 	@VelocityMethod(
 		text={	
 			"Returns the value held by the given tag name",
@@ -1633,11 +1674,64 @@ public class AttributeInContext {
 		since="3.3.0"
 	)
 	public String tagValue(String tagName) {
-		if ( this.tagsMap != null ) {
-			String v = this.tagsMap.get(tagName);
-			return ( v != null ? v : VOID_STRING );
-		}
-		return VOID_STRING;
+		return tagContainer.getTagValue(tagName);
+	}
+
+	//------------------------------------------------------------------------------------------
+	// TAGS since ver 3.4.0
+	//------------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the value held by the given tag name",
+			"If the tag is undefined or has no value, the default value is returned"
+		},
+		parameters = { 
+			"tagName : name of the tag for which to get the value" ,
+			"defaultValue : default value if no tag or no value"
+		},
+		example= {
+			"$attrib.tagValue('mytag', 'abc') "
+		},
+		since="3.4.0"
+	)
+	public String tagValue(String tagName, String defaultValue) {
+		return tagContainer.getTagValue(tagName, defaultValue);
+	}
+
+	@VelocityMethod(
+		text={	
+			"Returns the integer value held by the given tag name",
+			"If the tag is undefined or has no value, the default value is returned"
+		},
+		parameters = { 
+			"tagName : name of the tag for which to get the value" ,
+			"defaultValue : default value if no tag or no value"
+		},
+		example= {
+			"$attrib.tagValueAsInt('mytag', 123) "
+		},
+		since="3.4.0"
+	)
+	public int tagValueAsInt(String tagName, int defaultValue) {
+		return tagContainer.getTagValueAsInt(tagName, defaultValue);
+	}
+
+	@VelocityMethod(
+		text={	
+			"Returns the boolean value held by the given tag name",
+			"If the tag is undefined or has no value, the default value is returned"
+		},
+		parameters = { 
+			"tagName : name of the tag for which to get the value" ,
+			"defaultValue : default value if no tag or no value"
+		},
+		example= {
+			"$attrib.tagValueAsBoolean('mytag', false) "
+		},
+		since="3.4.0"
+	)
+	public boolean tagValueAsBoolean(String tagName, boolean defaultValue) {
+		return tagContainer.getTagValueAsBoolean(tagName, defaultValue);
 	}
 	
 	//-------------------------------------------------------------------------------------

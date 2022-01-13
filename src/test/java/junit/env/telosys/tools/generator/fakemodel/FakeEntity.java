@@ -26,6 +26,7 @@ import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.ForeignKey;
 import org.telosys.tools.generic.model.Link;
+import org.telosys.tools.generic.model.TagContainer;
 
 /**
  * Fake "Entity" for tests
@@ -49,6 +50,8 @@ public class FakeEntity implements Entity
 
 	private HashMap<String,ForeignKey> foreignKeys = new HashMap<>() ;
 	private HashMap<String,Link>       links       = new HashMap<>() ;
+
+	private TagContainer tagContainer = new FakeTagContainer();
 
 	/**
 	 * Constructor 
@@ -222,6 +225,11 @@ public class FakeEntity implements Entity
 				+ "|foreignKeys.size=" + foreignKeys.size() 
 				+ "|links.size=" + links.size() 
 				;
+	}
+
+	@Override
+	public TagContainer getTagContainer() {
+		return tagContainer;
 	}
 
 }
