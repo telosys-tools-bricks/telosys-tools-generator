@@ -34,8 +34,7 @@ import org.telosys.tools.generic.model.TagContainer;
  * @author Laurent Guerin
  *
  */
-public class FakeEntity implements Entity
-{
+public class FakeEntity implements Entity {
 	
 	private final String className ; 
 	
@@ -51,7 +50,7 @@ public class FakeEntity implements Entity
 	private HashMap<String,ForeignKey> foreignKeys = new HashMap<>() ;
 	private HashMap<String,Link>       links       = new HashMap<>() ;
 
-	private TagContainer tagContainer = new FakeTagContainer();
+	private FakeTagContainer tagContainer = new FakeTagContainer();
 
 	/**
 	 * Constructor 
@@ -62,6 +61,22 @@ public class FakeEntity implements Entity
 		super();
 		this.className = className ;
 		this.databaseTable = databaseTable;
+	}
+	
+	//--------------------------------------------------------------------------
+	// STORE ENTITY COMPONENTS : ATTRIBUTE, LINK, FK, etc
+	//--------------------------------------------------------------------------	
+	public void storeAttribute(Attribute attribute) {
+		attributes.add(attribute);
+	}
+	public void storeLink(Link link) {
+		links.put(link.getId(), link);
+	}
+	public void storeForeignKey(ForeignKey foreignKey) {
+		foreignKeys.put(foreignKey.getName(), foreignKey);
+	}
+	public void defineTag(Tag tag) {
+		tagContainer.addTag(tag);
 	}
 
 	//--------------------------------------------------------------------------
@@ -156,14 +171,6 @@ public class FakeEntity implements Entity
 	}
 
 	//--------------------------------------------------------------------------
-	// ATTRIBUTES ( ex COLUMNS )  management
-	//--------------------------------------------------------------------------
-	
-	public void storeAttribute(Attribute attribute) {
-		attributes.add(attribute);
-	}
-
-	//--------------------------------------------------------------------------
 	// COLUMNS exposed as "ATTRIBUTES" of the "GENERIC MODEL" ( v 3.0.0 )
 	//--------------------------------------------------------------------------
 	@Override
@@ -176,13 +183,6 @@ public class FakeEntity implements Entity
 		return attributesList ;
 	}
 
-	//--------------------------------------------------------------------------
-	// FOREIGN KEYS management
-	//--------------------------------------------------------------------------
-	public void storeForeignKey(ForeignKey foreignKey) {
-		foreignKeys.put(foreignKey.getName(), foreignKey);
-	}
-	
 	//--------------------------------------------------------------------------
 	// FOREIGN KEYS exposed as "GENERIC MODEL FOREIGN KEYS" 
 	//--------------------------------------------------------------------------
@@ -201,14 +201,6 @@ public class FakeEntity implements Entity
 		return Arrays.asList(linksArray);
 	}
 
-	/**
-	 * Store (add or update the given link)
-	 * @param link
-	 */
-	public void storeLink(Link link) {
-		links.put(link.getId(), link);
-	}
-	
 	@Override
 	public List<String> getWarnings() {
 		return Collections.emptyList();

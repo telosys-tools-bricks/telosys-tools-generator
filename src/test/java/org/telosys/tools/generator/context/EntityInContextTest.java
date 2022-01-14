@@ -64,9 +64,15 @@ public class EntityInContextTest {
 	
 	@Test
 	public void employeeEntityTest() throws GeneratorException {
+		// Generic model : Entity interface  
 		Employee e = new Employee();
+		// Build  EntityInContext from generic Entity
 		EntityInContext entityInContext = buildEntityInContext(e);
 		checkEntityInContext(entityInContext, e);
+		
+		// Tags
+		assertTrue(entityInContext.hasTag("Foo"));
+		assertEquals("abc", entityInContext.tagValue("Foo"));
 		
 		// Attributes
 		assertEquals(3, entityInContext.getAttributesCount());
@@ -76,10 +82,17 @@ public class EntityInContextTest {
 		// Non Key attributes
 		assertEquals(2, entityInContext.getNonKeyAttributesCount());
 		assertEquals(2, entityInContext.getNonKeyAttributes().size());
+		
 		// Links
-		assertEquals(0, entityInContext.getLinks().size());
-		assertFalse(entityInContext.hasLinks());
-		assertEquals(0, entityInContext.getLinksCount());
+		assertTrue(entityInContext.hasLinks());
+		assertEquals(1, entityInContext.getLinks().size());
+		assertEquals(1, entityInContext.getLinksCount());
+		// Link "country"
+		LinkInContext link = entityInContext.getLinks().get(0);
+		assertEquals("country", link.getFieldName());
+		// Check tags at link level 
+		assertTrue(link.hasTag("Foo"));
+		assertEquals("aaa", link.tagValue("Foo"));
 	}
 	
 	@Test
