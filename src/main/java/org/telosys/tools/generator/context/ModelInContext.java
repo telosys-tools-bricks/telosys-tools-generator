@@ -26,6 +26,7 @@ import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityNoDoc;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generator.context.tools.SqlTableNameProvider;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.Model;
 import org.telosys.tools.generic.model.enums.ModelType;
@@ -99,7 +100,8 @@ public class ModelInContext
 		this.entitiesByTableName = new HashMap<>();
 		for ( EntityInContext entity : this.allEntities ) {
 			// The table name is unique 
-			this.entitiesByTableName.put(entity.getDatabaseTable(), entity);
+			//this.entitiesByTableName.put(entity.getDatabaseTable(), entity);
+			this.entitiesByTableName.put(SqlTableNameProvider.getTableName(entity), entity); // v 3.4.0
 		}
 		
 		//--- Entities by CLASS NAME

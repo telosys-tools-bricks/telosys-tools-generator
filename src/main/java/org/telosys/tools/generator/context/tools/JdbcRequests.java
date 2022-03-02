@@ -54,7 +54,8 @@ public class JdbcRequests {
 		super();
 		this.entity = entity ;
 		
-		this.table = entity.getDatabaseTable();
+		// this.table = entity.getDatabaseTable();
+		this.table = SqlTableNameProvider.getTableName(entity); // v 3.4.0
 		this.attributesForPrimaryKey = buildAttributesForPrimaryKey();
 		this.attributesForSelect = buildAttributesForSelect();
 		this.attributesForInsert = buildAttributesForInsert();

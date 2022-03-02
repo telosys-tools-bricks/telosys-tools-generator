@@ -34,12 +34,7 @@ import org.telosys.tools.generic.model.Link;
 import org.telosys.tools.generic.model.TagContainer;
 
 /**
- * Specific Java Class for an Entity Java Bean with Object-Relational Mapping (ORM) <br>
- * This class provides the standard Java class informations plus : <br>
- * . the attributes of the class <br>
- * . the imports required by attributes types <br>
- * . the database table where the object is stored <br>
- * . the mapping for each attribute<br>
+ * Entity loaded from a model and exposed in the generator context <br>
  * 
  * @author Laurent GUERIN
  *
@@ -89,27 +84,44 @@ public class EntityInContext
 	
     //private final SqlConverter sqlConverter ; // Added in v 3.4.0
 
-	private final TagContainer tagContainer ; // All tags defined for the entity 
+	private final TagContainer tagContainer ; // All tags defined for the entity  ( added in v 3.4.0 )
+	
+	private final String  superClass ; // v 3.4.0
+	private final boolean isAbstract ; // v 3.4.0
+	private final boolean isInMemoryRepository ; // v 3.4.0
+	private final boolean isReadOnly; // v 3.4.0
+	private final boolean isAggregateRoot; // v 3.4.0
+	private final String  domain; // v 3.4.0
+	private final String  context; // v 3.4.0
+	private final boolean isDatabaseView; // v 3.4.0
+	private final String  databaseTablespace; // v 3.4.0	
 
 	//-----------------------------------------------------------------------------------------------
 	/**
-	 * Constructor based on Repository Entity
+	 * Constructor
 	 * @param entity
-	 * @param entityPackage
-	 * @param entitiesManager
+	 * @param defaultEntityPackage
+	 * @param modelInContext
 	 * @param env
-	 * @throws GeneratorException
 	 */
-	public EntityInContext( final Entity entity, final String entityPackage, 
-							final ModelInContext modelInContext, // v 3.0.0
-							final EnvInContext env ) 
+	public EntityInContext( final Entity entity, final String defaultEntityPackage, 
+							final ModelInContext modelInContext, final EnvInContext env ) 
 	{
 		if ( entity == null ) {
 			throw new IllegalArgumentException("Entity is null");
 		}
 		this.className = entity.getClassName();  // v 3.0.0
 		
-		this.packageName = StrUtil.notNull(entityPackage);
+//		this.packageName = StrUtil.notNull(defaultEntityPackage); 
+		// v 3.4.0
+		if ( nullOrVoid(entity.getPackageName()) ) {
+			// no package defined in the model @Package) => use default 
+			this.packageName = defaultEntityPackage;
+		}
+		else {
+			// package explicitly defined in the model ( @Package(xx) )
+			this.packageName = entity.getPackageName();
+		}
 		
 		if ( modelInContext == null ) {
 			throw new IllegalArgumentException("ModelInContext is null");
@@ -122,14 +134,19 @@ public class EntityInContext
 		this.env = env ;
 		//this.sqlConverter = new SqlConverter(env); // Added in v 3.4.0
 
-		this.databaseTable   = StrUtil.notNull(entity.getDatabaseTable());
-		this.databaseCatalog = StrUtil.notNull(entity.getDatabaseCatalog()); // v 3.0.0
+		//this.databaseTable   = StrUtil.notNull(entity.getDatabaseTable());
+		this.databaseTable   = entity.getDatabaseTable(); // v 3.4.0
 		
-		this.databaseSchema  = StrUtil.notNull(entity.getDatabaseSchema()); // v 3.0.0
+		//this.databaseCatalog = StrUtil.notNull(entity.getDatabaseCatalog()); // v 3.0.0
+		this.databaseCatalog = entity.getDatabaseCatalog(); // v 3.4.0
+		
+		//this.databaseSchema  = StrUtil.notNull(entity.getDatabaseSchema()); // v 3.0.0
+		this.databaseSchema  = entity.getDatabaseSchema(); // v 3.4.0
 		
 		this.databaseType    = StrUtil.notNull(entity.getDatabaseType()); // ver 2.0.7
 
-		this.databaseComment = StrUtil.notNull(entity.getDatabaseComment()); // v 3.1.0
+		//this.databaseComment = StrUtil.notNull(entity.getDatabaseComment()); // v 3.1.0
+		this.databaseComment = entity.getDatabaseComment(); // v 3.4.0
 		
 		//--- Initialize all the ATTRIBUTES for the current entity
 		this.attributes = new LinkedList<>();
@@ -147,8 +164,9 @@ public class EntityInContext
 		
 		//--- Init all the DATABASE FOREIGN KEYS  ( v 2.0.7 )
 		this.foreignKeys = new LinkedList<>();
-		for ( ForeignKey fk : entity.getDatabaseForeignKeys() ) {
-			this.foreignKeys.add( new ForeignKeyInContext(fk, env) );
+//		for ( ForeignKey fk : entity.getDatabaseForeignKeys() ) {
+		for ( ForeignKey fk : entity.getForeignKeys() ) { // v 3.4.0
+			this.foreignKeys.add( new ForeignKeyInContext(fk, modelInContext, env) );
 		}
 		
 		//--- Build the list of the "KEY" attributes
@@ -158,6 +176,17 @@ public class EntityInContext
 		this.nonKeyAttributes = selectAttributesIfKeyElement(false); 
 
 		this.tagContainer = entity.getTagContainer(); // V 3.4.0
+		
+		this.superClass = entity.getSuperClass() ; // v 3.4.0
+		this.isAbstract = entity.isAbstract() ; // v 3.4.0
+		this.isInMemoryRepository  = entity.isInMemoryRepository() ; // v 3.4.0
+		this.isReadOnly  = entity.isReadOnly() ; // v 3.4.0
+		this.isAggregateRoot = entity.isAggregateRoot() ; // v 3.4.0
+		this.domain = entity.getDomain(); // v 3.4.0
+		this.context = entity.getContext(); // v 3.4.0
+		this.isDatabaseView = entity.isDatabaseView(); // v 3.4.0
+		this.databaseTablespace = entity.getDatabaseTablespace(); // v 3.4.0
+		
 
 		//--- Post processing : import resolution
 		endOfAttributesDefinition();
@@ -186,11 +215,11 @@ public class EntityInContext
 
 	//-----------------------------------------------------------------------------------------------	
 	/**
-	 * Returns the Java class name without the package ( ie : "MyClass" )
+	 * Returns the entity class name without the package ( ie : "MyClass" )
 	 * @return
 	 */
 	@VelocityMethod ( text= { 
-			"Returns the class name for the entity without the package ( ie : \"MyClass\" )"
+			"Returns the entity class name without the package ( ie : \"MyClass\" )"
 		},
 		example="$entity.name"
 	)
@@ -217,9 +246,8 @@ public class EntityInContext
 		},
 		example="$entity.package"
 	)
-	public String getPackage()
-    {
-        return packageName ;
+	public String getPackage() {
+        return voidIfNull(this.packageName) ;
     }
 	
 	/**
@@ -231,8 +259,7 @@ public class EntityInContext
 		},
 		example="$entity.fullName"
 	)
-	public String getFullName()
-    {
+	public String getFullName() {
 		return packageName + "." + getName();
     }
 	
@@ -240,8 +267,7 @@ public class EntityInContext
 	 * Same as getName() 
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
-	{
+	public String toString() {
 		// NB : must return only the class name => do not change
 		// Usage example in ".vm" : ${beanClass}.class 
 		return getName() ;
@@ -267,6 +293,32 @@ public class EntityInContext
 			}
 		}
 		throw new GeneratorException("No attribute with column name '" + columnName + "'");
+	}
+	
+	public AttributeInContext getAttributeWithName(String attributeName) {
+		if ( attributeName != null ) {
+			for( AttributeInContext attribute : this.getAttributes() ) {
+				if ( attributeName.equals( attribute.getName() ) ) {
+					return attribute ;
+				}
+			}
+		}
+		return null;
+	}
+	public boolean hasAttribute(String attributeName) {
+		return getAttributeWithName(attributeName) != null ;
+	}
+	public AttributeInContext getAttributeByName(String attributeName) throws GeneratorException {
+		if ( StrUtil.nullOrVoid(attributeName) ) {
+			throw new GeneratorException("Invalid argument : 'attributeName' is null or empty");
+		}
+		AttributeInContext a = getAttributeWithName(attributeName);
+		if ( a != null ) {
+			return a ;
+		}
+		else {
+			throw new GeneratorException("No attribute with name '" + attributeName + "'");
+		}
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -758,16 +810,17 @@ public class EntityInContext
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
-			"Returns the database table mapped with this entity"
+			"Returns the 'database table name' mapped with this entity in the model",
+			"or an empty string if no table is specified in the model"
 		},
 		example="$entity.databaseTable"
 	)
 	public String getDatabaseTable() {
-		return databaseTable ;
+		return voidIfNull(this.databaseTable) ;
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
-			"Returns TRUE if this entity has a database table name explicitly defined in the model"
+			"Returns TRUE if this entity has a 'database table name' explicitly defined in the model"
 		},
 		example= {
 			"#if ( $entity.hasDatabaseTable() )",
@@ -777,7 +830,7 @@ public class EntityInContext
 		since="3.4.0"
 	)
 	public boolean hasDatabaseTable() {
-		return ! StrUtil.nullOrVoid(databaseTable);
+		return ! nullOrVoid(databaseTable);
 	}
 		
 	//-------------------------------------------------------------------------------------
@@ -832,22 +885,52 @@ public class EntityInContext
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
-			"Returns the database catalog of the table mapped with this entity"
+			"Returns TRUE if the entity has a 'database catalog' explicitly defined in the model"
+		},
+		example= {
+			"#if ( $entity.hasDatabaseCatalog() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean hasDatabaseCatalog() { // v 3.4.0
+		return ! nullOrVoid(this.databaseCatalog) ;
+	}
+	
+	@VelocityMethod ( text= { 
+			"Returns the 'database catalog' of the table mapped with this entity"
 		},
 		example="$entity.databaseCatalog"
 	)
 	public String getDatabaseCatalog() {
-		return databaseCatalog ;
+//		return databaseCatalog ;
+		return voidIfNull(databaseCatalog) ; // v 3.4.0
 	}
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
-			"Returns the database schema of the table mapped with this entity"
+			"Returns TRUE if the entity has a 'database schema' explicitly defined in the model"
+		},
+		example= {
+			"#if ( $entity.hasDatabaseSchema() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean hasDatabaseSchema() { // v 3.4.0
+		return ! nullOrVoid(this.databaseSchema) ;
+	}
+	
+	@VelocityMethod ( text= { 
+			"Returns the 'database schema' of the table mapped with this entity"
 		},
 		example="$entity.databaseSchema"
 	)
 	public String getDatabaseSchema() {
-		return databaseSchema ;
+		// return this.databaseSchema;
+		return voidIfNull(this.databaseSchema);  // v 3.4.0
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -889,8 +972,8 @@ public class EntityInContext
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
-			"Returns the database type of the table mapped with this entity <br>",
-			"Type returned by the database meta-data ( 'TABLE', 'VIEW', ... ) "
+			"Returns the real database type for the table mapped with this entity",
+			"('TABLE' or 'VIEW') "
 		},
 		example="$entity.databaseType",
 		since="2.0.7"
@@ -939,14 +1022,28 @@ public class EntityInContext
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
-			"Returns the database comment of the table mapped with this entity <br>",
-			""
+			"Returns TRUE if the entity has a 'database comment' explicitly defined in the model"
+		},
+		example= {
+			"#if ( $entity.hasDatabaseComment() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean hasDatabaseComment() { // v 3.4.0
+		return ! nullOrVoid(this.databaseComment) ;
+	}
+	
+	@VelocityMethod ( text= { 
+			"Returns the 'database comment' for the table mapped with this entity"
 		},
 		example="$entity.databaseComment",
 		since="3.1.0"
 	)
 	public String getDatabaseComment() {
-		return databaseComment ;
+		//return databaseComment ;
+		return voidIfNull(databaseComment); // v 3.4.0
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -1314,5 +1411,193 @@ public class EntityInContext
 	public boolean tagValueAsBoolean(String tagName, boolean defaultValue) {
 		return tagContainer.getTagValueAsBoolean(tagName, defaultValue);
 	}
+
+	//-------------------------------------------------------------------------------------
+	// New in v 3.4.0
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns TRUE if the entity has a 'super class' (if its class extends another class)"
+		},
+		example= {
+			"#if ( $entity.hasSuperClass() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean hasSuperClass() { // v 3.4.0
+		return ! nullOrVoid(this.superClass) ;
+	}
+
+	@VelocityMethod ( text= { 
+			"Returns the 'super class' extended by the entity class"
+		},
+		example= {
+			"$entity.superClass "
+		},
+		since="3.4.0"
+	)
+	public String getSuperClass() { // v 3.4.0
+		return voidIfNull(this.superClass);
+	}
+
+	@VelocityMethod ( text= { 
+			"Returns TRUE if the entity class is abstract "
+		},
+		example= {
+			"#if ( $entity.isAbstract() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean isAbstract() { // v 3.4.0
+		return this.isAbstract;
+	}
+
+	@VelocityMethod ( text= { 
+			"Returns TRUE if entity occurrences are stored in memory ( in a 'in-memory repository' ) "
+		},
+		example= {
+			"#if ( $entity.isInMemoryRepository() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean isInMemoryRepository() { // v 3.4.0
+		return this.isInMemoryRepository;
+	}
 	
+	@VelocityMethod ( text= { 
+			"Returns TRUE if the entity occurrences are 'read only' "
+		},
+		example= {
+			"#if ( $entity.isReadOnly() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean isReadOnly() { // v 3.4.0
+		return this.isReadOnly;
+	}
+
+	@VelocityMethod ( text= { 
+			"Returns TRUE if the entity is an 'aggregate root'"
+		},
+		example= {
+			"#if ( $entity.isAggregateRoot() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean isAggregateRoot() { // v 3.4.0
+		return this.isAggregateRoot;
+	}
+
+	@VelocityMethod ( text= { 
+			"Returns TRUE if the entity belongs to a 'domain'"
+		},
+		example= {
+			"#if ( $entity.hasDomain() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean hasDomain() { // v 3.4.0
+		return ! nullOrVoid(this.domain) ;
+	}
+
+	@VelocityMethod ( text= { 
+			"Returns the 'domain' to which the entity belongs"
+		},
+		example= {
+			"$entity.domain "
+		},
+		since="3.4.0"
+	)
+	public String getDomain() { // v 3.4.0
+		return voidIfNull(this.domain);
+	}
+
+	@VelocityMethod ( text= { 
+			"Returns TRUE if the entity belongs to a 'context'"
+		},
+		example= {
+			"#if ( $entity.hasContext() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean hasContext() { // v 3.4.0
+		return ! nullOrVoid(this.context) ;
+	}
+
+	@VelocityMethod ( text= { 
+			"Returns the 'context' to which the entity belongs"
+		},
+		example= {
+			"$entity.context "
+		},
+		since="3.4.0"
+	)
+	public String getContext() { // v 3.4.0
+		return voidIfNull(this.context);
+	}
+
+	@VelocityMethod ( text= { 
+			"Returns TRUE if the entity data comes from a 'database view'"
+		},
+		example= {
+			"#if ( $entity.isDatabaseView() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean isDatabaseView() { // v 3.4.0
+		return this.isDatabaseView ;
+	}
+
+	@VelocityMethod ( text= { 
+			"Returns TRUE if the entity has a 'database tablespace' explicitly defined in the model"
+		},
+		example= {
+			"#if ( $entity.hasDatabaseTablespace() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean hasDatabaseTablespace() { // v 3.4.0
+		return ! nullOrVoid(this.databaseTablespace) ;
+	}
+	
+	@VelocityMethod ( text= { 
+			"Returns the 'database tablespace' "
+		},
+		example= {
+			"$entity.databaseTablespace "
+		},
+		since="3.4.0"
+	)
+	public String getDatabaseTablespace() { // v 3.4.0
+		return voidIfNull(this.databaseTablespace);
+	}
+	
+	
+	//-------------------------------------------------------------------------------------
+
+	private String voidIfNull(String s) {
+		return s != null ? s : "" ;
+	}
+	private boolean nullOrVoid(String s) {
+		if ( s == null ) return true ;
+		if ( s.length() == 0 ) return true ;
+		return false;
+	}
 }

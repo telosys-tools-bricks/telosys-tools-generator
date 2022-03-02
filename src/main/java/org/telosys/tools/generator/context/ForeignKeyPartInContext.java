@@ -45,8 +45,8 @@ import org.telosys.tools.generic.model.ForeignKeyPart;
 public class ForeignKeyPartInContext
 {
 	private final String fkName ;
-	private final String referencedTableName ;
-	private final String referencedColumnName ;
+//	private final String referencedTableName ;  // removed in v 3.4.0
+//	private final String referencedColumnName ; // removed in v 3.4.0
 	private final String referencedEntityName ;
 	private final String referencedAttributeName ;
 	
@@ -54,8 +54,8 @@ public class ForeignKeyPartInContext
 	public ForeignKeyPartInContext( ForeignKeyPart fkPart ) {
 		super();
 		this.fkName   = fkPart.getFkName();
-		this.referencedTableName     = fkPart.getReferencedTable();
-		this.referencedColumnName    = fkPart.getReferencedColumn();
+//		this.referencedTableName     = fkPart.getReferencedTable(); 
+//		this.referencedColumnName    = fkPart.getReferencedColumn();
 		this.referencedEntityName    = fkPart.getReferencedEntity();
 		this.referencedAttributeName = fkPart.getReferencedAttribute();
 	}
@@ -71,24 +71,26 @@ public class ForeignKeyPartInContext
 	}
 
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the name of the TABLE referenced by the Foreign Key"
-			}
-	)
-	public String getReferencedTableName() {
-		return referencedTableName;
-	}
+	// removed in v 3.4.0
+//	@VelocityMethod(
+//		text={	
+//			"Returns the name of the TABLE referenced by the Foreign Key"
+//			}
+//	)
+//	public String getReferencedTableName() {
+//		return referencedTableName;
+//	}
 
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the name of the COLUMN referenced by the Foreign Key"
-			}
-	)
-	public String getReferencedColumnName() {
-		return referencedColumnName;
-	}
+	// removed in v 3.4.0
+//	@VelocityMethod(
+//		text={	
+//			"Returns the name of the COLUMN referenced by the Foreign Key"
+//			}
+//	)
+//	public String getReferencedColumnName() {
+//		return referencedColumnName;
+//	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(

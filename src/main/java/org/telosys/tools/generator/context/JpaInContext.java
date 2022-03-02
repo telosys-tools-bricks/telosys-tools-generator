@@ -27,6 +27,7 @@ import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.context.tools.AnnotationsBuilder;
 import org.telosys.tools.generator.context.tools.JpaAnnotations;
+import org.telosys.tools.generator.context.tools.SqlTableNameProvider;
 import org.telosys.tools.generic.model.enums.BooleanValue;
 import org.telosys.tools.generic.model.enums.FetchType;
 
@@ -315,7 +316,8 @@ public class JpaInContext {
 		
 		b.addLine("@Entity");
 		
-		String s = "@Table(name=\"" + entity.getDatabaseTable() + "\"" ;
+		//String s = "@Table(name=\"" + entity.getDatabaseTable() + "\"" ;
+		String s = "@Table(name=\"" + SqlTableNameProvider.getTableName(entity) + "\"" ; // v 3.4.0
 		if ( ! StrUtil.nullOrVoid( entity.getDatabaseSchema() ) ) {
 			s = s + ", schema=\"" + entity.getDatabaseSchema() + "\"" ; 
 		}
@@ -460,7 +462,7 @@ public class JpaInContext {
 			"alreadyMappedFields : list of all the fields already mapped by JPA as 'simple fields' "},
 		since = "3.3.0"
 			)
-	public String linkJoinAnnotation(int leftMargin, LinkInContext link, List<AttributeInContext> alreadyMappedFields ) {
+	public String linkJoinAnnotation(int leftMargin, LinkInContext link, List<AttributeInContext> alreadyMappedFields ) throws GeneratorException {
 		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
 		processLinkJoinAnnotation(annotations, link, alreadyMappedFields );
 		return annotations.getAnnotations();
@@ -477,7 +479,7 @@ public class JpaInContext {
 			"link : the link from which the JPA annotation will be generated"},
 		since = "3.3.0"
 			)
-	public String linkJoinAnnotation(int leftMargin, LinkInContext entityLink ) {
+	public String linkJoinAnnotation(int leftMargin, LinkInContext entityLink ) throws GeneratorException {
 		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
 		processLinkJoinAnnotation(annotations, entityLink, null );
 		return annotations.getAnnotations();
@@ -569,7 +571,8 @@ public class JpaInContext {
 	 */
 	private String buildCardinalityAnnotationForInverseSide( LinkInContext entityLink, String cardinality ) 
 					throws GeneratorException  {
-		String targetEntityClassName = entityLink.getTargetEntity().getName();
+		//String targetEntityClassName = entityLink.getTargetEntity().getName();
+		String targetEntityClassName = entityLink.getTargetEntityName(); // v 3.4.0
 		
 		StringBuilder annotation = new StringBuilder();
 		annotation.append( "@" + cardinality ) ;
@@ -624,10 +627,11 @@ public class JpaInContext {
 			if ( targetEntity != null ) {
 				// search fields referencing the entity with "toOne" cardinality
 				for ( LinkInContext inverseSideLink : targetEntity.getLinks() ) {
-					String inverseSideLinkTargetEntityName = "";
-					if ( inverseSideLink.getTargetEntity() != null ) {
-						inverseSideLinkTargetEntityName = inverseSideLink.getTargetEntity().getName();
-					}
+//					String inverseSideLinkTargetEntityName = "";
+//					if ( inverseSideLink.getTargetEntity() != null ) {
+//						inverseSideLinkTargetEntityName = inverseSideLink.getTargetEntity().getName();
+//					}
+					String inverseSideLinkTargetEntityName = inverseSideLink.getTargetEntityName(); // v 3.4.0
 					if (   inverseSideLink.isCardinalityManyToOne()
 						&& entityName.equals(inverseSideLinkTargetEntityName)) {
 						count++;
@@ -798,7 +802,8 @@ public class JpaInContext {
 	private void processLinkCardinalityAnnotation(AnnotationsBuilder annotations, LinkInContext link) 
 			throws GeneratorException {
 		String annotation = "" ;
-		String targetEntityClassName = link.getTargetEntity().getName();
+		//String targetEntityClassName = link.getTargetEntity().getName();
+		String targetEntityClassName = link.getTargetEntityName(); // v 3.4.0
 		if ( link.isOwningSide() ) {
 			if ( link.isCardinalityOneToOne() ) {
 				annotation = buildCardinalityAnnotationForOwningSide( link, "OneToOne", null ) ; 
@@ -833,15 +838,17 @@ public class JpaInContext {
 		annotations.addLine(annotation);
 	}
 	
-	private void processLinkJoinAnnotation(AnnotationsBuilder annotations, LinkInContext entityLink, List<AttributeInContext> alreadyMappedFields ) {
-		if ( entityLink.isCardinalityManyToMany() ) {
-			processJoinTable(annotations, entityLink) ;
+	private void processLinkJoinAnnotation(AnnotationsBuilder annotations, LinkInContext link, 
+			List<AttributeInContext> alreadyMappedFields ) throws GeneratorException {
+		if ( link.isCardinalityManyToMany() ) {
+			processJoinTable(annotations, link) ;
 		} 
 		else {
 		    // Example : @JoinColumn(name="BADGE_NUMBER", referencedColumnName="BADGE_NUMBER")
 			// used in owning side ManyToOne ( or OneToOne )
 			// can be used also for unidirectional OneToMany relationship (since JPA 2.x)
-			processJoinColumns(annotations, entityLink, entityLink.getJoinColumns(), alreadyMappedFields );
+//			processJoinColumns(annotations, link, link.getJoinColumns(), alreadyMappedFields );
+			processJoinColumns(annotations, link, alreadyMappedFields );
 		}
 	}	
 	//-------------------------------------------------------------------------------------
@@ -853,32 +860,42 @@ public class JpaInContext {
 	 * @param alreadyMappedFields (not used if null)
 	 */
 	private void processJoinColumns(AnnotationsBuilder annotations, LinkInContext link, 
-			List<JoinColumnInContext> joinColumns, List<AttributeInContext> alreadyMappedFields ) 
+					List<AttributeInContext> alreadyMappedFields ) throws GeneratorException
 	{
-		String[] jc = buildJoinColumnAnnotations( link, joinColumns, alreadyMappedFields );
-		if ( jc != null ) {
-			if ( jc.length == 1 ) {
-				// Single Join Column
-				// Example :
-				//   @JoinColumn(name="MGR_COUNTRY", referencedColumnName="COUNTRY") 
-				
-				annotations.addLine( jc[0] );
-			}
-			else if ( jc.length > 1 ) {
-				// Multiple Join Columns
-				// Example :
-				// @JoinColumns( {
-				//   @JoinColumn(name="MGR_COUNTRY", referencedColumnName="COUNTRY") ,
-				//   @JoinColumn(name="MGR_ID", referencedColumnName="EMP_ID") } )
-				
-				annotations.addLine("@JoinColumns( { " );
-				for ( int i = 0 ; i < jc.length ; i++ ) {
-					String end = ( i < jc.length - 1) ? "," : " } )" ;
-					annotations.addLine("    " + jc[i] + end );
-				}
-			}
-			// else ( jc.length == 0 ) : no join columns
+//		String[] jc = buildJoinColumnAnnotations( link, joinColumns, alreadyMappedFields );
+		List<String> jc = buildJoinColumnAnnotations( link, alreadyMappedFields );
+		if ( jc.size() == 1 ) {
+			// Single Join Column
+			// Example :
+			//   @JoinColumn(name="MGR_COUNTRY", referencedColumnName="COUNTRY") 
+			
+//				annotations.addLine( jc[0] );
+			annotations.addLine( jc.get(0) );
 		}
+//			else if ( jc.length > 1 ) {
+		else if ( jc.size() > 1) {
+			// Multiple Join Columns
+			// Example :
+			// @JoinColumns( {
+			//   @JoinColumn(name="MGR_COUNTRY", referencedColumnName="COUNTRY") ,
+			//   @JoinColumn(name="MGR_ID", referencedColumnName="EMP_ID") } )
+			
+			annotations.addLine("@JoinColumns( { " );
+//				for ( int i = 0 ; i < jc.length ; i++ ) {
+//					String end = ( i < jc.length - 1) ? "," : " } )" ;
+//					annotations.addLine("    " + jc[i] + end );
+//				}
+			int i = 0 ;
+			for ( String s : jc ) {
+				String jcEnd = ",";
+				if ( i == jc.size() - 1) {
+					jcEnd = "}" ;
+				}
+				annotations.addLine("    " + s + jcEnd );
+				i++;
+			}
+		}
+		// else ( jc.length == 0 ) : no join columns
 	}	
 	//-------------------------------------------------------------------------------------
 	/**
@@ -887,9 +904,17 @@ public class JpaInContext {
 	 * @param link
 	 */
 	private void processJoinTable(AnnotationsBuilder annotations, LinkInContext link ) {
+/*****
+ * 
+ * TODO
+ * 
+ *******
 		JoinTableInContext joinTable = link.getJoinTable();
-		if ( joinTable != null ) {
-			annotations.addLine("@JoinTable(name=\"" + joinTable.getName() + "\", " );
+		EntityInContext entity = link.getJoinEntity(); // TODO 
+//		if ( joinTable != null ) {
+		if ( entity != null ) {
+//			annotations.addLine("@JoinTable(name=\"" + joinTable.getName() + "\", " );
+			annotations.addLine("@JoinTable(name=\"" + entity.getSqlTableName() + "\", " );
 			
 			List<JoinColumnInContext> joinColumns = joinTable.getJoinColumns();
 			if ( joinColumns != null ) {
@@ -908,21 +933,25 @@ public class JpaInContext {
 //		else {
 //			annotations.addLine( "// @JoinTable ERROR : NO JOIN TABLE FOR THIS LINK ! " );
 //		}
+ *******/
 	}
 
 	//-------------------------------------------------------------------------------------
+//	private void processJoinTableColumns( AnnotationsBuilder annotations, LinkInContext link, 
+//			List<JoinColumnInContext> joinColumns, String name,  String end )
 	private void processJoinTableColumns( AnnotationsBuilder annotations, LinkInContext link, 
-			List<JoinColumnInContext> joinColumns, String name,  String end )
+			 String name,  String end ) throws GeneratorException
 	{
-		String[] jc = buildJoinColumnAnnotations( link, joinColumns, null );
+//		String[] jc = buildJoinColumnAnnotations( link, joinColumns, null );
+		List<String> jc = buildJoinColumnAnnotations( link, null );
 		if ( jc != null ) {
-			if ( jc.length == 1 ) 
+			if ( jc.size() == 1 ) 
 			{
 				// Single Join Column
 				// Example :
 				//   joinColumns=@JoinColumn(name="MGR_COUNTRY", referencedColumnName="COUNTRY") 
 				
-				annotations.addLine("  " + name + "=" + jc[0] + end);
+				annotations.addLine("  " + name + "=" + jc.get(0) + end);
 			}
 			else 
 			{
@@ -933,9 +962,18 @@ public class JpaInContext {
 				//     @JoinColumn(name="MGR_ID", referencedColumnName="EMP_ID") }
 				
 				annotations.addLine("  " + name + "={" );
-				for ( int i = 0 ; i < jc.length ; i++ ) {
-					String jcEnd = ( i < jc.length - 1) ? "," : ( "}"+end ) ;
-					annotations.addLine("    " + jc[i] + jcEnd );
+//				for ( int i = 0 ; i < jc.length ; i++ ) {
+//					String jcEnd = ( i < jc.length - 1) ? "," : ( "}"+end ) ;
+//					annotations.addLine("    " + jc[i] + jcEnd );
+//				}
+				int i = 0 ;
+				for ( String s : jc ) {
+					String jcEnd = ",";
+					if ( i == jc.size() - 1) {
+						jcEnd = "}" + end ;
+					}
+					annotations.addLine("    " + s + jcEnd );
+					i++;
 				}
 			}
 		}
@@ -953,13 +991,29 @@ public class JpaInContext {
 	 * @param alreadyMappedFields (not used if null)
 	 * @return
 	 */
-	private String[] buildJoinColumnAnnotations( LinkInContext link, List<JoinColumnInContext> joinColumns, 
-			List<AttributeInContext> alreadyMappedFields ) 
+//	private String[] buildJoinColumnAnnotations( LinkInContext link, List<JoinColumnInContext> joinColumns, 
+//			List<AttributeInContext> alreadyMappedFields ) 
+//	{
+//		String[] annotations = new String[joinColumns.size()];
+//		int i = 0 ;
+//		for ( JoinColumnInContext jc : joinColumns ) {
+//			annotations[i++] = buildJoinColumnAnnotation(jc, link, alreadyMappedFields);
+//		}
+//		return annotations;
+//	}
+	
+	private List<String> buildJoinColumnAnnotations( LinkInContext link,
+			List<AttributeInContext> alreadyMappedFields ) throws GeneratorException
 	{
-		String[] annotations = new String[joinColumns.size()];
+		List<LinkAttributeInContext> linkAttributes = link.getAttributes();
+
+		//String[] annotations = new String[joinColumns.size()];
+		List<String> annotations = new LinkedList<>();
 		int i = 0 ;
-		for ( JoinColumnInContext jc : joinColumns ) {
-			annotations[i++] = buildJoinColumnAnnotation(jc, link, alreadyMappedFields);
+		for ( LinkAttributeInContext linkAttribute : link.getAttributes() ) {
+			//annotations[i++] = buildJoinColumnAnnotation(jc, link, alreadyMappedFields);
+			String annotation = buildJoinColumnAnnotation(linkAttribute, link, alreadyMappedFields);
+			annotations.add(annotation);
 		}
 		return annotations;
 	}
@@ -972,32 +1026,35 @@ public class JpaInContext {
 	 * @param alreadyMappedFields (not used if null)
 	 * @return
 	 */
-	private String buildJoinColumnAnnotation(JoinColumnInContext joinColumn, LinkInContext link, List<AttributeInContext> alreadyMappedFields ) {
+//	private String buildJoinColumnAnnotation(JoinColumnInContext joinColumn, LinkInContext link, List<AttributeInContext> alreadyMappedFields ) {
+	private String buildJoinColumnAnnotation(LinkAttributeInContext linkAttribute, LinkInContext link, 
+			List<AttributeInContext> alreadyMappedFields ) throws GeneratorException {
 		StringBuilder sb = new StringBuilder();
 		sb.append( "@JoinColumn(");
-		sb.append( "name=\"" + joinColumn.getName()+"\"" );
+//		sb.append( "name=\"" + joinColumn.getName()+"\"" );
+		sb.append( "name=\"" + linkAttribute.getOriginAttribute().getSqlColumnName() +"\"" );
 		sb.append( ", " );
-		sb.append( "referencedColumnName=\"" + joinColumn.getReferencedColumnName()+"\"" );
-//		if ( link.isCardinalityManyToOne() || link.isCardinalityOneToOne() ) {
-// for all "JoinColumn"
-			/*
-			 * Defining "insertable=false, updatable=false" is useful when you need 
-			 * to map a field more than once in an entity, typically:
-			 *  - when using a composite key
-			 *  - when using a shared primary key
-			 *  - when using cascaded primary keys
-			 */
-			if ( alreadyMappedFields != null ) {
-				sb.append( buildJoinColumnInsertableUpdatable(joinColumn,alreadyMappedFields) );
-			}
-			else {
-				sb.append( buildJoinColumnInsertableUpdatable(link) );
-			}
-			if ( ! joinColumn.isNullable() ) { // v 3.3.0
-				sb.append( ", " );
-				sb.append( "nullable=false" ); 
-			}
+//		sb.append( "referencedColumnName=\"" + joinColumn.getReferencedColumnName()+"\"" );
+		sb.append( "referencedColumnName=\"" + linkAttribute.getReferencedAttribute().getSqlColumnName() +"\"" );
+		
+		/*
+		 * Defining "insertable=false, updatable=false" is useful when you need 
+		 * to map a field more than once in an entity, typically:
+		 *  - when using a composite key
+		 *  - when using a shared primary key
+		 *  - when using cascaded primary keys
+		 */
+		if ( alreadyMappedFields != null ) {
+			sb.append( buildJoinColumnInsertableUpdatable(linkAttribute, alreadyMappedFields) );
+		}
+		else {
+			sb.append( buildJoinColumnInsertableUpdatable(link) );
+		}
+//		if ( ! joinColumn.isNullable() ) { // v 3.3.0
+//			sb.append( ", " );
+//			sb.append( "nullable=false" ); 
 //		}
+			
 		sb.append( ")");
 		return sb.toString();
 	}
@@ -1024,9 +1081,10 @@ public class JpaInContext {
 		return BooleanValue.UNDEFINED;
 	}
 	
-	private String buildJoinColumnInsertableUpdatable(JoinColumnInContext joinColumn, List<AttributeInContext> alreadyMappedFields ) {
+//	private String buildJoinColumnInsertableUpdatable(JoinColumnInContext joinColumn, List<AttributeInContext> alreadyMappedFields ) {
+	private String buildJoinColumnInsertableUpdatable(LinkAttributeInContext linkAttribute, List<AttributeInContext> alreadyMappedFields ) {
 		StringBuilder sb = new StringBuilder();
-		if ( isColumnAlreadyMappedAsAField (joinColumn, alreadyMappedFields ) ) {
+		if ( isColumnAlreadyMappedAsAField (linkAttribute, alreadyMappedFields ) ) {
 			sb.append( ", " );
 			sb.append( "insertable=false" ); 
 			sb.append( ", " );
@@ -1041,12 +1099,15 @@ public class JpaInContext {
 	 * @param alreadyMappedFields list of all the fields already mapped 
 	 * @return
 	 */
-	private boolean isColumnAlreadyMappedAsAField (JoinColumnInContext joinColumn, List<AttributeInContext> alreadyMappedFields ) {
+//	private boolean isColumnAlreadyMappedAsAField (JoinColumnInContext joinColumn, List<AttributeInContext> alreadyMappedFields ) {
+	private boolean isColumnAlreadyMappedAsAField (LinkAttributeInContext linkAttribute, List<AttributeInContext> alreadyMappedFields ) {
 		if ( alreadyMappedFields != null ) {
-			String dbColumnName = joinColumn.getName(); // ie "PUBLISHER_ID" in "BOOK"
-			if ( dbColumnName != null ) {
-				for ( AttributeInContext field : alreadyMappedFields ) {
-					if ( dbColumnName.equals( field.getDatabaseName() ) ) {
+//			String dbColumnName = joinColumn.getName(); // ie "PUBLISHER_ID" in "BOOK"
+			String attributeName = linkAttribute.getOriginAttributeName(); // ie "publisherId" in "Book"
+			if ( attributeName != null ) {
+				for ( AttributeInContext attribute : alreadyMappedFields ) {
+//					if ( attributeName.equals( attribute.getDatabaseName() ) ) {
+					if ( attributeName.equals( attribute.getName() ) ) {
 						// Found in the list of mapped fields => already mapped as a field
 						return true ;
 					}

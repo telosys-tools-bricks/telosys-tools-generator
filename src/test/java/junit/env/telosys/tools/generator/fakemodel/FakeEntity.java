@@ -48,7 +48,8 @@ public class FakeEntity implements Entity {
 	private List<Attribute> attributes = new ArrayList<>();
 
 	private HashMap<String,ForeignKey> foreignKeys = new HashMap<>() ;
-	private HashMap<String,Link>       links       = new HashMap<>() ;
+//	private HashMap<String,Link>       links       = new HashMap<>() ;
+	private List<Link> links = new ArrayList<>();
 
 	private FakeTagContainer tagContainer = new FakeTagContainer();
 
@@ -70,7 +71,8 @@ public class FakeEntity implements Entity {
 		attributes.add(attribute);
 	}
 	public void storeLink(Link link) {
-		links.put(link.getId(), link);
+//		links.put(link.getId(), link);
+		links.add(link);
 	}
 	public void storeForeignKey(ForeignKey foreignKey) {
 		foreignKeys.put(foreignKey.getName(), foreignKey);
@@ -175,19 +177,30 @@ public class FakeEntity implements Entity {
 	//--------------------------------------------------------------------------
 	@Override
 	public List<Attribute> getAttributes() {
-
 		LinkedList<Attribute> attributesList = new LinkedList<>();
 		for ( Attribute a : attributes ) {
 			attributesList.add(a);
 		}
 		return attributesList ;
 	}
+	
+	@Override
+	public Attribute getAttributeByName(String name) {
+		for ( Attribute a : attributes ) {
+			if ( a.getName().equals(name)) {
+				return a;
+			}
+		}
+		return null;
+	}
+
 
 	//--------------------------------------------------------------------------
 	// FOREIGN KEYS exposed as "GENERIC MODEL FOREIGN KEYS" 
 	//--------------------------------------------------------------------------
 	@Override
-	public List<ForeignKey> getDatabaseForeignKeys() {
+//	public List<ForeignKey> getDatabaseForeignKeys() {
+	public List<ForeignKey> getForeignKeys() {
 		return new LinkedList<>(foreignKeys.values()); // Not sorted 
 	}
 	
@@ -197,8 +210,9 @@ public class FakeEntity implements Entity {
 
 	@Override
 	public List<Link> getLinks() {
-		Link[] linksArray = links.values().toArray(new Link[links.size()]);
-		return Arrays.asList(linksArray);
+//		Link[] linksArray = links.values().toArray(new Link[links.size()]);
+//		return Arrays.asList(linksArray);
+		return new ArrayList<>(links);
 	}
 
 	@Override
@@ -220,8 +234,45 @@ public class FakeEntity implements Entity {
 	}
 
 	@Override
-	public TagContainer getTagContainer() {
+	public TagContainer getTagContainer() { // v 3.4.0
 		return tagContainer;
+	}
+
+	@Override
+	public String getContext() { // v 3.4.0
+		return null;
+	}
+	@Override
+	public String getDatabaseTablespace() { // v 3.4.0
+		return null;
+	}
+	@Override
+	public String getDomain() { // v 3.4.0
+		return null;
+	}
+	@Override
+	public String getSuperClass() { // v 3.4.0
+		return null;
+	}
+	@Override
+	public boolean isAbstract() { // v 3.4.0
+		return false;
+	}
+	@Override
+	public boolean isAggregateRoot() { // v 3.4.0
+		return false;
+	}
+	@Override
+	public boolean isDatabaseView() { // v 3.4.0
+		return false;
+	}
+	@Override
+	public boolean isInMemoryRepository() { // v 3.4.0
+		return false;
+	}
+	@Override
+	public boolean isReadOnly() { // v 3.4.0
+		return false;
 	}
 
 }

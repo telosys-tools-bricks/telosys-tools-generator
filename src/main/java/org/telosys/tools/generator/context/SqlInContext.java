@@ -25,6 +25,7 @@ import java.util.Properties;
 
 import org.telosys.tools.commons.NamingStyleConverter;
 import org.telosys.tools.commons.StrUtil;
+import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.exceptions.GeneratorSqlException;
@@ -65,8 +66,8 @@ public class SqlInContext {
 	// and usages, eg :
 	//    JdbcInContext -> JdbcRequets : uses attribute.getDatabaseName()
 
-	private static final int FK_COL     = 1 ;
-	private static final int FK_REF_COL = 2 ;
+	private static final int FK_ORIGIN_SIDE     = 1 ;
+	private static final int FK_REFERENCED_SIDE = 2 ;
 	
 	private static final String CONV_TABLE_NAME  = "conv.tableName";
 	private static final String CONV_COLUMN_NAME = "conv.columnName";
@@ -277,10 +278,12 @@ public class SqlInContext {
 	)
 	public String tableName(EntityInContext entity) {
 		// Use entity database table name if defined in model
-		String tableNameInModel = entity.getDatabaseTable() ;
-		if ( ! StrUtil.nullOrVoid(tableNameInModel) ) {
+//		String tableNameInModel = entity.getDatabaseTable() ;
+//		if ( ! StrUtil.nullOrVoid(tableNameInModel) ) {
+		if ( entity.hasDatabaseTable() ) {
 			// defined in the model => use it as is
-			return tableNameInModel ;
+//			return tableNameInModel ;
+			return entity.getDatabaseTable() ;
 		}
 		else {
 			// not defined in the model => convert attribute database name
@@ -471,8 +474,9 @@ public class SqlInContext {
 			},
 		since = "3.4.0"
 	)
-	public String fkTable(ForeignKeyInContext fk) {
-		return convertToTableName(fk.getTableName());
+	public String fkOriginTable(ForeignKeyInContext fk) {
+		// return convertToTableName(fk.getTableName());
+		return fk.getOriginEntity().getSqlTableName();
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -489,7 +493,8 @@ public class SqlInContext {
 		since = "3.4.0"
 	)
 	public String fkReferencedTable(ForeignKeyInContext fk) {
-		return convertToTableName(fk.getReferencedTableName());
+		//return convertToTableName(fk.getReferencedTableName());
+		return fk.getReferencedEntity().getSqlTableName();
 	}
 		
 	//-------------------------------------------------------------------------------------
@@ -504,8 +509,8 @@ public class SqlInContext {
 			},
 		since = "3.4.0"
 	)
-	public String fkColumns(ForeignKeyInContext fk) {
-		return buildColumns(fk, FK_COL);
+	public String fkColumns(ForeignKeyInContext fk) throws GeneratorException {
+		return buildColumns(fk, FK_ORIGIN_SIDE);
     }
 
 	//-------------------------------------------------------------------------------------
@@ -520,8 +525,8 @@ public class SqlInContext {
 			},
 		since = "3.4.0"
 	)
-	public String fkReferencedColumns(ForeignKeyInContext fk) {
-		return buildColumns(fk, FK_REF_COL);
+	public String fkReferencedColumns(ForeignKeyInContext fk) throws GeneratorException {
+		return buildColumns(fk, FK_REFERENCED_SIDE);
     }
 
 	//-------------------------------------------------------------------------------------
@@ -554,7 +559,7 @@ public class SqlInContext {
 	    return properties;
 	}
 	//-------------------------------------------------------------------------------------
-	private String getConfigValue(String key) {
+	protected String getConfigValue(String key) {
 		String val = this.targetDbConfig.getProperty(key);
 		if ( val != null ) {
 			return val.trim();
@@ -679,17 +684,34 @@ public class SqlInContext {
 		}
 	}
 	
-	private String buildColumns(ForeignKeyInContext fk, int colType) {
+//	private String buildColumns(ForeignKeyInContext fk, int colType) {
+//		StringBuilder sb = new StringBuilder();
+//		for ( ForeignKeyColumnInContext fkCol : fk.getColumns() ) {
+//			if ( sb.length() > 0 ) {
+//				sb.append(", ");
+//			}
+//			if ( colType == FK_COL ) {
+//				sb.append( convertToColumnName(fkCol.getColumnName()) );
+//			}
+//			else {
+//				sb.append( convertToColumnName(fkCol.getReferencedColumnName()) );
+//			}
+//		}
+//		return sb.toString();
+//    }
+	private String buildColumns(ForeignKeyInContext fk, int colType) throws GeneratorException {
 		StringBuilder sb = new StringBuilder();
-		for ( ForeignKeyColumnInContext fkCol : fk.getColumns() ) {
+		for ( ForeignKeyAttributeInContext fkAttribute : fk.getAttributes() ) {
 			if ( sb.length() > 0 ) {
 				sb.append(", ");
 			}
-			if ( colType == FK_COL ) {
-				sb.append( convertToColumnName(fkCol.getColumnName()) );
+			if ( colType == FK_ORIGIN_SIDE ) {
+				// sb.append( convertToColumnName(fkAttribute.getOriginAttribute() ) );
+				sb.append(fkAttribute.getOriginAttribute().getSqlColumnName() ); 
 			}
 			else {
-				sb.append( convertToColumnName(fkCol.getReferencedColumnName()) );
+				// sb.append( convertToColumnName(fkAttribute.getReferencedColumnName()) );
+				sb.append(fkAttribute.getReferencedAttribute().getSqlColumnName() ); 
 			}
 		}
 		return sb.toString();

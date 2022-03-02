@@ -27,7 +27,6 @@ import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generator.context.FactoryInContext;
 import org.telosys.tools.generator.context.FileInContext;
 import org.telosys.tools.generator.context.FnInContext;
-import org.telosys.tools.generator.context.ForeignKeyColumnInContext;
 import org.telosys.tools.generator.context.ForeignKeyInContext;
 import org.telosys.tools.generator.context.ForeignKeyPartInContext;
 import org.telosys.tools.generator.context.H2InContext;
@@ -35,10 +34,7 @@ import org.telosys.tools.generator.context.HtmlInContext;
 import org.telosys.tools.generator.context.Java;
 import org.telosys.tools.generator.context.JdbcFactoryInContext;
 import org.telosys.tools.generator.context.JdbcInContext;
-import org.telosys.tools.generator.context.JoinColumnInContext;
-import org.telosys.tools.generator.context.JoinTableInContext;
 import org.telosys.tools.generator.context.JpaInContext;
-import org.telosys.tools.generator.context.LinkAttributesPairInContext;
 import org.telosys.tools.generator.context.LinkInContext;
 import org.telosys.tools.generator.context.Loader;
 import org.telosys.tools.generator.context.ModelInContext;
@@ -73,11 +69,12 @@ public class ObjectsList {
 		EntityInContext.class, // replaces JavaBeanClass.class ( ver 2.1.0 )
 		AttributeInContext.class,
 		ForeignKeyInContext.class, // ver 2.0.7
-		ForeignKeyColumnInContext.class, // ver 2.0.7
-		JoinColumnInContext.class, // ver 2.1.0
-		JoinTableInContext.class, // ver 2.1.0  (added to list in v 3.3.0)
+		//ForeignKeyColumnInContext.class, // ver 2.0.7 // removed in  v 3.4.0
+		//ForeignKeyAttrubuteInContext.class, // v 3.4.0 // removed in  v 3.4.0
+		// JoinColumnInContext.class, // ver 2.1.0 // removed in  v 3.4.0
+		//JoinTableInContext.class, // ver 2.1.0  (added to list in v 3.3.0) // removed in  v 3.4.0
 		LinkInContext.class,
-		LinkAttributesPairInContext.class, // ver 2.1.0
+		// LinkAttributesPairInContext.class, // ver 2.1.0 // removed in  v 3.4.0
 		Loader.class,
 		ModelInContext.class, // ver 2.1.0
 		DatabasesInContext.class, // ver 2.1.0

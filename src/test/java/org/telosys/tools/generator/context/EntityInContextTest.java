@@ -45,8 +45,6 @@ public class EntityInContextTest {
 		assertEquals(entity.getAttributes().size(), entityInContext.getAttributes().size() );
 		assertEquals(entity.getAttributes().size(), entityInContext.getAttributesCount() );
 		assertEquals(entity.getLinks().size(), entityInContext.getLinks().size() );
-		assertEquals(entity.getDatabaseForeignKeys().size(), entityInContext.getDatabaseForeignKeys().size() );
-		assertEquals(entity.getDatabaseForeignKeys().size(), entityInContext.getDatabaseForeignKeysCount() );
 		
 		for ( Attribute a : entity.getAttributes() ) {
 			String dbName = a.getDatabaseName();

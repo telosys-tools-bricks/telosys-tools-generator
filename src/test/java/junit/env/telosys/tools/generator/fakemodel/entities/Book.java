@@ -7,7 +7,7 @@ import org.telosys.tools.generic.model.types.NeutralType;
 import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
 import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
 import junit.env.telosys.tools.generator.fakemodel.FakeForeignKey;
-import junit.env.telosys.tools.generator.fakemodel.FakeForeignKeyColumn;
+import junit.env.telosys.tools.generator.fakemodel.FakeForeignKeyAttribute;
 
 public class Book extends FakeEntity {
 
@@ -22,8 +22,10 @@ public class Book extends FakeEntity {
 	}
 
 	private ForeignKey authorFK() {
-		FakeForeignKey fk = new FakeForeignKey("FK_BOOK_AUTHOR", "BOOK", "AUTHOR");
-		fk.addColumn(new FakeForeignKeyColumn("AUTHOR_ID", "ID", 1)) ;
+		//FakeForeignKey fk = new FakeForeignKey("FK_BOOK_AUTHOR", "BOOK", "AUTHOR");
+		FakeForeignKey fk = new FakeForeignKey("FK_BOOK_AUTHOR", "Book", "Author");
+		//fk.addColumn(new FakeForeignKeyColumn("AUTHOR_ID", "ID", 1)) ;
+		fk.addAttribute(new FakeForeignKeyAttribute(1, "authorId", "id")) ;
 		return fk ;
 	}
 

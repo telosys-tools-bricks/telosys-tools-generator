@@ -71,11 +71,13 @@ public class ContextName {
 	
 	public static final String  LINK              = "link" ;
 	public static final String  LINK_ATTRIBUTE    = "linkAttribute" ; // v 2.1.0
-	public static final String  JOIN_COLUMN       = "joinColumn" ; // v 2.1.0
+	public static final String  JOIN_COLUMN       = "joinColumn" ; // v 2.1.0 (TODO : remove)
+	public static final String  JOIN_ATTRIBUTE    = "joinAttribute" ; // v 3.4.0 
 	public static final String  JOIN_TABLE        = "joinTable" ; // v 3.3.0 (added for documentation)
 	
 	public static final String  FK                = "fk" ;    // v 2.0.7
-	public static final String  FKCOL             = "fkcol" ; // v 2.0.7
+	public static final String  FKCOL             = "fkcol" ; // v 2.0.7  (TODO : remove)
+	public static final String  FK_ATTRIBUTE      = "fkAttribute" ; // v 3.4.0
 
 	public static final String  DATABASE          = "database" ; // ver 2.1.0
 	public static final String  DATABASES         = "databases" ; // ver 2.1.0

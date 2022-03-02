@@ -9,7 +9,6 @@ import static org.junit.Assert.assertTrue;
 
 import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
 import junit.env.telosys.tools.generator.fakemodel.FakeForeignKey;
-import junit.env.telosys.tools.generator.fakemodel.FakeForeignKeyColumn;
 
 public class JpaInContextTest {
 	
@@ -281,6 +280,7 @@ public class JpaInContextTest {
 		return new AttributeInContext(null, fakeAttribute, null, new EnvInContext() );
 	}
 	
+	/****
 	private ForeignKeyInContext buidForeignKey1() {
 		FakeForeignKey fakeFK = new FakeForeignKey("FkDriverCar", "GoodDriver", "SpecialCar");
 		fakeFK.addColumn(new FakeForeignKeyColumn("carId", "id", 1));
@@ -293,4 +293,5 @@ public class JpaInContextTest {
 		fakeFK.addColumn(new FakeForeignKeyColumn("carId2", "myId2", 2));
 		return new ForeignKeyInContext(fakeFK, new EnvInContext());
 	}
+	****/
 }

@@ -23,6 +23,7 @@ import java.util.Map;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generator.context.tools.SqlTableNameProvider;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 /**
@@ -78,7 +79,8 @@ public class H2InContext {
 	public List<String> ddlCreateTable(final EntityInContext entity) {
 		List<String> lines1 = buildTableDefinition (entity);
 		List<String> lines2 = new LinkedList<>();
-		lines2.add( "CREATE TABLE " + entity.getDatabaseTable() + " (") ;
+		//lines2.add( "CREATE TABLE " + entity.getDatabaseTable() + " (") ;
+		lines2.add( "CREATE TABLE " + SqlTableNameProvider.getTableName(entity) + " (") ; // v 3.4.0
 		
 		int c = 0 ;
 		int last = lines1.size() ;
@@ -94,7 +96,7 @@ public class H2InContext {
 		lines2.add( ");" ) ;
 		return lines2 ;
 	}	
-
+	
 	private List<String> buildTableDefinition (final EntityInContext entity) {
 		List<String> lines = new LinkedList<>();
 		//--- Primary Key columns first 

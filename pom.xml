@@ -36,11 +36,13 @@
 		</dependency>
 
 		<!-- DEPENDENCIES / TESTS -->
+	<!-- 
 		<dependency>
 			<groupId>org.telosys</groupId>
-			<artifactId>telosys-tools-repository</artifactId> <!-- Used by GenerationTaskTest -->
+			<artifactId>telosys-tools-repository</artifactId>
 			<scope>test</scope>
 		</dependency>
+	 -->
 
 	</dependencies>
 

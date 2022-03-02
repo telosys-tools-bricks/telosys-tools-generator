@@ -19,107 +19,135 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.telosys.tools.generic.model.ForeignKey;
-import org.telosys.tools.generic.model.ForeignKeyColumn;
+import org.telosys.tools.generic.model.ForeignKeyAttribute;
 
 public class FakeForeignKey implements ForeignKey {
 	
     private final String fkName; 
-    private final String tableName; // table holding this FK
-    private final String referencedTableName; // table referenced by this FK
+//    private final String tableName; // table holding this FK
+//    private final String referencedTableName; // table referenced by this FK
     
-    private final List<ForeignKeyColumn> columns;
+    private final String originEntityName;
+    private final String referencedEntityName;
     
-    private String deferrable;
-    private int deferrableCode;
-    private String deleteRule;
-    private int deleteRuleCode;
-    private String updateRule;
-    private int updateRuleCode;
+//    private final List<ForeignKeyColumn> columns;
+    private final List<ForeignKeyAttribute> attributes;
+    
+//    private String deferrable;
+//    private int deferrableCode;
+//    private String deleteRule;
+//    private int deleteRuleCode;
+//    private String updateRule;
+//    private int updateRuleCode;
 
     
-    public FakeForeignKey(String fkName, String tableName, String referencedTableName) {
+//    public FakeForeignKey(String fkName, String tableName, String referencedTableName) {
+    public FakeForeignKey(String fkName, String originEntityName, String referencedEntityName) {
 		super();
         this.fkName = fkName;
-        this.tableName = tableName;
-        this.referencedTableName = referencedTableName;
-        this.columns = new LinkedList<>();
+//        this.tableName = tableName;
+//        this.referencedTableName = referencedTableName;
+        this.originEntityName = originEntityName ;
+        this.referencedEntityName = referencedEntityName ;
+        
+        //this.columns = new LinkedList<>();
+        this.attributes = new LinkedList<>();
 	}
 
 	@Override
     public String getName() {
         return fkName;
     }
-
+	@Override
+    public String getOriginEntityName() {
+        return originEntityName;
+    }
+	@Override
+    public String getReferencedEntityName() {
+        return referencedEntityName;
+    }
     @Override
-    public String getTableName() {
-        return tableName;
+    public List<ForeignKeyAttribute> getAttributes() {
+        return attributes;
     }
-
+    public void addAttribute(ForeignKeyAttribute fkAttribute) {
+    	// fkAttribute has always valid attributes (not null & not void)
+        this.attributes.add(fkAttribute);
+    }
     @Override
-    public String getReferencedTableName() {
-        return referencedTableName;
+    public boolean isComposite() {
+    	return this.attributes.size() > 1 ;
     }
-
-    @Override
-    public List<ForeignKeyColumn> getColumns() {
-        return columns;
-    }
-
-    public void addColumn(ForeignKeyColumn fkCol) {
-        this.columns.add(fkCol);
-    }
-
-    @Override
-    public String getDeferrable() {
-        return deferrable;
-    }
-
-    public void setDeferrable(String deferrable) {
-        this.deferrable = deferrable;
-    }
-
-    @Override
-    public int getDeferrableCode() {
-        return deferrableCode;
-    }
-
-    public void setDeferrableCode(int deferrableCode) {
-        this.deferrableCode = deferrableCode;
-    }
-
-    @Override
-    public String getDeleteRule() {
-        return deleteRule;
-    }
-
-    public void setDeleteRule(String deleteRule) {
-        this.deleteRule = deleteRule;
-    }
-
-    @Override
-    public int getDeleteRuleCode() {
-        return deleteRuleCode;
-    }
-
-    public void setDeleteRuleCode(int deleteRuleCode) {
-        this.deleteRuleCode = deleteRuleCode;
-    }
-
-    @Override
-    public String getUpdateRule() {
-        return updateRule;
-    }
-
-    public void setUpdateRule(String updateRule) {
-        this.updateRule = updateRule;
-    }
-
-    @Override
-    public int getUpdateRuleCode() {
-        return updateRuleCode;
-    }
-
-    public void setUpdateRuleCode(int updateRuleCode) {
-        this.updateRuleCode = updateRuleCode;
-    }
+//    @Override
+//    public String getTableName() {
+//        return tableName;
+//    }
+//
+//    @Override
+//    public String getReferencedTableName() {
+//        return referencedTableName;
+//    }
+//
+//    @Override
+//    public List<ForeignKeyColumn> getColumns() {
+//        return columns;
+//    }
+//
+//    public void addColumn(ForeignKeyColumn fkCol) {
+//        this.columns.add(fkCol);
+//    }
+//
+//    @Override
+//    public String getDeferrable() {
+//        return deferrable;
+//    }
+//
+//    public void setDeferrable(String deferrable) {
+//        this.deferrable = deferrable;
+//    }
+//
+//    @Override
+//    public int getDeferrableCode() {
+//        return deferrableCode;
+//    }
+//
+//    public void setDeferrableCode(int deferrableCode) {
+//        this.deferrableCode = deferrableCode;
+//    }
+//
+//    @Override
+//    public String getDeleteRule() {
+//        return deleteRule;
+//    }
+//
+//    public void setDeleteRule(String deleteRule) {
+//        this.deleteRule = deleteRule;
+//    }
+//
+//    @Override
+//    public int getDeleteRuleCode() {
+//        return deleteRuleCode;
+//    }
+//
+//    public void setDeleteRuleCode(int deleteRuleCode) {
+//        this.deleteRuleCode = deleteRuleCode;
+//    }
+//
+//    @Override
+//    public String getUpdateRule() {
+//        return updateRule;
+//    }
+//
+//    public void setUpdateRule(String updateRule) {
+//        this.updateRule = updateRule;
+//    }
+//
+//    @Override
+//    public int getUpdateRuleCode() {
+//        return updateRuleCode;
+//    }
+//
+//    public void setUpdateRuleCode(int updateRuleCode) {
+//        this.updateRuleCode = updateRuleCode;
+//    }
 }

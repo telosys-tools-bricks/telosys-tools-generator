@@ -4,6 +4,7 @@ import java.io.File;
 import java.math.BigDecimal;
 
 import org.junit.Test;
+import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.exceptions.GeneratorSqlException;
 import org.telosys.tools.generic.model.types.NeutralType;
 
@@ -13,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 import junit.env.telosys.tools.generator.context.Builder;
 import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
 import junit.env.telosys.tools.generator.fakemodel.FakeForeignKey;
-import junit.env.telosys.tools.generator.fakemodel.FakeForeignKeyColumn;
+import junit.env.telosys.tools.generator.fakemodel.FakeForeignKeyAttribute;
 
 public class SqlInContextTest {
 	
@@ -47,7 +48,7 @@ public class SqlInContextTest {
 	}
 	
 	@Test
-	public void testPostgreSQL() {
+	public void testPostgreSQL() throws GeneratorException {
 		AttributeInContext attribute ;
 		
 		SqlInContext sql = new SqlInContext("PostgreSQL") ;
@@ -112,19 +113,26 @@ public class SqlInContextTest {
 		assertEquals("fk_foo_bar", sql.convertToFkName("fkFooBar") );
 		assertEquals("fk_foo_bar", sql.convertToFkName("FkFooBar") );
 
-		ForeignKeyInContext fk = buidForeignKey1();
+		/***
+		ForeignKeyInContext fk ;
+		ModelInContext model = buildModel();
+		fk = buidForeignKey1(model);
 		assertEquals("fk_driver_car", sql.fkName(fk) );
-		assertEquals("good_driver", sql.fkTable(fk) );
+		assertEquals("fk_driver_car", fk.getSqlName() );
+		//assertEquals("good_driver", sql.fkTable(fk) );
+		assertEquals("good_driver", sql.fkOriginTable(fk));
 		assertEquals("special_car", sql.fkReferencedTable(fk) );
 		assertEquals("car_id", sql.fkColumns(fk) );
 		assertEquals("id",     sql.fkReferencedColumns(fk) );
 		
-		fk = buidForeignKey2();
+		fk = buidForeignKey2(model);
 		assertEquals("fk_driver_car", sql.fkName(fk) );
-		assertEquals("good_driver", sql.fkTable(fk) );
+		//assertEquals("good_driver", sql.fkTable(fk) );
+		assertEquals("good_driver", sql.fkOriginTable(fk));
 		assertEquals("special_car", sql.fkReferencedTable(fk) );
 		assertEquals("car_id1, car_id2",  sql.fkColumns(fk) );
 		assertEquals("my_id1, my_id2",    sql.fkReferencedColumns(fk) );
+		***/
 		
 		//EntityInContext carEntity = buildEntity("Car", "CAR");
 		EntityInContext carEntity = Builder.buildEntityInContext("Car", "CAR");
@@ -194,9 +202,14 @@ public class SqlInContextTest {
 		assertTrue(sql.getDatabaseConfigFile().endsWith("test-db.properties"));
 		
 		// Name conversion as defined in the file
-		assertEquals("CITY_CODE",   sql.convertToColumnName("cityCode") ) ;
-		assertEquals("EmployeeJob", sql.convertToTableName("employeeJob") ) ;		
-		assertEquals("employeeJob", sql.convertToPkName("EMPLOYEE_JOB") ) ;		
+		assertEquals("ANACONDA_CASE", sql.getConfigValue("conv.columnName"));
+		assertEquals("CITY_CODE",   sql.convertToColumnName("cityCode") ) ;   // ANACONDA_CASE
+
+		assertEquals("PascalCase", sql.getConfigValue("conv.tableName"));
+		assertEquals("Employeejob", sql.convertToTableName("employeeJob") ) ; // PascalCase	
+
+		assertEquals("camelCase", sql.getConfigValue("conv.pkName"));
+		assertEquals("employeeJob", sql.convertToPkName("EMPLOYEE_JOB") ) ;	  // camelCase	
 	}
 	
 	//------------------------------------------------------------------------------------
@@ -230,17 +243,27 @@ public class SqlInContextTest {
 		}
 		return new AttributeInContext(null, fakeAttribute, null, new EnvInContext() );
 	}
-	
-	private ForeignKeyInContext buidForeignKey1() {
-		FakeForeignKey fakeFK = new FakeForeignKey("FkDriverCar", "GoodDriver", "SpecialCar");
-		fakeFK.addColumn(new FakeForeignKeyColumn("carId", "id", 1));
-		return new ForeignKeyInContext(fakeFK, new EnvInContext());
+
+/***
+	private ForeignKeyInContext buidForeignKey1(ModelInContext model) {
+		FakeForeignKey fakeFK = new FakeForeignKey("FK_DRIVER_CAR1", "GoodDriver", "SpecialCar");
+//		fakeFK.addColumn(new FakeForeignKeyColumn("carId", "id", 1));
+		fakeFK.addAttribute(new FakeForeignKeyAttribute(1, "carId", "id"));
+		return new ForeignKeyInContext(fakeFK, model, new EnvInContext());
 	}
 
-	private ForeignKeyInContext buidForeignKey2() {
-		FakeForeignKey fakeFK = new FakeForeignKey("FK_DRIVER_CAR", "GOOD_DRIVER", "SPECIAL_CAR");
-		fakeFK.addColumn(new FakeForeignKeyColumn("carId1", "myId1", 1));
-		fakeFK.addColumn(new FakeForeignKeyColumn("carId2", "myId2", 2));
-		return new ForeignKeyInContext(fakeFK, new EnvInContext());
+	private ForeignKeyInContext buidForeignKey2(ModelInContext model) {
+//		FakeForeignKey fakeFK = new FakeForeignKey("FK_DRIVER_CAR", "GOOD_DRIVER", "SPECIAL_CAR");
+		FakeForeignKey fakeFK = new FakeForeignKey("FK_DRIVER_CAR2", "GoodDriver", "SpecialCar");
+//		fakeFK.addColumn(new FakeForeignKeyColumn("carId1", "myId1", 1));
+		fakeFK.addAttribute(new FakeForeignKeyAttribute(1, "carId1", "myId1"));
+//		fakeFK.addColumn(new FakeForeignKeyColumn("carId2", "myId2", 2));
+		fakeFK.addAttribute(new FakeForeignKeyAttribute(2, "carId2", "myId2"));
+		return new ForeignKeyInContext(fakeFK, model, new EnvInContext());
 	}
+	
+	private ModelInContext buildModel() {
+		
+	}
+**/
 }

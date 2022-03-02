@@ -22,28 +22,28 @@ public class GenerationMain {
 		System.out.println("loading TelosysToolsCfg...");
 		TelosysToolsCfg telosysToolsCfg = telosysProject.loadTelosysToolsCfg();
 		
-		System.out.println("loading model from 'dbrep' file : " + TestsProject.REPO_FILENAME );
-		Model model = telosysProject.loadModelFromDbRep(TestsProject.REPO_FILENAME);
-
-		//--- List of entities to be generated
-		List<String> selectedEntities = new LinkedList<String>() ;
-		selectedEntities.add("Author");
-		
-		List<TargetDefinition> selectedTargets = new LinkedList<TargetDefinition>();
-		selectedTargets.add(new TargetDefinition("Entity Java Bean", "${BEANNAME}.java", "${SRC}/${ENTITY_PKG}", "java_bean.vm", ""));
-		
-		List<TargetDefinition> resourcesTargets = null;
-		
-		//TelosysToolsLogger logger = new ConsoleLogger() ;
-		TelosysToolsLogger logger = LoggerProvider.getLogger();
-
-		
-		GenerationTask generationTask = new StandardGenerationTask(
-				model, selectedEntities, 
-				TestsProject.BUNDLE_NAME, selectedTargets, resourcesTargets, 
-				telosysToolsCfg, logger);
-		
-		GenerationTaskResult generationTaskResult = generationTask.launch();
-		System.out.println("Nb file(s) generated : " + generationTaskResult.getNumberOfFilesGenerated() );
+//		System.out.println("loading model from 'dbrep' file : " + TestsProject.REPO_FILENAME );
+//		Model model = telosysProject.loadModelFromDbRep(TestsProject.REPO_FILENAME);
+//
+//		//--- List of entities to be generated
+//		List<String> selectedEntities = new LinkedList<String>() ;
+//		selectedEntities.add("Author");
+//		
+//		List<TargetDefinition> selectedTargets = new LinkedList<TargetDefinition>();
+//		selectedTargets.add(new TargetDefinition("Entity Java Bean", "${BEANNAME}.java", "${SRC}/${ENTITY_PKG}", "java_bean.vm", ""));
+//		
+//		List<TargetDefinition> resourcesTargets = null;
+//		
+//		//TelosysToolsLogger logger = new ConsoleLogger() ;
+//		TelosysToolsLogger logger = LoggerProvider.getLogger();
+//
+//		
+//		GenerationTask generationTask = new StandardGenerationTask(
+//				model, selectedEntities, 
+//				TestsProject.BUNDLE_NAME, selectedTargets, resourcesTargets, 
+//				telosysToolsCfg, logger);
+//		
+//		GenerationTaskResult generationTaskResult = generationTask.launch();
+//		System.out.println("Nb file(s) generated : " + generationTaskResult.getNumberOfFilesGenerated() );
 	}
 }
