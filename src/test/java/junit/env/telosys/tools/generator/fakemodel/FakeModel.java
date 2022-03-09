@@ -26,12 +26,11 @@ import org.telosys.tools.generic.model.enums.ModelType;
 public class FakeModel implements Model
 {
 	private final String name ;
-	
 	private final String description ;
 	
-	private final int    databaseId ; 
-
-	private final String databaseProductName ; 
+	private final String databaseId ; 
+	private final String databaseName ; 
+	private final String databaseType ; 
 	
 	private final List<Entity> entities = new ArrayList<>();
 
@@ -44,8 +43,9 @@ public class FakeModel implements Model
 		super();
 		this.name = modelName;
 		this.description = "Fake model" ;
-		this.databaseId = 1 ; 
-		this.databaseProductName = "Fake database"; 
+		this.databaseId = "db1" ; 
+		this.databaseName = "Fake database"; 
+		this.databaseType = "Fake db type"; 
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -90,14 +90,20 @@ public class FakeModel implements Model
 
 	//--------------------------------------------------------------------------------------
 	@Override
-	public Integer getDatabaseId() {
+	public String getDatabaseId() {
 		return databaseId;
 	}
 
 	//--------------------------------------------------------------------------------------
 	@Override
-	public String getDatabaseProductName() {
-		return databaseProductName;
+	public String getDatabaseName() {
+		return databaseName;
+	}
+
+	//--------------------------------------------------------------------------------------
+	@Override
+	public String getDatabaseType() {
+		return databaseType;
 	}
 
 	//-------------------------------------------------------------------------------

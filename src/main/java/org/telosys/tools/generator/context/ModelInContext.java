@@ -53,13 +53,19 @@ public class ModelInContext
 	
 	private final String   modelTitle ;
 	private final String   modelDescription ;
-	private final int      databaseId ;
-	private final String   databaseProductName ;
+	
+	private final String   databaseId ; // String since v 3.4.0
+	private final String   databaseName ; // v 3.4.0 (replaces productName )
+	private final String   databaseType ; // v 3.4.0
 	
 	private final List<EntityInContext>       allEntities ;
 	private final Map<String,EntityInContext> entitiesByTableName ;
 	private final Map<String,EntityInContext> entitiesByClassName ;
-	
+
+	private String notNull(String s) {
+		return s != null ? s : "" ;
+	}
+
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -111,18 +117,9 @@ public class ModelInContext
 			this.entitiesByClassName.put(entity.getName(), entity);
 		}
 		
-		if ( model.getDatabaseId() != null ) {
-			this.databaseId          = model.getDatabaseId();
-		}
-		else {
-			this.databaseId = -1;
-		}
-		if ( model.getDatabaseProductName() != null ) {
-			this.databaseProductName = model.getDatabaseProductName();
-		}
-		else {
-			this.databaseProductName = "";
-		}
+		this.databaseId = notNull(model.getDatabaseId());
+		this.databaseName = notNull(model.getDatabaseName());
+		this.databaseType = notNull(model.getDatabaseType());
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -375,27 +372,34 @@ public class ModelInContext
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the ID of the database used to generate the model",
-			"A valid ID is >= 0 ",
-			"-1 means undefined"
+			"Returns the id of the database used to generate the model",
+			"(since ver 4 the id is a string) "
 			}
 	)
-    public int getDatabaseId()
-    {
+    public String getDatabaseId() {
 		return databaseId ;
     }
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the product name of the database used to generate the model",
-			"This is the product name return by the JDBC meta-data",
-			"(e.g. 'Apache Derby') "
-			}
+			"Returns the name of the database used to generate the model"
+			},
+		since="3.4.0"
 	)
-    public String getDatabaseProductName()
-    {
-		return databaseProductName ;
+    public String getDatabaseName() {
+		return databaseName ;
+    }
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the type of the database used to generate the model"
+			},
+		since="3.4.0"
+	)
+    public String getDatabaseType() {
+		return databaseType ;
     }
 
 }

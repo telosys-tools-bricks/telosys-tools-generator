@@ -19,8 +19,6 @@ import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.context.BeanValidation;
 import org.telosys.tools.generator.context.BundleInContext;
 import org.telosys.tools.generator.context.Const;
-import org.telosys.tools.generator.context.DatabaseInContext;
-import org.telosys.tools.generator.context.DatabasesInContext;
 import org.telosys.tools.generator.context.EmbeddedGenerator;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
@@ -77,8 +75,8 @@ public class ObjectsList {
 		// LinkAttributesPairInContext.class, // ver 2.1.0 // removed in  v 3.4.0
 		Loader.class,
 		ModelInContext.class, // ver 2.1.0
-		DatabasesInContext.class, // ver 2.1.0
-		DatabaseInContext.class, // ver 2.1.0
+//		DatabasesInContext.class, // removed in v 3.4.0
+//		DatabaseInContext.class, // removed in v 3.4.0
 		ProjectInContext.class, // ver 2.1.0
 		Target.class,
 		Today.class,

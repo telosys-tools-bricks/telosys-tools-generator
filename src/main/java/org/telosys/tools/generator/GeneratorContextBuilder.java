@@ -18,16 +18,12 @@ package org.telosys.tools.generator;
 import java.util.List;
 
 import org.telosys.tools.commons.StrUtil;
-import org.telosys.tools.commons.TelosysToolsException;
 import org.telosys.tools.commons.TelosysToolsLogger;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
-import org.telosys.tools.commons.dbcfg.DatabasesConfigurations;
-import org.telosys.tools.commons.dbcfg.DbConfigManager;
 import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generator.context.BeanValidation;
 import org.telosys.tools.generator.context.BundleInContext;
 import org.telosys.tools.generator.context.Const;
-import org.telosys.tools.generator.context.DatabasesInContext;
 import org.telosys.tools.generator.context.EmbeddedGenerator;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
@@ -142,7 +138,7 @@ public class GeneratorContextBuilder {
 		generatorContext.put(ContextName.H2,              new H2InContext());  // JDBC factory ( ver 2.1.1 )
 		generatorContext.put(ContextName.HTML,            new HtmlInContext());  // HTML utilities ( ver 3.0.0 )
 
-		generatorContext.put(ContextName.DATABASES,	buildDatabasesInContext(telosysToolsCfg) );
+//		generatorContext.put(ContextName.DATABASES,	buildDatabasesInContext(telosysToolsCfg) ); // removed in v 3.4.0
 				
 		//--- Set the dynamic class loader 
 		Loader loader = new Loader( telosysToolsCfg.getTemplatesFolderAbsolutePath(bundleName) ); 
@@ -190,29 +186,31 @@ public class GeneratorContextBuilder {
 		return generatorContext ;
 	}
 	
-	/**
-	 * Creates a DatabasesInContext instance for the given project configuration
-	 * @param telosysToolsCfg
-	 * @return
-	 */
-	private DatabasesInContext buildDatabasesInContext( TelosysToolsCfg telosysToolsCfg ) {
-		return new DatabasesInContext( loadDatabasesConfigurations(telosysToolsCfg));
-	}
+	// removed in v 3.4.0
+//	/**
+//	 * Creates a DatabasesInContext instance for the given project configuration
+//	 * @param telosysToolsCfg
+//	 * @return
+//	 */
+//	private DatabasesInContext buildDatabasesInContext( TelosysToolsCfg telosysToolsCfg ) {
+//		return new DatabasesInContext( loadDatabasesConfigurations(telosysToolsCfg));
+//	}
 	
-	/**
-	 * Loads DatabasesConfigurations if any for the given project configuration
-	 * @param telosysToolsCfg
-	 * @return
-	 */
-	private DatabasesConfigurations loadDatabasesConfigurations( TelosysToolsCfg telosysToolsCfg ) {
-		try {
-			// Try to load the DatabasesConfigurations
-			return new DbConfigManager(telosysToolsCfg).load();
-		} catch (TelosysToolsException e) {
-			// If the DatabasesConfigurations cannot be loaded just return a void set of configurations
-			return new DatabasesConfigurations() ; // Void
-		}
-	}
+	// removed in v 3.4.0
+//	/**
+//	 * Loads DatabasesConfigurations if any for the given project configuration
+//	 * @param telosysToolsCfg
+//	 * @return
+//	 */
+//	private DatabasesConfigurations loadDatabasesConfigurations( TelosysToolsCfg telosysToolsCfg ) {
+//		try {
+//			// Try to load the DatabasesConfigurations
+//			return new DbConfigManager(telosysToolsCfg).load();
+//		} catch (TelosysToolsException e) {
+//			// If the DatabasesConfigurations cannot be loaded just return a void set of configurations
+//			return new DatabasesConfigurations() ; // Void
+//		}
+//	}
 
 	//-------------------------------------------------------------------------------------------------------
 	private void setSelectedEntities(List<String> selectedEntitiesNames) throws GeneratorException {
