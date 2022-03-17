@@ -104,7 +104,7 @@ public class AttributeInContext {
     private final String  maxValue ;
 
     //--- Further info for DATE and TIME ---------------------------------
-    private final DateType dateType       ;  // By default only DATE
+    // removed in v 3.4.0 private final DateType dateType       ;  // By default only DATE
     private final boolean  isDateInThePast ;
     private final boolean  isDateInTheFuture ;
     // private final boolean  _bDateBefore      ; // Removed in v 3.3.0
@@ -219,7 +219,7 @@ public class AttributeInContext {
 	    this.maxValue = Util.bigDecimalToString(attribute.getMaxValue(), VOID_STRING ) ;
 	    
 		//--- Further info for DATE/TIME 
-	    this.dateType = ( attribute.getDateType() != null ?  attribute.getDateType() : DateType.UNDEFINED );
+	    // removed in v 3.4.0 this.dateType = ( attribute.getDateType() != null ?  attribute.getDateType() : DateType.UNDEFINED );
 	    this.isDateInThePast   = attribute.isDatePast();
 	    this.isDateInTheFuture = attribute.isDateFuture();
 	    // this._bDateBefore = attribute.isDateBefore();  // Removed in v 3.3.0
@@ -488,15 +488,16 @@ public class AttributeInContext {
 		return type.getWrapperType() ;		
 	}
 
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the type of the date : $const.DATE_ONLY, $const.TIME_ONLY, $const.DATE_AND_TIME"
-			}
-	)
-	public int getDateType() {
-		return dateType.getValue(); // returns the enum value
-	}
+//	//-------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns the type of the date : $const.DATE_ONLY, $const.TIME_ONLY, $const.DATE_AND_TIME"
+//			}
+//	)
+//	// removed in v 3.4.0 
+//	public int getDateType() {
+//		return dateType.getValue(); // returns the enum value
+//	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(

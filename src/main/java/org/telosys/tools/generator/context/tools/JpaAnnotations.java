@@ -91,14 +91,23 @@ public class JpaAnnotations
 		// @Temporal
 		if ( "java.util.Date".equals(sAttributeFullType) || "java.util.Calendar".equals(sAttributeFullType) ) 
 		{
-			int dateTypeValue = attribute.getDateType() ; // same 'int' value as in Velocity template
-			if ( dateTypeValue == DateType.DATE_ONLY.getValue() ) {
+//			int dateTypeValue = attribute.getDateType() ; // same 'int' value as in Velocity template
+//			if ( dateTypeValue == DateType.DATE_ONLY.getValue() ) {
+//				annotationTemporal(annotations, "DATE");
+//			}
+//			else if ( dateTypeValue == DateType.TIME_ONLY.getValue() ) {
+//				annotationTemporal(annotations, "TIME");
+//			}
+//			else if ( dateTypeValue == DateType.DATE_AND_TIME.getValue() ) {
+//				annotationTemporal(annotations, "TIMESTAMP");
+//			}
+			if ( attribute.isDateType() ){
 				annotationTemporal(annotations, "DATE");
 			}
-			else if ( dateTypeValue == DateType.TIME_ONLY.getValue() ) {
+			else if ( attribute.isTimeType() ){
 				annotationTemporal(annotations, "TIME");
 			}
-			else if ( dateTypeValue == DateType.DATE_AND_TIME.getValue() ) {
+			else if ( attribute.isTimestampType() ){
 				annotationTemporal(annotations, "TIMESTAMP");
 			}
 		}
