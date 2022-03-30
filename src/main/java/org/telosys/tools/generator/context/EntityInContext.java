@@ -15,8 +15,11 @@
  */
 package org.telosys.tools.generator.context;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.telosys.tools.commons.ListUtil;
 import org.telosys.tools.commons.StrUtil;
@@ -60,6 +63,7 @@ public class EntityInContext
 	private static final List<AttributeInContext>  VOID_ATTRIBUTES_LIST    = new LinkedList<>();
 	private static final List<ForeignKeyInContext> VOID_FOREIGN_KEYS_LIST  = new LinkedList<>();
 	private static final List<LinkInContext>       VOID_LINKS_LIST         = new LinkedList<>();
+	private static final List<EntityInContext>     VOID_ENTITIES_LIST      = new LinkedList<>();
 	
 	private final String     className ;
 	private final String     packageName ;
@@ -383,6 +387,28 @@ public class EntityInContext
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
+			"Returns TRUE if this entity has at least one collection "
+		},
+		example= {
+			"#if ( $entity.hasCollections() )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
+	public boolean hasCollections() {
+		if ( links != null ) {
+			for ( LinkInContext link : links ) {
+				if ( link.isCollectionType() ) {
+					return true ;
+				}
+			}
+		}
+		return false;
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
 			"Returns a list of all the links defined for the current entity"
 		},
 		example={	
@@ -399,6 +425,70 @@ public class EntityInContext
 		return VOID_LINKS_LIST ;
 	}
 
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns a list containing all entities referenced by the current entity",
+			"(only for the first level of dependency)"
+		},
+		example={	
+			"#foreach( $refEntity in $entity.referencedEntities )",
+			"...",
+			"#end" 
+		},
+		since="3.4.0"
+	)
+	@VelocityReturnType("List of 'entity' objects")
+	public Collection<EntityInContext> getReferencedEntities() {
+		if ( links != null ) {
+			Map<String, EntityInContext> map = new HashMap<>();
+			for ( LinkInContext link : links ) {
+				try {
+					EntityInContext entity = link.getTargetEntity();
+					map.put(entity.getName(), entity);
+				} catch (GeneratorException e) {
+					// Invalid link (no no target entity) => just ignore it
+				}
+			}
+			return map.values();
+		}
+		return VOID_ENTITIES_LIST;		
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns a list containing all entities referenced by the current entity",
+			"at all levels of dependencies tree (including all sub levels)"
+		},
+		example={	
+			"#foreach( $refEntity in $entity.referencedEntitiesForAllLevels )",
+			"...",
+			"#end" 
+		},
+		since="3.4.0"
+	)
+	@VelocityReturnType("List of 'entity' objects")
+	public Collection<EntityInContext> getReferencedEntitiesForAllLevels() {
+		Map<String, EntityInContext> map = new HashMap<>();
+		registerReferencedEntities(getLinks(), map, 1, 100); 
+		return map.values();
+	}
+	private void registerReferencedEntities(List<LinkInContext> entityLinks, Map<String, EntityInContext> map, 
+			int level, int maxLevel) {
+		if ( entityLinks != null && level <= maxLevel) {
+			for ( LinkInContext link : entityLinks ) {
+				try {
+					EntityInContext targetEntity = link.getTargetEntity(); // throws GeneratorException
+					map.put(targetEntity.getName(), targetEntity);
+					if ( targetEntity.hasLinks() ) {
+						registerReferencedEntities(targetEntity.getLinks(), map, level+1, maxLevel); // recursive call
+					}
+				} catch (GeneratorException e) {
+					// Invalid link (no no target entity) => just ignore it
+				}
+			}
+		}
+	}
+	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
 			"Returns a list of all the links selected in the model for the current entity"
