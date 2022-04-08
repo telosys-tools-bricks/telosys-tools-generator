@@ -64,6 +64,7 @@ public class EntityInContext
 	private static final List<ForeignKeyInContext> VOID_FOREIGN_KEYS_LIST  = new LinkedList<>();
 	private static final List<LinkInContext>       VOID_LINKS_LIST         = new LinkedList<>();
 	private static final List<EntityInContext>     VOID_ENTITIES_LIST      = new LinkedList<>();
+	private static final List<ReferenceInContext>  VOID_REFERENCES_LIST    = new LinkedList<>();
 	
 	private final String     className ;
 	private final String     packageName ;
@@ -452,7 +453,7 @@ public class EntityInContext
 			return map.values();
 		}
 		return VOID_ENTITIES_LIST;		
-	}
+	}	
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
@@ -484,6 +485,83 @@ public class EntityInContext
 					}
 				} catch (GeneratorException e) {
 					// Invalid link (no no target entity) => just ignore it
+				}
+			}
+		}
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns a list containing all references hold by the current entity",
+			"(only for the first level of dependency)"
+		},
+		example={	
+			"#foreach( $reference in $entity.references )",
+			"...",
+			"#end" 
+		},
+		since="3.4.0"
+	)
+	@VelocityReturnType("List of 'reference' objects")
+	public Collection<ReferenceInContext> getReferences() {
+		if ( links != null ) {
+			Map<String, ReferenceInContext> map = new HashMap<>();
+			for ( LinkInContext link : links ) {
+				registerReference(link, map);
+			}
+			return map.values();
+		}
+		return VOID_REFERENCES_LIST;		
+	}
+	private List<LinkInContext> registerReference(LinkInContext link, Map<String, ReferenceInContext> map ) {
+		try {
+			EntityInContext targetEntity = link.getTargetEntity(); // throws GeneratorException
+			ReferenceInContext reference = map.get(targetEntity.getName());
+			if ( reference == null ) {
+				// new reference => init
+				reference = new ReferenceInContext(targetEntity);
+				map.put(targetEntity.getName(), reference);
+			}
+			if ( link.isCardinalityToMany() ) {
+				reference.incrementToMany();
+			}
+			else {
+				reference.incrementToOne();
+			}
+			return targetEntity.getLinks(); 
+		} catch (GeneratorException e) {
+			// Invalid link (no no target entity) 
+			// Not supposed to happen => just ignore it
+			return null;
+		}		
+	}
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns a list containing all references hold by the current entity",
+			"in all levels of dependencies tree (including all sub levels)"
+		},
+		example={	
+			"#foreach( $reference in $entity.referencesInDepth )",
+			"...",
+			"#end" 
+		},
+		since="3.4.0"
+	)
+	@VelocityReturnType("List of 'reference' objects")
+	public Collection<ReferenceInContext> getReferencesInDepth() {
+		Map<String, ReferenceInContext> map = new HashMap<>();
+		registerReferences(getLinks(), map, 1, 100); 
+		return map.values();
+	}
+
+	private void registerReferences(List<LinkInContext> entityLinks, Map<String, ReferenceInContext> map, 
+			int level, int maxLevel) {
+		if ( entityLinks != null && level <= maxLevel) {
+			for ( LinkInContext link : entityLinks ) {
+				List<LinkInContext> subLinks = registerReference(link, map);
+				if ( subLinks != null ) {
+					// continue in depth with sublinks
+					registerReferences(subLinks, map, level+1, maxLevel); // recursive call
 				}
 			}
 		}

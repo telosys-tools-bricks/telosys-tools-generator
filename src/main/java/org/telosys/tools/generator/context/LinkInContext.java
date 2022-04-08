@@ -679,12 +679,35 @@ public class LinkInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
+			"Returns TRUE if the link cardinality is 'OneToMany' or 'ManyToMany'"
+			},
+		since="3.4.0"
+	)
+	public boolean isCardinalityToMany() {
+		return cardinality == Cardinality.ONE_TO_MANY || cardinality == Cardinality.MANY_TO_MANY ;
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns TRUE if the link cardinality is 'ManyToOne' or 'OneToOne'"
+			},
+		since="3.4.0"
+	)
+	public boolean isCardinalityToOne() {
+		return cardinality == Cardinality.MANY_TO_ONE || cardinality == Cardinality.ONE_TO_ONE ;
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
 			"Returns TRUE if the link is a collection",
 			"In other words, if its cardinality is 'OneToMany' or 'ManyToMany'"
 			}
 	)
 	public boolean isCollectionType() {
-		return cardinality == Cardinality.ONE_TO_MANY || cardinality == Cardinality.MANY_TO_MANY ;
+		//return cardinality == Cardinality.ONE_TO_MANY || cardinality == Cardinality.MANY_TO_MANY ;
+		return isCardinalityToMany();
 	}
 
 	//-------------------------------------------------------------------------------------

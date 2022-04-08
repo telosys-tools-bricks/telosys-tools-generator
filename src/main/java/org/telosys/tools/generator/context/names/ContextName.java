@@ -91,6 +91,7 @@ public class ContextName {
 	
 	public static final String  SQL               = "sql" ;     // ver 3.4.0
 	public static final String  FACTORY           = "factory" ; // ver 3.4.0
+	public static final String  REFERENCE         = "reference" ; // ver 3.4.0
 	
 	// Don't forget to also add :
 	//   - the name in "ContextNames"
