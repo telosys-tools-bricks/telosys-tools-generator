@@ -38,6 +38,7 @@ import org.telosys.tools.generator.context.Loader;
 import org.telosys.tools.generator.context.ModelInContext;
 import org.telosys.tools.generator.context.NowInContext;
 import org.telosys.tools.generator.context.ProjectInContext;
+import org.telosys.tools.generator.context.ReferenceInContext;
 import org.telosys.tools.generator.context.SqlInContext;
 import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generator.context.Today;
@@ -94,7 +95,8 @@ public class ObjectsList {
 		ForeignKeyPartInContext.class, // v3.3.0
 		
 		SqlInContext.class,    // v3.4.0
-		FactoryInContext.class // v3.4.0
+		FactoryInContext.class, // v3.4.0
+		ReferenceInContext.class // v3.4.0
 	};
 
 	public static final Class<?>[] getObjectsClasses() {
