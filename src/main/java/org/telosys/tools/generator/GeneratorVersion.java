@@ -23,7 +23,7 @@ package org.telosys.tools.generator;
  */
 public class GeneratorVersion {
 
-	public static final String GENERATOR_VERSION = "3.4.0" ;
+	public static final String GENERATOR_VERSION = "4.0.0" ;
 	
 	private GeneratorVersion() {}
 }

@@ -7,13 +7,13 @@
 	<parent>
 		<groupId>org.telosys</groupId>
 		<artifactId>telosys-tools-parent</artifactId>
-		<version>3.x.x</version>   <!-- parent version is always "3.x.x" -->
+		<version>4.x.x</version>
 		<relativePath>../telosys-tools-parent/pom.xml</relativePath>
 	</parent>
 
 	<name>telosys-tools-generator</name>
 	<artifactId>telosys-tools-generator</artifactId>
-	<version>3.4.0-SNAPSHOT</version> <!-- also update version in GeneratorVersion.java  -->
+	<version>4.0.0</version> <!-- also update version in GeneratorVersion.java  -->
 	<packaging>jar</packaging>
 
 	<dependencies>
@@ -36,13 +36,6 @@
 		</dependency>
 
 		<!-- DEPENDENCIES / TESTS -->
-	<!-- 
-		<dependency>
-			<groupId>org.telosys</groupId>
-			<artifactId>telosys-tools-repository</artifactId>
-			<scope>test</scope>
-		</dependency>
-	 -->
 
 	</dependencies>
 
