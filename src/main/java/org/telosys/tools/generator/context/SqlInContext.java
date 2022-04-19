@@ -434,7 +434,8 @@ public class SqlInContext {
 				if ( sb.length() > 0 ) {
 					sb.append(", ");
 				}
-				sb.append( convertToColumnName(attribute.getName()) );
+//				sb.append( convertToColumnName(attribute.getName()) );
+				sb.append( attribute.getSqlColumnName() );
 			}
 			return sb.toString();
 		}
