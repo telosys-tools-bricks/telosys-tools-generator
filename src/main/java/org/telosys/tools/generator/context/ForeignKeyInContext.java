@@ -271,6 +271,7 @@ public class ForeignKeyInContext {
 		"...",
 		"#end"
 		})
+	@VelocityReturnType("List<String>")
 	public List<String> getSqlOriginColumns() throws GeneratorException {
 		List<String> list = new LinkedList<>();
 //		SqlInContext sql = this.env.getSql();
@@ -310,6 +311,7 @@ public class ForeignKeyInContext {
 		"...",
 		"#end"
 		})
+	@VelocityReturnType("List<String>")
 	public List<String> getSqlReferencedColumns() throws GeneratorException {
 		List<String> list = new LinkedList<>();
 //		SqlInContext sql = this.env.getSql();

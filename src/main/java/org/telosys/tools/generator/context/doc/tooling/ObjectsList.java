@@ -25,6 +25,7 @@ import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generator.context.FactoryInContext;
 import org.telosys.tools.generator.context.FileInContext;
 import org.telosys.tools.generator.context.FnInContext;
+import org.telosys.tools.generator.context.ForeignKeyAttributeInContext;
 import org.telosys.tools.generator.context.ForeignKeyInContext;
 import org.telosys.tools.generator.context.ForeignKeyPartInContext;
 import org.telosys.tools.generator.context.H2InContext;
@@ -33,6 +34,7 @@ import org.telosys.tools.generator.context.Java;
 import org.telosys.tools.generator.context.JdbcFactoryInContext;
 import org.telosys.tools.generator.context.JdbcInContext;
 import org.telosys.tools.generator.context.JpaInContext;
+import org.telosys.tools.generator.context.LinkAttributeInContext;
 import org.telosys.tools.generator.context.LinkInContext;
 import org.telosys.tools.generator.context.Loader;
 import org.telosys.tools.generator.context.ModelInContext;
@@ -65,15 +67,25 @@ public class ObjectsList {
 		Java.class, // ver 2.0.7
 		JpaInContext.class, // ver 2.0.7
 		BeanValidation.class, // ver 2.0.7
+
 		EntityInContext.class, // replaces JavaBeanClass.class ( ver 2.1.0 )
+
+		// Attribute + attribute FK parts
 		AttributeInContext.class,
+		ForeignKeyPartInContext.class, // v3.3.0
+		
+		// FK + FK attributes
 		ForeignKeyInContext.class, // ver 2.0.7
+		ForeignKeyAttributeInContext.class, // v 3.4.0 - forgetting => added in v 4.0.1
 		//ForeignKeyColumnInContext.class, // ver 2.0.7 // removed in  v 3.4.0
-		//ForeignKeyAttrubuteInContext.class, // v 3.4.0 // removed in  v 3.4.0
 		// JoinColumnInContext.class, // ver 2.1.0 // removed in  v 3.4.0
 		//JoinTableInContext.class, // ver 2.1.0  (added to list in v 3.3.0) // removed in  v 3.4.0
+		
+		// Link + Link attributes
 		LinkInContext.class,
+		LinkAttributeInContext.class, // forgetting => added in v 4.0.1
 		// LinkAttributesPairInContext.class, // ver 2.1.0 // removed in  v 3.4.0
+		
 		Loader.class,
 		ModelInContext.class, // ver 2.1.0
 //		DatabasesInContext.class, // removed in v 3.4.0
@@ -92,7 +104,6 @@ public class ObjectsList {
 		NowInContext.class, // v 3.3.0
 		BundleInContext.class, // v 3.3.0
 		FileInContext.class, // v 3.3.0
-		ForeignKeyPartInContext.class, // v3.3.0
 		
 		SqlInContext.class,    // v3.4.0
 		FactoryInContext.class, // v3.4.0
