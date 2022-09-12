@@ -67,20 +67,21 @@ public class ContextName {
 	//--- Template objects names retrieved from standard objects 
 	public static final String  ATTRIBUTE         = "attribute" ;
 	public static final String  ATTRIB            = "attrib" ; // Other name for "attribute"
-	public static final String  FIELD             = "field" ;  // Other name for "attribute"
+//	public static final String  FIELD             = "field" ;  // Other name for "attribute" (removed v 4.0.1)
+	public static final String  ATTR              = "attr" ;   // Other name for "attribute" (v 4.0.1)
 	
 	public static final String  LINK              = "link" ;
 	public static final String  LINK_ATTRIBUTE    = "linkAttribute" ; // v 2.1.0
-	public static final String  JOIN_COLUMN       = "joinColumn" ; // v 2.1.0 (TODO : remove)
-	public static final String  JOIN_ATTRIBUTE    = "joinAttribute" ; // v 3.4.0 
-	public static final String  JOIN_TABLE        = "joinTable" ; // v 3.3.0 (added for documentation)
+	//  JOIN_COLUMN : "joinColumn" ( unused, removed in version 4.0.1 )
+	//  JOIN_ATTRIBUTE    = "joinAttribute" ; // v 3.4.0  ( unused, removed in version 4.0.1 )
+	//  JOIN_TABLE        = "joinTable" ; // ( unused, removed in version 4.0.1 )
 	
 	public static final String  FK                = "fk" ;    // v 2.0.7
-	public static final String  FKCOL             = "fkcol" ; // v 2.0.7  (TODO : remove)
+	//  FKCOL : "fkcol" ( unused, removed in version 4.0.1 )
 	public static final String  FK_ATTRIBUTE      = "fkAttribute" ; // v 3.4.0
 
-	public static final String  DATABASE          = "database" ; // ver 2.1.0
-	public static final String  DATABASES         = "databases" ; // ver 2.1.0
+	// DATABASE : "database" ( unused, removed in version 4.0.1 )
+	// DATABASES  : "databases" ( unused, removed in version 4.0.1 )
 	
 	public static final String  VALUES            = "values" ; // ver 3.0.0
 	public static final String  KEY_VALUES        = "keyValues" ; // ver 3.0.0
@@ -93,8 +94,11 @@ public class ContextName {
 	public static final String  FACTORY           = "factory" ; // ver 3.4.0
 	public static final String  REFERENCE         = "reference" ; // ver 3.4.0
 	
-	// Don't forget to also add :
-	//   - the name in "ContextNames"
+	// NB : don't forget to also add :
+	//   - the name in "ContextNames" ("ContextNames" class with "s" at the end)
 	//   - the class in "doc.tooling.ObjectsList"
+	// Check "References -> Project" : 2 references expected (at least)
+	//  - XxxInContext.java
+	//  - ContextNames.java
 	
 }

@@ -29,7 +29,8 @@ import org.telosys.tools.generic.model.Link;
  */
 //-------------------------------------------------------------------------------------
 @VelocityObject(
-	contextName = ContextName.FK_ATTRIBUTE ,
+//	contextName = ContextName.FK_ATTRIBUTE ,
+	contextName = ContextName.LINK_ATTRIBUTE ,  // error fixed in v 4.0.1
 	text = {
 			"Foreign Key attribute",
 			""

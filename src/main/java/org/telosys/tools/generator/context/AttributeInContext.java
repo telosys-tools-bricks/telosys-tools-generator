@@ -34,7 +34,6 @@ import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.ForeignKeyPart;
 import org.telosys.tools.generic.model.TagContainer;
 import org.telosys.tools.generic.model.enums.BooleanValue;
-import org.telosys.tools.generic.model.enums.DateType;
 import org.telosys.tools.generic.model.enums.GeneratedValueStrategy;
 import org.telosys.tools.generic.model.types.AttributeTypeInfo;
 import org.telosys.tools.generic.model.types.LanguageType;
@@ -49,7 +48,7 @@ import org.telosys.tools.generic.model.types.TypeConverter;
 //-------------------------------------------------------------------------------------
 @VelocityObject(
 		contextName = ContextName.ATTRIBUTE ,
-		otherContextNames= { ContextName.ATTRIB, ContextName.FIELD },		
+		otherContextNames= { ContextName.ATTRIB, ContextName.ATTR },	// FIELD -> ATTR v 4.0.1	
 		text = {
 				"This object provides all information about an entity attribute",
 				"Each attribute is obtained from its entity class ",
@@ -219,12 +218,9 @@ public class AttributeInContext {
 	    this.maxValue = Util.bigDecimalToString(attribute.getMaxValue(), VOID_STRING ) ;
 	    
 		//--- Further info for DATE/TIME 
-	    // removed in v 3.4.0 this.dateType = ( attribute.getDateType() != null ?  attribute.getDateType() : DateType.UNDEFINED );
 	    this.isDateInThePast   = attribute.isDatePast();
 	    this.isDateInTheFuture = attribute.isDateFuture();
-	    // this._bDateBefore = attribute.isDateBefore();  // Removed in v 3.3.0
 	    this.dateBeforeValue = StrUtil.notNull( attribute.getDateBeforeValue() );
-	    // this._bDateAfter  = attribute.isDateAfter();  // Removed in v 3.3.0
 	    this.dateAfterValue  = StrUtil.notNull( attribute.getDateAfterValue() );
         
 		//--- Database info
@@ -234,8 +230,6 @@ public class AttributeInContext {
         this.jdbcTypeName     = StrUtil.notNull( attribute.getJdbcTypeName() );
         this.isKeyElement     = attribute.isKeyElement();
 
-        // this.sqlType = "" ; // v 3.3.0  // Removed in v 3.4.0
-        
 		//--- Foreign Keys / references
         this.isForeignKey          = attribute.isFK() ;
         this.isForeignKeySimple    = attribute.isFKSimple() ;
@@ -246,8 +240,6 @@ public class AttributeInContext {
         	this.fkParts.add(new ForeignKeyPartInContext(fkPart)); // v 3.3.0
         }
 
-        // this.databaseSize     = StrUtil.notNull( attribute.getDatabaseSize() ) ; 
-        // this.size     = StrUtil.notNull( attribute.getDatabaseSize() ) ; // TODO : attribute.getSize()
         this.size     = attribute.getSize(); // v 3.4.0
 
         this.isAutoIncremented  = attribute.isAutoIncremented();
@@ -259,26 +251,6 @@ public class AttributeInContext {
         this.booleanTrueValue   = Util.trim(attribute.getBooleanTrueValue(), VOID_STRING) ; 
         this.booleanFalseValue  = Util.trim(attribute.getBooleanFalseValue(), VOID_STRING) ;
 		
-        
-//		//--- AutoIncremented is a shortcut for GeneratedValue if not defined
-//        if ( attribute.isAutoIncremented() && 
-//        	 attribute.getGeneratedValueStrategy() == GeneratedValueStrategy.UNDEFINED ) {
-//        	this.isGeneratedValue = true ;
-//        	this.generatedValueStrategy  = GeneratedValueStrategy.AUTO.getText() ; 
-//        	this.generatedValueGenerator = VOID_STRING ;
-//        } 
-//        else {
-//        	if (attribute.isGeneratedValue() ) {
-//        		this.isGeneratedValue = true ;
-//        		this.generatedValueStrategy  = StrUtil.notNull( attribute.getGeneratedValueStrategy() );
-//        		this.generatedValueGenerator = StrUtil.notNull( attribute.getGeneratedValueGenerator() ); 
-//			}
-//			else {
-//				this.isGeneratedValue = false;
-//				this.generatedValueStrategy  = VOID_STRING;
-//				this.generatedValueGenerator = VOID_STRING;
-//			}
-//        }
         //--- Generated Value  v 3.4.0
         this.isGeneratedValue = attribute.getGeneratedValueStrategy() != GeneratedValueStrategy.UNDEFINED ;
 		this.generatedValueStrategy = attribute.getGeneratedValueStrategy().getText() ;
@@ -295,12 +267,10 @@ public class AttributeInContext {
 		this.tableGeneratorPkColumnName = notNull(attribute.getGeneratedValueTablePkColumnName()); 
 		this.tableGeneratorValueColumnName = notNull(attribute.getGeneratedValueTableValueColumnName());
 		this.tableGeneratorPkColumnValue = notNull(attribute.getGeneratedValueTablePkColumnValue());
-
 		
 		this.isUsedInLinks         = attribute.isUsedInLinks(); 
 		this.isUsedInSelectedLinks = attribute.isUsedInSelectedLinks();
 		
-//		this.tagsMap = attribute.getTagsMap();
 		this.tagContainer = attribute.getTagContainer(); // v 3.4.0
 		
 		this.insertable = attribute.getInsertable(); // v 3.3.0
@@ -488,17 +458,6 @@ public class AttributeInContext {
 		return type.getWrapperType() ;		
 	}
 
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns the type of the date : $const.DATE_ONLY, $const.TIME_ONLY, $const.DATE_AND_TIME"
-//			}
-//	)
-//	// removed in v 3.4.0 
-//	public int getDateType() {
-//		return dateType.getValue(); // returns the enum value
-//	}
-
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -629,47 +588,6 @@ public class AttributeInContext {
 	}
 
 	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns the database native type for the attribute with the size if it makes sense",
-//			"For example : INTEGER, VARCHAR(24), NUMBER, CHAR(3), etc...",
-//			"",
-//			"(!) DEPRECATED : do not use (will be removed)"
-//			},
-//		since="2.0.7"
-//	)
-//    public String getDatabaseTypeWithSize() {
-//		if ( StrUtil.nullOrVoid(databaseType)) {
-//			// No database type
-//			return "";
-//		}
-//		if ( isSizeRequired(databaseType) ) {
-//			//if ( StrUtil.nullOrVoid(databaseSize)) {
-//			if ( StrUtil.nullOrVoid(size)) {
-//				// no database size 
-//				return databaseType;
-//			}
-//			else {
-//				// database size
-//				//return this.databaseType.trim() + "(" + this.databaseSize.trim() + ")" ;
-//				return this.databaseType.trim() + "(" + this.size.trim() + ")" ;
-//			}
-//		}
-//		else {
-//			// no size required
-//			return this.databaseType.trim() ;
-//		}
-//    }
-//    private boolean isSizeRequired(String type) {
-//		if ( type.contains("VARCHAR") ) return true; // VARCHAR, VARCHAR2
-//		if ( type.contains("CHAR") ) return true;
-//		if ( type.contains("DECIMAL") ) return true;
-//		if ( type.contains("NUMERIC") ) return true;
-//		if ( type.contains("NUMBER") ) return true;
-//		return false;
-//    }
-    
-	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Returns the database size for the attribute",
@@ -684,19 +602,6 @@ public class AttributeInContext {
 			}
 	)
     public String getDatabaseSize() {
-		/*
-		//if ( ! StrUtil.nullOrVoid(this.databaseSize) ) {
-		if ( ! StrUtil.nullOrVoid(this.size) ) {
-			// Explicitly defined in the model => use it as is
-	        //return databaseSize ;
-	        return this.size ;
-		}
-		else {
-			// Try to extract the size from database type ( eg "varchar(20)", "number(10,2)" )
-			String size = extractSizeFromType(this.databaseType);
-			return size;
-		}
-		*/
 		// Try to extract the size from database type ( eg "varchar(20)", "number(10,2)" )
 		String databaseSize = extractSizeFromType(this.databaseType);
 		if ( ! StrUtil.nullOrVoid(databaseSize) ) {
@@ -1597,54 +1502,6 @@ public class AttributeInContext {
 	//------------------------------------------------------------------------------------------
 	// TAGS since ver 3.3.0
 	//------------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns TRUE if the attribute has a tag with the given name"
-//		},
-//		parameters = { 
-//			"tagName : name of the tag for which to check the existence" 
-//		},
-//		example= {
-//			"$attrib.hasTag('mytag') "
-//		},
-//		since="3.3.0"
-//	)
-//	public boolean hasTag(String tagName) {
-//		if ( this.tagsMap != null ) {
-//			return this.tagsMap.containsKey(tagName);
-//		}
-//		return false; 
-//	}
-
-//	/**
-//	 * Returns the value held by the tag
-//     * @param tagName
-//	 * @return
-//	 * @since v 3.3.0
-//	 */
-//	@VelocityMethod(
-//		text={	
-//			"Returns the value held by the given tag name",
-//			"If the tag is undefined or has no value, the returned value is an empty string"
-//		},
-//		parameters = { 
-//			"tagName : name of the tag for which to get the value" 
-//		},
-//		example= {
-//			"$attrib.tagValue('mytag') "
-//		},
-//		since="3.3.0"
-//	)
-//	public String tagValue(String tagName) {
-//		if ( this.tagsMap != null ) {
-//			String v = this.tagsMap.get(tagName);
-//			return ( v != null ? v : VOID_STRING );
-//		}
-//		return VOID_STRING;
-//	}
-
-	//------------------------------------------------------------------------------------------
-	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Returns TRUE if the attribute has a tag with the given name"
@@ -1819,30 +1676,6 @@ public class AttributeInContext {
 	}
 	
 	//-------------------------------------------------------------------------------------
-// REMOVED in v 3.4.0
-//	@VelocityMethod(
-//		text={	
-//			"Returns the database SQL type corresponding to the attribute",
-//			"for example : INTEGER, VARCHAR(24), NUMBER, CHAR(3), etc...",
-//			"Returns the 'sqlType' if explicitly defined or tries to infer it from the neutral type",
-//			"The Sql Type inference is based on 'env.database' (PostgreSQL, MySQL, etc)", 
-//			"or 'env.databaseTypesMapping' (specific types mapping)"
-//			},
-//		since="3.3.0"
-//	)
-//    public String getSqlType() {
-//		if ( StrUtil.nullOrVoid(this.sqlType) ) {
-//			// not explicitly defined => try to infer SQL type
-//	        return SqlConverter.getSqlType(this, this.envInContext);
-//		}
-//		else {
-//			// explicitly defined => return it
-//			return this.sqlType;
-//		}
-//    }
-//	
-
-	//-------------------------------------------------------------------------------------
 	//  v 3.4.0 : 
 	//  getSize(), getSizeAsDecimal(), 
 	//  getSqlColumnName(), getSqlColumnType(), getSqlColumnConstraints 
@@ -1905,10 +1738,6 @@ public class AttributeInContext {
 		since="3.4.0"
 	)
 	public String getSize() {
-//		// use @DbSize first : eg @DbSize(45) or @DbSize(10,2)
-//		if ( ! StrUtil.nullOrVoid(this.getDatabaseSize()) ) {
-//			return this.getDatabaseSize();
-//		} 
 		// EVOLUTION : add @Size(xx) annotation ( and @DbSize deprecated )
 		if ( ! StrUtil.nullOrVoid(this.size) ) {
 			return this.size ;

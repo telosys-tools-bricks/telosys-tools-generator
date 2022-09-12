@@ -79,7 +79,7 @@ public class EntityInContext
 	private final List<AttributeInContext> keyAttributes ;   // The KEY attributes for this class
 	private final List<AttributeInContext> nonKeyAttributes; // The NON KEY attributes for this class
 
-	private final List<ForeignKeyInContext> foreignKeys ; // The database FOREIGN KEYS attributes for this entity ( v 2.0.7)
+	private final List<ForeignKeyInContext> foreignKeys ; // The database FOREIGN KEYS attributes for this entity
 	
 	private final List<LinkInContext> links ; // The links for this class ( ALL LINKS )
 	
@@ -87,8 +87,6 @@ public class EntityInContext
 	
 	private final EnvInContext   env ; // ver 2.1.0
 	
-    //private final SqlConverter sqlConverter ; // Added in v 3.4.0
-
 	private final TagContainer tagContainer ; // All tags defined for the entity  ( added in v 3.4.0 )
 	
 	private final String  superClass ; // v 3.4.0
@@ -115,10 +113,8 @@ public class EntityInContext
 		if ( entity == null ) {
 			throw new IllegalArgumentException("Entity is null");
 		}
-		this.className = entity.getClassName();  // v 3.0.0
+		this.className = entity.getClassName();
 		
-//		this.packageName = StrUtil.notNull(defaultEntityPackage); 
-		// v 3.4.0
 		if ( nullOrVoid(entity.getPackageName()) ) {
 			// no package defined in the model @Package) => use default 
 			this.packageName = defaultEntityPackage;
@@ -131,27 +127,22 @@ public class EntityInContext
 		if ( modelInContext == null ) {
 			throw new IllegalArgumentException("ModelInContext is null");
 		}
-		this.modelInContext = modelInContext ; // v 3.0.0
+		this.modelInContext = modelInContext ;
 		
 		if ( env == null ) {
 			throw new IllegalArgumentException("EnvInContext is null");
 		}
 		this.env = env ;
-		//this.sqlConverter = new SqlConverter(env); // Added in v 3.4.0
 
-		//this.databaseTable   = StrUtil.notNull(entity.getDatabaseTable());
-		this.databaseTable   = entity.getDatabaseTable(); // v 3.4.0
+		this.databaseTable   = entity.getDatabaseTable();
 		
-		//this.databaseCatalog = StrUtil.notNull(entity.getDatabaseCatalog()); // v 3.0.0
-		this.databaseCatalog = entity.getDatabaseCatalog(); // v 3.4.0
+		this.databaseCatalog = entity.getDatabaseCatalog(); 
 		
-		//this.databaseSchema  = StrUtil.notNull(entity.getDatabaseSchema()); // v 3.0.0
-		this.databaseSchema  = entity.getDatabaseSchema(); // v 3.4.0
+		this.databaseSchema  = entity.getDatabaseSchema();
 		
-		this.databaseType    = StrUtil.notNull(entity.getDatabaseType()); // ver 2.0.7
+		this.databaseType    = StrUtil.notNull(entity.getDatabaseType()); 
 
-		//this.databaseComment = StrUtil.notNull(entity.getDatabaseComment()); // v 3.1.0
-		this.databaseComment = entity.getDatabaseComment(); // v 3.4.0
+		this.databaseComment = entity.getDatabaseComment();
 		
 		//--- Initialize all the ATTRIBUTES for the current entity
 		this.attributes = new LinkedList<>();
@@ -162,15 +153,14 @@ public class EntityInContext
 
 		//--- Initialize all the LINKS for the current entity
 		this.links = new LinkedList<>();
-		for ( Link link : entity.getLinks() ) { // v 3.0.0
-			LinkInContext linkInContext = new LinkInContext(this, link, this.modelInContext, this.env ); // v 3.0.0
+		for ( Link link : entity.getLinks() ) { 
+			LinkInContext linkInContext = new LinkInContext(this, link, this.modelInContext, this.env ); 
 			this.links.add(linkInContext);
 		}
 		
-		//--- Init all the DATABASE FOREIGN KEYS  ( v 2.0.7 )
+		//--- Init all the DATABASE FOREIGN KEYS 
 		this.foreignKeys = new LinkedList<>();
-//		for ( ForeignKey fk : entity.getDatabaseForeignKeys() ) {
-		for ( ForeignKey fk : entity.getForeignKeys() ) { // v 3.4.0
+		for ( ForeignKey fk : entity.getForeignKeys() ) { 
 			this.foreignKeys.add( new ForeignKeyInContext(fk, modelInContext, env) );
 		}
 		
@@ -180,7 +170,7 @@ public class EntityInContext
 		//--- Build the list of the "NON KEY" attributes
 		this.nonKeyAttributes = selectAttributesIfKeyElement(false); 
 
-		this.tagContainer = entity.getTagContainer(); // V 3.4.0
+		this.tagContainer = entity.getTagContainer(); 
 		
 		this.superClass = entity.getSuperClass() ; // v 3.4.0
 		this.isAbstract = entity.isAbstract() ; // v 3.4.0
@@ -191,7 +181,6 @@ public class EntityInContext
 		this.context = entity.getContext(); // v 3.4.0
 		this.isDatabaseView = entity.isDatabaseView(); // v 3.4.0
 		this.databaseTablespace = entity.getDatabaseTablespace(); // v 3.4.0
-		
 
 		//--- Post processing : import resolution
 		endOfAttributesDefinition();
@@ -280,12 +269,13 @@ public class EntityInContext
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
-			"Returns the attribute associated with the given database column name"
+			"Returns the attribute associated with the given database column name",
+			"or throws an error if not found"
 		},
 		parameters = {
-			"columnName : the database column's name"
+			"columnName : the database column name"
 		},
-		example="$entity.attributeByColumnName"
+		example="$entity.getAttributeByColumnName('column_name')"
 	)
 	@VelocityReturnType("'attribute' object")
 	public AttributeInContext getAttributeByColumnName(String columnName) throws GeneratorException {
@@ -300,19 +290,33 @@ public class EntityInContext
 		throw new GeneratorException("No attribute with column name '" + columnName + "'");
 	}
 	
-	public AttributeInContext getAttributeWithName(String attributeName) {
-		if ( attributeName != null ) {
-			for( AttributeInContext attribute : this.getAttributes() ) {
-				if ( attributeName.equals( attribute.getName() ) ) {
-					return attribute ;
-				}
-			}
-		}
-		return null;
-	}
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns TRUE if the entity has an attribute with the given name"
+		},
+		example= {
+			"#if ( $entity.hasAttribute('foo') )",
+			"...",
+			"#end"
+		},
+		since="3.4.0"
+	)
 	public boolean hasAttribute(String attributeName) {
 		return getAttributeWithName(attributeName) != null ;
 	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns the attribute associated with the given name",
+			"or throws an error if not found"
+		},
+		parameters = {
+			"attributeName : the attribute name in the entity"
+		},
+		example="$entity.getAttributeByName('foo')",
+		since="3.4.0"
+	)
+	@VelocityReturnType("'attribute' object")	
 	public AttributeInContext getAttributeByName(String attributeName) throws GeneratorException {
 		if ( StrUtil.nullOrVoid(attributeName) ) {
 			throw new GeneratorException("Invalid argument : 'attributeName' is null or empty");
@@ -324,6 +328,17 @@ public class EntityInContext
 		else {
 			throw new GeneratorException("No attribute with name '" + attributeName + "'");
 		}
+	}
+	
+	private AttributeInContext getAttributeWithName(String attributeName) {
+		if ( attributeName != null ) {
+			for( AttributeInContext attribute : this.getAttributes() ) {
+				if ( attributeName.equals( attribute.getName() ) ) {
+					return attribute ;
+				}
+			}
+		}
+		return null;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -1072,8 +1087,7 @@ public class EntityInContext
 		example="$entity.databaseCatalog"
 	)
 	public String getDatabaseCatalog() {
-//		return databaseCatalog ;
-		return voidIfNull(databaseCatalog) ; // v 3.4.0
+		return voidIfNull(databaseCatalog);
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -1097,8 +1111,7 @@ public class EntityInContext
 		example="$entity.databaseSchema"
 	)
 	public String getDatabaseSchema() {
-		// return this.databaseSchema;
-		return voidIfNull(this.databaseSchema);  // v 3.4.0
+		return voidIfNull(this.databaseSchema);
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -1210,8 +1223,7 @@ public class EntityInContext
 		since="3.1.0"
 	)
 	public String getDatabaseComment() {
-		//return databaseComment ;
-		return voidIfNull(databaseComment); // v 3.4.0
+		return voidIfNull(databaseComment);
 	}
 	
 	//-------------------------------------------------------------------------------------

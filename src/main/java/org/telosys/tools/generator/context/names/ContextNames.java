@@ -74,7 +74,7 @@ public class ContextNames {
 		GENERATOR_OBJECTS_LIST.add( ContextName.LOADER );
 		GENERATOR_OBJECTS_LIST.add( ContextName.PROJECT );
 		GENERATOR_OBJECTS_LIST.add( ContextName.MODEL ); // ver 2.0.7
-		GENERATOR_OBJECTS_LIST.add( ContextName.DATABASES ); // ver 2.1.0
+		// ContextName.DATABASES ( removed in version 4.0.1 )
 		GENERATOR_OBJECTS_LIST.add( ContextName.TODAY );
 		GENERATOR_OBJECTS_LIST.add( ContextName.ENV ); // ver 2.1.0
 		GENERATOR_OBJECTS_LIST.add( ContextName.JDBC_FACTORY ); // ver 2.1.1
@@ -101,16 +101,17 @@ public class ContextNames {
 	static {
 		PREDEFINED_NAMES_LIST.add( ContextName.ATTRIBUTE ); 
 		PREDEFINED_NAMES_LIST.add( ContextName.ATTRIB ); 
-		PREDEFINED_NAMES_LIST.add( ContextName.FIELD ); 
+		//PREDEFINED_NAMES_LIST.add( ContextName.FIELD ); // replaced by ATTR in v 4.0.1
+		PREDEFINED_NAMES_LIST.add( ContextName.ATTR ); 
 				
 		PREDEFINED_NAMES_LIST.add( ContextName.LINK ); 
 
 		PREDEFINED_NAMES_LIST.add( ContextName.FK ); // v 2.0.7
-		PREDEFINED_NAMES_LIST.add( ContextName.FKCOL ); // v 2.0.7
+		// ContextName.FKCOL  ( removed in version 4.0.1 )
 
-		PREDEFINED_NAMES_LIST.add( ContextName.DATABASE ); // v 2.1.0
+		// ContextName.DATABASE ( removed in version 4.0.1 )
 		PREDEFINED_NAMES_LIST.add( ContextName.LINK_ATTRIBUTE ); // v 2.1.0
-		PREDEFINED_NAMES_LIST.add( ContextName.JOIN_COLUMN ); // v 2.1.0
+		// ContextName.JOIN_COLUMN ( removed in version 4.0.1 )
 
 		PREDEFINED_NAMES_LIST.add( ContextName.JDBC ); // v 2.1.1
 
@@ -118,9 +119,10 @@ public class ContextNames {
 		PREDEFINED_NAMES_LIST.add( ContextName.KEY_VALUES ); // v 3.0.0
 		PREDEFINED_NAMES_LIST.add( ContextName.DATA_VALUES ); // v 3.0.0
 
-		PREDEFINED_NAMES_LIST.add( ContextName.JOIN_TABLE ); // v 3.3.0
+		// PREDEFINED_NAMES_LIST.add( ContextName.JOIN_TABLE ); // v 3.3.0
 		PREDEFINED_NAMES_LIST.add( ContextName.FILE );   // v 3.3.0 
-		PREDEFINED_NAMES_LIST.add( ContextName.FKPART ); // v 3.3.0
+		PREDEFINED_NAMES_LIST.add( ContextName.FKPART ); // forgetting added in v 4.0.1
+		PREDEFINED_NAMES_LIST.add( ContextName.FK_ATTRIBUTE ); // v 3.3.0
 		
 		PREDEFINED_NAMES_LIST.add( ContextName.SQL );     // v 3.4.0
 		PREDEFINED_NAMES_LIST.add( ContextName.REFERENCE ); // v 3.4.0
