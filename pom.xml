@@ -30,10 +30,12 @@
 			<groupId>org.telosys</groupId>
 			<artifactId>telosys-tools-generator-engine-velocity17</artifactId>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
 			<artifactId>velocity</artifactId>
 		</dependency>
+		 -->
 
 		<!-- DEPENDENCIES / TESTS -->
 
