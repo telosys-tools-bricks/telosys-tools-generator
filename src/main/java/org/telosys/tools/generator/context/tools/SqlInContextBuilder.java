@@ -41,6 +41,7 @@ public class SqlInContextBuilder {
 	public static final String POSTGRESQL = "postgresql";
 	public static final String MYSQL = "mysql";
 	public static final String SQLSERVER = "sqlserver";
+	public static final String SQLITE = "sqlite"; // ver 4.0.1
 
 	private static final List<String> KNOWN_DB = new LinkedList<>();
 	static {
@@ -49,6 +50,7 @@ public class SqlInContextBuilder {
 		KNOWN_DB.add(POSTGRESQL);
 		KNOWN_DB.add(MYSQL);
 		KNOWN_DB.add(SQLSERVER);
+		KNOWN_DB.add(SQLITE); // ver 4.0.1
 	}
 
 	public static boolean knownDatabase(String dbName) {
