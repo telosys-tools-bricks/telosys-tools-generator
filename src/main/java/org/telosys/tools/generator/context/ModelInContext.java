@@ -106,8 +106,7 @@ public class ModelInContext
 		this.entitiesByTableName = new HashMap<>();
 		for ( EntityInContext entity : this.allEntities ) {
 			// The table name is unique 
-			//this.entitiesByTableName.put(entity.getDatabaseTable(), entity);
-			this.entitiesByTableName.put(SqlTableNameProvider.getTableName(entity), entity); // v 3.4.0
+			this.entitiesByTableName.put(SqlTableNameProvider.getTableName(entity), entity); 
 		}
 		
 		//--- Entities by CLASS NAME

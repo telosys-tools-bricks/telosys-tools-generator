@@ -79,8 +79,7 @@ public class H2InContext {
 	public List<String> ddlCreateTable(final EntityInContext entity) {
 		List<String> lines1 = buildTableDefinition (entity);
 		List<String> lines2 = new LinkedList<>();
-		//lines2.add( "CREATE TABLE " + entity.getDatabaseTable() + " (") ;
-		lines2.add( "CREATE TABLE " + SqlTableNameProvider.getTableName(entity) + " (") ; // v 3.4.0
+		lines2.add( "CREATE TABLE " + SqlTableNameProvider.getTableName(entity) + " (") ; 
 		
 		int c = 0 ;
 		int last = lines1.size() ;

@@ -278,11 +278,8 @@ public class SqlInContext {
 	)
 	public String tableName(EntityInContext entity) {
 		// Use entity database table name if defined in model
-//		String tableNameInModel = entity.getDatabaseTable() ;
-//		if ( ! StrUtil.nullOrVoid(tableNameInModel) ) {
 		if ( entity.hasDatabaseTable() ) {
 			// defined in the model => use it as is
-//			return tableNameInModel ;
 			return entity.getDatabaseTable() ;
 		}
 		else {
