@@ -18,7 +18,6 @@ package org.telosys.tools.generator.context.tools;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generic.model.enums.BooleanValue;
-import org.telosys.tools.generic.model.enums.DateType;
 
 /**
  * This class manages the JPA annotations for a given Java attribute ( a field mapped on a column )
@@ -91,16 +90,6 @@ public class JpaAnnotations
 		// @Temporal
 		if ( "java.util.Date".equals(sAttributeFullType) || "java.util.Calendar".equals(sAttributeFullType) ) 
 		{
-//			int dateTypeValue = attribute.getDateType() ; // same 'int' value as in Velocity template
-//			if ( dateTypeValue == DateType.DATE_ONLY.getValue() ) {
-//				annotationTemporal(annotations, "DATE");
-//			}
-//			else if ( dateTypeValue == DateType.TIME_ONLY.getValue() ) {
-//				annotationTemporal(annotations, "TIME");
-//			}
-//			else if ( dateTypeValue == DateType.DATE_AND_TIME.getValue() ) {
-//				annotationTemporal(annotations, "TIMESTAMP");
-//			}
 			if ( attribute.isDateType() ){
 				annotationTemporal(annotations, "DATE");
 			}
