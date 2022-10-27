@@ -889,7 +889,7 @@ public class JpaInContext {
 			for ( String s : jc ) {
 				String jcEnd = ",";
 				if ( i == jc.size() - 1) {
-					jcEnd = "}" ;
+					jcEnd = "} )" ;
 				}
 				annotations.addLine("    " + s + jcEnd );
 				i++;
