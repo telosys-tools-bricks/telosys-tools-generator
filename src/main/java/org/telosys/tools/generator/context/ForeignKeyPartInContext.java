@@ -76,7 +76,8 @@ public class ForeignKeyPartInContext
 	@VelocityMethod(
 		text={	
 			"Returns the name of the Foreign Key"
-			}
+			},
+		since="3.3.0"
 	)
 	public String getFkName() {
 		return fkName;
@@ -86,7 +87,8 @@ public class ForeignKeyPartInContext
 	@VelocityMethod(
 		text={	
 			"Returns the name of the ENTITY referenced by the Foreign Key"
-			}
+			},
+		since="3.3.0"
 	)
 	public String getReferencedEntityName() {
 		return referencedEntityName;
@@ -96,7 +98,8 @@ public class ForeignKeyPartInContext
 	@VelocityMethod(
 		text={	
 			"Returns the ENTITY object referenced by the Foreign Key"
-			}
+			},
+		since="4.1.0"
 	)
 	public EntityInContext getReferencedEntity() {
 		EntityInContext entity = modelInContext.getEntityByClassName(this.referencedEntityName);
@@ -110,7 +113,8 @@ public class ForeignKeyPartInContext
 	@VelocityMethod(
 		text={	
 			"Returns the name of the ATTRIBUTE referenced by the Foreign Key"
-			}
+			},
+		since="3.3.0"
 	)
 	public String getReferencedAttributeName() {
 		return referencedAttributeName;
@@ -120,7 +124,8 @@ public class ForeignKeyPartInContext
 	@VelocityMethod(
 		text={	
 			"Returns the ATTRIBUTE object referenced by the Foreign Key"
-			}
+			},
+		since="4.1.0"
 	)
 	public AttributeInContext getReferencedAttribute() {
 		EntityInContext entity = getReferencedEntity();
@@ -133,7 +138,7 @@ public class ForeignKeyPartInContext
 
 	//-------------------------------------------------------------------------------------
 	@Override
-	public String toString() {
+	public String toString() { // added in ver 4.1.0
 		return fkName + ":" + referencedEntityName + "." + referencedAttributeName ;
 	}
 

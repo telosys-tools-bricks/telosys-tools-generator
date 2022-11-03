@@ -19,7 +19,6 @@ import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.telosys.tools.commons.jdbctypes.JdbcTypesManager;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.ForeignKeyPart;
 import org.telosys.tools.generic.model.TagContainer;
@@ -53,7 +52,7 @@ public class FakeAttribute implements Attribute {
 
 	// ----- JDBC -----
 
-	private int _iJdbcTypeCode = 0; // dbTypeCode="4" - dbTypeCode="12"
+//	private int _iJdbcTypeCode = 0; // dbTypeCode="4" - dbTypeCode="12"
 
 	// ----- JAVA -----
 
@@ -61,23 +60,23 @@ public class FakeAttribute implements Attribute {
 
 	private final String neutralType; // v 3.0.0
 
-	private boolean _bNotNull = false; // javaNotNull="true|false"
+	private boolean notNull = false; // javaNotNull="true|false"
 
-	private String _sJavaDefaultValue = null; // javaDefaultValue="..."
+	private String defaultValue = null; // javaDefaultValue="..."
 
 	private boolean _bSelected = true; // selected by default
 
 	// ----- SPECIAL DATA for ALL -----
-	private String _sLabel = null;
-	private String _sInputType = null;
+	private String label = null;
+	private String inputType = null;
 
 	// ----- SPECIAL DATA for STRING -----
-	private boolean _bLongText = false; //
-	private boolean _bNotEmpty = false; // notEmpty="true|false"
-	private boolean _bNotBlank = false; // notBlank="true|false"
-	private Integer _iMinLength = null;
-	private Integer _iMaxLength = null;
-	private String _sPattern = null;
+	private boolean longText = false; //
+	private boolean notEmpty = false; // notEmpty="true|false"
+	private boolean notBlank = false; // notBlank="true|false"
+	private Integer minLength = null;
+	private Integer maxLength = null;
+	private String  pattern = null;
 
 	// ----- SPECIAL DATA for DATE & TIME -----
 	private DateType dateType = null; // enumeration - ver 3.0.0
@@ -89,12 +88,12 @@ public class FakeAttribute implements Attribute {
 	private String dateAfterValue = null;
 
 	// ----- SPECIAL DATA for NUMERIC -----
-	private BigDecimal _iMinValue = null;
-	private BigDecimal _iMaxValue = null;
+	private BigDecimal minValue = null;
+	private BigDecimal maxValue = null;
 
 	// ----- SPECIAL DATA for BOOLEAN -----
-	private String _sBooleanTrueValue = null; // the special value for TRUE
-	private String _sBooleanFalseValue = null; // the special value for FALSE
+	private String booleanTrueValue = null; // the special value for TRUE
+	private String booleanFalseValue = null; // the special value for FALSE
 
 	private GeneratedValueStrategy generatedValueStrategy = GeneratedValueStrategy.UNDEFINED ;
 	private String  generatedValueGeneratorName = null ;
@@ -223,21 +222,21 @@ public class FakeAttribute implements Attribute {
 	}
 
 	// -----------------------------------------------------------------------------
-
-	@Override
-	public Integer getJdbcTypeCode() {
-		return _iJdbcTypeCode;
-	}
-
-	public void setJdbcTypeCode(int typeCode) {
-		_iJdbcTypeCode = typeCode;
-	}
-
-	@Override
-	public String getJdbcTypeName() {
-		String text = JdbcTypesManager.getJdbcTypes().getTextForCode(getJdbcTypeCode());
-		return text != null ? text : "???";
-	}
+//
+//	@Override
+//	public Integer getJdbcTypeCode() {
+//		return _iJdbcTypeCode;
+//	}
+//
+//	public void setJdbcTypeCode(int typeCode) {
+//		_iJdbcTypeCode = typeCode;
+//	}
+//
+//	@Override
+//	public String getJdbcTypeName() {
+//		String text = JdbcTypesManager.getJdbcTypes().getTextForCode(getJdbcTypeCode());
+//		return text != null ? text : "???";
+//	}
 
 	// -----------------------------------------------------------------------------
 
@@ -277,7 +276,7 @@ public class FakeAttribute implements Attribute {
 	// -----------------------------------------------------------------------------
 	@Override
 	public String getDefaultValue() { // ver 3.0.0
-		return _sJavaDefaultValue;
+		return defaultValue;
 	}
 
 	/**
@@ -287,7 +286,7 @@ public class FakeAttribute implements Attribute {
 	 *            the default value ( eg : "0", "false" )
 	 */
 	public void setDefaultValue(String s) {
-		_sJavaDefaultValue = s;
+		defaultValue = s;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -299,66 +298,61 @@ public class FakeAttribute implements Attribute {
 	// -----------------------------------------------------------------------------
 	@Override
 	public boolean isNotNull() { // v 3.0.0
-		return _bNotNull;
+		return notNull;
 	}
 	public void setNotNull(boolean v) { // v 3.0.0
-		_bNotNull = v;
+		notNull = v;
 	}
 
 	// -----------------------------------------------------------------------------
 	@Override
-	public boolean isNotEmpty() { // v 3.0.0
-		return _bNotEmpty;
+	public boolean isNotEmpty() {
+		return notEmpty;
 	}
 	public void setNotEmpty(boolean v) {
-		_bNotEmpty = v;
+		notEmpty = v;
 	}
 
 	// -----------------------------------------------------------------------------
 	@Override
-	public boolean isNotBlank() { // v 3.0.0
-		return _bNotBlank;
+	public boolean isNotBlank() {
+		return notBlank;
 	}
-
 	public void setNotBlank(boolean v) {
-		_bNotBlank = v;
+		notBlank = v;
 	}
 
 	// -----------------------------------------------------------------------------
 	@Override
-	public Integer getMinLength() { // ver 3.0.0
-		return _iMinLength;
+	public Integer getMinLength() {
+		return minLength;
 	}
-
-	public void setMinLength(Integer v) { // ver 3.0.0
-		_iMinLength = v;
+	public void setMinLength(Integer v) {
+		minLength = v;
 	}
 
 	// -----------------------------------------------------------------------------
 	@Override
-	public Integer getMaxLength() { // ver 3.0.0
-		return _iMaxLength;
+	public Integer getMaxLength() {
+		return maxLength;
 	}
-
-	public void setMaxLength(Integer v) { // ver 3.0.0
-		_iMaxLength = v;
+	public void setMaxLength(Integer v) {
+		maxLength = v;
 	}
 
 	// -----------------------------------------------------------------------------
 	public String getPattern() {
-		return _sPattern;
+		return pattern;
 	}
-
 	public void setPattern(String v) {
-		_sPattern = v;
+		pattern = v;
 	}
 
 	// -----------------------------------------------------------------------------
 	@Override
-	public boolean isSelected() { // v 3.0.0
+	public boolean isSelected() {
 		return _bSelected;
 	}
-
 	public void setSelected(boolean b) {
 		_bSelected = b;
 	}
@@ -367,28 +361,26 @@ public class FakeAttribute implements Attribute {
 	// Special infos
 	// -----------------------------------------------------------------------------
 	@Override
-	public String getLabel() { // V 2.0.3
-		return _sLabel;
+	public String getLabel() {
+		return label;
 	}
-
-	public void setLabel(String s) { // V 2.0.3
-		_sLabel = s;
-	}
-
-	// -----------------------------------------------------------------------------
-	@Override
-	public String getInputType() { // V 2.0.3
-		return _sInputType;
-	}
-
-	public void setInputType(String s) { // V 2.0.3
-		_sInputType = s;
+	public void setLabel(String s) {
+		label = s;
 	}
 
 	// -----------------------------------------------------------------------------
 	@Override
-	public boolean isLongText() { // v 3.0.0
-		return _bLongText;
+	public String getInputType() {
+		return inputType;
+	}
+	public void setInputType(String s) { 
+		inputType = s;
+	}
+
+	// -----------------------------------------------------------------------------
+	@Override
+	public boolean isLongText() {
+		return longText;
 	}
 
 	public void setLongText(String flag) {
@@ -396,7 +388,7 @@ public class FakeAttribute implements Attribute {
 	}
 
 	public void setLongText(boolean b) {
-		_bLongText = b;
+		longText = b;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -453,7 +445,7 @@ public class FakeAttribute implements Attribute {
 	 * @return the value or "" if none (never null)
 	 */
 	public String getBooleanTrueValue() {
-		return (_sBooleanTrueValue != null ? _sBooleanTrueValue : "");
+		return (booleanTrueValue != null ? booleanTrueValue : "");
 	}
 
 	/**
@@ -462,33 +454,33 @@ public class FakeAttribute implements Attribute {
 	 * @return the value or "" if none (never null)
 	 */
 	public String getBooleanFalseValue() {
-		return (_sBooleanFalseValue != null ? _sBooleanFalseValue : "");
+		return (booleanFalseValue != null ? booleanFalseValue : "");
 	}
 
 	public void setBooleanTrueValue(String v) {
-		_sBooleanTrueValue = v;
+		booleanTrueValue = v;
 	}
 
 	public void setBooleanFalseValue(String v) {
-		_sBooleanFalseValue = v;
+		booleanFalseValue = v;
 	}
 
 	// -----------------------------------------------------------------------------
 
 	public BigDecimal getMinValue() { // ver 3.0.0
-		return _iMinValue;
+		return minValue;
 	}
 
 	public void setMinValue(BigDecimal v) { // ver 3.0.0
-		_iMinValue = v;
+		minValue = v;
 	}
 
 	public BigDecimal getMaxValue() { // ver 3.0.0
-		return _iMaxValue;
+		return maxValue;
 	}
 
 	public void setMaxValue(BigDecimal v) { // ver 3.0.0
-		_iMaxValue = v;
+		maxValue = v;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -523,7 +515,7 @@ public class FakeAttribute implements Attribute {
 		return getName() + "|" // added in v 3.0.0
 				+ "table:" + getDatabaseName() + "|" + (isKeyElement() ? "PK" : "") + "|" // v
 																							// 3.0.0
-				+ getJdbcTypeCode() + "|" + getNeutralType(); // v 3.0.0
+				+ "|" + getNeutralType(); // v 3.0.0
 	}
 
 	// ---------------------------------------------------------------------------------------------------

@@ -20,8 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.telosys.tools.commons.StrUtil;
-import org.telosys.tools.commons.jdbctypes.JdbcTypes;
-import org.telosys.tools.commons.jdbctypes.JdbcTypesManager;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.GeneratorUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
@@ -119,8 +117,9 @@ public class AttributeInContext {
     private final boolean isDatabaseNotNull ;  // True if "not null" in the database
     private final boolean isAutoIncremented  ;  // True if auto-incremented by the database
 
-    private final int     jdbcTypeCode    ;  // JDBC type code for this column
-    private final String  jdbcTypeName    ;  // JDBC type name 
+// removed in ver 4.1
+//    private final int     jdbcTypeCode    ;  // JDBC type code for this column
+//    private final String  jdbcTypeName    ;  // JDBC type name 
     
 	//--- FOREIGN KEYS  -------------------------------------------------
     private final boolean isForeignKey          ; 
@@ -219,8 +218,9 @@ public class AttributeInContext {
 		//--- Database info
 		this.databaseName     = StrUtil.notNull( attribute.getDatabaseName() ) ;
         this.databaseType     = StrUtil.notNull( attribute.getDatabaseType() ) ;
-        this.jdbcTypeCode     = attribute.getJdbcTypeCode() != null ? attribute.getJdbcTypeCode() : 0 ;
-        this.jdbcTypeName     = StrUtil.notNull( attribute.getJdbcTypeName() );
+// removed in v 4.1
+//        this.jdbcTypeCode     = attribute.getJdbcTypeCode() != null ? attribute.getJdbcTypeCode() : 0 ;
+//        this.jdbcTypeName     = StrUtil.notNull( attribute.getJdbcTypeName() );
         this.isKeyElement     = attribute.isKeyElement();
 
 		//--- Foreign Keys / references
@@ -698,41 +698,42 @@ public class AttributeInContext {
     }
     
 	//----------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the JDBC type of the attribute (the type code)"
-			}
-		)
-    public int getJdbcTypeCode() {
-        return jdbcTypeCode ;
-    }
-
-	//----------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the JDBC type name ('CHAR', 'VARCHAR', 'NUMERIC', ... )<br>",
-			"The 'java.sql.Types' constant name for the current JDBC type code"
-			}
-		)
-    public String getJdbcTypeName() {
-        return jdbcTypeName ;
-    }
-
-	//----------------------------------------------------------------------
-    /**
-     * Returns the recommended Java type for the JDBC type 
-     * @return
-     */
-	@VelocityMethod(
-			text={	
-				"Returns the recommended Java type for the JDBC type of the attribute"
-				}
-		)
-    public String getJdbcRecommendedJavaType()
-    {
-    	JdbcTypes types = JdbcTypesManager.getJdbcTypes();
-    	return types.getJavaTypeForCode(jdbcTypeCode, isDatabaseNotNull );
-    }
+// removed in v 4.1	
+//	@VelocityMethod(
+//		text={	
+//			"Returns the JDBC type of the attribute (the type code)"
+//			}
+//		)
+//    public int getJdbcTypeCode() {
+//        return jdbcTypeCode ;
+//    }
+//
+//	//----------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns the JDBC type name ('CHAR', 'VARCHAR', 'NUMERIC', ... )<br>",
+//			"The 'java.sql.Types' constant name for the current JDBC type code"
+//			}
+//		)
+//    public String getJdbcTypeName() {
+//        return jdbcTypeName ;
+//    }
+//
+//	//----------------------------------------------------------------------
+//    /**
+//     * Returns the recommended Java type for the JDBC type 
+//     * @return
+//     */
+//	@VelocityMethod(
+//			text={	
+//				"Returns the recommended Java type for the JDBC type of the attribute"
+//				}
+//		)
+//    public String getJdbcRecommendedJavaType()
+//    {
+//    	JdbcTypes types = JdbcTypesManager.getJdbcTypes();
+//    	return types.getJavaTypeForCode(jdbcTypeCode, isDatabaseNotNull );
+//    }
 
 	//----------------------------------------------------------------------
     /**
