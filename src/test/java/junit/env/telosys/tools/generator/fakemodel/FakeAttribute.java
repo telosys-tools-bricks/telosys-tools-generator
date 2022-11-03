@@ -44,12 +44,12 @@ public class FakeAttribute implements Attribute {
 	private String  databaseDefaultValue = null; 
 	private String  databaseComment = null; 
 
-	private boolean _bKeyElement = false; 
+	private boolean keyElement = false; 
 
-	private boolean _bForeignKeySimple = false; 
-	private boolean _bForeignKeyComposite = false; 
+	private boolean foreignKeySimple = false; 
+	private boolean foreignKeyComposite = false; 
 
-	private boolean _bAutoIncremented = false; 
+	private boolean autoIncremented = false; 
 
 	// ----- JDBC -----
 
@@ -57,9 +57,9 @@ public class FakeAttribute implements Attribute {
 
 	// ----- JAVA -----
 
-	private String _sName;
+	private String name;
 
-	private final String _sNeutralType; // v 3.0.0
+	private final String neutralType; // v 3.0.0
 
 	private boolean _bNotNull = false; // javaNotNull="true|false"
 
@@ -81,12 +81,12 @@ public class FakeAttribute implements Attribute {
 
 	// ----- SPECIAL DATA for DATE & TIME -----
 	private DateType dateType = null; // enumeration - ver 3.0.0
-	private boolean _bDatePast = false;
-	private boolean _bDateFuture = false;
-	private boolean _bDateBefore = false;
-	private boolean _bDateAfter = false;
-	private String _sDateBeforeValue = null;
-	private String _sDateAfterValue = null;
+	private boolean  datePast = false;
+	private boolean  dateFuture = false;
+//	private boolean _bDateBefore = false;
+//	private boolean _bDateAfter = false;
+	private String dateBeforeValue = null;
+	private String dateAfterValue = null;
 
 	// ----- SPECIAL DATA for NUMERIC -----
 	private BigDecimal _iMinValue = null;
@@ -116,9 +116,9 @@ public class FakeAttribute implements Attribute {
 	 */
 	public FakeAttribute(String name, String neutralType, boolean keyElement) {
 		super();
-		this._sName = name;
-		this._sNeutralType = neutralType;
-		this._bKeyElement = keyElement ;
+		this.name = name;
+		this.neutralType = neutralType;
+		this.keyElement = keyElement ;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -134,42 +134,42 @@ public class FakeAttribute implements Attribute {
 	// -----------------------------------------------------------------------------
 	@Override
 	public boolean isKeyElement() { // v 3.0.0
-		return _bKeyElement;
+		return keyElement;
 	}
 
 	// -----------------------------------------------------------------------------
 	@Override
 	public boolean isFK() {
-		return _bForeignKeySimple || _bForeignKeyComposite;
+		return foreignKeySimple || foreignKeyComposite;
 	}
 
 	public void setFKSimple(boolean flag) {
-		_bForeignKeySimple = flag;
+		foreignKeySimple = flag;
 	}
 
 	@Override
 	public boolean isFKSimple() {
-		return _bForeignKeySimple;
+		return foreignKeySimple;
 	}
 
 	public void setFKComposite(boolean flag) {
-		_bForeignKeyComposite = flag;
+		foreignKeyComposite = flag;
 	}
 
 	@Override
 	public boolean isFKComposite() {
-		return _bForeignKeyComposite;
+		return foreignKeyComposite;
 	}
 
 	// -----------------------------------------------------------------------------
 
 	public void setAutoIncremented(boolean b) {
-		_bAutoIncremented = b;
+		autoIncremented = b;
 	}
 
 	@Override
 	public boolean isAutoIncremented() {
-		return _bAutoIncremented;
+		return autoIncremented;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -259,11 +259,11 @@ public class FakeAttribute implements Attribute {
 	// -----------------------------------------------------------------------------
 	@Override
 	public String getName() { // v 3.0.0
-		return _sName;
+		return name;
 	}
 
 	public void setName(String s) { // v 3.0.0
-		_sName = s;
+		name = s;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -271,7 +271,7 @@ public class FakeAttribute implements Attribute {
 	// -----------------------------------------------------------------------------
 	@Override
 	public String getNeutralType() { // v 3.0.0
-		return _sNeutralType;
+		return neutralType;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -416,53 +416,34 @@ public class FakeAttribute implements Attribute {
 
 	@Override
 	public boolean isDatePast() {
-		return _bDatePast;
+		return datePast;
 	}
-
 	public void setDatePast(boolean v) {
-		_bDatePast = v;
+		datePast = v;
 	}
 
 	@Override
 	public boolean isDateFuture() {
-		return _bDateFuture;
+		return dateFuture;
 	}
-
 	public void setDateFuture(boolean v) {
-		_bDateFuture = v;
+		dateFuture = v;
 	}
 
 	@Override
-	public boolean isDateBefore() {
-		return _bDateBefore;
-	}
-
-	public void setDateBefore(boolean v) {
-		_bDateBefore = v;
-	}
-
 	public String getDateBeforeValue() {
-		return _sDateBeforeValue;
+		return dateBeforeValue;
 	}
-
 	public void setDateBeforeValue(String v) {
-		_sDateBeforeValue = v;
+		dateBeforeValue = v;
 	}
 
-	public boolean isDateAfter() {
-		return _bDateAfter;
-	}
-
-	public void setDateAfter(boolean v) {
-		_bDateAfter = v;
-	}
-
+	@Override
 	public String getDateAfterValue() {
-		return _sDateAfterValue;
+		return dateAfterValue;
 	}
-
 	public void setDateAfterValue(String v) {
-		_sDateAfterValue = v;
+		dateAfterValue = v;
 	}
 	// -----------------------------------------------------------------------------
 
@@ -523,9 +504,7 @@ public class FakeAttribute implements Attribute {
 		setDateType(null);
 		setDatePast(false);
 		setDateFuture(false);
-		setDateBefore(false);
 		setDateBeforeValue(null);
-		setDateAfter(false);
 		setDateAfterValue(null);
 		// --- Number category
 		setMinValue(null);
@@ -553,35 +532,21 @@ public class FakeAttribute implements Attribute {
 	// ---------------------------------------------------------------------------------------------------
 	@Override
 	public boolean isGeneratedValue() {
-//		return isGeneratedValue ;
 		return generatedValueStrategy != GeneratedValueStrategy.UNDEFINED;
 	}
-//	public void setGeneratedValue(boolean v) {
-//		isGeneratedValue = v;
-//	}
 
-//	@Override
-//	public String getGeneratedValueGenerator() {
-//		return generatedValueGenerator ;
-//	}
 	@Override
 	public String getGeneratedValueGeneratorName() {
 		return generatedValueGeneratorName;
 	}	
-//	public void setGeneratedValueGenerator(String v) {
 	public void setGeneratedValueGeneratorName(String v) {
 		generatedValueGeneratorName = v;
 	}
 
-//	@Override
-//	public String getGeneratedValueStrategy() {
-//		return generatedValueStrategy ;
-//	}
 	@Override
 	public GeneratedValueStrategy getGeneratedValueStrategy() {
 		return generatedValueStrategy;
 	}	
-//	public void setGeneratedValueStrategy(String v) {
 	public void setGeneratedValueStrategy(GeneratedValueStrategy v) {
 		generatedValueStrategy = v ;
 	}
@@ -589,18 +554,6 @@ public class FakeAttribute implements Attribute {
 	// ---------------------------------------------------------------------------------------------------
 	// Sequence generator information
 	// ---------------------------------------------------------------------------------------------------
-//	@Override
-//	public boolean hasSequenceGenerator() {
-//		return hasSequenceGenerator;
-//	}
-//	public void setHasSequenceGenerator(boolean v) {
-//		hasSequenceGenerator = v;
-//	}
-
-//	@Override
-//	public Integer getSequenceGeneratorAllocationSize() {
-//		return null;
-//	}
 	@Override
 	public Integer getGeneratedValueAllocationSize() {
 		return generatedValueAllocationSize;
@@ -609,60 +562,15 @@ public class FakeAttribute implements Attribute {
 		this.generatedValueAllocationSize = v;
 	}
 
-//	@Override
-//	public String getSequenceGeneratorName() {
-//		return sequenceGeneratorName;
-//	}
-//	public void setSequenceGeneratorName(String v) {
-//		sequenceGeneratorName = v ;
-//	}
-
-//	@Override
-//	public String getSequenceGeneratorSequenceName() {
-//		return sequenceGeneratorSequenceName;
-//	}
 	@Override
 	public String getGeneratedValueSequenceName() {
 		return generatedValueSequenceName;
 	}	
-//	public void setSequenceGeneratorSequenceName(String v) {
 	public void setGeneratedValueSequenceName(String v) {
 		generatedValueSequenceName = v ;
 	}
 
 	// ---------------------------------------------------------------------------------------------------
-	// Table generator information
-	// ---------------------------------------------------------------------------------------------------
-//	@Override
-//	public boolean hasTableGenerator() {
-//		return false;
-//	}
-//
-//	@Override
-//	public String getTableGeneratorName() {
-//		return null;
-//	}
-//
-//	@Override
-//	public String getTableGeneratorPkColumnName() {
-//		return null;
-//	}
-//
-//	@Override
-//	public String getTableGeneratorPkColumnValue() {
-//		return null;
-//	}
-//
-//	@Override
-//	public String getTableGeneratorTable() {
-//		return null;
-//	}
-//
-//	@Override
-//	public String getTableGeneratorValueColumnName() {
-//		return null;
-//	}
-
 	@Override
 	public boolean isObjectTypeExpected() {
 		return false;

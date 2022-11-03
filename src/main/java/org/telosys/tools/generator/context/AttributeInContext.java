@@ -41,7 +41,7 @@ import org.telosys.tools.generic.model.types.NeutralType;
 import org.telosys.tools.generic.model.types.TypeConverter;
 
 /**
- * Context class for an ATTRIBUTE ( with or without database mapping )
+ * "$attribute" object usable in templates 
  *  
  * @author Laurent GUERIN
  */
@@ -103,12 +103,9 @@ public class AttributeInContext {
     private final String  maxValue ;
 
     //--- Further info for DATE and TIME ---------------------------------
-    // removed in v 3.4.0 private final DateType dateType       ;  // By default only DATE
     private final boolean  isDateInThePast ;
     private final boolean  isDateInTheFuture ;
-    // private final boolean  _bDateBefore      ; // Removed in v 3.3.0
     private final String   dateBeforeValue  ;
-    // private final boolean  _bDateAfter       ;  // Removed in v 3.3.0
     private final String   dateAfterValue   ;
 
 	//--- Database info -------------------------------------------------
@@ -157,17 +154,13 @@ public class AttributeInContext {
 	private final boolean isUsedInSelectedLinks ; 
 	
 	//--- TAGS (added in v 3.3.0)
-//	private final Map<String, String> tagsMap ; // All tags defined for the attribute (0..N) 
 	private final TagContainer tagContainer ; // All tags defined for the attribute 
 
     private final BooleanValue  insertable ; // Added in v 3.3.0
     private final BooleanValue  updatable  ; // Added in v 3.3.0
     
-   // private final String sqlType ; // Added in v 3.3.0 // Removed in v 3.4.0
-
     private final boolean isTransient ; // Added in v 3.3.0
 
-    //private final SqlConverter sqlConverter ; // Added in v 3.4.0
     private final EnvInContext env; // Added in v 3.4.0
 	
     private final boolean isUnique ;  // v 3.4.0
@@ -237,7 +230,7 @@ public class AttributeInContext {
         this.referencedEntityClassName = attribute.getReferencedEntityClassName() ;
         // Build "Foreign Key Parts" if any ( v 3.3.0 )
         for ( ForeignKeyPart fkPart : attribute.getFKParts() ) {
-        	this.fkParts.add(new ForeignKeyPartInContext(fkPart)); // v 3.3.0
+        	this.fkParts.add(new ForeignKeyPartInContext(fkPart, modelInContext));
         }
 
         this.size     = attribute.getSize(); // v 3.4.0
@@ -757,8 +750,8 @@ public class AttributeInContext {
 
 	//----------------------------------------------------------------------
 	@VelocityMethod(
-	text={ "Returns TRUE if the attribute is used in (at least) one Foreign Key",
-		"( it can be an 'Simple FK' or a 'Composite FK' or both )" },
+	text={ "Returns TRUE if the attribute is used in at least one Foreign Key",
+		"( it can be a 'Simple FK' or a 'Composite FK' or several FK of any type )" },
 	since="3.0.0"
 	)
     public boolean isFK() { 
@@ -767,8 +760,8 @@ public class AttributeInContext {
 
 	//----------------------------------------------------------------------
 	@VelocityMethod(
-	text={ "Returns TRUE if the attribute is itself a 'Simple Foreign Key' ",
-		   "( the FK is based only on this single attribute ) " },
+	text={ "Returns TRUE if the attribute is used in at least one 'Simple Foreign Key' ",
+		   "( 'Simple FK' means the FK is based only on this attribute ) " },
 	since="3.0.0"
 	)
     public boolean isFKSimple() { 
@@ -777,8 +770,8 @@ public class AttributeInContext {
 
 	//----------------------------------------------------------------------
 	@VelocityMethod(
-	text={ "Returns TRUE if the attribute is a part of a 'Composite Foreign Key' ",
-		   "( the FK is based on many attributes including this attribute ) " },
+	text={ "Returns TRUE if the attribute is used in at least one 'Composite Foreign Key' ",
+		   "( 'Composite FK' means the FK is based on many attributes including this attribute ) " },
 	since="3.0.0"
 	)
     public boolean isFKComposite() { 
@@ -799,12 +792,12 @@ public class AttributeInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( 
 	text= { 
-		"Returns the parts of Foreign Keys for which the attribute is implied. ",
-		"Each 'FK part' provides the referenced entity and attribute (with table and colunm)",
+		"Returns all the parts of Foreign Keys in which the attribute is involved. ",
+		"Each 'FK part' provides the referenced entity and attribute.",
 		"An empty list is returned if the attribute does not participate in any FK."
 	},
 	example={	
-		"#foreach( $fkPart in $attrib.fkParts )",
+		"#foreach( $fkPart in $attribute.fkParts )",
 		"...",
 		"#end" 
 	},
@@ -814,7 +807,16 @@ public class AttributeInContext {
 	public List<ForeignKeyPartInContext> getFkParts() {
 		return fkParts ;
 	}
-	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns the number of FK parts in which the attribute is involved."
+		},
+		example="$attribute.fkPartsCount",
+		since="4.1.0"
+	)
+	public int getFkPartsCount() {
+		return fkParts.size() ;
+	}	
 	//-------------------------------------------------------------------------------------
     /**
      * Returns TRUE if the attribute is auto-incremented by the Database engine
@@ -1205,10 +1207,8 @@ public class AttributeInContext {
 	since="2.0.7"
 	)
 	public boolean isNumberType() {
-    	if ( isByteType() || isShortType() || isIntegerType() || isLongType() )   return true ;
-    	if ( isFloatType() || isDoubleType() )   return true ;
-    	if ( isDecimalType() )   return true ;
-    	return false ;
+    	return  isByteType() || isShortType() || isIntegerType() || isLongType() 
+    			|| isFloatType() || isDoubleType() || isDecimalType() ;
 	}
 
 	//------------------------------------------------------------------------------------------

@@ -15,13 +15,15 @@
  */
 package org.telosys.tools.generator.context;
 
+import org.telosys.tools.commons.StrUtil;
+import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.ForeignKeyPart;
 
 /**
- * Database Foreign Key Part exposed in the generator context
+ * "$fkPart" object exposed in the generator context
  * 
  * @author Laurent Guerin
  *
@@ -36,7 +38,7 @@ import org.telosys.tools.generic.model.ForeignKeyPart;
 		since = "3.3.0",
 		example= {
 				"",
-				"#foreach( $fkPart in $attrib.fkParts )",
+				"#foreach( $fkPart in $attribute.fkParts )",
 				"    $fkPart.fkName : $fkPart.referencedEntityName / $fkPart.referencedAttributeName ",
 				"#end"				
 		}
@@ -45,19 +47,29 @@ import org.telosys.tools.generic.model.ForeignKeyPart;
 public class ForeignKeyPartInContext
 {
 	private final String fkName ;
-//	private final String referencedTableName ;  // removed in v 3.4.0
-//	private final String referencedColumnName ; // removed in v 3.4.0
 	private final String referencedEntityName ;
 	private final String referencedAttributeName ;
-	
+	private final ModelInContext modelInContext ;  
+
 	//-------------------------------------------------------------------------------------
-	public ForeignKeyPartInContext( ForeignKeyPart fkPart ) {
+	public ForeignKeyPartInContext( ForeignKeyPart fkPart, ModelInContext modelInContext ) {
 		super();
+		if ( StrUtil.nullOrVoid(fkPart.getFkName()) ) {
+			throw new IllegalArgumentException("FK name is null or void");
+		}
+		if ( StrUtil.nullOrVoid(fkPart.getReferencedEntityName()) ) {
+			throw new IllegalArgumentException("FK referenced entity name is null or void");
+		}
+		if ( StrUtil.nullOrVoid(fkPart.getReferencedAttributeName()) ) {
+			throw new IllegalArgumentException("FK referenced attribute name is null or void");
+		}
+		if ( modelInContext == null ) {
+			throw new IllegalArgumentException("model is null");
+		}
 		this.fkName   = fkPart.getFkName();
-//		this.referencedTableName     = fkPart.getReferencedTable(); 
-//		this.referencedColumnName    = fkPart.getReferencedColumn();
-		this.referencedEntityName    = fkPart.getReferencedEntity();
-		this.referencedAttributeName = fkPart.getReferencedAttribute();
+		this.referencedEntityName    = fkPart.getReferencedEntityName();
+		this.referencedAttributeName = fkPart.getReferencedAttributeName();
+		this.modelInContext = modelInContext;
 	}
 	 
 	//-------------------------------------------------------------------------------------
@@ -69,28 +81,6 @@ public class ForeignKeyPartInContext
 	public String getFkName() {
 		return fkName;
 	}
-
-	//-------------------------------------------------------------------------------------
-	// removed in v 3.4.0
-//	@VelocityMethod(
-//		text={	
-//			"Returns the name of the TABLE referenced by the Foreign Key"
-//			}
-//	)
-//	public String getReferencedTableName() {
-//		return referencedTableName;
-//	}
-
-	//-------------------------------------------------------------------------------------
-	// removed in v 3.4.0
-//	@VelocityMethod(
-//		text={	
-//			"Returns the name of the COLUMN referenced by the Foreign Key"
-//			}
-//	)
-//	public String getReferencedColumnName() {
-//		return referencedColumnName;
-//	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -105,11 +95,46 @@ public class ForeignKeyPartInContext
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
+			"Returns the ENTITY object referenced by the Foreign Key"
+			}
+	)
+	public EntityInContext getReferencedEntity() {
+		EntityInContext entity = modelInContext.getEntityByClassName(this.referencedEntityName);
+		if ( entity == null ) {
+			throw new IllegalStateException(ContextName.FKPART + " : unknown entity '" + this.referencedEntityName + "'");
+		}
+		return entity;
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
 			"Returns the name of the ATTRIBUTE referenced by the Foreign Key"
 			}
 	)
 	public String getReferencedAttributeName() {
 		return referencedAttributeName;
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the ATTRIBUTE object referenced by the Foreign Key"
+			}
+	)
+	public AttributeInContext getReferencedAttribute() {
+		EntityInContext entity = getReferencedEntity();
+		try {
+			return entity.getAttributeByName(this.referencedAttributeName);
+		} catch (GeneratorException e) {
+			throw new IllegalStateException(ContextName.FKPART + " : unknown attribute '" + this.referencedAttributeName + "'");
+		}
+	}
+
+	//-------------------------------------------------------------------------------------
+	@Override
+	public String toString() {
+		return fkName + ":" + referencedEntityName + "." + referencedAttributeName ;
 	}
 
 }

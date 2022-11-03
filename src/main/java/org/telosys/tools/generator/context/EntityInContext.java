@@ -37,7 +37,7 @@ import org.telosys.tools.generic.model.Link;
 import org.telosys.tools.generic.model.TagContainer;
 
 /**
- * Entity loaded from a model and exposed in the generator context <br>
+ * "$entity" object exposed in the generator context
  * 
  * @author Laurent GUERIN
  *
@@ -45,7 +45,6 @@ import org.telosys.tools.generic.model.TagContainer;
 //-------------------------------------------------------------------------------------
 @VelocityObject(
 		contextName= ContextName.ENTITY ,
-		//otherContextNames=ContextName.BEAN_CLASS,
 		text = { 
 				"Entity class for the current generation ",
 				"",
@@ -1776,8 +1775,9 @@ public class EntityInContext
 		return s != null ? s : "" ;
 	}
 	private boolean nullOrVoid(String s) {
-		if ( s == null ) return true ;
-		if ( s.length() == 0 ) return true ;
-		return false;
+//		if ( s == null ) return true ;
+//		if ( s.length() == 0 ) return true ;
+//		return false;
+		return StrUtil.nullOrVoid(s);
 	}
 }
