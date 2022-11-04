@@ -91,6 +91,8 @@ public class LinkInContext {
     
 	private final TagContainer tagContainer ; // All tags defined for the link v 3.4.0
 
+	private final boolean      isOrphanRemoval ; // Added in v 4.1.0
+
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -106,18 +108,8 @@ public class LinkInContext {
 		this.modelInContext = modelInContext ; // v 3.0.0
 		this.envInContext = envInContext ; // v 3.3.0
 		
-// removed in v 3.4.0
-//		//--- Build the list of "join columns"
-//		this.joinColumns = new LinkedList<>();
-//		if ( link.getJoinColumns() != null ) {
-//			for ( JoinColumn joinColumn : link.getJoinColumns() ) {
-//				this.joinColumns.add( new JoinColumnInContext(joinColumn) ) ;
-//			}
-//		}
 		this.linkAttributes = new LinkedList<>();
-//		if ( link.getJoinAttributes() != null ) {
 		if ( link.getAttributes() != null ) {
-//			for ( JoinAttribute joinAttribute : link.getJoinAttributes() ) {
 			for ( LinkAttribute linkAttribute : link.getAttributes() ) {
 				this.linkAttributes.add( new LinkAttributeInContext(modelInContext, entity, 
 						link, 
@@ -126,20 +118,10 @@ public class LinkInContext {
 			}
 		}
 
-//		//--- Set the join table if any
-//		if ( link.getJoinTable() != null ) {
-//			this.joinTable = new JoinTableInContext( link.getJoinTable() ) ;
-//		}
-//		else {
-//			this.joinTable = null ;
-//		}
 		this.joinEntityName = link.getJoinEntityName(); // added in v 3.4.0
 		
 		//--- Init link information (ver 3.0.0)
-//		this.id = link.getId() ; // removed in v 3.4.0
 		this.fieldName = link.getFieldName() ;
-		// _fieldType = link.getFieldType(); // removed in v 3.3.0
-//		this.targetTableName = link.getTargetTableName(); // removed in v 3.4.0
 		this.targetEntityName = link.getReferencedEntityName();  // added in v 3.4.0
 		this.isSelected = link.isSelected();
 		this.mappedBy = link.getMappedBy(); // keep null if not defined
@@ -156,6 +138,8 @@ public class LinkInContext {
 		this.isEmbedded  = link.isEmbedded(); // v 3.3.0
 		
 		this.tagContainer = link.getTagContainer(); // V 3.4.0
+		
+		this.isOrphanRemoval = link.isOrphanRemoval(); // v 4.1.0
 	}
 	
 	/**
@@ -165,8 +149,6 @@ public class LinkInContext {
 	 * @return
 	 */
 	private String buildCollectionType(String className) {
-		// Before v 3.3.0 always return "List<" + className + ">" ; 
-		// get collection type from current target language (added in v 3.3.0 )
 		TypeConverter typeConverter = envInContext.getTypeConverter();
 		// get collection type for the current language 
 		String collectionType = typeConverter.getCollectionType(className);
@@ -201,8 +183,7 @@ public class LinkInContext {
 			"n : the number of blanks to be added at the end of the name" 
 			}
 	)
-	public String formattedFieldType(int iSize) throws GeneratorException
-    {
+	public String formattedFieldType(int iSize) {
 		String currentType = getFieldType();
 		String sTrailingBlanks = "";
         int iDelta = iSize - currentType.length();
@@ -254,31 +235,6 @@ public class LinkInContext {
 		return Util.buildSetter(this.getFieldName());
 	}
 
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns TRUE if the link has a 'join table'"
-//			}
-//	)
-//	public boolean hasJoinTable() {
-//		return joinTable != null ;
-//	}	
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns the name of the 'join table' for the link ",
-//			"NB : can be null if the link doesn't have a 'join table'",
-//			"check existence before with 'hasJoinTable()' "
-//			}
-//	)
-//	public String getJoinTableName() {
-//		if ( joinTable != null ) {
-//			return joinTable.getName();
-//		}
-//		else {
-//			return null ;
-//		}
-//	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -302,30 +258,6 @@ public class LinkInContext {
 		return voidIfNull(this.joinEntityName) ;
 	}
 	
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns the 'join table' object for the link ",
-//			"NB : can be null if the link doesn't have a 'join table' ",
-//			"check existence before with 'hasJoinTable()' "			
-//			}
-//	)
-//	public JoinTableInContext getJoinTable() {
-//		return joinTable ;
-//	}
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns TRUE if the link has 'join columns' (at least one)"
-//			}
-//	)
-//	public boolean hasJoinColumns() {
-//		if ( joinColumns != null ) {
-//			return ! joinColumns.isEmpty() ;
-//		}
-//		return false ;
-//	}
-	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -335,15 +267,6 @@ public class LinkInContext {
 		since="2.1.0"
 	)
 	public boolean hasAttributeInPrimaryKey() throws GeneratorException {
-//		if ( joinColumns != null ) {
-//			for ( JoinColumnInContext jc : joinColumns ) {
-//				//--- ORIGIN attribute
-//				AttributeInContext attribOrigin = entity.getAttributeByColumnName(jc.getName());
-//				if ( attribOrigin.isKeyElement() ) {
-//					return true ;
-//				}
-//			}
-//		}
 		// v 3.4.0
 		for ( LinkAttributeInContext a : linkAttributes) { 
 			//--- Search ORIGIN attribute in entity
@@ -355,26 +278,6 @@ public class LinkInContext {
 		return false ;
 	}
 	
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns the 'join columns' for the link "
-//			}
-//	)
-//	public List<JoinColumnInContext> getJoinColumns() {
-//		return joinColumns ;
-//	}
-	
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns the 'join attributes' for the link "
-//			}
-//	)
-//	public List<JoinAttributeInContext> getJoinAttributes() {
-//		return joinAttributes ;
-//	}
-	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
 			"Returns the number of attributes used to define the link"
@@ -383,47 +286,9 @@ public class LinkInContext {
 		since="2.1.0"
 	)
 	public int getAttributesCount() {
-//		if ( joinColumns != null ) {
-//			return joinColumns.size() ;
-//		}
-//		return 0 ;
 		return linkAttributes.size(); // never null
 	}
 
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns a list of attributes pair defining the link ",
-//			"Each pair contains the owning side attribute and its corresponding reverse side attribute ",
-//			"Each link is supposed to contain at least 1 pair of attributes"
-//			}
-//	)
-//	@VelocityReturnType("List of '$linkAttribute' (origin-target association) ")	
-//	public List<LinkAttributesPairInContext> getAttributes() throws GeneratorException {
-//		List<LinkAttributesPairInContext> list = new LinkedList<>();
-////		if ( joinColumns != null ) {
-////			for ( JoinColumnInContext jc : joinColumns ) {
-////				//--- ORIGIN attribute
-////				AttributeInContext attribOrigin = entity.getAttributeByColumnName(jc.getName());
-////				//--- TARGET attribute
-////				EntityInContext referencedEntity = this.getTargetEntity();
-////				AttributeInContext attribTarget = referencedEntity.getAttributeByColumnName(jc.getReferencedColumnName());
-////				//--- New attribute mapping in the list
-////				list.add( new LinkAttributesPairInContext(attribOrigin, attribTarget) );
-////			}
-////		}
-//		for ( JoinAttributeInContext ja : joinAttributes ) {
-//			//--- ORIGIN attribute
-//			AttributeInContext attribOrigin = entity.getAttributeByName(ja.getOriginAttributeName());
-//			//--- TARGET attribute
-//			EntityInContext referencedEntity = this.getTargetEntity();
-//			AttributeInContext attribTarget = referencedEntity.getAttributeByName(ja.getReferencedAttributeName());
-//			//--- New attribute mapping in the list
-//			list.add( new LinkAttributesPairInContext(attribOrigin, attribTarget) );
-//		}
-//		return list ;
-//	}
-	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -446,13 +311,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean usesAttribute(AttributeInContext attribute) {
-//		if ( joinColumns != null ) {
-//			for ( JoinColumnInContext jc : joinColumns ) {
-//				if ( attribute.getDatabaseName().equals( jc.getName() ) ) {
-//					return true ;
-//				}
-//			}
-//		}
 		for ( LinkAttributeInContext linkAttribute : linkAttributes ) {
 			if ( attribute.getName().equals( linkAttribute.getOriginAttributeName()) ) {
 				return true ;
@@ -461,17 +319,6 @@ public class LinkInContext {
 		return false ; 
 	}
 	
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns the unique id of the link in the repository (id used by the tool)",
-//			"(not supposed to be used in a generated file)"
-//			}
-//	)
-//	public String getId() { // removed in v 3.4.0
-//		return id ;
-//	}
-
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -481,16 +328,6 @@ public class LinkInContext {
 	public boolean isSelected() {
 		return isSelected ;
 	}
-
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns the name of the target table (table referenced by the link)"
-//			}
-//	)
-//	public String getTargetTableName() { // removed in v 3.4.0
-//		return targetTableName ;
-//	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -509,7 +346,7 @@ public class LinkInContext {
 			"eg : Person, List<Person>,  ..."
 			}
 	)
-	public String getFieldType() throws GeneratorException {
+	public String getFieldType() {
 		String targetEntityClassName = this.getTargetEntitySimpleType() ;
 		if ( this.isCollectionType() ) {
 			return buildCollectionType(targetEntityClassName);
@@ -561,18 +398,6 @@ public class LinkInContext {
 			},
 		since = "2.1.0"
 	)
-//	public EntityInContext getTargetEntity() throws GeneratorException {
-////		String targetTableName = getTargetTableName();
-//		if ( targetTableName == null ) {
-//			throw new GeneratorException("Cannot get target entity. No target table name for link '" + getId() + "'" );
-//		}
-//		
-//		EntityInContext targetEntity = modelInContext.getEntityByTableName( targetTableName ); // v 3.0.0
-//		if ( targetEntity == null ) {
-//			throw new GeneratorException("Cannot get target entity. No entity for table name '" + targetTableName + "'" );
-//		}
-//		return targetEntity ;
-//	}
 	// new version based on 'targetEntityName'
 	public EntityInContext getTargetEntity() throws GeneratorException {
 		if ( this.targetEntityName == null ) {
@@ -607,8 +432,7 @@ public class LinkInContext {
 			""
 			}
 	)
-	public String getTargetEntitySimpleType() throws GeneratorException {
-		// return this.getTargetEntity().getName();
+	public String getTargetEntitySimpleType() {
 		return voidIfNull(this.targetEntityName); // v 3.4.0
 	}
 	
@@ -706,7 +530,6 @@ public class LinkInContext {
 			}
 	)
 	public boolean isCollectionType() {
-		//return cardinality == Cardinality.ONE_TO_MANY || cardinality == Cardinality.MANY_TO_MANY ;
 		return isCardinalityToMany();
 	}
 
@@ -1034,11 +857,27 @@ public class LinkInContext {
 	public boolean tagValueAsBoolean(String tagName, boolean defaultValue) {
 		return tagContainer.getTagValueAsBoolean(tagName, defaultValue);
 	}
-	
-	//-------------------------------------------------------------------------------------
 
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns TRUE if the link is marked with 'OrphanRemoval' option.",
+			"Useful for ORM like JPA, Doctrine, etc"
+			},
+		example= {
+				"#if ( $link.isOrphanRemoval() )  ",
+				"...",
+				"#end  "
+			},
+		since="4.1.0"
+	)
+	public boolean isOrphanRemoval() {
+		return isOrphanRemoval ;
+	}
+
+	//-------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------------
 	private String voidIfNull(String s) {
 		return s != null ? s : "" ;
 	}
-	
 }

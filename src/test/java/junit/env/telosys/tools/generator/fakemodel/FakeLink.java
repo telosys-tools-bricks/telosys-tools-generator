@@ -38,37 +38,23 @@ public class FakeLink implements Link {
     private final String      targetEntityClassName;
     private final Cardinality cardinality ;
 
-//    private String id;
-    
-    private final boolean selected = true ; // Always considered as "selected" 
-
-//    private List<JoinColumn> joinColumns;
     private List<LinkAttribute> linkAttributes;  // v 3.4.0
-
-    
-    private String sourceTableName; // table associated with the entity holding the link
-    private String targetTableName; // table associated with the target entity 
     
     private boolean owningSide;
     private String mappedBy;
     
     private boolean inverseSide;
-    private String  inverseSideLinkId;
     
     private Optional       optional    = Optional.UNDEFINED;
     private FetchType      fetchType   = FetchType.UNDEFINED;
-    private CascadeOptions cascadeOptions;
+    private CascadeOptions cascadeOptions = new CascadeOptions();
     
     private boolean basedOnForeignKey;
     private String foreignKeyName;
     
-//    private boolean basedOnJoinTable;
-    private boolean isBasedOnJoinEntity;
-//    private JoinTable joinTable;
-//    private String joinTableName;
-    private String joinEntityName;
+    private boolean isBasedOnJoinEntity = false;
+    private String joinEntityName = null;
     
-//    private String comparableString;
     private boolean isEmbedded = false ;
     private boolean isTransient = false ;
     
@@ -76,6 +62,8 @@ public class FakeLink implements Link {
     private BooleanValue updatable  = BooleanValue.UNDEFINED; // Added in v 3.3.0
     
 	private TagContainer tagContainer = new FakeTagContainer();
+	
+	private boolean orphanRemoval = false;
 
     /**
      * Constructor
@@ -97,38 +85,6 @@ public class FakeLink implements Link {
 			this.inverseSide = true ;
 		}
 	}
-
-//	@Override
-//    public String getId() {
-//        return id;
-//    }
-//
-//    public void setId(String id) {
-//        this.id = id;
-//    }
-
-//    @Override
-//    public List<JoinColumn> getJoinColumns() {
-//        return joinColumns;
-//    }
-//    public void setJoinColumns(List<JoinColumn> joinColumns) {
-//        this.joinColumns = joinColumns;
-//    }
-//    public boolean hasJoinColumns() {
-//        if ( this.joinColumns != null ) {
-//        	return ! this.joinColumns.isEmpty() ;
-//        }
-//        return false;
-//    }
-
-//    @Override
-//    public String getTargetTableName() {
-//        return targetTableName;
-//    }
-//
-//    public void setTargetTableName(String targetTableName) {
-//        this.targetTableName = targetTableName;
-//    }
 
     @Override
     public String getReferencedEntityName() {
@@ -160,17 +116,8 @@ public class FakeLink implements Link {
 
     @Override
     public boolean isSelected() {
-        return selected; // Always "TRUE" ( "SELECTED" )
+        return true; // Always "TRUE" ( "SELECTED" )
     }
-
-//    @Override
-//    public String getSourceTableName() {
-//        return sourceTableName;
-//    }
-//
-//    public void setSourceTableName(String sourceTableName) {
-//        this.sourceTableName = sourceTableName;
-//    }
 
     @Override
     public boolean isInverseSide() {
@@ -179,14 +126,6 @@ public class FakeLink implements Link {
     public void setInverseSide(boolean inverseSide) {
         this.inverseSide = inverseSide;
     }
-
-//    @Override
-//    public String getInverseSideLinkId() {
-//        return inverseSideLinkId;
-//    }
-//    public void setInverseSideLinkId(String inverseSideLinkId) {
-//        this.inverseSideLinkId = inverseSideLinkId;
-//    }
 
     @Override
     public Optional getOptional() {
@@ -237,42 +176,6 @@ public class FakeLink implements Link {
         this.foreignKeyName = foreignKeyName;
     }
 
-//    @Override
-//    public boolean isBasedOnJoinTable() {
-//        return basedOnJoinTable;
-//    }
-//
-//    public void setBasedOnJoinTable(boolean basedOnJoinTable) {
-//        this.basedOnJoinTable = basedOnJoinTable;
-//    }
-
-//    @Override
-//    public JoinTable getJoinTable() {
-//        return joinTable;
-//    }
-//
-//    public void setJoinTable(JoinTable joinTable) {
-//        this.joinTable = joinTable;
-//    }
-//
-//    @Override
-//    public String getJoinTableName() {
-//        return joinTableName;
-//    }
-//
-//    public void setJoinTableName(String joinTableName) {
-//        this.joinTableName = joinTableName;
-//    }
-
-//    @Override
-//    public String getComparableString() {
-//        return comparableString;
-//    }
-//
-//    public void setComparableString(String comparableString) {
-//        this.comparableString = comparableString;
-//    }
-
     @Override
     public boolean isEmbedded() {
         return this.isEmbedded;
@@ -317,13 +220,19 @@ public class FakeLink implements Link {
 
 	@Override
 	public String getJoinEntityName() {
-		// TODO Auto-generated method stub
-		return null;
+		return joinEntityName;
 	}
 
 	@Override
 	public boolean isBasedOnJoinEntity() {
-		// TODO Auto-generated method stub
-		return false;
+		return isBasedOnJoinEntity;
+	}
+
+	@Override
+	public boolean isOrphanRemoval() {
+		return orphanRemoval;
+	}
+	public void setOrphanRemoval(boolean v) {
+		this.orphanRemoval = v;
 	}
 }

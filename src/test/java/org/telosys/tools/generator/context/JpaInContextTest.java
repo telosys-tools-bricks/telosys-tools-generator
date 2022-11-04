@@ -1,14 +1,21 @@
 package org.telosys.tools.generator.context;
 
 import org.junit.Test;
+import org.telosys.tools.commons.cfg.TelosysToolsCfg;
+import org.telosys.tools.commons.cfg.TelosysToolsCfgManager;
+import org.telosys.tools.generic.model.enums.Cardinality;
+import org.telosys.tools.generic.model.enums.FetchType;
 import org.telosys.tools.generic.model.enums.GeneratedValueStrategy;
+import org.telosys.tools.generic.model.enums.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
-import junit.env.telosys.tools.generator.fakemodel.FakeForeignKey;
+import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
+import junit.env.telosys.tools.generator.fakemodel.FakeLink;
+import junit.env.telosys.tools.generator.fakemodel.FakeModel;
 
 public class JpaInContextTest {
 	
@@ -236,6 +243,73 @@ public class JpaInContextTest {
 		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=\"MyGenerator\")", a[1]);
 		assertEquals("@SequenceGenerator(name=\"MyGenerator\", sequenceName=\"MYSEQ\", allocationSize=2)", a[2]);
 		assertEquals("@Column(name=\"id\")", a[3]);
+	}
+	
+	//---------------------------------------------------------------------------------------------
+	// LINK CARDINALITY 
+	//---------------------------------------------------------------------------------------------
+	@Test 
+	public void testLinkCardinalityOneToMany() {
+		FakeLink fakeLink = new FakeLink("towns", "Town", Cardinality.ONE_TO_MANY);
+		LinkInContext link = buildLink("Country", fakeLink);
+		assertFalse(link.isOwningSide());
+		JpaInContext jpa = new JpaInContext();
+		assertEquals("@OneToMany", jpa.linkCardinalityAnnotation(0, link) );
+		jpa.setGenTargetEntity(true);
+		assertEquals("@OneToMany(targetEntity=Town.class)", jpa.linkCardinalityAnnotation(0, link) );
+	}
+
+	@Test 
+	public void testLinkCardinalityOneToManyWithOptions() {
+		FakeLink fakeLink = new FakeLink("towns", "Town", Cardinality.ONE_TO_MANY);
+		fakeLink.setFetchType(FetchType.LAZY);
+		fakeLink.setMappedBy("country");
+		fakeLink.setOrphanRemoval(true);
+		fakeLink.setOptional(Optional.TRUE); // ignored for OneToMany
+		LinkInContext link = buildLink("Country", fakeLink);
+		assertFalse(link.isOwningSide());
+		JpaInContext jpa = new JpaInContext();
+		assertEquals("@OneToMany(mappedBy=\"country\", fetch=FetchType.LAZY, orphanRemoval=true)", 
+				jpa.linkCardinalityAnnotation(0, link) );
+	}
+
+	@Test 
+	public void testLinkCardinalityManyToOne() {
+		FakeLink fakeLink = new FakeLink("country", "Country", Cardinality.MANY_TO_ONE);
+		LinkInContext link = buildLink("Town", fakeLink);
+		assertTrue(link.isOwningSide());
+		JpaInContext jpa = new JpaInContext();
+		assertEquals("@ManyToOne", jpa.linkCardinalityAnnotation(0, link) );
+		jpa.setGenTargetEntity(true);
+		assertEquals("@ManyToOne(targetEntity=Country.class)", jpa.linkCardinalityAnnotation(0, link) );
+	}
+
+	@Test 
+	public void testLinkCardinalityManyToOneWithOptions() {
+		FakeLink fakeLink = new FakeLink("country", "Country", Cardinality.MANY_TO_ONE);
+		fakeLink.setFetchType(FetchType.LAZY);
+		fakeLink.setMappedBy("town"); // error : not used for ManyToOne
+		fakeLink.setOrphanRemoval(true); // ignored for ManyToOne
+		fakeLink.setOptional(Optional.TRUE);
+		LinkInContext link = buildLink("Town", fakeLink);
+		assertTrue(link.isOwningSide());
+		JpaInContext jpa = new JpaInContext();
+		assertEquals("@ManyToOne(fetch=FetchType.LAZY, optional=true)", jpa.linkCardinalityAnnotation(0, link) );
+	}
+
+	private LinkInContext buildLink(String entityName, FakeLink fakeLink ) {
+		FakeEntity fakeOriginEntity = new FakeEntity(entityName, "");
+		FakeEntity fakeTargetEntity = new FakeEntity(fakeLink.getReferencedEntityName(), "");
+		FakeModel fakeModel = new FakeModel("mymodel");
+		fakeModel.addEntity(fakeOriginEntity);
+		fakeModel.addEntity(fakeTargetEntity);
+
+		TelosysToolsCfgManager cfgManager = new TelosysToolsCfgManager("/tmp/foo");
+		TelosysToolsCfg cfg = cfgManager.createDefaultTelosysToolsCfg();
+		EnvInContext env = new EnvInContext();
+		ModelInContext model = new ModelInContext(fakeModel, cfg, env);
+		EntityInContext entity = new EntityInContext(fakeOriginEntity, "org.demo", model, env);
+		return new LinkInContext(entity, fakeLink, model, env );
 	}
 	
 	//------------------------------------------------------------------------------------
