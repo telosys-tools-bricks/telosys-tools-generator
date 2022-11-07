@@ -1,10 +1,12 @@
 package org.telosys.tools.generator.context;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class BigDecimalTest  {
 
@@ -14,39 +16,41 @@ public class BigDecimalTest  {
 		
 		// any fractional part of this BigDecimal will be discarded
 		d = new BigDecimal("123") ;
-		System.out.println(d + " toBigInteger : " + d.toBigInteger() );
-		System.out.println(d + " intValue     : " + d.intValue() );
+		assertEquals(BigInteger.valueOf(123), d.toBigInteger());
+		assertEquals(123, d.intValue());
 		
 		d = new BigDecimal("123.456") ;
-		System.out.println(d + " toBigInteger : " + d.toBigInteger() );
-		System.out.println(d + " intValue     : " + d.intValue() );
+		assertEquals(BigInteger.valueOf(123), d.toBigInteger());
+		assertEquals(123, d.intValue());
 		
 		//d = new BigDecimal("  123   ") ; // NumberFormatException
-		d = new BigDecimal("  123   ".trim()) ;  // OK
-		
+		d = new BigDecimal("  123   ".trim()) ;  // OK		
 		// d = new BigDecimal(" 123.456  ") ; // NumberFormatException
+		assertEquals(123, d.intValue());
 
 		d = new BigDecimal("+123.456") ; // OK
+		assertEquals(123, d.intValue());
+		assertEquals(6, d.precision());
+		assertEquals(3, d.scale());
+
 		d = new BigDecimal("-123.456") ; // OK
-		d = new BigDecimal("000123.456") ; // OK
-		
-		System.out.println(d + " toBigInteger : " + d.toBigInteger() );
+		assertEquals(-123, d.intValue());
+
+		d = new BigDecimal("000123.456") ; // OK		
+		assertEquals(BigInteger.valueOf(123), d.toBigInteger());
 		
 		try {
 			d = new BigDecimal("1AA23.456") ; // OK
 		} catch (NumberFormatException e) {
-			System.out.println("ERROR : " + e.getMessage()); // no message
+			assertNull(e.getMessage());// no message
 		}
-		
-		
-		assertEquals("a", "a");
 	}
 	
 	@Test
 	public void testInteger() {
-		Integer i ;
+		Integer i = Integer.valueOf("1234");
+		assertEquals(1234, i.intValue());
 		
-		i = Integer.valueOf("1234");
 		// i = Integer.valueOf("123.456"); // Number format exception 
 	}		
 
@@ -57,23 +61,16 @@ public class BigDecimalTest  {
 		assertEquals(0, sb.length());
 		
 		sb.append("abc");
-		System.out.println(sb);
 		assertEquals(3, sb.length());
 		
 		sb.append('d');
-		System.out.println(sb);
 		assertEquals(4, sb.length());
 		
-		sb.append(true);
-		System.out.println(sb);
+		sb.append(true); // add "true"
 		assertEquals(8, sb.length());
 		
-		System.out.println(sb.indexOf("cd"));
-		sb.deleteCharAt(2);
-		System.out.println(sb);
+		assertEquals(2, sb.indexOf("cd"));
+		sb.deleteCharAt(2); // remove char at position 2 : 'c'
 		assertEquals(7, sb.length());
-		
-		
 	}		
-
 }
