@@ -54,7 +54,8 @@ public class JdbcRequests {
 		super();
 		this.entity = entity ;
 		
-		this.table = SqlTableNameProvider.getTableName(entity);
+//		this.table = SqlTableNameProvider.getTableName(entity);
+		this.table = entity.getSqlTableName() ; // v 4.1.0
 		this.attributesForPrimaryKey = buildAttributesForPrimaryKey();
 		this.attributesForSelect = buildAttributesForSelect();
 		this.attributesForInsert = buildAttributesForInsert();
@@ -180,7 +181,8 @@ public class JdbcRequests {
             if (bPrefix) {
                 sb.append(this.table + ".");
             }
-            sb.append( attribute.getDatabaseName() );
+//            sb.append( attribute.getDatabaseName() );
+            sb.append( attribute.getSqlColumnName() ); // v 4.1.0
             n++;
         }
         return sb.toString();
@@ -203,7 +205,8 @@ public class JdbcRequests {
             if (bPrefix) {
                 sb.append(this.table + ".");
             }
-            sb.append( attribute.getDatabaseName() + " = ?" );
+//            sb.append( attribute.getDatabaseName() + " = ?" );
+            sb.append( attribute.getSqlColumnName() + " = ?" ); // v 4.1.0
             n++;
         }
         return sb.toString();
@@ -243,7 +246,8 @@ public class JdbcRequests {
             if (bPrefix) {
                 sb.append(this.table + ".");
             }
-            sb.append( attribute.getDatabaseName() + " = ?" );
+//            sb.append( attribute.getDatabaseName() + " = ?" );
+            sb.append( attribute.getSqlColumnName() + " = ?" ); // v 4.1.0
             n++;
         }
         return sb.toString();

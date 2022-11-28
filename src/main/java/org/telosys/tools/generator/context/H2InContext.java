@@ -23,7 +23,6 @@ import java.util.Map;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.generator.context.tools.SqlTableNameProvider;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 /**
@@ -34,22 +33,6 @@ import org.telosys.tools.generic.model.types.NeutralType;
  *
  */
 //-------------------------------------------------------------------------------------
-/**
- * @author laguerin
- *
- */
-/**
- * @author laguerin
- *
- */
-/**
- * @author laguerin
- *
- */
-/**
- * @author laguerin
- *
- */
 @VelocityObject(
 		contextName=ContextName.H2,
 		text = { 
@@ -61,9 +44,6 @@ import org.telosys.tools.generic.model.types.NeutralType;
 //-------------------------------------------------------------------------------------
 public class H2InContext {
 
-	//==============================================================================================
-	// Version 2.1.1
-	//==============================================================================================
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(text={	
 			"Returns the 'CREATE TABLE' DDL statement for the given entity",
@@ -78,22 +58,22 @@ public class H2InContext {
 			)
 	public List<String> ddlCreateTable(final EntityInContext entity) {
 		List<String> lines1 = buildTableDefinition (entity);
-		List<String> lines2 = new LinkedList<>();
-		lines2.add( "CREATE TABLE " + SqlTableNameProvider.getTableName(entity) + " (") ; 
+		List<String> resultingLines = new LinkedList<>();
+//		lines2.add( "CREATE TABLE " + SqlTableNameProvider.getTableName(entity) + " (") ; 
+		resultingLines.add( "CREATE TABLE " + entity.getSqlTableName() + " (") ; // v 4.1.0
 		
 		int c = 0 ;
-		int last = lines1.size() ;
 		for ( String line : lines1 ) {
 			c++;
-			if ( c != last ) {
-				lines2.add(line + ",");
+			if ( c < lines1.size() ) {
+				resultingLines.add(line + ",");
 			}
 			else {
-				lines2.add(line);
+				resultingLines.add(line);
 			}
 		}		
-		lines2.add( ");" ) ;
-		return lines2 ;
+		resultingLines.add( ");" ) ;
+		return resultingLines ;
 	}	
 	
 	private List<String> buildTableDefinition (final EntityInContext entity) {
@@ -113,25 +93,15 @@ public class H2InContext {
 		return lines ;
 	}	
 
-	private String buildPrimaryKeyDefinition (final EntityInContext entity ) {
-		// PRIMARY KEY(code)
-		StringBuilder sb = new StringBuilder();
-		sb.append("PRIMARY KEY(");
-		int c = 0 ;
-		for ( AttributeInContext attribute : entity.getKeyAttributes() ) {
-			c++;
-			if ( c > 1 ) {
-				sb.append(",");
-			}
-			sb.append(attribute.getDatabaseName());
-		}
-		sb.append(")");
-		return sb.toString();
-	}
-
+	/**
+	 * Builds H2 column definition for given attribute
+	 * @param attribute
+	 * @return
+	 */
 	private String buildColumnDefinition (final AttributeInContext attribute ) {
 		StringBuilder sb = new StringBuilder();
-		sb.append( attribute.getDatabaseName() ) ;
+//		sb.append( attribute.getDatabaseName() ) ;
+		sb.append( attribute.getSqlColumnName() ); // v 4.1.0
 		sb.append( " ") ;
 		sb.append( getColumnType(attribute) ) ;
 		sb.append( " ") ;
@@ -144,6 +114,47 @@ public class H2InContext {
 		return sb.toString();
 	}
 	
+	/**
+	 * Builds H2 primary key definition for given entity
+	 * @param entity
+	 * @return
+	 */
+	private String buildPrimaryKeyDefinition (final EntityInContext entity ) {
+		// PRIMARY KEY(code)
+		StringBuilder sb = new StringBuilder();
+		sb.append("PRIMARY KEY(");
+		int c = 0 ;
+		for ( AttributeInContext attribute : entity.getKeyAttributes() ) {
+			c++;
+			if ( c > 1 ) {
+				sb.append(",");
+			}
+//			sb.append(attribute.getDatabaseName());
+			sb.append( attribute.getSqlColumnName() ); // v 4.1.0
+		}
+		sb.append(")");
+		return sb.toString();
+	}
+
+	/**
+	 * Returns H2 SQL type for the given attribute
+	 * @param attribute
+	 * @return
+	 */
+	private String getColumnType(final AttributeInContext attribute ) {
+		if ( attribute.isAutoIncremented() ) {
+			//--- Particular case : Auto-incremented column
+			return "IDENTITY" ; // H2 type mapped to java.lang.Long 
+		}
+		else {
+			//--- Standard case : get the mapped type
+			String h2Type = mappingNeutralTypeToH2Type.get(attribute.getNeutralType()) ;
+			if ( h2Type == null ) {
+				h2Type = "UNKNOWN_TYPE";
+			}
+			return h2Type ;
+		}
+	}
 	/*
 	 * Mapping : "Neutral type" --> "H2 database type"
 	 */
@@ -163,104 +174,5 @@ public class H2InContext {
 		mappingNeutralTypeToH2Type.put(NeutralType.TIME,      "TIME"     );
 		mappingNeutralTypeToH2Type.put(NeutralType.TIMESTAMP, "TIMESTAMP");
 	}
-	
-	private String getColumnType (final AttributeInContext attribute ) {
-		
-		if ( attribute.isAutoIncremented() ) {
-			//--- Particular case : Auto-incremented column
-			return "IDENTITY" ; // H2 type mapped to java.lang.Long 
-		}
-		else {
-			//--- Standard case : get the mapped type
-			String h2Type = mappingNeutralTypeToH2Type.get(attribute.getNeutralType()) ;
-			if ( h2Type == null ) {
-				h2Type = "UNKNOWN_TYPE";
-			}
-			return h2Type ;
-		}
-	}
-	
-/****
-	private String getColumnTypeOLD (final AttributeInContext attribute ) {
-		
-		//--- Particular case : Auto-incremented column
-		if ( attribute.isAutoIncremented() ) {
-			return "IDENTITY" ; // H2 type mapped to java.lang.Long 
-		}
-		int jdbcType = attribute.getJdbcTypeCode() ;
-		switch (jdbcType) {
-		
-			//--- STRING TYPES
-			case java.sql.Types.CHAR :
-				return "CHAR("+attribute.getDatabaseSize()+")"; // H2 type mapped to java.lang.String
-			case java.sql.Types.VARCHAR :
-				return "VARCHAR("+attribute.getDatabaseSize()+")"; // H2 type mapped to java.lang.String
-			case java.sql.Types.LONGVARCHAR :
-				return "LONGVARCHAR("+attribute.getDatabaseSize()+")"; // H2 type mapped to java.lang.String
-				
-			//--- INTEGER TYPES
-			case java.sql.Types.TINYINT :
-				return "TINYINT"; // H2 type mapped to java.lang.Byte 
-				
-			case java.sql.Types.SMALLINT :
-				return "SMALLINT"; // H2 type mapped to java.lang.Short 
-				
-			case java.sql.Types.INTEGER :
-				return "INTEGER"; // H2 type mapped to java.lang.Integer 
-				
-			case java.sql.Types.BIGINT :
-				return "BIGINT"; // H2 type mapped to java.lang.Long 
-				
-			case java.sql.Types.NUMERIC :
-				return "NUMERIC"; // H2 type mapped to java.math.BigDecimal
-			case java.sql.Types.DECIMAL :
-				return "DECIMAL"; // H2 type mapped to java.math.BigDecimal
-			
-			//--- REAL/DOUBLE TYPES
-			case java.sql.Types.REAL :
-				return "REAL"; // H2 type mapped to java.lang.Float 
-				
-			case java.sql.Types.FLOAT :
-				return "FLOAT"; // H2 type mapped to java.lang.Double 
-				
-			case java.sql.Types.DOUBLE :
-				return "DOUBLE"; // H2 type mapped to java.lang.Double 
-				
-			//--- DATE/TIME TYPES
-			case java.sql.Types.DATE :
-				return "DATE"; // H2 type mapped to java.sql.Date 
-					
-			case java.sql.Types.TIME :
-				return "TIME"; // H2 type mapped to java.sql.Time 
-					
-			case java.sql.Types.TIMESTAMP :
-				return "TIMESTAMP"; // H2 type mapped to java.sql.Timestamp 
-					
-			//--- BOOLEAN TYPES
-			case java.sql.Types.BOOLEAN :
-				return "BOOLEAN"; // H2 type mapped to java.lang.Boolean 
-			case java.sql.Types.BIT :
-				return "BIT"; // H2 type mapped to java.lang.Boolean 
-				
-			//--- BINARY TYPES
-			case java.sql.Types.BINARY :
-				return "BINARY"; // H2 type mapped to byte[]
-			case java.sql.Types.VARBINARY :
-				return "VARBINARY"; // H2 type mapped to byte[]
-			case java.sql.Types.LONGVARBINARY :
-				return "LONGVARBINARY"; // H2 type mapped to byte[]
-				
-			//--- LOB TYPES
-			case java.sql.Types.BLOB :
-				return "BLOB"; // H2 type mapped to java.sql.Blob
-			case java.sql.Types.CLOB :
-				return "CLOB"; // H2 type mapped to java.sql.Clob
-				
-			//--- DEFAULT
-			default :
-				return "OTHER"; // H2 type mapped to java.lang.Object 
-		}
-	}
-*****/
 	
 }
