@@ -28,7 +28,6 @@ import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.context.tools.AnnotationsBuilder;
 import org.telosys.tools.generator.context.tools.JpaAnnotations;
 import org.telosys.tools.generator.context.tools.ListBuilder;
-import org.telosys.tools.generator.context.tools.SqlTableNameProvider;
 import org.telosys.tools.generic.model.enums.BooleanValue;
 import org.telosys.tools.generic.model.enums.FetchType;
 
@@ -317,7 +316,8 @@ public class JpaInContext {
 		
 		b.addLine("@Entity");
 		
-		String s = "@Table(name=\"" + SqlTableNameProvider.getTableName(entity) + "\"" ;
+//		String s = "@Table(name=\"" + SqlTableNameProvider.getTableName(entity) + "\"" ;
+		String s = "@Table(name=\"" + entity.getSqlTableName() + "\"" ;  // v 4.1.0
 		if ( ! StrUtil.nullOrVoid( entity.getDatabaseSchema() ) ) {
 			s = s + ", schema=\"" + entity.getDatabaseSchema() + "\"" ; 
 		}

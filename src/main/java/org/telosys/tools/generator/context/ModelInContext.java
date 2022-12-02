@@ -20,13 +20,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.telosys.tools.commons.NamingStyleConverter;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityNoDoc;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.generator.context.tools.SqlTableNameProvider;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.Model;
 import org.telosys.tools.generic.model.enums.ModelType;
@@ -46,6 +46,8 @@ import org.telosys.tools.generic.model.enums.ModelType;
 //-------------------------------------------------------------------------------------
 public class ModelInContext
 {
+	private static final NamingStyleConverter converter = new NamingStyleConverter(); // v 4.1.0 (from old class SqlTableNameProvider)
+	
 	private final String    modelName ;
 	private final String    modelFolderName ;
 	private final String    modelVersion ;
@@ -59,8 +61,8 @@ public class ModelInContext
 	private final String   databaseType ; // v 3.4.0
 	
 	private final List<EntityInContext>       allEntities ;
-	private final Map<String,EntityInContext> entitiesByTableName ;
-	private final Map<String,EntityInContext> entitiesByClassName ;
+	private final Map<String,EntityInContext> entitiesByTableName ; // Key = table name in upper case
+	private final Map<String,EntityInContext> entitiesByClassName ; // Key = entity name as is
 
 	private String notNull(String s) {
 		return s != null ? s : "" ;
@@ -106,7 +108,8 @@ public class ModelInContext
 		this.entitiesByTableName = new HashMap<>();
 		for ( EntityInContext entity : this.allEntities ) {
 			// The table name is unique 
-			this.entitiesByTableName.put(SqlTableNameProvider.getTableName(entity), entity); 
+//			this.entitiesByTableName.put(SqlTableNameProvider.getTableName(entity), entity); 
+			this.entitiesByTableName.put(getTableNameUpperCase(entity), entity); // v 4.1.0
 		}
 		
 		//--- Entities by CLASS NAME
@@ -119,6 +122,24 @@ public class ModelInContext
 		this.databaseId = notNull(model.getDatabaseId());
 		this.databaseName = notNull(model.getDatabaseName());
 		this.databaseType = notNull(model.getDatabaseType());
+	}
+
+	/**
+	 * Returns the table name for the given entity (always in upper case)
+	 * @param entity
+	 * @return
+	 */
+	private String getTableNameUpperCase(EntityInContext entity) { // v 4.1.0 (from old class SqlTableNameProvider)
+		String tableName = "";
+		if (entity.hasDatabaseTable()) {
+			// The entity has a table name specified in the model => use it
+			tableName = entity.getDatabaseTable();
+		} else {
+			// No table name in the model => build default table name
+			// Convert entity name to 'ANACONDA_CASE'
+			tableName = converter.toAnacondaCase(entity.getName());
+		}
+		return tableName.toUpperCase();
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -326,7 +347,7 @@ public class ModelInContext
 			"The table name is supposed to be unique in the model"
 			},
 		parameters={
-			"tableName : the name of the table associated with the searched entity "
+			"tableName : the name of the table associated with the searched entity (not case sensitive)"
 		},
 		example = {
 			"#if ( $model.hasEntityWithTableName($tableName) )",
@@ -335,15 +356,19 @@ public class ModelInContext
 			""
 		}
 	)
-    public EntityInContext getEntityByTableName( String tableName )
-    {
-		EntityInContext entity = entitiesByTableName.get(tableName);
+    public EntityInContext getEntityByTableName( String tableName ) { 
+//		EntityInContext entity = entitiesByTableName.get(tableName);
+		EntityInContext entity = searchEntityByTableName(tableName); // v 4.1.0
 		if ( entity != null ) {
 			return entity;
 		}
 		else {
 			throw new GeneratorContextException("Table '" + tableName +"' not found in model");
 		}
+    }
+    private EntityInContext searchEntityByTableName(String tableName) { // v 4.1.0
+    	// Convert table name to upper case
+    	return entitiesByTableName.get(tableName.toUpperCase());
     }
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -352,7 +377,7 @@ public class ModelInContext
 			"else FALSE"
 			},
 		parameters={
-			"tableName : the name of the table associated with the searched entity "
+			"tableName : the name of the table associated with the searched entity (not case sensitive)"
 		},
 		example = {
 			"#if ( $model.hasEntityWithTableName($tableName) )",
@@ -361,9 +386,9 @@ public class ModelInContext
 			""
 		}
 	)
-    public boolean hasEntityWithTableName( String tableName )
-    {
-		return ( entitiesByTableName.get(tableName) != null ) ;
+    public boolean hasEntityWithTableName( String tableName ) {
+//		return ( entitiesByTableName.get(tableName) != null ) ;
+		return ( searchEntityByTableName(tableName) != null ) ; // v 4.1.0
     }
 
 	//-------------------------------------------------------------------------------------
