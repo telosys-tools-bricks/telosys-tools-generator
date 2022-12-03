@@ -64,8 +64,6 @@ public class FakeAttribute implements Attribute {
 
 	private String defaultValue = null; // javaDefaultValue="..."
 
-	private boolean _bSelected = true; // selected by default
-
 	// ----- SPECIAL DATA for ALL -----
 	private String label = null;
 	private String inputType = null;
@@ -346,15 +344,6 @@ public class FakeAttribute implements Attribute {
 	}
 	public void setPattern(String v) {
 		pattern = v;
-	}
-
-	// -----------------------------------------------------------------------------
-	@Override
-	public boolean isSelected() {
-		return _bSelected;
-	}
-	public void setSelected(boolean b) {
-		_bSelected = b;
 	}
 
 	// -----------------------------------------------------------------------------

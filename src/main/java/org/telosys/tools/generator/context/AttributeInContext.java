@@ -73,7 +73,7 @@ public class AttributeInContext {
 
 	private boolean       mustUseFullType = false ; 
 
-	private final boolean selected ;
+//	private final boolean selected ; // removed in v 4.1.0
     
 	//--- Basic minimal attribute info ---------------------------------
 	private final String  name ;  // attribute name 
@@ -183,7 +183,7 @@ public class AttributeInContext {
 		//this.sqlConverter = new SqlConverter(env); // Added in v 3.4.0
 		this.env = env ; // Added in v 3.4.0
 		//--------------------------------------------------
-		this.selected        = attribute.isSelected(); 
+//		this.selected        = attribute.isSelected(); // removed in v 4.1.0
 		//--------------------------------------------------
 		
 		this.name   = attribute.getName(); 		
@@ -1089,15 +1089,16 @@ public class AttributeInContext {
 		return s != null ? s : "" ;
 	}
 	
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns TRUE if the attribute is selected (ckeckbox ckecked in the GUI)"
-			}
-	)
-	public boolean isSelected() {
-		return selected;
-	}
+//	//-------------------------------------------------------------------------------------
+// removed in v 4.1.0	
+//	@VelocityMethod(
+//		text={	
+//			"Returns TRUE if the attribute is selected (ckeckbox ckecked in the GUI)"
+//			}
+//	)
+//	public boolean isSelected() {
+//		return selected;
+//	}
 
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
