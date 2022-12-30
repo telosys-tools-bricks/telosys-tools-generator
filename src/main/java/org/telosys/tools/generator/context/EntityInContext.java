@@ -98,6 +98,8 @@ public class EntityInContext
 	private final boolean isDatabaseView; // v 3.4.0
 	private final String  databaseTablespace; // v 3.4.0	
 
+	private final boolean isJoinEntity ; // v 4.1.0
+	
 	//-----------------------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -180,6 +182,8 @@ public class EntityInContext
 		this.context = entity.getContext(); // v 3.4.0
 		this.isDatabaseView = entity.isDatabaseView(); // v 3.4.0
 		this.databaseTablespace = entity.getDatabaseTablespace(); // v 3.4.0
+
+		this.isJoinEntity = entity.isJoinEntity() ; // v 4.1.0
 
 		//--- Post processing : import resolution
 		endOfAttributesDefinition();
@@ -1392,7 +1396,7 @@ public class EntityInContext
 		},
 		since="2.1.0"
 	)
-    public List<String> referencedEntityTypes(List<AttributeInContext> attributes) throws GeneratorException {
+    public List<String> referencedEntityTypes(List<AttributeInContext> attributes) {
 		List<String> referencedEntityTypes = new LinkedList<>();
 		for ( AttributeInContext attribute : attributes ) {
 			//--- Is this attribute involved in a link ?
@@ -1421,7 +1425,7 @@ public class EntityInContext
 		},
 		since="2.1.0"
 	)
-    public List<String> referencedEntityTypes() throws GeneratorException {
+    public List<String> referencedEntityTypes() { 
 		List<String> referencedEntityTypes = new LinkedList<>();
 		//--- Search all the referenced entities (from all the "owning side" links)
 		for( LinkInContext link : this.getLinks()  ) {
@@ -1469,12 +1473,8 @@ public class EntityInContext
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
-			"Returns TRUE if the entity is a 'join entity' ",
-			"( typically if the entity is a 'join table' in the database )",
-			"An entity is considered as a 'join entity' if : ",
-			" - the entity has 2 Foreign Keys",
-			" - all attributes are part of the Primary Key ",
-			" - all attributes are part of a Foreign Key"
+			"Returns TRUE if the entity is marked as '@JoinEntity'",
+			"( typically if the entity is a 'join table' in the database )"
 		},
 		example= {
 				"#if ( $entity.isJoinEntity() )",
@@ -1484,20 +1484,7 @@ public class EntityInContext
 		since="3.3.0"
 	)
 	public boolean isJoinEntity() {
-		//--- Check if entity has 2 Foreign Keys
-		if ( foreignKeys.size() != 2 ) {
-			return false;
-		} 
-		//--- Check if all attributes are in the PK and in a FK
-		for ( AttributeInContext a : attributes) {
-			if ( ! a.isKeyElement() ) { 
-				return false ; // at least one attribute is not in PK 
-			}
-			if ( ! a.isFK() ) {
-				return false ; // at least one attribute is not in FK
-			}
-		}
-		return true ;
+		return this.isJoinEntity;
 	}
 	
 	//------------------------------------------------------------------------------------------
@@ -1768,16 +1755,12 @@ public class EntityInContext
 		return voidIfNull(this.databaseTablespace);
 	}
 	
-	
 	//-------------------------------------------------------------------------------------
 
 	private String voidIfNull(String s) {
 		return s != null ? s : "" ;
 	}
 	private boolean nullOrVoid(String s) {
-//		if ( s == null ) return true ;
-//		if ( s.length() == 0 ) return true ;
-//		return false;
 		return StrUtil.nullOrVoid(s);
 	}
 }

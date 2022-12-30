@@ -147,23 +147,24 @@ public class EntityInContextTest {
 		assertEquals("CAR", entityInContext.getSqlTableName() );
 	}
 	
-	@Test
-	public void joinEntityTest() throws GeneratorException {
-		EntityInContext entityInContext ;
-		
-		// Not join entity
-		entityInContext = buildEntityInContext(new Employee());
-		assertFalse(entityInContext.isJoinEntity());
-
-		// Join entity
-		entityInContext = buildEntityInContext(new EmpTeam());
-		assertEquals(2, entityInContext.getDatabaseForeignKeysCount()); // 2 FK
-		assertEquals(2, entityInContext.getKeyAttributesCount()); // 2 attributes in PK 
-		assertEquals(0, entityInContext.getNonKeyAttributesCount()); // no attribute out of PK
-		assertTrue(entityInContext.getAttributeByColumnName("TEAM_CODE").isFK());
-		assertTrue(entityInContext.getAttributeByColumnName("EMP_ID").isFK());
-		assertTrue(entityInContext.isJoinEntity());
-	}
+//	@Test
+//	public void joinEntityTest() throws GeneratorException {
+//		EntityInContext entityInContext ;
+//		
+//		// Not join entity
+//		entityInContext = buildEntityInContext(new Employee());
+//		assertFalse(entityInContext.isJoinEntity());
+//
+	// NOW only based on @JoinEntity => test no longer useful 
+//		// Join entity
+//		entityInContext = buildEntityInContext(new EmpTeam());
+//		assertEquals(2, entityInContext.getDatabaseForeignKeysCount()); // 2 FK
+//		assertEquals(2, entityInContext.getKeyAttributesCount()); // 2 attributes in PK 
+//		assertEquals(0, entityInContext.getNonKeyAttributesCount()); // no attribute out of PK
+//		assertTrue(entityInContext.getAttributeByColumnName("TEAM_CODE").isFK());
+//		assertTrue(entityInContext.getAttributeByColumnName("EMP_ID").isFK());
+//		assertTrue(entityInContext.isJoinEntity());
+//	}
 	
 	@Test
 	public void keyAttributesNamesAsString() {

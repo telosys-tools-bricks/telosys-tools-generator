@@ -134,6 +134,11 @@ public class FakeEntity implements Entity {
 		}
 		return false;
 	}
+
+	@Override
+	public boolean isJoinEntity() { // 4.1.0
+		return false;
+	}
 	
 	//--------------------------------------------------------------------------
 	@Override
