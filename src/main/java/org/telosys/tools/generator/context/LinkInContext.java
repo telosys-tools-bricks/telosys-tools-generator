@@ -66,8 +66,11 @@ public class LinkInContext {
 
 //	private final List<JoinColumnInContext> joinColumns ;  // removed in v 3.4.0
 	private final List<LinkAttributeInContext> linkAttributes ; // added in v 3.4.0  (replaces joinColumns)
+	
 //	private final JoinTableInContext        joinTable ;  // removed in v 3.4.0
-	private final String joinEntityName ;  // added in v 3.4.0  (replaces joinTable)
+	private final boolean isBasedOnJoinEntity; // added in v 4.1.0
+	private final String  joinEntityName ;  // added in v 3.4.0  (replaces joinTable)
+	private final EntityInContext joinEntity; // added in v 4.1.0
 
 	//--- Added in ver 3.0.0 (to replace reference / Link )
 //	private final String       id ; // removed in v 3.4.0
@@ -118,7 +121,14 @@ public class LinkInContext {
 			}
 		}
 
+		this.isBasedOnJoinEntity = link.isBasedOnJoinEntity() ; // added in v 4.1.0
 		this.joinEntityName = link.getJoinEntityName(); // added in v 3.4.0
+		if ( ! StrUtil.nullOrVoid(this.joinEntityName) ) {
+			this.joinEntity = modelInContext.getEntityByClassName(this.joinEntityName);
+		}
+		else {
+			this.joinEntity = null;
+		}
 		
 		//--- Init link information (ver 3.0.0)
 		this.fieldName = link.getFieldName() ;
@@ -256,6 +266,16 @@ public class LinkInContext {
 	)
 	public String getJoinEntityName() {
 		return voidIfNull(this.joinEntityName) ;
+	}
+	
+	//-------------------------------------------------------------------------------------
+	public EntityInContext getJoinEntity() {
+		if ( this.joinEntity != null ) {
+			return this.joinEntity;
+		}
+		else {
+			throw new GeneratorContextException("No 'join entity' for this link");
+		}
 	}
 	
 	//-------------------------------------------------------------------------------------

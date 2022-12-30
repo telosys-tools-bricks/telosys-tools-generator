@@ -891,18 +891,43 @@ public class JpaInContext {
 	 * @param annotations
 	 * @param link
 	 */
-	private void processJoinTable(AnnotationsBuilder annotations, LinkInContext link ) {
+	private void processJoinTable(AnnotationsBuilder annotations, LinkInContext link ) throws GeneratorException {
+		EntityInContext entity = link.getJoinEntity();
+		if ( entity.getDatabaseForeignKeysCount() != 2) {
+			// error
+		}
+		ForeignKeyInContext fk1 = entity.getDatabaseForeignKeys().get(0);
+		ForeignKeyInContext fk2 = entity.getDatabaseForeignKeys().get(1);
+		
+		annotations.addLine("@JoinTable( name=\"" + entity.getSqlTableName() + "\", " );
+		// Example : joinColumns = @JoinColumn(name = "post_id"),
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("joinColumns = " );
+		if ( fk1.getAttributesCount() > 1 ) {
+			sb.append("{ " );
+		}
+		int n = 0; 
+		for ( ForeignKeyAttributeInContext fkAttrib : fk1.getAttributes() ) {
+			n++;
+			if ( n > 1 ) {
+				sb.append(", " );
+			}
+			sb.append("@JoinColumn( name=\"");
+			sb.append(fkAttrib.getOriginAttribute().getSqlColumnName());
+			sb.append("\"");
+		}
+		if ( fk1.getAttributesCount() > 1 ) {
+			sb.append("} " );
+		}
+		
+		
+		annotations.addLine(" )" );
 /*****
  * 
  * TODO
  * 
  *******
-		JoinTableInContext joinTable = link.getJoinTable();
-		EntityInContext entity = link.getJoinEntity(); // TODO 
-//		if ( joinTable != null ) {
-		if ( entity != null ) {
-//			annotations.addLine("@JoinTable(name=\"" + joinTable.getName() + "\", " );
-			annotations.addLine("@JoinTable(name=\"" + entity.getSqlTableName() + "\", " );
 			
 			List<JoinColumnInContext> joinColumns = joinTable.getJoinColumns();
 			if ( joinColumns != null ) {
@@ -914,16 +939,10 @@ public class JpaInContext {
 			{
 				processJoinTableColumns(annotations, link, inverseJoinColumns, "inverseJoinColumns", "" );
 			}
-//			annotations.addLine(" ) \n" );
-			annotations.addLine(" )" );
-		}
-		// else : no join table (not an error)
-//		else {
-//			annotations.addLine( "// @JoinTable ERROR : NO JOIN TABLE FOR THIS LINK ! " );
-//		}
  *******/
 	}
 
+	
 	//-------------------------------------------------------------------------------------
 	private void processJoinTableColumns( AnnotationsBuilder annotations, LinkInContext link, 
 			 String name,  String end ) throws GeneratorException
