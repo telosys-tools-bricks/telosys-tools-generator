@@ -462,100 +462,6 @@ public class JpaInContext {
 		return "";
 	}
 	//----------------------------------------------------------------
-//	/**
-//	 * Build an return the cardinality annotation for an "OWNING SIDE"
-//	 * Example : "@ManyToOne ( cascade = CascadeType.ALL, fetch = FetchType.EAGER ) "
-//	 * @param link
-//	 * @param cardinality
-//	 * @param targetEntityClassName the target entity ( or null if none ) 
-//	 * @return
-//	 */
-//	private String buildCardinalityAnnotationForOwningSide( LinkInContext link, String cardinality, String targetEntityClassName ) 
-//	{
-//		StringBuilder sb = new StringBuilder();
-//		sb.append( "@" + cardinality ) ;
-//		//String options = buildCardinalityOptions(link, targetEntityClassName);
-//		String options = buildCardinalityFurtherInformation(link);
-//		if ( ! StrUtil.nullOrVoid(options) ) {
-//			sb.append( "(" );
-//			sb.append( options );
-//			sb.append( ")" );
-//		}
-//		return sb.toString();
-//	}
-	
-	//-------------------------------------------------------------------------------------
-//	private String buildCardinalityOptions(LinkInContext link, String targetEntityClassName) {
-//		boolean notVoid = false ;
-//		StringBuilder sb = new StringBuilder();
-//		//--- Common further information : cascade, fetch and optional
-//		// ie "cascade = CascadeType.ALL, fetch = FetchType.EAGER"
-//		String sCardinalityFurtherInformation = buildCardinalityFurtherInformation(link);
-//		if ( ! StrUtil.nullOrVoid(sCardinalityFurtherInformation) ) {
-//			sb.append( sCardinalityFurtherInformation );
-//			notVoid = true ;
-//		}
-//		//--- targetEntity ( for ManyToMany and OneToMany )
-//		if ( this.genTargetEntity && targetEntityClassName != null ) {
-//			if ( notVoid ) {
-//				sb.append( ", " );
-//			}
-//			sb.append( "targetEntity=" + targetEntityClassName + ".class" ) ;			
-//		}
-//		return sb.toString();
-//	}
-	//-------------------------------------------------------------------------------------
-//	/**
-//	 * Build an return the cardinality annotation for an "INVERSE SIDE" <br>
-//	 * Example : "@OneToMany ( mappedBy="fieldName", targetEntity=TheClass.class ) "
-//	 * 
-//	 * @param link
-//	 * @param cardinality
-//	 * @return
-//	 * @throws GeneratorException
-//	 */
-//	private String buildCardinalityAnnotationForInverseSide( LinkInContext link, String cardinality ) {
-//		String targetEntityClassName = link.getTargetEntityName();
-//		
-//		StringBuilder annotation = new StringBuilder();
-//		annotation.append( "@" + cardinality ) ;
-//		annotation.append( "(" );
-//		boolean notVoid = false ;
-//		//--- Common further information : cascade, fetch and optional
-//		// ie "cascade = CascadeType.ALL, fetch = FetchType.EAGER"
-//		String sCardinalityFurtherInformation = buildCardinalityFurtherInformation(link);
-//		if ( ! StrUtil.nullOrVoid(sCardinalityFurtherInformation)) {
-//			annotation.append( sCardinalityFurtherInformation );
-//			notVoid = true ;
-//		}
-////		//--- mappedBy - NB : no "mappedBy" for ManyToOne (see JPA javadoc) ( cannot be an inverse side )
-////		if ( ! link.isCardinalityManyToOne() ) { 
-////			// try to get "mapped by" information
-////			String mappedBy = link.getMappedBy(); 
-////			if ( mappedBy == null ) {
-////				// No defined in link => try to infer 
-////				mappedBy = inferMappedBy(link);
-////			}
-////			if ( mappedBy != null ) {
-////				if ( notVoid ) {
-////					annotation.append( ", " ); 
-////				}
-////				annotation.append( "mappedBy=\"" + mappedBy + "\"" );
-////				notVoid = true ;
-////			}
-////		}
-////		//--- targetEntity ( always usable, even with ManyToOne )
-////		if ( this.genTargetEntity && targetEntityClassName != null ) {
-////			if ( notVoid ) {
-////				annotation.append( ", " ); 
-////			}
-////			annotation.append( "targetEntity=" + targetEntityClassName + ".class" ); // No quotes
-////		}
-//		//---
-//		annotation.append( ")" );
-//		return annotation.toString();
-//	}
-	
 	/**
 	 * Try to infer the 'mappedBy' value by searching in the 'target entity' links 
 	 * @param link
@@ -797,39 +703,6 @@ public class JpaInContext {
 	}
 
 	private void processLinkCardinalityAnnotation(AnnotationsBuilder annotations, LinkInContext link) {
-//		String annotation = "" ;
-//		String targetEntityClassName = link.getTargetEntityName(); 
-//		if ( link.isOwningSide() ) {
-//			if ( link.isCardinalityOneToOne() ) {
-//				annotation = buildCardinalityAnnotationForOwningSide( link, "OneToOne", null ) ; 
-//			} 
-//			else if ( link.isCardinalityManyToOne() ) {
-//				annotation = buildCardinalityAnnotationForOwningSide( link, "ManyToOne", null ) ; 
-//			} 
-//			else if ( link.isCardinalityManyToMany() ) {
-//				annotation = buildCardinalityAnnotationForOwningSide( link, "ManyToMany", targetEntityClassName ) ; 
-//			}
-//			else if ( link.isCardinalityOneToMany() ) {
-//				//--- Possible for unidirectional "OneToMany" relationship ( whithout inverse side )
-//				annotation = buildCardinalityAnnotationForOwningSide( link, "OneToMany", targetEntityClassName ) ; 
-//			} 
-//		} 
-//		else {
-//			//--- INVERSE SIDE
-//			if (link.isCardinalityOneToOne()) {
-//				annotation = buildCardinalityAnnotationForInverseSide( link, "OneToOne" ); 
-//			} 
-//			else if (link.isCardinalityOneToMany()) {
-//				annotation = buildCardinalityAnnotationForInverseSide( link, "OneToMany" ); 
-//			} 
-//			else if (link.isCardinalityManyToMany()) {
-//				annotation = buildCardinalityAnnotationForInverseSide( link, "ManyToMany" ); 
-//			} 
-//			else if (link.isCardinalityManyToOne()) {
-//				// Not supposed to occur for an INVERSE SIDE !
-//				annotation = buildCardinalityAnnotationForInverseSide( link, "ManyToOne" ) ; 
-//			} 
-//		}
 		String annotation = buildCardinalityAnnotation(link);
 		if ( ! StrUtil.nullOrVoid(annotation) ) {
 			annotations.addLine(annotation);
@@ -839,7 +712,11 @@ public class JpaInContext {
 	private void processLinkJoinAnnotation(AnnotationsBuilder annotations, LinkInContext link, 
 			List<AttributeInContext> alreadyMappedFields ) throws GeneratorException {
 		if ( link.isCardinalityManyToMany() ) {
-			processJoinTable(annotations, link) ;
+			if ( ! link.hasMappedBy() ) {
+				// no @MappedBy(xxx) in model => generate @JoinTable
+				processJoinTable(annotations, link) ;
+			}
+			// else @ManyToMany(mappedBy="xx") is already generated
 		} 
 		else {
 		    // Example : @JoinColumn(name="BADGE_NUMBER", referencedColumnName="BADGE_NUMBER")
@@ -901,82 +778,44 @@ public class JpaInContext {
 		
 		annotations.addLine("@JoinTable( name=\"" + entity.getSqlTableName() + "\", " );
 		// Example : joinColumns = @JoinColumn(name = "post_id"),
+		annotations.addLine( processJoinTableColumns("  joinColumns",        fk1, "," ) ) ; // Example :  joinColumns = @JoinColumn(name = "post_id"),
+		annotations.addLine( processJoinTableColumns("  inverseJoinColumns", fk2, " )" ) );  // Example :  inverseJoinColumns = @JoinColumn( name = "idRole" ) )
+	}
 
+	// @JoinTable( name = "T_Users_Roles_Associations",
+    // joinColumns = @JoinColumn( name = "idUser" ),
+    // inverseJoinColumns = @JoinColumn( name = "idRole" ) )
+	
+	private String processJoinTableColumns(String name, ForeignKeyInContext fk, String endingChar) throws GeneratorException {
 		StringBuilder sb = new StringBuilder();
-		sb.append("joinColumns = " );
-		if ( fk1.getAttributesCount() > 1 ) {
+		sb.append(name); // "joinColumns" or "inverseJoinColumns"
+		sb.append(" = " );
+		if ( fk.getAttributesCount() > 1 ) {
 			sb.append("{ " );
 		}
 		int n = 0; 
-		for ( ForeignKeyAttributeInContext fkAttrib : fk1.getAttributes() ) {
+		for ( ForeignKeyAttributeInContext fkAttrib : fk.getAttributes() ) {
 			n++;
 			if ( n > 1 ) {
 				sb.append(", " );
 			}
-			sb.append("@JoinColumn( name=\"");
+			sb.append("@JoinColumn( ");
+			//--- name="MGR_COUNTRY"
+			sb.append("name=\""); 
 			sb.append(fkAttrib.getOriginAttribute().getSqlColumnName());
 			sb.append("\"");
+			//--- referencedColumnName="COUNTRY" (useful ?)
+			sb.append(", referencedColumnName=\""); 
+			sb.append(fkAttrib.getReferencedAttribute().getSqlColumnName());
+			sb.append("\"");
+			//--- end of JoinColumn
+			sb.append(")");
 		}
-		if ( fk1.getAttributesCount() > 1 ) {
+		if ( fk.getAttributesCount() > 1 ) {
 			sb.append("} " );
 		}
-		
-		
-		annotations.addLine(" )" );
-/*****
- * 
- * TODO
- * 
- *******
-			
-			List<JoinColumnInContext> joinColumns = joinTable.getJoinColumns();
-			if ( joinColumns != null ) {
-				processJoinTableColumns(annotations, link, joinColumns, "joinColumns", "," );
-			}
-			
-			List<JoinColumnInContext> inverseJoinColumns = joinTable.getInverseJoinColumns();
-			if ( inverseJoinColumns != null ) 
-			{
-				processJoinTableColumns(annotations, link, inverseJoinColumns, "inverseJoinColumns", "" );
-			}
- *******/
-	}
-
-	
-	//-------------------------------------------------------------------------------------
-	private void processJoinTableColumns( AnnotationsBuilder annotations, LinkInContext link, 
-			 String name,  String end ) throws GeneratorException
-	{
-		List<String> jc = buildJoinColumnAnnotations( link, null );
-		if ( jc != null ) {
-			if ( jc.size() == 1 ) 
-			{
-				// Single Join Column
-				// Example :
-				//   joinColumns=@JoinColumn(name="MGR_COUNTRY", referencedColumnName="COUNTRY") 
-				
-				annotations.addLine("  " + name + "=" + jc.get(0) + end);
-			}
-			else 
-			{
-				// Multiple Join Columns
-				// Example :
-				//   joinColumns={
-				//     @JoinColumn(name="MGR_COUNTRY", referencedColumnName="COUNTRY") ,
-				//     @JoinColumn(name="MGR_ID", referencedColumnName="EMP_ID") }
-				
-				annotations.addLine("  " + name + "={" );
-				int i = 0 ;
-				for ( String s : jc ) {
-					String jcEnd = ",";
-					if ( i == jc.size() - 1) {
-						jcEnd = "}" + end ;
-					}
-					annotations.addLine("    " + s + jcEnd );
-					i++;
-				}
-			}
-		}
+		sb.append(endingChar);
+		return sb.toString();
 	}
 	
 	//-------------------------------------------------------------------------------------
