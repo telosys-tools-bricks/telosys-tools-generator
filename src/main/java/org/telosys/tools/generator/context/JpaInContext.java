@@ -316,7 +316,6 @@ public class JpaInContext {
 		
 		b.addLine("@Entity");
 		
-//		String s = "@Table(name=\"" + SqlTableNameProvider.getTableName(entity) + "\"" ;
 		String s = "@Table(name=\"" + entity.getSqlTableName() + "\"" ;  // v 4.1.0
 		if ( ! StrUtil.nullOrVoid( entity.getDatabaseSchema() ) ) {
 			s = s + ", schema=\"" + entity.getDatabaseSchema() + "\"" ; 
@@ -769,26 +768,42 @@ public class JpaInContext {
 	 * @param link
 	 */
 	private void processJoinTable(AnnotationsBuilder annotations, LinkInContext link ) throws GeneratorException {
-		EntityInContext entity = link.getJoinEntity();
-		if ( entity.getDatabaseForeignKeysCount() != 2) {
-			// error
+		EntityInContext joinEntity = link.getJoinEntity();
+		if ( joinEntity.getDatabaseForeignKeysCount() != 2) {
+			throw new GeneratorContextException("@JoinTable error : join entity '" + joinEntity.getName() +"' has " + joinEntity.getDatabaseForeignKeysCount() + " FK (2 expected)");
 		}
-		ForeignKeyInContext fk1 = entity.getDatabaseForeignKeys().get(0);
-		ForeignKeyInContext fk2 = entity.getDatabaseForeignKeys().get(1);
 		
-		annotations.addLine("@JoinTable( name=\"" + entity.getSqlTableName() + "\", " );
-		// Example : joinColumns = @JoinColumn(name = "post_id"),
-		annotations.addLine( processJoinTableColumns("  joinColumns",        fk1, "," ) ) ; // Example :  joinColumns = @JoinColumn(name = "post_id"),
-		annotations.addLine( processJoinTableColumns("  inverseJoinColumns", fk2, " )" ) );  // Example :  inverseJoinColumns = @JoinColumn( name = "idRole" ) )
+		link.getEntity();
+		
+		// Get the FK referencing the "owning side" : the current entity (entity holding the link)
+		ForeignKeyInContext fkOwningSide  = getForeignKey(joinEntity, link.getEntity().getName()) ;
+		// Get the FK referencing the "inverse side" : the other entity (in the collection)
+		ForeignKeyInContext fkInverseSide = getForeignKey(joinEntity, link.getTargetEntityName()) ;
+
+		annotations.addLine("@JoinTable( name=\"" + joinEntity.getSqlTableName() + "\", " );
+		// Example for entity "Employee" having a link for a collection of "Skill" : "private List<Skill> skills" 
+		// Example : joinColumns = @JoinColumn( name="emp_id", referencedColumnName="id"),
+		annotations.addLine( processJoinTableColumns("  joinColumns",        fkOwningSide, "," ) ) ; 
+		// Example :  inverseJoinColumns = @JoinColumn( name="skill_id", referencedColumnName="id") )
+		annotations.addLine( processJoinTableColumns("  inverseJoinColumns", fkInverseSide, " )" ) );  
 	}
 
+	private ForeignKeyInContext getForeignKey(EntityInContext joinEntity, String referencedEntityName) {
+		for ( ForeignKeyInContext fk : joinEntity.getDatabaseForeignKeys() ) {
+			if ( referencedEntityName.equals( fk.getReferencedEntityName() ) ) {
+				return fk;
+			}
+		}
+		throw new GeneratorContextException("@JoinTable error : join entity '" + joinEntity.getName() +"' no FK referencing '" + referencedEntityName + "'");
+	}
+	
 	// @JoinTable( name = "T_Users_Roles_Associations",
     // joinColumns = @JoinColumn( name = "idUser" ),
     // inverseJoinColumns = @JoinColumn( name = "idRole" ) )
 	
-	private String processJoinTableColumns(String name, ForeignKeyInContext fk, String endingChar) throws GeneratorException {
+	private String processJoinTableColumns(String joinColType, ForeignKeyInContext fk, String endingChar) throws GeneratorException {
 		StringBuilder sb = new StringBuilder();
-		sb.append(name); // "joinColumns" or "inverseJoinColumns"
+		sb.append(joinColType); // "joinColumns" or "inverseJoinColumns"
 		sb.append(" = " );
 		if ( fk.getAttributesCount() > 1 ) {
 			sb.append("{ " );
