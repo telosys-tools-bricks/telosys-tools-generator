@@ -68,7 +68,7 @@ public class LinkInContext {
 	private final List<LinkAttributeInContext> linkAttributes ; // added in v 3.4.0  (replaces joinColumns)
 	
 //	private final JoinTableInContext        joinTable ;  // removed in v 3.4.0
-	private final boolean isBasedOnJoinEntity; // added in v 4.1.0
+//	private final boolean isBasedOnJoinEntity; // added in v 4.1.0 // ununsed => removed
 	private final String  joinEntityName ;  // added in v 3.4.0  (replaces joinTable)
 //	private final EntityInContext joinEntity; // added in v 4.1.0
 
@@ -121,7 +121,7 @@ public class LinkInContext {
 			}
 		}
 
-		this.isBasedOnJoinEntity = link.isBasedOnJoinEntity() ; // added in v 4.1.0
+		//this.isBasedOnJoinEntity = link.isBasedOnJoinEntity() ; // added in v 4.1.0 // unused => removed
 		this.joinEntityName = link.getJoinEntityName(); // added in v 3.4.0
 		
 		//--- Init link information (ver 3.0.0)
@@ -263,7 +263,14 @@ public class LinkInContext {
 	}
 	
 	//-------------------------------------------------------------------------------------
-	//TODO: doc
+	@VelocityMethod(
+			text={	
+				"Returns the 'join entity' (entity object) used by the link ",
+				"Throws an exception if the link doesn't have a 'join entity'",
+				"check existence before with 'hasJoinEntity()' "
+				},
+			since="4.1.0"
+		)
 	public EntityInContext getJoinEntity() {
 		if ( ! StrUtil.nullOrVoid(this.joinEntityName) ) {
 			return modelInContext.getEntityByClassName(this.joinEntityName);

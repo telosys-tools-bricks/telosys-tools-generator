@@ -21,7 +21,6 @@ import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.context.tools.JdbcRequests;
-import org.telosys.tools.generator.context.tools.JdbcTypesMapper;
 
 //-------------------------------------------------------------------------------------
 @VelocityObject(
