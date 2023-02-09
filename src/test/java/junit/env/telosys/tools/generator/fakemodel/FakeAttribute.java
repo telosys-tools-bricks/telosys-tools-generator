@@ -39,7 +39,7 @@ public class FakeAttribute implements Attribute {
 	private String  databaseName = null; 
 	private String  databaseTypeName = null; 
 	private String  databaseSize = null; 
-	private boolean databaseNotNull = false; 
+//	private boolean databaseNotNull = false; 
 	private String  databaseDefaultValue = null; 
 	private String  databaseComment = null; 
 
@@ -171,18 +171,18 @@ public class FakeAttribute implements Attribute {
 
 	// -----------------------------------------------------------------------------
 
-	public void setDatabaseNotNull(boolean flag) {
-		databaseNotNull = flag;
-	}
-
-	public void setDatabaseNotNull(String flag) {
-		databaseNotNull = "true".equalsIgnoreCase(flag);
-	}
-
-	@Override
-	public boolean isDatabaseNotNull() {
-		return databaseNotNull;
-	}
+//	public void setDatabaseNotNull(boolean flag) {
+//		databaseNotNull = flag;
+//	}
+//
+//	public void setDatabaseNotNull(String flag) {
+//		databaseNotNull = "true".equalsIgnoreCase(flag);
+//	}
+//
+//	@Override
+//	public boolean isDatabaseNotNull() {
+//		return databaseNotNull;
+//	}
 
 	// -----------------------------------------------------------------------------
 	public void setDatabaseSize(String size) {

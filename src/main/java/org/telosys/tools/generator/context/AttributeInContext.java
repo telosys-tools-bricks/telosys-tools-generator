@@ -114,7 +114,7 @@ public class AttributeInContext {
     //private final String  databaseSize   ;   // removed in v 3.4.0
     private final String  databaseComment ;     // Comment of this column 
     private final String  databaseDefaultValue ;   
-    private final boolean isDatabaseNotNull ;  // True if "not null" in the database
+//    private final boolean isDatabaseNotNull ;  // True if "not null" in the database (REMOVED in v 4.1.0)
     private final boolean isAutoIncremented  ;  // True if auto-incremented by the database
 
 // removed in ver 4.1
@@ -238,7 +238,7 @@ public class AttributeInContext {
         this.isAutoIncremented  = attribute.isAutoIncremented();
         this.databaseComment  = StrUtil.notNull( attribute.getDatabaseComment() ) ; 
         this.databaseDefaultValue = StrUtil.notNull( attribute.getDatabaseDefaultValue() ) ; 
-        this.isDatabaseNotNull  = attribute.isDatabaseNotNull();
+        // this.isDatabaseNotNull  = attribute.isDatabaseNotNull(); // removed in v 4.1
         
 		//--- Further info for BOOLEAN 
         this.booleanTrueValue   = Util.trim(attribute.getBooleanTrueValue(), VOID_STRING) ; 
@@ -688,13 +688,14 @@ public class AttributeInContext {
 	//----------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute must be NOT NULL when stored in the database",
+		"Returns TRUE if the attribute must be NOT NULL",
 		"",
 		"(!) DEPRECATED : use 'isNotNull()' instead "
 		}
 	)
     public boolean isDatabaseNotNull() {
-        return isDatabaseNotNull;
+        // return isDatabaseNotNull;
+        return isNotNull;
     }
     
 	//----------------------------------------------------------------------
