@@ -38,6 +38,11 @@
 		 -->
 
 		<!-- DEPENDENCIES / TESTS -->
+		<dependency>
+			<groupId>org.telosys</groupId>
+			<artifactId>telosys-tools-dsl-parser</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 

@@ -516,13 +516,13 @@ public class FakeAttribute implements Attribute {
 		return generatedValueStrategy != GeneratedValueStrategy.UNDEFINED;
 	}
 
-	@Override
-	public String getGeneratedValueGeneratorName() {
-		return generatedValueGeneratorName;
-	}	
-	public void setGeneratedValueGeneratorName(String v) {
-		generatedValueGeneratorName = v;
-	}
+//	@Override
+//	public String getGeneratedValueGeneratorName() {
+//		return generatedValueGeneratorName;
+//	}	
+//	public void setGeneratedValueGeneratorName(String v) {
+//		generatedValueGeneratorName = v;
+//	}
 
 	@Override
 	public GeneratedValueStrategy getGeneratedValueStrategy() {
@@ -541,6 +541,11 @@ public class FakeAttribute implements Attribute {
 	}
 	public void setGeneratedValueAllocationSize(Integer v) {
 		this.generatedValueAllocationSize = v;
+	}
+
+	@Override
+	public Integer getGeneratedValueInitialValue() {
+		return null;
 	}
 
 	@Override
@@ -642,18 +647,25 @@ public class FakeAttribute implements Attribute {
 	}
 
 	@Override
-	public String getGeneratedValueTablePkColumnName() {
-		return null;
-	}
-
-	@Override
 	public String getGeneratedValueTablePkColumnValue() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	public String getGeneratedValueTableValueColumnName() {
-		return null;
-	}
+//	@Override
+//	public String getGeneratedValueTablePkColumnName() {
+//		return null;
+//	}
+//
+//	@Override
+//	public String getGeneratedValueTablePkColumnValue() {
+//		return null;
+//	}
+//
+//	@Override
+//	public String getGeneratedValueTableValueColumnName() {
+//		return null;
+//	}
+
 
 }

@@ -3,6 +3,9 @@ package org.telosys.tools.generator.context;
 import org.junit.Test;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.cfg.TelosysToolsCfgManager;
+import org.telosys.tools.dsl.model.DslModelAttribute;
+import org.telosys.tools.generic.model.Attribute;
+import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.enums.Cardinality;
 import org.telosys.tools.generic.model.enums.FetchType;
 import org.telosys.tools.generic.model.enums.GeneratedValueStrategy;
@@ -32,10 +35,11 @@ public class JpaInContextTest {
 	
 	@Test // (expected = GeneratorSqlException.class)
 	public void testColumnNotNullUnique() {
-		FakeAttribute attrib = buildFakeAttribute("code", "string"); 
-		attrib.setNotNull(true);
-		attrib.setUnique(true);
-		String[] a = fieldAnnotations(buildAttribute(attrib));
+		DslModelAttribute attribute = new DslModelAttribute("code", "string");
+		attribute.setNotNull(true); // @NotNull
+		attribute.setUnique(true); // @Unique
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+		String[] a = fieldAnnotations(attribInCtx);
 		// check result
 		assertEquals(1, a.length);
 		assertEquals("@Column(name=\"code\", nullable=false, unique=true)", a[0]);
@@ -43,9 +47,10 @@ public class JpaInContextTest {
 
 	@Test 
 	public void testColumnNotNull() {
-		FakeAttribute attrib = buildFakeAttribute("firstName", "string"); 
-		attrib.setNotNull(true);
-		String[] a = fieldAnnotations(buildAttribute(attrib));
+		DslModelAttribute attribute = new DslModelAttribute("firstName", "string");
+		attribute.setNotNull(true); // @NotNull
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+		String[] a = fieldAnnotations(attribInCtx);
 		// check result
 		assertEquals(1, a.length);
 		assertEquals("@Column(name=\"first_name\", nullable=false)", a[0]);
@@ -53,9 +58,10 @@ public class JpaInContextTest {
 
 	@Test 
 	public void testColumnDatabaseName() {
-		FakeAttribute attrib = buildFakeAttribute("firstName", "string"); 
-		attrib.setDatabaseName("FIRST_NAME");
-		String[] a = fieldAnnotations(buildAttribute(attrib));
+		DslModelAttribute attribute = new DslModelAttribute("firstName", "string");
+		attribute.setDatabaseName("FIRST_NAME");
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+		String[] a = fieldAnnotations(attribInCtx);
 		// check result
 		assertEquals(1, a.length);
 		assertEquals("@Column(name=\"FIRST_NAME\")", a[0]);
@@ -63,8 +69,10 @@ public class JpaInContextTest {
 
 	@Test 
 	public void testColumnId() {
-		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		String[] a = fieldAnnotations(buildAttribute(attrib));
+		DslModelAttribute attribute = new DslModelAttribute("id", "int");
+		attribute.setKeyElement(true); // @Id
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+		String[] a = fieldAnnotations(attribInCtx);
 		// check result
 		assertEquals(2, a.length);
 		assertEquals("@Id", a[0]);
@@ -73,19 +81,24 @@ public class JpaInContextTest {
 
 	@Test 
 	public void testColumnIdWithColDef() {
-		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		String[] a = fieldAnnotations(buildAttribute(attrib), true);
+		DslModelAttribute attribute = new DslModelAttribute("id", "int");
+		attribute.setKeyElement(true); // @Id
+		attribute.setSize("20");
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+		String[] a = fieldAnnotations(attribInCtx, true);
 		// check result
 		assertEquals(2, a.length);
 		assertEquals("@Id", a[0]);
-		assertEquals("@Column(name=\"id\", columnDefinition=\"INT\")", a[1]);
+		assertEquals("@Column(name=\"id\", columnDefinition=\"INT\")", a[1]); // "int" type => no length=20 
 	}
 
 	@Test 
 	public void testColumnCodeWithColDef() {
-		FakeAttribute attrib = buildFakeAttributeId("code", "string"); 
-		attrib.setSize("20");
-		String[] a = fieldAnnotations(buildAttribute(attrib), true);
+		DslModelAttribute attribute = new DslModelAttribute("code", "string");
+		attribute.setKeyElement(true); // @Id
+		attribute.setSize("20");
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+		String[] a = fieldAnnotations(attribInCtx, true);
 		// check result
 		assertEquals(2, a.length);
 		assertEquals("@Id", a[0]);
@@ -94,10 +107,12 @@ public class JpaInContextTest {
 
 	@Test 
 	public void testColumnCodeWithColDefNotNull() {
-		FakeAttribute attrib = buildFakeAttributeId("code", "string"); 
-		attrib.setNotNull(true);
-		attrib.setSize("20");
-		String[] a = fieldAnnotations(buildAttribute(attrib), true);
+		DslModelAttribute attribute = new DslModelAttribute("code", "string");
+		attribute.setKeyElement(true); // @Id
+		attribute.setNotNull(true);
+		attribute.setSize("20");
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+		String[] a = fieldAnnotations(attribInCtx, true);
 		// check result
 		assertEquals(2, a.length);
 		assertEquals("@Id", a[0]);
@@ -106,11 +121,13 @@ public class JpaInContextTest {
 
 	@Test 
 	public void testColumnCodeWithColDefUnique() {
-		FakeAttribute attrib = buildFakeAttributeId("code", "string"); 
-		attrib.setUnique(true);
-		attrib.setSize("20");
-		String[] a = fieldAnnotations(buildAttribute(attrib), true);
+		DslModelAttribute attribute = new DslModelAttribute("code", "string");
+		attribute.setKeyElement(true); // @Id
+		attribute.setUnique(true);
+		attribute.setSize("20");
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
 		// check result
+		String[] a = fieldAnnotations(attribInCtx, true);
 		assertEquals(2, a.length);
 		assertEquals("@Id", a[0]);
 		assertEquals("@Column(name=\"code\", length=20, unique=true, columnDefinition=\"VARCHAR(20) UNIQUE\")", a[1]);
@@ -118,9 +135,10 @@ public class JpaInContextTest {
 
 	@Test 
 	public void testColumnIdUnique() {
-		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		attrib.setUnique(true);
-		AttributeInContext attribInCtx = buildAttribute(attrib);
+		DslModelAttribute attribute = new DslModelAttribute("id", "int");
+		attribute.setKeyElement(true); // @Id
+		attribute.setUnique(true); // @Unique
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
 		// check result
 		assertTrue(attribInCtx.isUnique());
 		assertFalse(attribInCtx.isGeneratedValue());
@@ -130,12 +148,15 @@ public class JpaInContextTest {
 		assertEquals("@Column(name=\"id\", unique=true)", a[1]);
 	}
 
+	//---------------------------------------------------------------------------------------------
+	// ID + AUTOINCREMENTED
+	//---------------------------------------------------------------------------------------------
 	@Test 
 	public void testColumnIdAutoIncremented() {
-		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		// @AutoIncremented
-		attrib.setAutoIncremented(true);
-		AttributeInContext attribInCtx = buildAttribute(attrib);
+		DslModelAttribute attribute = new DslModelAttribute("id", "int");
+		attribute.setKeyElement(true); // @Id
+		attribute.setAutoIncremented(true); // @AutoIncremented
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
 		// check result
 		assertTrue(attribInCtx.isAutoIncremented());
 		assertFalse(attribInCtx.isGeneratedValue());
@@ -146,12 +167,15 @@ public class JpaInContextTest {
 		assertEquals("@Column(name=\"id\")", a[2]);
 	}
 
+	//---------------------------------------------------------------------------------------------
+	// ID with GENERATED VALUE / AUTO
+	//---------------------------------------------------------------------------------------------
 	@Test 
 	public void testColumnIdGenValAUTO() {
-		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		// @GeneratedValue(AUTO)
-		attrib.setGeneratedValueStrategy(GeneratedValueStrategy.AUTO);
-		AttributeInContext attribInCtx = buildAttribute(attrib);
+		DslModelAttribute attribute = new DslModelAttribute("id", "int");
+		attribute.setKeyElement(true); // @Id
+		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.AUTO);		
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
 		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
 		String[] a = fieldAnnotations(attribInCtx);
@@ -161,12 +185,16 @@ public class JpaInContextTest {
 		assertEquals("@Column(name=\"id\")", a[2]);
 	}
 	
+	//---------------------------------------------------------------------------------------------
+	// ID with GENERATED VALUE / IDENTITY
+	//---------------------------------------------------------------------------------------------
 	@Test 
 	public void testColumnIdGenValIDENTITY() {
-		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		// @GeneratedValue(IDENTITY)
-		attrib.setGeneratedValueStrategy(GeneratedValueStrategy.IDENTITY);
-		AttributeInContext attribInCtx = buildAttribute(attrib);
+		DslModelAttribute attribute = new DslModelAttribute("id", "int");
+		attribute.setKeyElement(true); // @Id
+		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.IDENTITY);		
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+
 		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
 		String[] a = fieldAnnotations(attribInCtx);
@@ -176,73 +204,105 @@ public class JpaInContextTest {
 		assertEquals("@Column(name=\"id\")", a[2]);
 	}
 	
+	//---------------------------------------------------------------------------------------------
+	// ID with GENERATED VALUE / SEQUENCE
+	//---------------------------------------------------------------------------------------------
 	@Test 
 	public void testColumnIdGenValSEQUENCE() {
-		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		// @GeneratedValue(SEQUENCE)  
-		attrib.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
-		AttributeInContext attribInCtx = buildAttribute(attrib);
+		DslModelAttribute attribute = new DslModelAttribute("id", "int");
+		attribute.setKeyElement(true); // @Id
+		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);		
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+		
 		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
 		String[] a = fieldAnnotations(attribInCtx);
-		assertEquals(3, a.length);
-		assertEquals("@Id", a[0]);
-		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE)", a[1]);
-		assertEquals("@Column(name=\"id\")", a[2]);
+		assertEquals(4, a.length);
+		int i=0;
+		assertEquals("@Id", a[i++]);
+		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=\"City_id_gen\")", a[i++]);
+		assertEquals("@SequenceGenerator(name=\"City_id_gen\")", a[i++] ); // NO 'sequenceName' (only 'name' is required in JPA spec)
+		assertEquals("@Column(name=\"id\")", a[i++]);
 	}
 		
 	@Test 
-	public void testColumnIdGenValSEQUENCEwithGeneratorName() {
-		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		// @GeneratedValue(SEQUENCE, MyGeneratorName ) 
-		attrib.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
-		attrib.setGeneratedValueGeneratorName("MyGenerator");
-		AttributeInContext attribInCtx = buildAttribute(attrib);
+	public void testColumnIdGenValSequenceWithName() {
+		DslModelAttribute attribute = new DslModelAttribute("id", "int");
+		attribute.setKeyElement(true); // @Id
+		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
+		attribute.setGeneratedValueSequenceName("MY_SEQUENCE");
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("Book", "BOOK"), attribute);
+		
 		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
 		String[] a = fieldAnnotations(attribInCtx);
 		assertEquals(4, a.length);
-		assertEquals("@Id", a[0]);
-		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=\"MyGenerator\")", a[1]);
-		assertEquals("@SequenceGenerator(name=\"MyGenerator\")", a[2]); // only 'name' is required in JPA spec
-		assertEquals("@Column(name=\"id\")", a[3]);
+		int i=0;
+		assertEquals("@Id", a[i++]);
+		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=\"Book_id_gen\")", a[i++]);
+		assertEquals("@SequenceGenerator(name=\"Book_id_gen\", sequenceName=\"MY_SEQUENCE\")", a[i++]);
+		assertEquals("@Column(name=\"id\")", a[i++]);
 	}
 
 	@Test 
-	public void testColumnIdGenValSEQUENCEwithGeneratorNameAndSequenceName() {
-		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		// @GeneratedValue(SEQUENCE, MyGeneratorName, MYSEQ ) 
-		attrib.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
-		attrib.setGeneratedValueGeneratorName("MyGenerator");
-		attrib.setGeneratedValueSequenceName("MYSEQ");
-		AttributeInContext attribInCtx = buildAttribute(attrib);
+	public void testColumnIdGenValSequenceWithNameAndAllocationSize() {
+		DslModelAttribute attribute = new DslModelAttribute("id", "int");
+		attribute.setKeyElement(true); // @Id
+		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
+		attribute.setGeneratedValueSequenceName("MY_SEQUENCE");
+		attribute.setGeneratedValueAllocationSize(20);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("Book", "BOOK"), attribute);
+		
 		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
 		String[] a = fieldAnnotations(attribInCtx);
 		assertEquals(4, a.length);
-		assertEquals("@Id", a[0]);
-		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=\"MyGenerator\")", a[1]);
-		assertEquals("@SequenceGenerator(name=\"MyGenerator\", sequenceName=\"MYSEQ\")", a[2]);
-		assertEquals("@Column(name=\"id\")", a[3]);
+		int i=0;
+		assertEquals("@Id", a[i++]);
+		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=\"Book_id_gen\")", a[i++]);
+		assertEquals("@SequenceGenerator(name=\"Book_id_gen\", sequenceName=\"MY_SEQUENCE\", allocationSize=20)", a[i++]);
+		assertEquals("@Column(name=\"id\")", a[i++]);
 	}
-	
+
 	@Test 
-	public void testColumnIdGenValSEQUENCEwithGeneratorNameAndSequenceNameAndAllocationSize() {
-		FakeAttribute attrib = buildFakeAttributeId("id", "int"); 
-		// @GeneratedValue(SEQUENCE, MySeqGenName, MYSEQ, 2) 
-		attrib.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
-		attrib.setGeneratedValueGeneratorName("MyGenerator");
-		attrib.setGeneratedValueSequenceName("MYSEQ");
-		attrib.setGeneratedValueAllocationSize(2);
-		AttributeInContext attribInCtx = buildAttribute(attrib);
+	public void testColumnIdGenValSequenceWithNameAndInitialValue() {
+		DslModelAttribute attribute = new DslModelAttribute("id", "int");
+		attribute.setKeyElement(true); // @Id
+		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
+		attribute.setGeneratedValueSequenceName("MY_SEQUENCE");
+		attribute.setGeneratedValueInitialValue(1);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("Book", "BOOK"), attribute);
+		
 		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
 		String[] a = fieldAnnotations(attribInCtx);
 		assertEquals(4, a.length);
-		assertEquals("@Id", a[0]);
-		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=\"MyGenerator\")", a[1]);
-		assertEquals("@SequenceGenerator(name=\"MyGenerator\", sequenceName=\"MYSEQ\", allocationSize=2)", a[2]);
-		assertEquals("@Column(name=\"id\")", a[3]);
+		int i=0;
+		assertEquals("@Id", a[i++]);
+		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=\"Book_id_gen\")", a[i++]);
+		assertEquals("@SequenceGenerator(name=\"Book_id_gen\", sequenceName=\"MY_SEQUENCE\", initialValue=1)", a[i++]);
+		assertEquals("@Column(name=\"id\")", a[i++]);
+	}
+
+	@Test 
+	public void testColumnIdGenValSequenceWithNameAndAllocationSizeAndInitialValue() {
+		DslModelAttribute attribute = new DslModelAttribute("id", "int");
+		attribute.setKeyElement(true); // @Id
+		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
+		attribute.setGeneratedValueSequenceName("MY_SEQUENCE");
+		attribute.setGeneratedValueAllocationSize(20);
+		attribute.setGeneratedValueInitialValue(1);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("Book", "BOOK"), attribute);
+		
+		// check result
+		assertTrue(attribInCtx.isGeneratedValue());
+		String[] a = fieldAnnotations(attribInCtx);
+		assertEquals(4, a.length);
+		int i=0;
+		assertEquals("@Id", a[i++]);
+		assertEquals("@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=\"Book_id_gen\")", a[i++]);
+		assertEquals("@SequenceGenerator(name=\"Book_id_gen\", sequenceName=\"MY_SEQUENCE\", allocationSize=20, initialValue=1)", a[i++]);
+		assertEquals("@Column(name=\"id\")", a[i++]);
 	}
 	
 	//---------------------------------------------------------------------------------------------
@@ -318,19 +378,19 @@ public class JpaInContextTest {
 		System.out.println(s);
 	}
 
-//	private EntityInContext buildEntity(String entityName, String tableName) {
-//		
-//		FakeModel fakeModel = new FakeModel("FakeModel");
-//		Entity fakeEntity = new FakeEntity(entityName, tableName);
-//		fakeModel.addEntity(fakeEntity);
-//
-//		TelosysToolsCfgManager cfgManager = new TelosysToolsCfgManager("projectAbsolutePath");
-//		TelosysToolsCfg telosysToolsCfg = cfgManager.createDefaultTelosysToolsCfg();
-//		EnvInContext envInContext = new EnvInContext() ; 
-//		
-//		ModelInContext modelInContext = new ModelInContext(fakeModel, telosysToolsCfg, envInContext);
-//		return new EntityInContext(fakeEntity, "org.foo.pkg", modelInContext, envInContext);
-//	}
+	private EntityInContext buildEntity(String entityName, String tableName) {
+		
+		FakeModel fakeModel = new FakeModel("FakeModel");
+		Entity fakeEntity = new FakeEntity(entityName, tableName);
+		fakeModel.addEntity(fakeEntity);
+
+		TelosysToolsCfgManager cfgManager = new TelosysToolsCfgManager("projectAbsolutePath");
+		TelosysToolsCfg telosysToolsCfg = cfgManager.createDefaultTelosysToolsCfg();
+		EnvInContext envInContext = new EnvInContext() ; 
+		
+		ModelInContext modelInContext = new ModelInContext(fakeModel, telosysToolsCfg, envInContext);
+		return new EntityInContext(fakeEntity, "org.foo.pkg", modelInContext, envInContext);
+	}
 	
 	private FakeAttribute buildFakeAttribute(String attribName, String neutralType) {
 		return new FakeAttribute(attribName, neutralType, false);
@@ -338,21 +398,25 @@ public class JpaInContextTest {
 	private FakeAttribute buildFakeAttributeId(String attribName, String neutralType) {
 		return new FakeAttribute(attribName, neutralType, true);
 	}
+	
 	private AttributeInContext buildAttribute(FakeAttribute attribute) {
 		return new AttributeInContext(null, attribute, null, new EnvInContext() );
 	}
-	
-	private AttributeInContext buildAttribute(String attribName, String neutralType, String dbName) {
-		FakeAttribute fakeAttribute = new FakeAttribute(attribName, neutralType, false);
-		if ( dbName != null ) {
-			fakeAttribute.setDatabaseName(dbName);
-		}
-		else {
-			fakeAttribute.setDatabaseName(""); // no database name
-			// as in DSL model default value
-		}
-		return new AttributeInContext(null, fakeAttribute, null, new EnvInContext() );
+	private AttributeInContext buildAttributeInContext(EntityInContext entityInContext, Attribute attribute) {
+		return new AttributeInContext(entityInContext, attribute, null, new EnvInContext() );
 	}
+	
+//	private AttributeInContext buildAttribute(String attribName, String neutralType, String dbName) {
+//		FakeAttribute fakeAttribute = new FakeAttribute(attribName, neutralType, false);
+//		if ( dbName != null ) {
+//			fakeAttribute.setDatabaseName(dbName);
+//		}
+//		else {
+//			fakeAttribute.setDatabaseName(""); // no database name
+//			// as in DSL model default value
+//		}
+//		return new AttributeInContext(null, fakeAttribute, null, new EnvInContext() );
+//	}
 	
 	/****
 	private ForeignKeyInContext buidForeignKey1() {

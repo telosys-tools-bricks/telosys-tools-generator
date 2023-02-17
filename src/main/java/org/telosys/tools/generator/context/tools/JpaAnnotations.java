@@ -122,23 +122,29 @@ public class JpaAnnotations
 		else if ( IDENTITY.equalsIgnoreCase( strategy ) ) {
 			annotationGeneratedValue(annotations, GENERATION_TYPE_IDENTITY, null);
 		} 
-		else if ( SEQUENCE.equalsIgnoreCase( strategy ) )	{
-			annotationGeneratedValue( annotations, GENERATION_TYPE_SEQUENCE, attribute.getGeneratedValueGenerator() );
-			if (attribute.hasSequenceGenerator() ) {
-				annotationSequenceGenerator(annotations);
-			}
+		else if ( SEQUENCE.equalsIgnoreCase( strategy ) ) {
+			String generatorName = buildGeneratorName();
+			annotationGeneratedValue( annotations, GENERATION_TYPE_SEQUENCE, generatorName );
+			annotationSequenceGenerator(annotations, generatorName);
 		} 
 		else if ( TABLE.equalsIgnoreCase( strategy ) ) {
-			annotationGeneratedValue( annotations, GENERATION_TYPE_TABLE, attribute.getGeneratedValueGenerator() );
-			if (attribute.hasTableGenerator()) {
-				annotationTableGenerator(annotations);
-			}
+			String generatorName = buildGeneratorName();
+			annotationGeneratedValue( annotations, GENERATION_TYPE_TABLE, generatorName);
+//			if (attribute.hasTableGenerator()) {
+//				annotationTableGenerator(annotations);
+//			}
+			annotationTableGenerator(annotations, generatorName);
 		}
 		else{
 			// AUTO is the default strategy ( see JPA doc ) => use it explicitly 
 			annotationGeneratedValue(annotations, GENERATION_TYPE_AUTO, null);
 		}		
 	}
+	
+	private String buildGeneratorName() {
+		return attribute.getEntity().getName() + "_" + attribute.getName() + "_gen" ;
+	}
+	
 	/**
 	 * Adds a "@GeneratedValue" annotation
 	 * @param strategy
@@ -161,23 +167,27 @@ public class JpaAnnotations
 	/**
 	 * Adds a "@SequenceGenerator" annotation
 	 */
-	private void annotationSequenceGenerator(AnnotationsBuilder annotations) {
+	private void annotationSequenceGenerator(AnnotationsBuilder annotations, String generatorName) {
 		
+		StringBuilder sb = new StringBuilder();
+
 		// name - String : (Required) 
 		//    A unique generator name that can be referenced by one or more classes 
 		//    to be the generator for primary key values.
-		String name = attribute.getSequenceGeneratorName() ;
-		if ( StrUtil.nullOrVoid(name) ) {
-			return; // name is required : if no name => no annotation
-		}
-		
-		StringBuilder sb = new StringBuilder();
-		sb.append("@SequenceGenerator(name=\"").append(name).append("\"");
+//		String name = attribute.getSequenceGeneratorName() ;
+//		if ( StrUtil.nullOrVoid(name) ) {
+//			return; // name is required : if no name => no annotation
+//		}
+//		
+		sb.append("@SequenceGenerator(name=\"").append(generatorName).append("\"");
 		
 		// sequenceName - String : (Optional)
 		//    The name of the database sequence object from which to obtain primary key values.
-		if ( ! StrUtil.nullOrVoid( attribute.getSequenceGeneratorSequenceName() ) ) {
-			sb.append(", sequenceName=\"").append(attribute.getSequenceGeneratorSequenceName()).append("\"");
+//		if ( ! StrUtil.nullOrVoid( attribute.getSequenceGeneratorSequenceName() ) ) {
+//			sb.append(", sequenceName=\"").append(attribute.getSequenceGeneratorSequenceName()).append("\"");
+//		}
+		if ( attribute.hasGeneratedValueSequenceName() ) {
+			sb.append(", sequenceName=\"").append(attribute.getGeneratedValueSequenceName()).append("\"");
 		}
 		
 		// allocationSize - int : (Optional) 
@@ -185,14 +195,21 @@ public class JpaAnnotations
 		//  If the sequence object already exists in the database, then you must specify the allocationSize 
 		//  to match the INCREMENT value of the database sequence object. For example, if you have a sequence object
 		//  in the database that you defined to INCREMENT BY 5, set the allocationSize to 5 in the sequence generator definition
-		if ( attribute.getSequenceGeneratorAllocationSize() > 0 ) {
-			sb.append(", allocationSize=").append(attribute.getSequenceGeneratorAllocationSize());
+//		if ( attribute.getSequenceGeneratorAllocationSize() > 0 ) {
+//			sb.append(", allocationSize=").append(attribute.getSequenceGeneratorAllocationSize());
+//		}
+		if ( attribute.hasGeneratedValueAllocationSize() ) {
+			sb.append(", allocationSize=").append(attribute.getGeneratedValueAllocationSize() );
+		}
+		
+		//  . initialValue (Optional)
+		if ( attribute.hasGeneratedValueInitialValue() ) {
+			sb.append(", initialValue=").append(attribute.getGeneratedValueInitialValue() );
 		}
 		
 		// Other JPA attribute in @SequenceGenerator (not supported yet)
 		//  . schema (Optional)
 		//  . catalog (Optional)
-		//  . initialValue (Optional)
 		
 		sb.append(")") ;
 		annotations.addLine ( sb.toString() );
@@ -201,30 +218,63 @@ public class JpaAnnotations
 	/**
 	 * Adds a "@TableGenerator" annotation
 	 */
-	private void annotationTableGenerator(AnnotationsBuilder annotations) 
+//	private void annotationTableGenerator(AnnotationsBuilder annotations) 
+//	{
+//		// Other JPA attribute in @TableGenerator (not supported yet)
+//		// . allocationSize
+//		// . catalog
+//		// . initialValue
+//		// . schema
+//		// . uniqueConstraints
+//
+//		String s = "@TableGenerator(name=\"" + attribute.getTableGeneratorName() + "\"" ; // Required
+//		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorTable() ) ) {
+//			s = s + ", table=\"" + attribute.getTableGeneratorTable() + "\"" ;
+//		}
+//		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorPkColumnName() ) ) {
+//			s = s + ", pkColumnName=\"" + attribute.getTableGeneratorPkColumnName() + "\"" ;
+//		}
+//		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorValueColumnName() ) ) {
+//			s = s + ", valueColumnName=\"" + attribute.getTableGeneratorValueColumnName() + "\"" ;
+//		}
+//		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorPkColumnValue() ) ) {
+//			s = s + ", pkColumnValue=\"" + attribute.getTableGeneratorPkColumnValue() + "\"" ;
+//		}
+//		s = s + ")" ;
+//		annotations.addLine ( s );				
+//	}
+	private void annotationTableGenerator(AnnotationsBuilder annotations, String generatorName) 
 	{
+		StringBuilder sb = new StringBuilder();
+		
+		// name (Required)
+		sb.append("@TableGenerator(name=\"").append(generatorName).append("\""); 
+		
+		//  pkColumnValue (Optional)
+		if ( attribute.hasGeneratedValueTablePkValue() ) {
+			sb.append(", pkColumnValue=\"").append( attribute.getGeneratedValueTablePkValue() ).append("\"");
+		}
+
+		// allocationSize - int : (Optional) 
+		if ( attribute.hasGeneratedValueAllocationSize() ) {
+			sb.append(", allocationSize=").append(attribute.getGeneratedValueAllocationSize() );
+		}
+		
+		// initialValue (Optional)
+		if ( attribute.hasGeneratedValueInitialValue() ) {
+			sb.append(", initialValue=").append(attribute.getGeneratedValueInitialValue() );
+		}
+
 		// Other JPA attribute in @TableGenerator (not supported yet)
-		// . allocationSize
 		// . catalog
-		// . initialValue
 		// . schema
+		// . table
+		// . pkColumnName
+		// . valueColumnName
 		// . uniqueConstraints
 
-		String s = "@TableGenerator(name=\"" + attribute.getTableGeneratorName() + "\"" ; // Required
-		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorTable() ) ) {
-			s = s + ", table=\"" + attribute.getTableGeneratorTable() + "\"" ;
-		}
-		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorPkColumnName() ) ) {
-			s = s + ", pkColumnName=\"" + attribute.getTableGeneratorPkColumnName() + "\"" ;
-		}
-		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorValueColumnName() ) ) {
-			s = s + ", valueColumnName=\"" + attribute.getTableGeneratorValueColumnName() + "\"" ;
-		}
-		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorPkColumnValue() ) ) {
-			s = s + ", pkColumnValue=\"" + attribute.getTableGeneratorPkColumnValue() + "\"" ;
-		}
-		s = s + ")" ;
-		annotations.addLine ( s );				
+		sb.append(")") ;
+		annotations.addLine ( sb.toString() );
 	}
 
 	/**

@@ -133,21 +133,26 @@ public class AttributeInContext {
     private final String  booleanFalseValue ; // eg "0", ""No"",  ""false""
     
 	//--- JPA KEY Generation infos -------------------------------------------------
-    private final boolean isGeneratedValue ;  // True if GeneratedValue ( annotation "@GeneratedValue" )
-	private final String  generatedValueStrategy ; // "AUTO", "IDENTITY", "SEQUENCE", "TABLE" 
-	private final String  generatedValueGenerator ;
+//    private final boolean isGeneratedValue ;  // True if GeneratedValue ( annotation "@GeneratedValue" )
+	private final GeneratedValueStrategy generatedValueStrategy ; // "AUTO", "IDENTITY", "SEQUENCE", "TABLE" 
 	
-    private final boolean hasSequenceGenerator  ;  // True if SequenceGenerator ( annotation "@SequenceGenerator" )
-	private final String  sequenceGeneratorName     ;
-	private final String  sequenceGeneratorSequenceName   ;
-	private final int     sequenceGeneratorAllocationSize ;
+	// private final String  generatedValueGenerator ; // removed in v 4.1.0 
+	
+	private final Integer generatedValueAllocationSize ; // v 4.1.0 not dedicated to SEQUENCE
+	private final Integer generatedValueInitialValue ; // v 4.1.0
+	
+//    private final boolean hasSequenceGenerator  ;  // True if SequenceGenerator ( annotation "@SequenceGenerator" )
+	// private final String  sequenceGeneratorName     ; // removed in v 4.1.0 
+	private final String  generatedValueSequenceName   ;
+	// private final int     sequenceGeneratorAllocationSize ;  // removed in v 4.1.0 
 
-    private final boolean hasTableGenerator;  // True if TableGenerator ( annotation "@TableGenerator" )
-	private final String  tableGeneratorName;
+//    private final boolean hasTableGenerator;  // True if TableGenerator ( annotation "@TableGenerator" )
+	// private final String  tableGeneratorName; // removed in v 4.1.0 
+	private final String  generatedValueTablePkValue;
+
 	private final String  tableGeneratorTable;
 	private final String  tableGeneratorPkColumnName;
 	private final String  tableGeneratorValueColumnName;
-	private final String  tableGeneratorPkColumnValue;
 
 	private final boolean isUsedInLinks ; 
 	private final boolean isUsedInSelectedLinks ; 
@@ -245,21 +250,28 @@ public class AttributeInContext {
         this.booleanFalseValue  = Util.trim(attribute.getBooleanFalseValue(), VOID_STRING) ;
 		
         //--- Generated Value  v 3.4.0
-        this.isGeneratedValue = attribute.getGeneratedValueStrategy() != GeneratedValueStrategy.UNDEFINED ;
-		this.generatedValueStrategy = attribute.getGeneratedValueStrategy().getText() ;
-		this.generatedValueGenerator = notNull(attribute.getGeneratedValueGeneratorName());
-		// Generated Value / Sequence  v 3.4.0
-        this.hasSequenceGenerator = attribute.getGeneratedValueStrategy() == GeneratedValueStrategy.SEQUENCE ;
-		this.sequenceGeneratorName = this.generatedValueGenerator; // sequenceGeneratorName : to be removed ?
-		this.sequenceGeneratorSequenceName = notNull(attribute.getGeneratedValueSequenceName());
-		this.sequenceGeneratorAllocationSize = notNull(attribute.getGeneratedValueAllocationSize());
-		// Generated Value / Table  v 3.4.0
-        this.hasTableGenerator    = attribute.getGeneratedValueStrategy() == GeneratedValueStrategy.TABLE ;
-		this.tableGeneratorName = this.generatedValueGenerator; // tableGeneratorName : to be removed ?
-		this.tableGeneratorTable = notNull(attribute.getGeneratedValueTableName());
-		this.tableGeneratorPkColumnName = notNull(attribute.getGeneratedValueTablePkColumnName()); 
-		this.tableGeneratorValueColumnName = notNull(attribute.getGeneratedValueTableValueColumnName());
-		this.tableGeneratorPkColumnValue = notNull(attribute.getGeneratedValueTablePkColumnValue());
+//        this.isGeneratedValue = attribute.getGeneratedValueStrategy() != GeneratedValueStrategy.UNDEFINED ;
+		this.generatedValueStrategy = attribute.getGeneratedValueStrategy() ;
+//		this.generatedValueGenerator = notNull(attribute.getGeneratedValueGeneratorName());// removed in v 4.1
+		this.generatedValueAllocationSize = attribute.getGeneratedValueAllocationSize() ; // v 4.1
+		this.generatedValueInitialValue   = attribute.getGeneratedValueInitialValue() ; // v 4.1
+				
+		// Generated Value / SEQUENCE  v 3.4.0
+//        this.hasSequenceGenerator = attribute.getGeneratedValueStrategy() == GeneratedValueStrategy.SEQUENCE ;
+//		this.sequenceGeneratorName = this.generatedValueGenerator; // removed in v 4.1.0
+		this.generatedValueSequenceName = notNull(attribute.getGeneratedValueSequenceName());
+//		this.sequenceGeneratorAllocationSize = notNull(attribute.getGeneratedValueAllocationSize()); // removed in v 4.1.0
+		
+		// Generated Value / TABLE  v 3.4.0
+		this.generatedValueTablePkValue = notNull(attribute.getGeneratedValueTablePkColumnValue());
+
+		// this.hasTableGenerator    = attribute.getGeneratedValueStrategy() == GeneratedValueStrategy.TABLE ;
+		// this.tableGeneratorName = this.generatedValueGenerator; // removed in v 4.1.0
+		
+		// TODO 
+		this.tableGeneratorTable = ""; // notNull(attribute.getGeneratedValueTableName());
+		this.tableGeneratorPkColumnName = ""; //notNull(attribute.getGeneratedValueTablePkColumnName()); 
+		this.tableGeneratorValueColumnName = ""; //notNull(attribute.getGeneratedValueTableValueColumnName());
 		
 		this.isUsedInLinks         = attribute.isUsedInLinks(); 
 		this.isUsedInSelectedLinks = attribute.isUsedInSelectedLinks();
@@ -1284,7 +1296,7 @@ public class AttributeInContext {
 	}
 
 	//-----------------------------------------------------------------------------------------
-	// JPA "@GeneratedValue"
+	// GENERATED VALUE  (for ORM like JPA or Doctrine )
 	//-----------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -1295,170 +1307,216 @@ public class AttributeInContext {
 		}
 	)
 	public boolean isGeneratedValue() {
-		return isGeneratedValue;
+		// return isGeneratedValue;
+		return this.generatedValueStrategy != GeneratedValueStrategy.UNDEFINED ;
 	}
 
+	//-------------------------------------------------------------------------------------
 	/**
-	 * Returns the GeneratedValue strategy : auto, identity, sequence, table
-	 * or null if not defined
+	 * Returns the generated value strategy : 'AUTO', 'IDENTITY', 'SEQUENCE', 'TABLE' or ''
 	 * @return
 	 */
-	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the strategy for a 'generated value' (or null if none)",
-			"e.g : 'auto', 'identity', 'sequence', 'table' "
+			"Returns the generated value strategy if any : ",
+			" 'AUTO', 'IDENTITY', 'SEQUENCE', 'TABLE' or '' "
 			}
 	)
 	public String getGeneratedValueStrategy() {
-		return generatedValueStrategy;
+		return generatedValueStrategy.getText() ;
 	}
 
 	//-------------------------------------------------------------------------------------
 	/**
-	 * Returns the GeneratedValue generator : the name of the primary key generator to use <br>
-	 * The generator name referenced a "SequenceGenerator" or a "TableGenerator"
+	 * Returns the generated value allocation size (usable in JPA "@SequenceGenerator" or "@TableGenerator")
 	 * @return
 	 */
 	@VelocityMethod(
 		text={	
-			"Returns the generator for a 'generated value' ",
-			"Typically for JPA : 'SequenceGenerator' or 'TableGenerator' "
+			"Returns the generated value allocation size usable in ORM like JPA or Doctrine",
+			"Typically for JPA '@SequenceGenerator allocationSize' or '@TableGenerator allocationSize' "
 			}
 	)
-	public String getGeneratedValueGenerator() {
-		return generatedValueGenerator;
+	public int getGeneratedValueAllocationSize() {
+		return generatedValueAllocationSize != null ? generatedValueAllocationSize.intValue() : 0 ;
+	}
+	public boolean hasGeneratedValueAllocationSize() {
+		return generatedValueAllocationSize != null ;
 	}
 
-	//-----------------------------------------------------------------------------------------
-	// JPA "@SequenceGenerator"
-	//-----------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------------
 	/**
-	 * Returns true if this attribute is a "GeneratedValue" using a "SequenceGenerator"
+	 * Returns the generated value initial value (usable in JPA "@SequenceGenerator" or "@TableGenerator")
 	 * @return
 	 */
 	@VelocityMethod(
 		text={	
-			"Returns TRUE if the attribute is a 'generated value' using a 'sequence generator' ",
-			"Typically for JPA '@SequenceGenerator'  "
+			"Returns the generated value initial value usable in ORM like JPA or Doctrine",
+			"Typically for JPA '@SequenceGenerator initialValue' or '@TableGenerator initialValue' "
 			}
 	)
-	public boolean hasSequenceGenerator() {
-		return hasSequenceGenerator;
+	public int getGeneratedValueInitialValue() {
+		return generatedValueInitialValue != null ? generatedValueInitialValue.intValue() : 0 ;
 	}
+	public boolean hasGeneratedValueInitialValue() {
+		return generatedValueInitialValue != null ;
+	}
+
+
+	//-------------------------------------------------------------------------------------
+// removed in v 4.1
+//	/**
+//	 * Returns the GeneratedValue generator : the name of the primary key generator to use <br>
+//	 * The generator name referenced a "SequenceGenerator" or a "TableGenerator"
+//	 * @return
+//	 */
+//	@VelocityMethod(
+//		text={	
+//			"Returns the generator for a 'generated value' ",
+//			"Typically for JPA : 'SequenceGenerator' or 'TableGenerator' "
+//			}
+//	)
+//	public String getGeneratedValueGenerator() {
+//		return generatedValueGenerator;
+//	}
+
+//	//-----------------------------------------------------------------------------------------
+//	// JPA "@SequenceGenerator"
+//	//-----------------------------------------------------------------------------------------
+//	/**
+//	 * Returns true if this attribute is a "GeneratedValue" using a "SequenceGenerator"
+//	 * @return
+//	 */
+//	@VelocityMethod(
+//		text={	
+//			"Returns TRUE if the attribute is a 'generated value' using a 'sequence generator' ",
+//			"Typically for JPA '@SequenceGenerator'  "
+//			}
+//	)
+//	public boolean hasSequenceGenerator() {
+//		return hasSequenceGenerator;
+//	}
+
+	//-----------------------------------------------------------------------------------------
+// removed in v 4.1
+//	/**
+//	 * Returns the "@SequenceGenerator" name
+//	 * @return
+//	 */
+//	@VelocityMethod(
+//		text={	
+//			"Returns the name of the 'sequence generator' ",
+//			"Typically for JPA '@SequenceGenerator/name'  "
+//			}
+//	)
+//	public String getSequenceGeneratorName() {
+//		return sequenceGeneratorName;
+//	}
 
 	//-----------------------------------------------------------------------------------------
 	/**
-	 * Returns the "@SequenceGenerator" name
+	 * Returns the generated value sequence name
 	 * @return
 	 */
 	@VelocityMethod(
 		text={	
-			"Returns the name of the 'sequence generator' ",
-			"Typically for JPA '@SequenceGenerator/name'  "
-			}
-	)
-	public String getSequenceGeneratorName() {
-		return sequenceGeneratorName;
-	}
-
-	//-----------------------------------------------------------------------------------------
-	/**
-	 * Returns the "@SequenceGenerator" sequence name
-	 * @return
-	 */
-	@VelocityMethod(
-		text={	
-			"Returns the 'sequence name' to be used in the 'sequence generator' definition",
+			"Returns the 'sequence name' used for a generated value",
 			"Typically for JPA '@SequenceGenerator/sequenceName'  "
 			}
 	)
-	public String getSequenceGeneratorSequenceName() {
-		return sequenceGeneratorSequenceName;
+	public String getGeneratedValueSequenceName() {
+		return generatedValueSequenceName;
+	}
+	public boolean hasGeneratedValueSequenceName() {
+		return ! StrUtil.nullOrVoid(generatedValueSequenceName);
 	}
 
-	//-----------------------------------------------------------------------------------------
-	/**
-	 * Returns the "@SequenceGenerator" sequence allocation size
-	 * @return
-	 */
-	@VelocityMethod(
-		text={	
-			"Returns the 'sequence allocation size' to be used in the 'sequence generator' definition",
-			"Typically for JPA '@SequenceGenerator/allocationSize'  "
-			}
-	)
-	public int getSequenceGeneratorAllocationSize() {
-		return sequenceGeneratorAllocationSize;
-	}
 
 	//-----------------------------------------------------------------------------------------
-	// JPA "@TableGenerator"
-	//-----------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns TRUE if the attribute is a 'generated value' using a 'table generator' ",
-			"Typically for JPA '@TableGenerator'  "
-			}
-	)
-	public boolean hasTableGenerator() {
-		return hasTableGenerator;
-	}
+//	/**
+//	 * Returns the "@SequenceGenerator" sequence allocation size
+//	 * @return
+//	 */
+//	@VelocityMethod(
+//		text={	
+//			"Returns the 'sequence allocation size' to be used in the 'sequence generator' definition",
+//			"Typically for JPA '@SequenceGenerator/allocationSize'  "
+//			}
+//	)
+//	public int getSequenceGeneratorAllocationSize() {
+//		return sequenceGeneratorAllocationSize;
+//	}
+
+//	//-----------------------------------------------------------------------------------------
+//	// JPA "@TableGenerator"
+//	//-----------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns TRUE if the attribute is a 'generated value' using a 'table generator' ",
+//			"Typically for JPA '@TableGenerator'  "
+//			}
+//	)
+//	public boolean hasTableGenerator() {
+//		return hasTableGenerator;
+//	}
 
 	//-----------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the name of the 'table generator' ",
-			"Typically for JPA '@TableGenerator/name'  "
-			}
-	)
-	public String getTableGeneratorName() {
-		return tableGeneratorName;
-	}
+//	@VelocityMethod(
+//		text={	
+//			"Returns the name of the 'table generator' ",
+//			"Typically for JPA '@TableGenerator/name'  "
+//			}
+//	)
+//	public String getTableGeneratorName() {
+//		return tableGeneratorName;
+//	}
 
-	//-----------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the name of the table used in the 'table generator' ",
-			"Typically for JPA '@TableGenerator/table'  "
-			}
-	)
-	public String getTableGeneratorTable() {
-		return tableGeneratorTable;
-	}
-
-	//-----------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the name of the Primary Key column used in the 'table generator' ",
-			"Typically for JPA '@TableGenerator/pkColumnName'  "
-			}
-	)
-	public String getTableGeneratorPkColumnName() {
-		return tableGeneratorPkColumnName;
-	}
-
-	//-----------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the name of the column that stores the last value generated by the 'table generator' ",
-			"Typically for JPA '@TableGenerator/valueColumnName'  "
-			}
-	)
-	public String getTableGeneratorValueColumnName() {
-		return tableGeneratorValueColumnName;
-	}
-
+//	//-----------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns the name of the table used in the 'table generator' ",
+//			"Typically for JPA '@TableGenerator/table'  "
+//			}
+//	)
+//	public String getTableGeneratorTable() {
+//		return tableGeneratorTable;
+//	}
+//
+//	//-----------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns the name of the Primary Key column used in the 'table generator' ",
+//			"Typically for JPA '@TableGenerator/pkColumnName'  "
+//			}
+//	)
+//	public String getTableGeneratorPkColumnName() {
+//		return tableGeneratorPkColumnName;
+//	}
+//
+//	//-----------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns the name of the column that stores the last value generated by the 'table generator' ",
+//			"Typically for JPA '@TableGenerator/valueColumnName'  "
+//			}
+//	)
+//	public String getTableGeneratorValueColumnName() {
+//		return tableGeneratorValueColumnName;
+//	}
+//
 	//-----------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={
-		"Returns the primary key value in the generator table that distinguishes this set of generated values",
+		"Returns the primary key value in the table that distinguishes this set of generated values",
 		"from others that may be stored in the table",
 		"Typically for JPA '@TableGenerator/pkColumnValue'  "
 		}
 	)
-	public String getTableGeneratorPkColumnValue() {
-		return tableGeneratorPkColumnValue;
+	public String getGeneratedValueTablePkValue() {
+		return generatedValueTablePkValue;
+	}
+	public boolean hasGeneratedValueTablePkValue() {
+		return ! StrUtil.nullOrVoid(generatedValueTablePkValue);
 	}
 	
 	//------------------------------------------------------------------------------------------
