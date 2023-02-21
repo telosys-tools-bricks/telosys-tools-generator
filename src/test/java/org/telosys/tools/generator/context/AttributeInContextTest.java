@@ -3,12 +3,11 @@ package org.telosys.tools.generator.context;
 import java.math.BigDecimal;
 
 import org.junit.Test;
+import org.telosys.tools.dsl.model.DslModelAttribute;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
 
 public class AttributeInContextTest {
 	
@@ -176,13 +175,13 @@ public class AttributeInContextTest {
 	//------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------
 	private AttributeInContext buildAttribute(String attribName, String neutralType) {
-		FakeAttribute fakeAttribute = new FakeAttribute(attribName, neutralType, false);
+		DslModelAttribute fakeAttribute = new DslModelAttribute(attribName, neutralType);
 		return new AttributeInContext(null, fakeAttribute, null, new EnvInContext() );
 	}
 	//------------------------------------------------------------------------------------
 	private AttributeInContext buildAttribute(String attribName, String neutralType,
 			String dbName, String dbType, String size) {
-		FakeAttribute fakeAttribute = new FakeAttribute(attribName, neutralType, false);
+		DslModelAttribute fakeAttribute = new DslModelAttribute(attribName, neutralType);
 		fakeAttribute.setDatabaseName(dbName);
 		fakeAttribute.setDatabaseType(dbType);
 		fakeAttribute.setSize(size); // since v 3.4.0 'size' is the reference  (instead of 'dbSize' )
@@ -191,7 +190,7 @@ public class AttributeInContextTest {
 	//------------------------------------------------------------------------------------
 	private AttributeInContext buildAttributeWithConstraints(String attribName, String neutralType,
 			boolean notNull, String defaultValue, String dbDefaultValue) {
-		FakeAttribute fakeAttribute = new FakeAttribute(attribName, neutralType, false);
+		DslModelAttribute fakeAttribute = new DslModelAttribute(attribName, neutralType);
 		fakeAttribute.setNotNull(notNull);
 		fakeAttribute.setDefaultValue(defaultValue);
 		fakeAttribute.setDatabaseDefaultValue(dbDefaultValue);

@@ -1,48 +1,52 @@
 package junit.env.telosys.tools.generator.fakemodel.entities;
 
+import org.telosys.tools.dsl.model.DslModelAttribute;
+import org.telosys.tools.dsl.model.DslModelEntity;
+import org.telosys.tools.dsl.model.DslModelLink;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.Link;
 import org.telosys.tools.generic.model.enums.Cardinality;
 import org.telosys.tools.generic.model.types.NeutralType;
 
-import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
-import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
-import junit.env.telosys.tools.generator.fakemodel.FakeLink;
-
-public class Car extends FakeEntity {
+public class Car extends DslModelEntity {
 
 	public static final String ENTITY_NAME = "Car";
 	
 	public Car() {
-		super(ENTITY_NAME, "CAR");
-		storeAttribute(idAttribute());
-		storeAttribute(nameAttribute());
-		storeAttribute(descAttribute());
-		storeLink(brandLink());
+		super(ENTITY_NAME);
+		setDatabaseTable("CAR");
+		addAttribute(idAttribute());
+		addAttribute(nameAttribute());
+		addAttribute(descAttribute());
+		addLink(brandLink());
 	}
 	
 	private Attribute idAttribute() {
-		FakeAttribute a = new FakeAttribute("id", NeutralType.INTEGER, true);
+		DslModelAttribute a = new DslModelAttribute("id", NeutralType.INTEGER);
+		a.setKeyElement(true);
 		a.setDatabaseName("ID");
 		a.setNotNull(true);
 		return a ;
 	}
 
 	private Attribute nameAttribute() {
-		FakeAttribute a = new FakeAttribute("name", NeutralType.STRING, false);
+		DslModelAttribute a = new DslModelAttribute("name", NeutralType.STRING);
 		a.setDatabaseName("NAME");
 		a.setMaxLength(60);
 		return a ;
 	}
 	
 	private Attribute descAttribute() { 
-		FakeAttribute a = new FakeAttribute("desc", NeutralType.STRING, false);
+		DslModelAttribute a = new DslModelAttribute("desc", NeutralType.STRING);
 		a.setDatabaseName("DESC");
 		a.setMaxLength(60);
 		return a ;
 	}
 
 	private Link brandLink() { 
-		return new FakeLink("brand", "Brand", Cardinality.MANY_TO_ONE);
+		DslModelLink link = new DslModelLink("brand");
+		link.setReferencedEntityName("Brand");
+		link.setCardinality(Cardinality.MANY_TO_ONE);
+		return link;
 	}
 }

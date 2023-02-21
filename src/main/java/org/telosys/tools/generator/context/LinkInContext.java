@@ -79,7 +79,7 @@ public class LinkInContext {
 	private final String       targetEntityName ; // v 3.4.0
 	private final String       mappedBy ;
 	private final boolean      isSelected ;
-	private final boolean      isOwningSide ;
+//	private final boolean      isOwningSide ; // removed in v 4.1.0
 	
 	private final Cardinality    cardinality ;
 	private final FetchType      fetchType ;
@@ -122,19 +122,19 @@ public class LinkInContext {
 		}
 
 		//this.isBasedOnJoinEntity = link.isBasedOnJoinEntity() ; // added in v 4.1.0 // unused => removed
-		this.joinEntityName = link.getJoinEntityName(); // added in v 3.4.0
+		this.joinEntityName = link.getJoinEntityName(); // keep null if not defined  // added in v 3.4.0
 		
 		//--- Init link information (ver 3.0.0)
 		this.fieldName = link.getFieldName() ;
 		this.targetEntityName = link.getReferencedEntityName();  // added in v 3.4.0
 		this.isSelected = link.isSelected();
 		this.mappedBy = link.getMappedBy(); // keep null if not defined
-		this.isOwningSide = link.isOwningSide();
+//		this.isOwningSide = link.isOwningSide(); // removed in v 4.1.0
 		
-		this.cardinality = link.getCardinality();
+		this.cardinality = link.getCardinality() != null ? link.getCardinality() : Cardinality.UNDEFINED ;
 		this.fetchType = link.getFetchType() != null ? link.getFetchType() : FetchType.DEFAULT ;
-		this.optional = link.getOptional();
-		this.cascadeOptions = link.getCascadeOptions();
+		this.optional = link.getOptional() != null ? link.getOptional() : Optional.UNDEFINED ;
+		this.cascadeOptions = link.getCascadeOptions() != null ? link.getCascadeOptions() : new CascadeOptions() ;
 		
 		this.isInsertable = link.getInsertable();
 		this.isUpdatable  = link.getUpdatable();
@@ -384,7 +384,25 @@ public class LinkInContext {
 			}
 	)
 	public boolean isOwningSide() {
-		return isOwningSide ;
+		// changed in v 4.1.0
+		// return isOwningSide ;
+		switch ( this.cardinality ) {
+		case ONE_TO_ONE:
+			// @MappedBy(xxx) => inverse side, no @MappedBy(xxx) => supposed to be owning side
+			return ! hasMappedBy() ; 
+		case ONE_TO_MANY:
+			// One to many => inverse side
+			return false ;
+		case MANY_TO_ONE:
+			// Many to One => owning side (supposed to hold the FK)
+			return true ;
+		case MANY_TO_MANY:
+			// if the link holds the relation definition with @JoinEntity(xx) and doesn't have @MappedBy(xxx)
+			return hasJoinEntity() && ! hasMappedBy() ; 
+		default:
+			return false ;
+		}
+		
 	}
 
 	//-------------------------------------------------------------------------------------

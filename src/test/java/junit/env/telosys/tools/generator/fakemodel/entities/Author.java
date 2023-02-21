@@ -1,36 +1,33 @@
 package junit.env.telosys.tools.generator.fakemodel.entities;
 
+import org.telosys.tools.dsl.model.DslModelAttribute;
+import org.telosys.tools.dsl.model.DslModelEntity;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.types.NeutralType;
 
-import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
-import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
-
-public class Author extends FakeEntity {
+public class Author extends DslModelEntity {
 
 	public static final String ENTITY_NAME = "Author";
 
 	public Author() {
-		//super(ENTITY_NAME, "AUTHOR");
-		super(ENTITY_NAME, ""); // no table name
-		storeAttribute(idAttribute());
-		storeAttribute(firstNameAttribute());
-		storeAttribute(lastNameAttribute());
+		super(ENTITY_NAME); 
+		this.addAttribute(idAttribute());
+		this.addAttribute(firstNameAttribute());
+		this.addAttribute(lastNameAttribute());
 	}
 	
 	private Attribute idAttribute() {
-		FakeAttribute attribute = new FakeAttribute("id", NeutralType.INTEGER, true);
+		DslModelAttribute attribute = new DslModelAttribute("id", NeutralType.INTEGER);
+		attribute.setKeyElement(true);
 		attribute.setDatabaseName("ID");
 		attribute.setDatabaseType("NUMBER");
-		//attribute.setDatabaseNotNull(true);
 		attribute.setNotNull(true);
-		//attribute.isUnique(true); // TODO
 		attribute.setDatabaseDefaultValue("0");
 		return attribute ;
 	}
 
 	private Attribute firstNameAttribute() {
-		FakeAttribute attribute = new FakeAttribute("firstName", NeutralType.STRING, false);
+		DslModelAttribute attribute = new DslModelAttribute("firstName", NeutralType.STRING);
 		attribute.setDatabaseName("FIRST_NAME");
 		attribute.setDatabaseType("VARCHAR");
 		attribute.setDatabaseDefaultValue("default-firts-name");
@@ -38,7 +35,7 @@ public class Author extends FakeEntity {
 	}
 
 	private Attribute lastNameAttribute() {
-		FakeAttribute attribute = new FakeAttribute("lastName", "string", false);
+		DslModelAttribute attribute = new DslModelAttribute("lastName", NeutralType.STRING);
 		attribute.setDatabaseName("LAST_NAME");
 		attribute.setDatabaseType("VARCHAR");
 		return attribute ;

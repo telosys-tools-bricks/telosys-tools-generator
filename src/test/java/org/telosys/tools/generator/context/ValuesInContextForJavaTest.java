@@ -7,14 +7,13 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.telosys.tools.dsl.model.DslModelAttribute;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.enums.DateType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
 
 public class ValuesInContextForJavaTest {
 	private static final String LOCAL_DATE = "java.time.LocalDate" ;
@@ -299,11 +298,8 @@ public class ValuesInContextForJavaTest {
 		attributes.add( buildAttributeInContext("date2",     "date"      ) );
 		attributes.add( buildAttributeInContext("time1",     "time"      ) );
 		
-//		FakeAttribute attrib = new FakeAttribute("time3", "time");
-		FakeAttribute attrib = new FakeAttribute("time3", "time", false);
+		DslModelAttribute attrib = new DslModelAttribute("time3", "time");
 		attrib.setDateType(DateType.TIME_ONLY);
-//		attrib.setSqlTypeExpected(true);
-//		AttributeInContext attrib = buildAttributeInContext("time2",     "time"      ) ;
 		attributes.add( buildAttributeInContext(attrib) );
 		
 		ValuesInContext values = new ValuesInContext( attributes, 2, env );
@@ -408,7 +404,7 @@ public class ValuesInContextForJavaTest {
 	}
 	//------------------------
 	private Attribute buildAttribute(String attributeName, String neutralType, int maxLength, boolean notNull) {
-		FakeAttribute attribute = new FakeAttribute(attributeName, neutralType, false );
+		DslModelAttribute attribute = new DslModelAttribute(attributeName, neutralType );
 //		attribute.setName(attributeName);
 //		attribute.setFullType(javaType);
 		attribute.setMaxLength(maxLength);
@@ -425,10 +421,4 @@ public class ValuesInContextForJavaTest {
 		sb.append('"');
 		return sb.toString();
 	}
-//	private Column getColumnForIntegerType(String attributeName) {
-//		Column column = new Column();
-//		column.setJavaName(attributeName);
-//		column.setJavaType("java.lang.Integer");
-//		return column ;
-//	}
 }

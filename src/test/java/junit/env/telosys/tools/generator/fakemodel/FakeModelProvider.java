@@ -1,5 +1,6 @@
 package junit.env.telosys.tools.generator.fakemodel;
 
+import org.telosys.tools.dsl.model.DslModel;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.Model;
@@ -15,7 +16,7 @@ public class FakeModelProvider {
 	}
 	
 	public static Model buildModel() {
-		FakeModel model = new FakeModel("FakeModel");
+		DslModel model = new DslModel("FakeModel");
 		model.addEntity( checkEntity( new Employee() ) );
 		model.addEntity( checkEntity( new Book() ) );
 		model.addEntity( checkEntity( new Author() ) );

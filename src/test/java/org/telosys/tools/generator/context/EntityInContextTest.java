@@ -114,8 +114,8 @@ public class EntityInContextTest {
 		assertEquals("", entityInContext.getDatabaseCatalog());
 		assertEquals("", entityInContext.getDatabaseComment());
 		assertEquals("", entityInContext.getDatabaseSchema());
-		assertEquals("", entityInContext.getDatabaseType()); // "TABLE" or "VIEW"
-		assertFalse(entityInContext.isTableType());
+		assertEquals("TABLE", entityInContext.getDatabaseType()); // "TABLE" or "VIEW" : Table type by default
+		assertTrue(entityInContext.isTableType());
 		assertFalse(entityInContext.isViewType());
 		
 		// Key attributes

@@ -1,56 +1,56 @@
 package junit.env.telosys.tools.generator.fakemodel.entities;
 
+import org.telosys.tools.dsl.model.DslModelAttribute;
+import org.telosys.tools.dsl.model.DslModelEntity;
+import org.telosys.tools.dsl.model.DslModelLink;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.Link;
 import org.telosys.tools.generic.model.enums.Cardinality;
 import org.telosys.tools.generic.model.types.NeutralType;
 
-import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
-import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
-import junit.env.telosys.tools.generator.fakemodel.FakeLink;
-import junit.env.telosys.tools.generator.fakemodel.FakeTagContainer;
-import junit.env.telosys.tools.generator.fakemodel.Tag;
-
-public class Employee extends FakeEntity {
+public class Employee extends DslModelEntity {
 
 	public static final String ENTITY_NAME = "Employee";
 	
 	public Employee() {
-		super(ENTITY_NAME, ""); //no database table
+		super(ENTITY_NAME); 
 		// Entity tags
-		defineTag(new Tag("Foo", "abc"));
+		Builder.tag(this, "Foo", "abc");
 		// Entity attributes
-		storeAttribute(idAttribute());
-		storeAttribute(firstNameAttribute());
-		storeAttribute(lastNameAttribute());
+		addAttribute(idAttribute());
+		addAttribute(firstNameAttribute());
+		addAttribute(lastNameAttribute());
 		// Entity links
-		storeLink(countryLink());
+		addLink(countryLink());
 	}
 	
 	private Attribute idAttribute() {
-		FakeAttribute attribute = new FakeAttribute("id", NeutralType.INTEGER, true);
+		DslModelAttribute attribute = new DslModelAttribute("id", NeutralType.INTEGER);
+		attribute.setKeyElement(true);
 		attribute.setDatabaseName("ID");
 		attribute.setNotNull(true);
 		return attribute ;
 	}
 
 	private Attribute firstNameAttribute() {
-		FakeAttribute attribute = new FakeAttribute("firstName", NeutralType.STRING, false);
+		DslModelAttribute attribute = new DslModelAttribute("firstName", NeutralType.STRING);
 		attribute.setDatabaseDefaultValue("xy");
 		return attribute ;
 	}
 
 	private Attribute lastNameAttribute() {
-		FakeAttribute attribute = new FakeAttribute("lastName", NeutralType.STRING, false);
+		DslModelAttribute attribute = new DslModelAttribute("lastName", NeutralType.STRING);
 		attribute.setDatabaseName("LAST_NAME");
 		attribute.setDatabaseType("VARCHAR");
 		return attribute ;
 	}
 	
 	private Link countryLink() {
-		FakeLink link =  new FakeLink("country", "Country", Cardinality.MANY_TO_ONE);
-		FakeTagContainer tags = (FakeTagContainer)link.getTagContainer();
-		tags.addTag(new Tag("Foo", "aaa"));
+		DslModelLink link =  new DslModelLink("country");
+		link.setReferencedEntityName("Country");
+		link.setCardinality(Cardinality.MANY_TO_ONE);
+		
+		Builder.tag(link, "Foo", "aaa");
 		return link;
 	}
 }

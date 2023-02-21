@@ -1,28 +1,29 @@
 package junit.env.telosys.tools.generator.fakemodel.entities;
 
+import org.telosys.tools.dsl.model.DslModelAttribute;
+import org.telosys.tools.dsl.model.DslModelEntity;
+import org.telosys.tools.dsl.model.DslModelForeignKeyAttribute;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.types.NeutralType;
 
-import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
-import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
-import junit.env.telosys.tools.generator.fakemodel.FakeForeignKey;
-
-public class EmpTeam extends FakeEntity {
+public class EmpTeam extends DslModelEntity {
 
 	public static final String ENTITY_NAME  = "EmpTeam";
 	public static final String ENTITY_TABLE = "EMP_TEAM";
 
 	public EmpTeam() {
-		super(ENTITY_NAME, ENTITY_TABLE);
-		storeAttribute(teamCodeAttribute());
-		storeAttribute(empIdAttribute());
-		
-		storeForeignKey(new FakeForeignKey("FK1", ENTITY_TABLE, "EMPLOYEE"));
-		storeForeignKey(new FakeForeignKey("FK2", ENTITY_TABLE, "TEAM"));
+		super(ENTITY_NAME);
+		setDatabaseTable(ENTITY_TABLE);
+		addAttribute(teamCodeAttribute());
+		addAttribute(empIdAttribute());
+		// Foreign Keys
+		Builder.foreignKey(this, "FK1", "EmpTeam", "Employee", new DslModelForeignKeyAttribute(1, "empId",    "id"));
+		Builder.foreignKey(this, "FK2", "EmpTeam", "Team",     new DslModelForeignKeyAttribute(1, "teamCode", "code") );
 	}
 	
 	private Attribute teamCodeAttribute() {
-		FakeAttribute attribute = new FakeAttribute("teamCode", NeutralType.STRING, true);
+		DslModelAttribute attribute = new DslModelAttribute("teamCode", NeutralType.STRING);
+		attribute.setKeyElement(true);
 		attribute.setDatabaseName("TEAM_CODE");
 		attribute.setDatabaseType("VARCHAR");
 		attribute.setFKSimple(true);
@@ -30,7 +31,8 @@ public class EmpTeam extends FakeEntity {
 	}
 
 	private Attribute empIdAttribute() {
-		FakeAttribute attribute = new FakeAttribute("empId", NeutralType.INTEGER, true);
+		DslModelAttribute attribute = new DslModelAttribute("empId", NeutralType.INTEGER);
+		attribute.setKeyElement(true);
 		attribute.setDatabaseName("EMP_ID");
 		attribute.setDatabaseType("NUMBER");
 		attribute.setFKSimple(true);

@@ -4,6 +4,7 @@ import java.io.File;
 import java.math.BigDecimal;
 
 import org.junit.Test;
+import org.telosys.tools.dsl.model.DslModelAttribute;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.exceptions.GeneratorSqlException;
 import org.telosys.tools.generic.model.types.NeutralType;
@@ -12,9 +13,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import junit.env.telosys.tools.generator.context.Builder;
-import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
-import junit.env.telosys.tools.generator.fakemodel.FakeForeignKey;
-import junit.env.telosys.tools.generator.fakemodel.FakeForeignKeyAttribute;
 
 public class SqlInContextTest {
 	
@@ -217,23 +215,9 @@ public class SqlInContextTest {
 	private void print(String s) {
 		System.out.println(s);
 	}
-
-//	private EntityInContext buildEntity(String entityName, String tableName) {
-//		
-//		FakeModel fakeModel = new FakeModel("FakeModel");
-//		Entity fakeEntity = new FakeEntity(entityName, tableName);
-//		fakeModel.addEntity(fakeEntity);
-//
-//		TelosysToolsCfgManager cfgManager = new TelosysToolsCfgManager("projectAbsolutePath");
-//		TelosysToolsCfg telosysToolsCfg = cfgManager.createDefaultTelosysToolsCfg();
-//		EnvInContext envInContext = new EnvInContext() ; 
-//		
-//		ModelInContext modelInContext = new ModelInContext(fakeModel, telosysToolsCfg, envInContext);
-//		return new EntityInContext(fakeEntity, "org.foo.pkg", modelInContext, envInContext);
-//	}
 	
 	private AttributeInContext buildAttribute(String attribName, String neutralType, String dbName) {
-		FakeAttribute fakeAttribute = new FakeAttribute(attribName, neutralType, false);
+		DslModelAttribute fakeAttribute = new DslModelAttribute(attribName, neutralType);
 		if ( dbName != null ) {
 			fakeAttribute.setDatabaseName(dbName);
 		}

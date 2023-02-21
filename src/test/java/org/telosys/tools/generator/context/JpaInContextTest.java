@@ -3,9 +3,11 @@ package org.telosys.tools.generator.context;
 import org.junit.Test;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.cfg.TelosysToolsCfgManager;
+import org.telosys.tools.dsl.model.DslModel;
 import org.telosys.tools.dsl.model.DslModelAttribute;
+import org.telosys.tools.dsl.model.DslModelEntity;
+import org.telosys.tools.dsl.model.DslModelLink;
 import org.telosys.tools.generic.model.Attribute;
-import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.enums.Cardinality;
 import org.telosys.tools.generic.model.enums.FetchType;
 import org.telosys.tools.generic.model.enums.GeneratedValueStrategy;
@@ -15,22 +17,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
-import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
-import junit.env.telosys.tools.generator.fakemodel.FakeLink;
-import junit.env.telosys.tools.generator.fakemodel.FakeModel;
-
 public class JpaInContextTest {
 	
-	private String[] fieldAnnotations(AttributeInContext attribute, boolean withColumnDefinition) {
+	private String[] jpaFieldAnnotations(AttributeInContext attribute) {
+		return jpaFieldAnnotations(attribute, false);
+	}
+	private String[] jpaFieldAnnotations(AttributeInContext attribute, boolean withColumnDefinition) {
 		JpaInContext jpa = new JpaInContext() ;
 		jpa.setGenColumnDefinition(withColumnDefinition);
 		String annotations = jpa.fieldAnnotations(0, attribute);
 		print(annotations);
 		return annotations.split("\n");
-	}
-	private String[] fieldAnnotations(AttributeInContext attribute) {
-		return fieldAnnotations(attribute, false);
 	}
 	
 	@Test // (expected = GeneratorSqlException.class)
@@ -38,8 +35,8 @@ public class JpaInContextTest {
 		DslModelAttribute attribute = new DslModelAttribute("code", "string");
 		attribute.setNotNull(true); // @NotNull
 		attribute.setUnique(true); // @Unique
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
-		String[] a = fieldAnnotations(attribInCtx);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City"), attribute);
+		String[] a = jpaFieldAnnotations(attribInCtx);
 		// check result
 		assertEquals(1, a.length);
 		assertEquals("@Column(name=\"code\", nullable=false, unique=true)", a[0]);
@@ -49,8 +46,8 @@ public class JpaInContextTest {
 	public void testColumnNotNull() {
 		DslModelAttribute attribute = new DslModelAttribute("firstName", "string");
 		attribute.setNotNull(true); // @NotNull
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
-		String[] a = fieldAnnotations(attribInCtx);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City"), attribute);
+		String[] a = jpaFieldAnnotations(attribInCtx);
 		// check result
 		assertEquals(1, a.length);
 		assertEquals("@Column(name=\"first_name\", nullable=false)", a[0]);
@@ -60,8 +57,8 @@ public class JpaInContextTest {
 	public void testColumnDatabaseName() {
 		DslModelAttribute attribute = new DslModelAttribute("firstName", "string");
 		attribute.setDatabaseName("FIRST_NAME");
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
-		String[] a = fieldAnnotations(attribInCtx);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City", "CITY"), attribute);
+		String[] a = jpaFieldAnnotations(attribInCtx);
 		// check result
 		assertEquals(1, a.length);
 		assertEquals("@Column(name=\"FIRST_NAME\")", a[0]);
@@ -71,8 +68,8 @@ public class JpaInContextTest {
 	public void testColumnId() {
 		DslModelAttribute attribute = new DslModelAttribute("id", "int");
 		attribute.setKeyElement(true); // @Id
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
-		String[] a = fieldAnnotations(attribInCtx);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City", "CITY"), attribute);
+		String[] a = jpaFieldAnnotations(attribInCtx);
 		// check result
 		assertEquals(2, a.length);
 		assertEquals("@Id", a[0]);
@@ -84,8 +81,8 @@ public class JpaInContextTest {
 		DslModelAttribute attribute = new DslModelAttribute("id", "int");
 		attribute.setKeyElement(true); // @Id
 		attribute.setSize("20");
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
-		String[] a = fieldAnnotations(attribInCtx, true);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City", "CITY"), attribute);
+		String[] a = jpaFieldAnnotations(attribInCtx, true);
 		// check result
 		assertEquals(2, a.length);
 		assertEquals("@Id", a[0]);
@@ -97,8 +94,8 @@ public class JpaInContextTest {
 		DslModelAttribute attribute = new DslModelAttribute("code", "string");
 		attribute.setKeyElement(true); // @Id
 		attribute.setSize("20");
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
-		String[] a = fieldAnnotations(attribInCtx, true);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City", "CITY"), attribute);
+		String[] a = jpaFieldAnnotations(attribInCtx, true);
 		// check result
 		assertEquals(2, a.length);
 		assertEquals("@Id", a[0]);
@@ -111,8 +108,8 @@ public class JpaInContextTest {
 		attribute.setKeyElement(true); // @Id
 		attribute.setNotNull(true);
 		attribute.setSize("20");
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
-		String[] a = fieldAnnotations(attribInCtx, true);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City", "CITY"), attribute);
+		String[] a = jpaFieldAnnotations(attribInCtx, true);
 		// check result
 		assertEquals(2, a.length);
 		assertEquals("@Id", a[0]);
@@ -125,9 +122,9 @@ public class JpaInContextTest {
 		attribute.setKeyElement(true); // @Id
 		attribute.setUnique(true);
 		attribute.setSize("20");
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City", "CITY"), attribute);
 		// check result
-		String[] a = fieldAnnotations(attribInCtx, true);
+		String[] a = jpaFieldAnnotations(attribInCtx, true);
 		assertEquals(2, a.length);
 		assertEquals("@Id", a[0]);
 		assertEquals("@Column(name=\"code\", length=20, unique=true, columnDefinition=\"VARCHAR(20) UNIQUE\")", a[1]);
@@ -138,29 +135,42 @@ public class JpaInContextTest {
 		DslModelAttribute attribute = new DslModelAttribute("id", "int");
 		attribute.setKeyElement(true); // @Id
 		attribute.setUnique(true); // @Unique
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City", "CITY"), attribute);
 		// check result
 		assertTrue(attribInCtx.isUnique());
 		assertFalse(attribInCtx.isGeneratedValue());
-		String[] a = fieldAnnotations(attribInCtx);
+		String[] a = jpaFieldAnnotations(attribInCtx);
 		assertEquals(2, a.length);
 		assertEquals("@Id", a[0]);
 		assertEquals("@Column(name=\"id\", unique=true)", a[1]);
 	}
 
 	//---------------------------------------------------------------------------------------------
-	// ID + AUTOINCREMENTED
+	// AUTOINCREMENTED
 	//---------------------------------------------------------------------------------------------
+	@Test 
+	public void testColumnAutoIncrementedWithoutId() { // NO @Id (NO PRIAMRY KEY) 
+		DslModelAttribute attribute = new DslModelAttribute("foo", "long");
+		attribute.setAutoIncremented(true); // @AutoIncremented
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City"), attribute);
+		// check result
+		assertTrue(attribInCtx.isAutoIncremented());
+		assertFalse(attribInCtx.isGeneratedValue());
+		String[] a = jpaFieldAnnotations(attribInCtx);
+		assertEquals(1, a.length);
+		assertEquals("@Column(name=\"foo\")", a[0]);
+	}
+
 	@Test 
 	public void testColumnIdAutoIncremented() {
 		DslModelAttribute attribute = new DslModelAttribute("id", "int");
 		attribute.setKeyElement(true); // @Id
 		attribute.setAutoIncremented(true); // @AutoIncremented
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City", "CITY"), attribute);
 		// check result
 		assertTrue(attribInCtx.isAutoIncremented());
 		assertFalse(attribInCtx.isGeneratedValue());
-		String[] a = fieldAnnotations(attribInCtx);
+		String[] a = jpaFieldAnnotations(attribInCtx);
 		assertEquals(3, a.length);
 		assertEquals("@Id", a[0]);
 		assertEquals("@GeneratedValue(strategy=GenerationType.IDENTITY)", a[1]);
@@ -175,10 +185,10 @@ public class JpaInContextTest {
 		DslModelAttribute attribute = new DslModelAttribute("id", "int");
 		attribute.setKeyElement(true); // @Id
 		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.AUTO);		
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City", "CITY"), attribute);
 		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
-		String[] a = fieldAnnotations(attribInCtx);
+		String[] a = jpaFieldAnnotations(attribInCtx);
 		assertEquals(3, a.length);
 		assertEquals("@Id", a[0]);
 		assertEquals("@GeneratedValue(strategy=GenerationType.AUTO)", a[1]);
@@ -193,11 +203,11 @@ public class JpaInContextTest {
 		DslModelAttribute attribute = new DslModelAttribute("id", "int");
 		attribute.setKeyElement(true); // @Id
 		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.IDENTITY);		
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City", "CITY"), attribute);
 
 		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
-		String[] a = fieldAnnotations(attribInCtx);
+		String[] a = jpaFieldAnnotations(attribInCtx);
 		assertEquals(3, a.length);
 		assertEquals("@Id", a[0]);
 		assertEquals("@GeneratedValue(strategy=GenerationType.IDENTITY)", a[1]);
@@ -212,11 +222,11 @@ public class JpaInContextTest {
 		DslModelAttribute attribute = new DslModelAttribute("id", "int");
 		attribute.setKeyElement(true); // @Id
 		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);		
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("City", "CITY"), attribute);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City", "CITY"), attribute);
 		
 		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
-		String[] a = fieldAnnotations(attribInCtx);
+		String[] a = jpaFieldAnnotations(attribInCtx);
 		assertEquals(4, a.length);
 		int i=0;
 		assertEquals("@Id", a[i++]);
@@ -231,11 +241,11 @@ public class JpaInContextTest {
 		attribute.setKeyElement(true); // @Id
 		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
 		attribute.setGeneratedValueSequenceName("MY_SEQUENCE");
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("Book", "BOOK"), attribute);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("Book", "BOOK"), attribute);
 		
 		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
-		String[] a = fieldAnnotations(attribInCtx);
+		String[] a = jpaFieldAnnotations(attribInCtx);
 		assertEquals(4, a.length);
 		int i=0;
 		assertEquals("@Id", a[i++]);
@@ -251,11 +261,11 @@ public class JpaInContextTest {
 		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
 		attribute.setGeneratedValueSequenceName("MY_SEQUENCE");
 		attribute.setGeneratedValueAllocationSize(20);
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("Book", "BOOK"), attribute);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("Book", "BOOK"), attribute);
 		
 		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
-		String[] a = fieldAnnotations(attribInCtx);
+		String[] a = jpaFieldAnnotations(attribInCtx);
 		assertEquals(4, a.length);
 		int i=0;
 		assertEquals("@Id", a[i++]);
@@ -271,11 +281,11 @@ public class JpaInContextTest {
 		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.SEQUENCE);
 		attribute.setGeneratedValueSequenceName("MY_SEQUENCE");
 		attribute.setGeneratedValueInitialValue(1);
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("Book", "BOOK"), attribute);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("Book", "BOOK"), attribute);
 		
 		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
-		String[] a = fieldAnnotations(attribInCtx);
+		String[] a = jpaFieldAnnotations(attribInCtx);
 		assertEquals(4, a.length);
 		int i=0;
 		assertEquals("@Id", a[i++]);
@@ -292,11 +302,11 @@ public class JpaInContextTest {
 		attribute.setGeneratedValueSequenceName("MY_SEQUENCE");
 		attribute.setGeneratedValueAllocationSize(20);
 		attribute.setGeneratedValueInitialValue(1);
-		AttributeInContext attribInCtx = buildAttributeInContext(buildEntity("Book", "BOOK"), attribute);
+		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("Book", "BOOK"), attribute);
 		
 		// check result
 		assertTrue(attribInCtx.isGeneratedValue());
-		String[] a = fieldAnnotations(attribInCtx);
+		String[] a = jpaFieldAnnotations(attribInCtx);
 		assertEquals(4, a.length);
 		int i=0;
 		assertEquals("@Id", a[i++]);
@@ -310,8 +320,8 @@ public class JpaInContextTest {
 	//---------------------------------------------------------------------------------------------
 	@Test 
 	public void testLinkCardinalityOneToMany() {
-		FakeLink fakeLink = new FakeLink("towns", "Town", Cardinality.ONE_TO_MANY);
-		LinkInContext link = buildLink("Country", fakeLink);
+		DslModelLink fakeLink = buildDslModelLink("towns", "Town", Cardinality.ONE_TO_MANY);
+		LinkInContext link = buildLinkInContext("Country", fakeLink);
 		assertFalse(link.isOwningSide());
 		JpaInContext jpa = new JpaInContext();
 		assertEquals("@OneToMany", jpa.linkCardinalityAnnotation(0, link) );
@@ -321,12 +331,12 @@ public class JpaInContextTest {
 
 	@Test 
 	public void testLinkCardinalityOneToManyWithOptions() {
-		FakeLink fakeLink = new FakeLink("towns", "Town", Cardinality.ONE_TO_MANY);
+		DslModelLink fakeLink = buildDslModelLink("towns", "Town", Cardinality.ONE_TO_MANY);
 		fakeLink.setFetchType(FetchType.LAZY);
 		fakeLink.setMappedBy("country");
 		fakeLink.setOrphanRemoval(true);
 		fakeLink.setOptional(Optional.TRUE); // ignored for OneToMany
-		LinkInContext link = buildLink("Country", fakeLink);
+		LinkInContext link = buildLinkInContext("Country", fakeLink);
 		assertFalse(link.isOwningSide());
 		JpaInContext jpa = new JpaInContext();
 		assertEquals("@OneToMany(mappedBy=\"country\", fetch=FetchType.LAZY, orphanRemoval=true)", 
@@ -335,8 +345,8 @@ public class JpaInContextTest {
 
 	@Test 
 	public void testLinkCardinalityManyToOne() {
-		FakeLink fakeLink = new FakeLink("country", "Country", Cardinality.MANY_TO_ONE);
-		LinkInContext link = buildLink("Town", fakeLink);
+		DslModelLink fakeLink = buildDslModelLink("country", "Country", Cardinality.MANY_TO_ONE);
+		LinkInContext link = buildLinkInContext("Town", fakeLink);
 		assertTrue(link.isOwningSide());
 		JpaInContext jpa = new JpaInContext();
 		assertEquals("@ManyToOne", jpa.linkCardinalityAnnotation(0, link) );
@@ -346,21 +356,27 @@ public class JpaInContextTest {
 
 	@Test 
 	public void testLinkCardinalityManyToOneWithOptions() {
-		FakeLink fakeLink = new FakeLink("country", "Country", Cardinality.MANY_TO_ONE);
+		DslModelLink fakeLink = buildDslModelLink("country", "Country", Cardinality.MANY_TO_ONE);
 		fakeLink.setFetchType(FetchType.LAZY);
 		fakeLink.setMappedBy("town"); // error : not used for ManyToOne
 		fakeLink.setOrphanRemoval(true); // ignored for ManyToOne
 		fakeLink.setOptional(Optional.TRUE);
-		LinkInContext link = buildLink("Town", fakeLink);
+		LinkInContext link = buildLinkInContext("Town", fakeLink);
 		assertTrue(link.isOwningSide());
 		JpaInContext jpa = new JpaInContext();
 		assertEquals("@ManyToOne(fetch=FetchType.LAZY, optional=true)", jpa.linkCardinalityAnnotation(0, link) );
 	}
 
-	private LinkInContext buildLink(String entityName, FakeLink fakeLink ) {
-		FakeEntity fakeOriginEntity = new FakeEntity(entityName, "");
-		FakeEntity fakeTargetEntity = new FakeEntity(fakeLink.getReferencedEntityName(), "");
-		FakeModel fakeModel = new FakeModel("mymodel");
+	private DslModelLink buildDslModelLink(String fielName, String referencedEntityName, Cardinality cardinality) {
+		DslModelLink fakeLink = new DslModelLink(fielName);
+		fakeLink.setReferencedEntityName(referencedEntityName);
+		fakeLink.setCardinality(cardinality);
+		return fakeLink;
+	}
+	private LinkInContext buildLinkInContext(String entityName, DslModelLink fakeLink ) {
+		DslModelEntity fakeOriginEntity = new DslModelEntity(entityName);
+		DslModelEntity fakeTargetEntity = new DslModelEntity(fakeLink.getReferencedEntityName());
+		DslModel fakeModel = new DslModel("mymodel");
 		fakeModel.addEntity(fakeOriginEntity);
 		fakeModel.addEntity(fakeTargetEntity);
 
@@ -378,10 +394,12 @@ public class JpaInContextTest {
 		System.out.println(s);
 	}
 
-	private EntityInContext buildEntity(String entityName, String tableName) {
-		
-		FakeModel fakeModel = new FakeModel("FakeModel");
-		Entity fakeEntity = new FakeEntity(entityName, tableName);
+	private EntityInContext buildEntityInContext(String entityName) {
+		return buildEntityInContext(entityName, "NO_TABLE");
+	}
+	private EntityInContext buildEntityInContext(String entityName, String tableName) {
+		DslModel fakeModel = new DslModel("FakeModel");
+		DslModelEntity fakeEntity = new DslModelEntity(entityName);
 		fakeModel.addEntity(fakeEntity);
 
 		TelosysToolsCfgManager cfgManager = new TelosysToolsCfgManager("projectAbsolutePath");
@@ -392,44 +410,7 @@ public class JpaInContextTest {
 		return new EntityInContext(fakeEntity, "org.foo.pkg", modelInContext, envInContext);
 	}
 	
-	private FakeAttribute buildFakeAttribute(String attribName, String neutralType) {
-		return new FakeAttribute(attribName, neutralType, false);
-	}
-	private FakeAttribute buildFakeAttributeId(String attribName, String neutralType) {
-		return new FakeAttribute(attribName, neutralType, true);
-	}
-	
-	private AttributeInContext buildAttribute(FakeAttribute attribute) {
-		return new AttributeInContext(null, attribute, null, new EnvInContext() );
-	}
 	private AttributeInContext buildAttributeInContext(EntityInContext entityInContext, Attribute attribute) {
 		return new AttributeInContext(entityInContext, attribute, null, new EnvInContext() );
 	}
-	
-//	private AttributeInContext buildAttribute(String attribName, String neutralType, String dbName) {
-//		FakeAttribute fakeAttribute = new FakeAttribute(attribName, neutralType, false);
-//		if ( dbName != null ) {
-//			fakeAttribute.setDatabaseName(dbName);
-//		}
-//		else {
-//			fakeAttribute.setDatabaseName(""); // no database name
-//			// as in DSL model default value
-//		}
-//		return new AttributeInContext(null, fakeAttribute, null, new EnvInContext() );
-//	}
-	
-	/****
-	private ForeignKeyInContext buidForeignKey1() {
-		FakeForeignKey fakeFK = new FakeForeignKey("FkDriverCar", "GoodDriver", "SpecialCar");
-		fakeFK.addColumn(new FakeForeignKeyColumn("carId", "id", 1));
-		return new ForeignKeyInContext(fakeFK, new EnvInContext());
-	}
-
-	private ForeignKeyInContext buidForeignKey2() {
-		FakeForeignKey fakeFK = new FakeForeignKey("FK_DRIVER_CAR", "GOOD_DRIVER", "SPECIAL_CAR");
-		fakeFK.addColumn(new FakeForeignKeyColumn("carId1", "myId1", 1));
-		fakeFK.addColumn(new FakeForeignKeyColumn("carId2", "myId2", 2));
-		return new ForeignKeyInContext(fakeFK, new EnvInContext());
-	}
-	****/
 }

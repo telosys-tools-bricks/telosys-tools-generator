@@ -6,13 +6,11 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.telosys.tools.dsl.model.DslModelAttribute;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generic.model.Attribute;
-import org.telosys.tools.generic.model.Entity;
 
 import junit.env.telosys.tools.generator.context.Builder;
-import junit.env.telosys.tools.generator.fakemodel.FakeAttribute;
-import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
 
 public class FnInContextForJavaTest {
 	
@@ -123,7 +121,7 @@ public class FnInContextForJavaTest {
 	}
 
 	private AttributeInContext buildAttribute(EntityInContext entityInContext, String name, String type, EnvInContext envInContext) {
-		Attribute attribute = new FakeAttribute(name, type, false);
+		Attribute attribute = new DslModelAttribute(name, type);
 		return new AttributeInContext(entityInContext, 
 				attribute, 
 				null, 

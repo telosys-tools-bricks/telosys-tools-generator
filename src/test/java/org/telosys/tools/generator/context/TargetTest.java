@@ -5,12 +5,12 @@ import java.io.File;
 import org.junit.Test;
 import org.telosys.tools.commons.bundles.TargetDefinition;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
+import org.telosys.tools.dsl.model.DslModelEntity;
 import org.telosys.tools.generic.model.Entity;
 
 import static org.junit.Assert.assertEquals;
 
 import junit.env.telosys.tools.generator.TestsEnv;
-import junit.env.telosys.tools.generator.fakemodel.FakeEntity;
 
 public class TargetTest {
 	
@@ -46,9 +46,9 @@ public class TargetTest {
 				"${SRC}/${ROOT_PKG}/persistence/services", 
 				"bean.vm", 
 				"*");
-//		Target target = new Target( targetDef, buildEntity("AUTHOR", "Author"), getVariables() );  // v 3.0.0
 		TelosysToolsCfg telosysToolsCfg = getTelosysToolsCfg();
-		Target target = new Target( telosysToolsCfg, targetDef, buildEntity("AUTHOR", "Author") );  // v 3.3.0
+//		Target target = new Target( telosysToolsCfg, targetDef, buildEntity("AUTHOR", "Author") ); 
+		Target target = new Target( telosysToolsCfg, targetDef, buildEntity("Author") ); 
 		print(target);
 		
 		assertEquals("Target 1",         target.getTargetName());
@@ -87,8 +87,8 @@ public class TargetTest {
 				"${SRC}/${ENTITY_PKG}", 
 				"bean.vm", 
 				"*");
-//		Target target = new Target( targetDef, buildEntity("AUTHOR", "Author"), getVariables() ); // v 3.0.0
-		Target target = new Target( getTelosysToolsCfg(), targetDef, buildEntity("BOOK", "Book") ); // v 3.3.0
+//		Target target = new Target( getTelosysToolsCfg(), targetDef, buildEntity("BOOK", "Book") ); // v 3.3.0
+		Target target = new Target( getTelosysToolsCfg(), targetDef, buildEntity("Book") ); // v 3.3.0
 		print(target);
 		
 		assertEquals("Book.java", target.getFile());
@@ -127,8 +127,9 @@ public class TargetTest {
 
 	}
 	
-	private Entity buildEntity(String tableName, String className) { 
-		FakeEntity entity = new FakeEntity(className, tableName );
+//	private Entity buildEntity(String tableName, String className) { 
+	private Entity buildEntity(String className) { 
+		DslModelEntity entity = new DslModelEntity(className );
 //		entity.setDatabaseTable(tableName);
 //		entity.setClassName(className);
 		return entity ;
