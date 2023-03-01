@@ -115,7 +115,7 @@ public class AttributeInContext {
     private final String  databaseComment ;     // Comment of this column 
     private final String  databaseDefaultValue ;   
 //    private final boolean isDatabaseNotNull ;  // True if "not null" in the database (REMOVED in v 4.1.0)
-    private final boolean isAutoIncremented  ;  // True if auto-incremented by the database
+//    private final boolean isAutoIncremented  ;  // True if auto-incremented by the database (REMOVED in v 4.1.0)
 
 // removed in ver 4.1
 //    private final int     jdbcTypeCode    ;  // JDBC type code for this column
@@ -185,11 +185,8 @@ public class AttributeInContext {
 		this.envInContext = env ; 
 		this.modelInContext = modelInContext ; 
 		this.entityInContext = entity ;
-		//this.sqlConverter = new SqlConverter(env); // Added in v 3.4.0
 		this.env = env ; // Added in v 3.4.0
-		//--------------------------------------------------
 //		this.selected        = attribute.isSelected(); // removed in v 4.1.0
-		//--------------------------------------------------
 		
 		this.name   = attribute.getName(); 		
 		this.neutralType     = attribute.getNeutralType() ; 
@@ -240,7 +237,7 @@ public class AttributeInContext {
 
         this.size     = attribute.getSize(); // v 3.4.0
 
-        this.isAutoIncremented  = attribute.isAutoIncremented();
+//        this.isAutoIncremented  = attribute.isAutoIncremented(); // removed in v 4.1.0
         this.databaseComment  = StrUtil.notNull( attribute.getDatabaseComment() ) ; 
         this.databaseDefaultValue = StrUtil.notNull( attribute.getDatabaseDefaultValue() ) ; 
         // this.isDatabaseNotNull  = attribute.isDatabaseNotNull(); // removed in v 4.1
@@ -259,11 +256,11 @@ public class AttributeInContext {
 		// Generated Value / SEQUENCE  v 3.4.0
 //        this.hasSequenceGenerator = attribute.getGeneratedValueStrategy() == GeneratedValueStrategy.SEQUENCE ;
 //		this.sequenceGeneratorName = this.generatedValueGenerator; // removed in v 4.1.0
-		this.generatedValueSequenceName = notNull(attribute.getGeneratedValueSequenceName());
+		this.generatedValueSequenceName = StrUtil.notNull(attribute.getGeneratedValueSequenceName());
 //		this.sequenceGeneratorAllocationSize = notNull(attribute.getGeneratedValueAllocationSize()); // removed in v 4.1.0
 		
 		// Generated Value / TABLE  v 3.4.0
-		this.generatedValueTablePkValue = notNull(attribute.getGeneratedValueTablePkColumnValue());
+		this.generatedValueTablePkValue = StrUtil.notNull(attribute.getGeneratedValueTablePkColumnValue());
 
 		// this.hasTableGenerator    = attribute.getGeneratedValueStrategy() == GeneratedValueStrategy.TABLE ;
 		// this.tableGeneratorName = this.generatedValueGenerator; // removed in v 4.1.0
@@ -287,13 +284,6 @@ public class AttributeInContext {
 
 	}
 
-	private String notNull(String s) {
-		return s != null ? s : "" ;
-	}
-	private int notNull(Integer i) {
-		return i != null ? i.intValue() : 0 ;
-	}
-	
 	protected final LanguageType getLanguageType() {
 		TypeConverter typeConverter = envInContext.getTypeConverter();
 		LanguageType languageType = typeConverter.getType(this.attributeTypeInfo);
@@ -683,7 +673,9 @@ public class AttributeInContext {
 		}
 	)
     public boolean hasDatabaseDefaultValue() {
-    	if ( isAutoIncremented ) return false ; // No default value for auto-incremented fields
+    	//if ( isAutoIncremented ) return false ; // No default value for auto-incremented fields
+		// v 4.1.0
+    	if ( isGeneratedValue() ) return false ; // No default value for auto-incremented fields
 		return ! StrUtil.nullOrVoid(databaseDefaultValue);
     }
     
@@ -843,7 +835,8 @@ public class AttributeInContext {
 		}
 	)
     public boolean isAutoIncremented() {
-        return isAutoIncremented;
+//        return isAutoIncremented;
+        return generatedValueStrategy == GeneratedValueStrategy.IDENTITY ;
     }
 
 	//----------------------------------------------------------------------
@@ -1092,8 +1085,7 @@ public class AttributeInContext {
     	return voidIfNull(defaultValue) ;
     }
 
-	public String toString() 
-	{
+	public String toString() {
 		String s =  initialValue != null ? " = " + initialValue : "" ;
 		return this.getType() + " " + name + s ; 
 	}
@@ -1310,7 +1302,27 @@ public class AttributeInContext {
 		// return isGeneratedValue;
 		return this.generatedValueStrategy != GeneratedValueStrategy.UNDEFINED ;
 	}
-
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+		"Returns TRUE if the attribute has a generated value strategy equal to the given name",
+		"(strategy name comparison is not case sensitive)"
+		},
+	parameters = { 
+			"strategyName : can be 'AUTO', 'IDENTITY', 'SEQUENCE', 'TABLE' " 
+		},
+	example= {
+			"$attribute.hasGeneratedValueStrategy('SEQUENCE') "
+		},	
+	since="4.1.0"
+	)
+	public boolean hasGeneratedValueStrategy(String strategyName) {
+		if ( this.generatedValueStrategy != null && strategyName != null ) {
+			return strategyName.equalsIgnoreCase(this.generatedValueStrategy.name() );
+		}
+		return false;
+	}
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Returns the generated value strategy : 'AUTO', 'IDENTITY', 'SEQUENCE', 'TABLE' or ''
@@ -1318,8 +1330,9 @@ public class AttributeInContext {
 	 */
 	@VelocityMethod(
 		text={	
-			"Returns the generated value strategy if any : ",
-			" 'AUTO', 'IDENTITY', 'SEQUENCE', 'TABLE' or '' "
+			"Returns the generated value strategy if any.",
+			"The returned strategy can be 'AUTO', 'IDENTITY', 'SEQUENCE', 'TABLE' (or '' if none)",
+			"Useful for ORM like JPA or Doctrine "			
 			}
 	)
 	public String getGeneratedValueStrategy() {
@@ -1334,7 +1347,7 @@ public class AttributeInContext {
 	@VelocityMethod(
 		text={	
 			"Returns the generated value allocation size usable in ORM like JPA or Doctrine",
-			"Typically for JPA '@SequenceGenerator allocationSize' or '@TableGenerator allocationSize' "
+			"Can be used for JPA '@SequenceGenerator allocationSize' or '@TableGenerator allocationSize' "
 			}
 	)
 	public int getGeneratedValueAllocationSize() {
@@ -1420,7 +1433,7 @@ public class AttributeInContext {
 	 */
 	@VelocityMethod(
 		text={	
-			"Returns the 'sequence name' used for a generated value",
+			"Returns the 'sequence name' used for a generated value (or a void string if none)",
 			"Typically for JPA '@SequenceGenerator/sequenceName'  "
 			}
 	)
@@ -1507,9 +1520,9 @@ public class AttributeInContext {
 	//-----------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={
-		"Returns the primary key value in the table that distinguishes this set of generated values",
-		"from others that may be stored in the table",
-		"Typically for JPA '@TableGenerator/pkColumnValue'  "
+		"Returns the primary key (string value) that identifies the generated value in the table ",
+		"useful for ORM like JPA or Doctrine ",
+		"Returns a void string if none"
 		}
 	)
 	public String getGeneratedValueTablePkValue() {

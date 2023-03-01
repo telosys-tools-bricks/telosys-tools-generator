@@ -1337,7 +1337,8 @@ public class EntityInContext
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
 			"Returns TRUE if this entity has an 'auto-incremented' key attribute ",
-			"( a key based on a numeric value incremented by the database )"
+			"( a key based on a numeric value automatically incremented by the database )",
+			"If 'true' the key generation is based on 'IDENTITY' strategy"
 		},
 		example= {
 			"#if ( $entity.hasAutoIncrementedKey() )",
@@ -1349,6 +1350,29 @@ public class EntityInContext
 		if ( keyAttributes != null ) {
 			for ( AttributeInContext keyAttribute : keyAttributes ) {
 				if ( keyAttribute.isAutoIncremented() ) {
+					return true ; 
+				}
+			}
+		}
+		return false ; 
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns TRUE if this entity has a key with an 'auto-generated' value.",
+			"A key generation based on a predefined strategy: 'AUTO', 'IDENTITY', 'SEQUENCE', 'TABLE'"
+		},
+		example= {
+			"#if ( $entity.hasGeneratedKey() )",
+			"...",
+			"#end"
+		},
+		since="4.1.0"
+	)
+	public boolean hasGeneratedKey() {
+		if ( keyAttributes != null ) {
+			for ( AttributeInContext keyAttribute : keyAttributes ) {
+				if ( keyAttribute.isGeneratedValue() ) {
 					return true ; 
 				}
 			}

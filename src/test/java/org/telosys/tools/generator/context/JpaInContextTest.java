@@ -151,11 +151,12 @@ public class JpaInContextTest {
 	@Test 
 	public void testColumnAutoIncrementedWithoutId() { // NO @Id (NO PRIAMRY KEY) 
 		DslModelAttribute attribute = new DslModelAttribute("foo", "long");
-		attribute.setAutoIncremented(true); // @AutoIncremented
+		//attribute.setAutoIncremented(true); // @AutoIncremented
+		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.IDENTITY); // auto-incremented
 		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City"), attribute);
 		// check result
 		assertTrue(attribInCtx.isAutoIncremented());
-		assertFalse(attribInCtx.isGeneratedValue());
+		assertTrue(attribInCtx.isGeneratedValue());
 		String[] a = jpaFieldAnnotations(attribInCtx);
 		assertEquals(1, a.length);
 		assertEquals("@Column(name=\"foo\")", a[0]);
@@ -165,11 +166,12 @@ public class JpaInContextTest {
 	public void testColumnIdAutoIncremented() {
 		DslModelAttribute attribute = new DslModelAttribute("id", "int");
 		attribute.setKeyElement(true); // @Id
-		attribute.setAutoIncremented(true); // @AutoIncremented
+		//attribute.setAutoIncremented(true); // @AutoIncremented
+		attribute.setGeneratedValueStrategy(GeneratedValueStrategy.IDENTITY); // auto-incremented
 		AttributeInContext attribInCtx = buildAttributeInContext(buildEntityInContext("City", "CITY"), attribute);
 		// check result
 		assertTrue(attribInCtx.isAutoIncremented());
-		assertFalse(attribInCtx.isGeneratedValue());
+		assertTrue(attribInCtx.isGeneratedValue());
 		String[] a = jpaFieldAnnotations(attribInCtx);
 		assertEquals(3, a.length);
 		assertEquals("@Id", a[0]);
