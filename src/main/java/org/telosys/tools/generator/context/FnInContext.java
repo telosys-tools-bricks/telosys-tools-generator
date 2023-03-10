@@ -224,7 +224,8 @@ public class FnInContext {
 			)
 	public String argumentsListWithType( List<AttributeInContext> fieldsList )  {
 		if ( fieldsList != null ) {
-			if ( env.languageIsGo() ) {
+//			if ( env.languageIsGo() ) {
+			if ( currentLanguageIsGolang() ) { // v 4.1.0
 				// Specific order for Go : "name type"
 				return argumentsListWithTypeAfterArg(fieldsList);
 			}
@@ -238,6 +239,10 @@ public class FnInContext {
 		}
 	}
 
+	private boolean currentLanguageIsGolang() {
+		return "Go".equalsIgnoreCase( env.getLanguage() );
+	}
+	
 	/**
 	 * Returns a list of arguments with the type BEFORE the argument name<br>
 	 * Standard syntax for most languages
@@ -289,7 +294,8 @@ public class FnInContext {
 			)
 	public String argumentsListWithWrapperType( List<AttributeInContext> attributesList )  {
 		if ( attributesList != null ) {
-			if ( env.languageIsGo() ) {
+			// if ( env.languageIsGo() ) {
+			if ( currentLanguageIsGolang() ) { // v 4.1.0
 				// Specific order for Go : "name type"
 				// No wrapper type for go : reuse function for standard types
 				return argumentsListWithTypeAfterArg(attributesList);

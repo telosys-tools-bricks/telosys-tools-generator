@@ -33,10 +33,10 @@ import org.telosys.tools.generic.model.ForeignKeyPart;
 import org.telosys.tools.generic.model.TagContainer;
 import org.telosys.tools.generic.model.enums.BooleanValue;
 import org.telosys.tools.generic.model.enums.GeneratedValueStrategy;
-import org.telosys.tools.generic.model.types.AttributeTypeInfo;
-import org.telosys.tools.generic.model.types.LanguageType;
+import org.telosys.tools.generic.model.languages.types.AttributeTypeInfo;
+import org.telosys.tools.generic.model.languages.types.LanguageType;
+import org.telosys.tools.generic.model.languages.types.TypeConverter;
 import org.telosys.tools.generic.model.types.NeutralType;
-import org.telosys.tools.generic.model.types.TypeConverter;
 
 /**
  * "$attribute" object usable in templates 

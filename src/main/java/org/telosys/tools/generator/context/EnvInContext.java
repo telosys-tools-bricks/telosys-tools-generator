@@ -23,26 +23,9 @@ import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.context.tools.SqlInContextBuilder;
-import org.telosys.tools.generic.model.types.LiteralValuesProvider;
-import org.telosys.tools.generic.model.types.LiteralValuesProviderForCPlusPlus;
-import org.telosys.tools.generic.model.types.LiteralValuesProviderForCSharp;
-import org.telosys.tools.generic.model.types.LiteralValuesProviderForGo;
-import org.telosys.tools.generic.model.types.LiteralValuesProviderForJava;
-import org.telosys.tools.generic.model.types.LiteralValuesProviderForJavaScript;
-import org.telosys.tools.generic.model.types.LiteralValuesProviderForPHP;
-import org.telosys.tools.generic.model.types.LiteralValuesProviderForPython;
-import org.telosys.tools.generic.model.types.LiteralValuesProviderForScala;
-import org.telosys.tools.generic.model.types.LiteralValuesProviderForTypeScript;
-import org.telosys.tools.generic.model.types.TypeConverter;
-import org.telosys.tools.generic.model.types.TypeConverterForCPlusPlus;
-import org.telosys.tools.generic.model.types.TypeConverterForCSharp;
-import org.telosys.tools.generic.model.types.TypeConverterForGo;
-import org.telosys.tools.generic.model.types.TypeConverterForJava;
-import org.telosys.tools.generic.model.types.TypeConverterForJavaScript;
-import org.telosys.tools.generic.model.types.TypeConverterForPHP;
-import org.telosys.tools.generic.model.types.TypeConverterForPython;
-import org.telosys.tools.generic.model.types.TypeConverterForScala;
-import org.telosys.tools.generic.model.types.TypeConverterForTypeScript;
+import org.telosys.tools.generic.model.languages.TargetLanguageProvider;
+import org.telosys.tools.generic.model.languages.literals.LiteralValuesProvider;
+import org.telosys.tools.generic.model.languages.types.TypeConverter;
 
 //-------------------------------------------------------------------------------------
 @VelocityObject(
@@ -57,14 +40,7 @@ import org.telosys.tools.generic.model.types.TypeConverterForTypeScript;
 public class EnvInContext {
 	
 	private static final String JAVA       = "JAVA" ;
-	private static final String CSHARP     = "C#" ;
 	private static final String GO         = "GO" ;
-	private static final String TYPESCRIPT = "TYPESCRIPT" ;
-	private static final String JAVASCRIPT = "JAVASCRIPT" ;
-	private static final String PYTHON     = "PYTHON" ;
-	private static final String PHP        = "PHP" ;
-	private static final String CPLUSPLUS  = "C++" ; // v 3.3.0
-	private static final String SCALA      = "SCALA" ; // v 3.3.0
 	
 	private String entityClassNamePrefix = "" ;
 	private String entityClassNameSuffix = "" ;
@@ -73,9 +49,6 @@ public class EnvInContext {
 	
 	private String specificCollectionType = null ; // v 3.3.0
 
-	// v 3.4.0
-	//private Map<String,String> databaseTypesMapping = new LinkedHashMap<>() ; // v 3.3.0
-	//private String database = "default" ; // v 3.3.0
 	private String database = "" ; // v 3.4.0
 	private File   databaseConvFile = null ;  // v 3.4.0
 	private SqlInContext sqlInContext = null;   // v 3.4.0
@@ -157,9 +130,9 @@ public class EnvInContext {
 	@VelocityMethod(
 		text={	
 			"Set the language for the current code generation",
-			"Supported languages are 'Java', 'C#', 'Go', 'Python', 'JavaScript', 'TypeScript',  ",
-			"( the default language is 'Java' )",
-			"This information is used dermine language peculiarities like types and literal values"
+			"See documentation for all supported languages ('Java', 'C#', 'Go', 'Python', 'JavaScript', 'TypeScript', etc) ",
+			"The current language is 'Java' by default ",
+			"This information is used determine language peculiarities like types and literal values"
 			},
 		example={ 
 			"#set ( $env.language = 'C#' ) ",
@@ -171,8 +144,13 @@ public class EnvInContext {
 		since = "3.0.0"
 			)
 	public void setLanguage( String language ) throws GeneratorException {
-		checkLanguageValidity(language);
-		this.language = language ;
+		if ( TargetLanguageProvider.isDefinedLanguage(language) ) {
+			this.language = language ;
+		}
+		else {
+			// Unknown language
+			throw new GeneratorException("Unknown language '" + language + "'");			
+		}
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -191,36 +169,22 @@ public class EnvInContext {
 	}
 	
 	//-------------------------------------------------------------------------------------
-	private void checkLanguageValidity(String language) throws GeneratorException {
-		String languageUC = language.toUpperCase() ;
-		if ( JAVA.equals(languageUC) ) return ;
-		if ( CSHARP.equals(languageUC) ) return ;
-		if ( GO.equals(languageUC) ) return ;
-		if ( TYPESCRIPT.equals(languageUC) ) return ;
-		if ( JAVASCRIPT.equals(languageUC) ) return ;
-		if ( PYTHON.equals(languageUC) ) return ;
-		if ( PHP.equals(languageUC) ) return ;
-		if ( CPLUSPLUS.equals(languageUC) ) return ;
-		if ( SCALA.equals(languageUC) ) return ;
-		// Unknown language
-		throw new GeneratorException("Unknown language '" + language + "'");
-	}
 	
-	/**
-	 * Returns TRUE if the current language is Java
-	 * @return
-	 */
-	protected boolean languageIsJava() {
-		return JAVA.equalsIgnoreCase(this.language) ;
-	}
-	/**
-	 * Returns TRUE if the current language is GoLang
-	 * @return
-	 */
-	protected boolean languageIsGo() {
-		return GO.equalsIgnoreCase(this.language) ;
-	}
-	
+//	/**
+//	 * Returns TRUE if the current language is Java
+//	 * @return
+//	 */
+//	protected boolean languageIsJava() {
+//		return JAVA.equalsIgnoreCase(this.language) ;
+//	}
+//	/**
+//	 * Returns TRUE if the current language is GoLang
+//	 * @return
+//	 */
+//	protected boolean languageIsGo() {
+//		return GO.equalsIgnoreCase(this.language) ;
+//	}
+//	
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Returns the TypeConverter corresponding to the current language <br>
@@ -229,48 +193,55 @@ public class EnvInContext {
 	 * @since ver 3.0.0
 	 */
 	public TypeConverter getTypeConverter() { // keep 'public' for debug in '.vm' files
-		TypeConverter typeConverter = createTypeConverterForCurrentLanguage();
+//		TypeConverter typeConverter = createTypeConverterForCurrentLanguage();
+//		// set specific collection type if any 
+//		if ( specificCollectionType != null ) {
+//			typeConverter.setSpecificCollectionType(specificCollectionType);
+//		}
+//		return typeConverter;
+
+		TypeConverter typeConverter = TargetLanguageProvider.getTypeConverter(this.language); // v 4.1.0
 		// set specific collection type if any 
 		if ( specificCollectionType != null ) {
 			typeConverter.setSpecificCollectionType(specificCollectionType);
 		}
-		return typeConverter;
+		return typeConverter;		
 	}
 	
-	private TypeConverter createTypeConverterForCurrentLanguage()  {
-		String languageUC = this.language.toUpperCase() ;
-		if ( JAVA.equals(languageUC) ) {
-			return new TypeConverterForJava() ;
-		}
-		else if ( CSHARP.equals(languageUC) ) {
-			return new TypeConverterForCSharp() ; 
-		}
-		else if ( GO.equals(languageUC) ) {
-			return new TypeConverterForGo() ; 
-		}
-		else if ( TYPESCRIPT.equals(languageUC) ) {
-			return new TypeConverterForTypeScript() ;
-		}
-		else if ( JAVASCRIPT.equals(languageUC) ) {
-			return new TypeConverterForJavaScript() ;
-		}
-		else if ( PYTHON.equals(languageUC) ) {
-			return new TypeConverterForPython() ;
-		}
-		else if ( PHP.equals(languageUC) ) {
-			return new TypeConverterForPHP() ;
-		}
-		else if ( CPLUSPLUS.equals(languageUC) ) {
-			return new TypeConverterForCPlusPlus() ;
-		}
-		else if ( SCALA.equals(languageUC) ) {
-			return new TypeConverterForScala() ;
-		}
-		else {
-			// By default : Java  ( not supposed to happen ) 
-			return new TypeConverterForJava() ;
-		}
-	}
+//	private TypeConverter createTypeConverterForCurrentLanguage()  {
+//		String languageUC = this.language.toUpperCase() ;
+//		if ( JAVA.equals(languageUC) ) {
+//			return new TypeConverterForJava() ;
+//		}
+//		else if ( CSHARP.equals(languageUC) ) {
+//			return new TypeConverterForCSharp() ; 
+//		}
+//		else if ( GO.equals(languageUC) ) {
+//			return new TypeConverterForGo() ; 
+//		}
+//		else if ( TYPESCRIPT.equals(languageUC) ) {
+//			return new TypeConverterForTypeScript() ;
+//		}
+//		else if ( JAVASCRIPT.equals(languageUC) ) {
+//			return new TypeConverterForJavaScript() ;
+//		}
+//		else if ( PYTHON.equals(languageUC) ) {
+//			return new TypeConverterForPython() ;
+//		}
+//		else if ( PHP.equals(languageUC) ) {
+//			return new TypeConverterForPHP() ;
+//		}
+//		else if ( CPLUSPLUS.equals(languageUC) ) {
+//			return new TypeConverterForCPlusPlus() ;
+//		}
+//		else if ( SCALA.equals(languageUC) ) {
+//			return new TypeConverterForScala() ;
+//		}
+//		else {
+//			// By default : Java  ( not supposed to happen ) 
+//			return new TypeConverterForJava() ;
+//		}
+//	}
 
 	/**
 	 * Returns the LiteralValuesProvider for the current language
@@ -278,38 +249,39 @@ public class EnvInContext {
 	 * @since ver 3.0.0
 	 */
 	public LiteralValuesProvider getLiteralValuesProvider()  {
-		String languageUC = this.language.toUpperCase() ;
-		if ( JAVA.equals(languageUC) ) {
-			return new LiteralValuesProviderForJava() ;
-		}
-		else if ( CSHARP.equals(languageUC) ) {
-			return new LiteralValuesProviderForCSharp() ;
-		}
-		else if ( GO.equals(languageUC) ) {
-			return new LiteralValuesProviderForGo() ;
-		}
-		else if ( JAVASCRIPT.equals(languageUC) ) {
-			return new LiteralValuesProviderForJavaScript() ;
-		}
-		else if ( TYPESCRIPT.equals(languageUC) ) {
-			return new LiteralValuesProviderForTypeScript() ;
-		}
-		else if ( PYTHON.equals(languageUC) ) {
-			return new LiteralValuesProviderForPython();
-		}
-		else if ( PHP.equals(languageUC) ) {
-			return new LiteralValuesProviderForPHP();
-		}
-		else if ( CPLUSPLUS.equals(languageUC) ) {
-			return new LiteralValuesProviderForCPlusPlus() ;
-		}
-		else if ( SCALA.equals(languageUC) ) {
-			return new LiteralValuesProviderForScala() ;
-		}
-		else {
-			// By default : Java  ( not supposed to happen ) 
-			return new LiteralValuesProviderForJava() ;
-		}
+//		String languageUC = this.language.toUpperCase() ;
+//		if ( JAVA.equals(languageUC) ) {
+//			return new LiteralValuesProviderForJava() ;
+//		}
+//		else if ( CSHARP.equals(languageUC) ) {
+//			return new LiteralValuesProviderForCSharp() ;
+//		}
+//		else if ( GO.equals(languageUC) ) {
+//			return new LiteralValuesProviderForGo() ;
+//		}
+//		else if ( JAVASCRIPT.equals(languageUC) ) {
+//			return new LiteralValuesProviderForJavaScript() ;
+//		}
+//		else if ( TYPESCRIPT.equals(languageUC) ) {
+//			return new LiteralValuesProviderForTypeScript() ;
+//		}
+//		else if ( PYTHON.equals(languageUC) ) {
+//			return new LiteralValuesProviderForPython();
+//		}
+//		else if ( PHP.equals(languageUC) ) {
+//			return new LiteralValuesProviderForPHP();
+//		}
+//		else if ( CPLUSPLUS.equals(languageUC) ) {
+//			return new LiteralValuesProviderForCPlusPlus() ;
+//		}
+//		else if ( SCALA.equals(languageUC) ) {
+//			return new LiteralValuesProviderForScala() ;
+//		}
+//		else {
+//			// By default : Java  ( not supposed to happen ) 
+//			return new LiteralValuesProviderForJava() ;
+//		}
+		return TargetLanguageProvider.getLiteralValuesProvider(this.language); // v 4.1.0
 	}
 	
 	//-------------------------------------------------------------------------------------

@@ -147,7 +147,6 @@ public class FnInContextForJavaTest {
 	public void testArgumentsListForDefault() { // Default = Java
 		EnvInContext envInContext = new EnvInContext();
 		Assert.assertEquals("JAVA", envInContext.getLanguage().toUpperCase() );
-		Assert.assertTrue(envInContext.languageIsJava());
 		
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
@@ -159,6 +158,7 @@ public class FnInContextForJavaTest {
 	public void testArgumentsListForCSharp() throws GeneratorException { // C#
 		EnvInContext envInContext = new EnvInContext();
 		envInContext.setLanguage("C#");
+		Assert.assertEquals("C#", envInContext.getLanguage().toUpperCase() );
 		
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
@@ -170,7 +170,6 @@ public class FnInContextForJavaTest {
 	public void testArgumentsListForGoLang() throws GeneratorException { // Go
 		EnvInContext envInContext = new EnvInContext();
 		envInContext.setLanguage("Go");
-		Assert.assertTrue(envInContext.languageIsGo());
 		Assert.assertEquals("GO", envInContext.getLanguage().toUpperCase() );
 
 		List<AttributeInContext> attributes = buildAttributes(envInContext);

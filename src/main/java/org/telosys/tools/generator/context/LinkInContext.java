@@ -33,7 +33,7 @@ import org.telosys.tools.generic.model.enums.BooleanValue;
 import org.telosys.tools.generic.model.enums.Cardinality;
 import org.telosys.tools.generic.model.enums.FetchType;
 import org.telosys.tools.generic.model.enums.Optional;
-import org.telosys.tools.generic.model.types.TypeConverter;
+import org.telosys.tools.generic.model.languages.types.TypeConverter;
 
 /**
  * Link exposed in the Velocity Context 
