@@ -42,12 +42,4 @@ public class GeneratorException extends Exception
         super(message, cause);
     }
 
-//    /**
-//     * Constructor 
-//     * Transforms a GeneratorEngineException to GeneratorException
-//     * @param engineException
-//     */
-//    public GeneratorException(GeneratorEngineException engineException) {
-//        super(engineException.getMessage(), engineException.getCause());
-//    }
 }

@@ -37,6 +37,7 @@ import org.telosys.tools.generator.context.JpaInContext;
 import org.telosys.tools.generator.context.Loader;
 import org.telosys.tools.generator.context.ModelInContext;
 import org.telosys.tools.generator.context.NowInContext;
+import org.telosys.tools.generator.context.PhpInContext;
 import org.telosys.tools.generator.context.ProjectInContext;
 import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generator.context.Today;
@@ -137,9 +138,8 @@ public class GeneratorContextBuilder {
 		generatorContext.put(ContextName.BEAN_VALIDATION, new BeanValidation()); // Bean Validation utility functions
 		generatorContext.put(ContextName.H2,              new H2InContext());  // JDBC factory ( ver 2.1.1 )
 		generatorContext.put(ContextName.HTML,            new HtmlInContext());  // HTML utilities ( ver 3.0.0 )
+		generatorContext.put(ContextName.PHP,             new PhpInContext());  // PHP utilities ( ver 4.1.0 )
 
-//		generatorContext.put(ContextName.DATABASES,	buildDatabasesInContext(telosysToolsCfg) ); // removed in v 3.4.0
-				
 		//--- Set the dynamic class loader 
 		Loader loader = new Loader( telosysToolsCfg.getTemplatesFolderAbsolutePath(bundleName) ); 
 		generatorContext.put(ContextName.LOADER, loader);
@@ -186,32 +186,6 @@ public class GeneratorContextBuilder {
 		return generatorContext ;
 	}
 	
-	// removed in v 3.4.0
-//	/**
-//	 * Creates a DatabasesInContext instance for the given project configuration
-//	 * @param telosysToolsCfg
-//	 * @return
-//	 */
-//	private DatabasesInContext buildDatabasesInContext( TelosysToolsCfg telosysToolsCfg ) {
-//		return new DatabasesInContext( loadDatabasesConfigurations(telosysToolsCfg));
-//	}
-	
-	// removed in v 3.4.0
-//	/**
-//	 * Loads DatabasesConfigurations if any for the given project configuration
-//	 * @param telosysToolsCfg
-//	 * @return
-//	 */
-//	private DatabasesConfigurations loadDatabasesConfigurations( TelosysToolsCfg telosysToolsCfg ) {
-//		try {
-//			// Try to load the DatabasesConfigurations
-//			return new DbConfigManager(telosysToolsCfg).load();
-//		} catch (TelosysToolsException e) {
-//			// If the DatabasesConfigurations cannot be loaded just return a void set of configurations
-//			return new DatabasesConfigurations() ; // Void
-//		}
-//	}
-
 	//-------------------------------------------------------------------------------------------------------
 	private void setSelectedEntities(List<String> selectedEntitiesNames) throws GeneratorException {
 		//--- Set "$selectedEntities" ( list of all the selected entities )
