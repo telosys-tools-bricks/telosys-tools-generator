@@ -19,6 +19,7 @@ import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.context.BeanValidation;
 import org.telosys.tools.generator.context.BundleInContext;
 import org.telosys.tools.generator.context.Const;
+import org.telosys.tools.generator.context.CsharpInContext;
 import org.telosys.tools.generator.context.EmbeddedGenerator;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
@@ -39,6 +40,7 @@ import org.telosys.tools.generator.context.LinkInContext;
 import org.telosys.tools.generator.context.Loader;
 import org.telosys.tools.generator.context.ModelInContext;
 import org.telosys.tools.generator.context.NowInContext;
+import org.telosys.tools.generator.context.PhpInContext;
 import org.telosys.tools.generator.context.ProjectInContext;
 import org.telosys.tools.generator.context.ReferenceInContext;
 import org.telosys.tools.generator.context.SqlInContext;
@@ -107,7 +109,10 @@ public class ObjectsList {
 		
 		SqlInContext.class,    // v3.4.0
 		FactoryInContext.class, // v3.4.0
-		ReferenceInContext.class // v3.4.0
+		ReferenceInContext.class, // v3.4.0
+
+		PhpInContext.class,   // v 4.1.0
+		CsharpInContext.class // v 4.1.0
 	};
 
 	public static final Class<?>[] getObjectsClasses() {

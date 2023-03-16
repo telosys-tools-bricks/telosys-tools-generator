@@ -24,7 +24,7 @@ import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.commons.variables.VariablesNames;
 
 /**
- * Reserved context names
+ * Reserved context names (used in "telosys-doc" and in "Eclipse plugin")
  *  
  * @author L. Guerin
  *
@@ -92,8 +92,12 @@ public class ContextNames {
 		
 		//--- Version 3.4.0
 		GENERATOR_OBJECTS_LIST.add( ContextName.FACTORY ); // v 3.4.0
-
-
+		
+		//--- Version 4.1.0
+		GENERATOR_OBJECTS_LIST.add( ContextName.PHP );    // v 4.1.0
+		GENERATOR_OBJECTS_LIST.add( ContextName.CSHARP ); // v 4.1.0
+		
+		
 		Collections.sort(GENERATOR_OBJECTS_LIST);
 	}
 

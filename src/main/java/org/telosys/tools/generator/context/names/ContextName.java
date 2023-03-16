@@ -57,7 +57,9 @@ public class ContextName {
 	public static final String  JDBC_FACTORY      = "jdbcFactory" ; // ver 2.1.1
 	public static final String  H2                = "h2" ;	// ver 2.1.1
 	public static final String  NOW               = "now" ; // ver 3.3.0
-	public static final String  PHP               = "php" ; // ver 4.1.0
+	
+	public static final String  PHP               = "php" ;    // ver 4.1.0
+	public static final String  CSHARP            = "csharp" ; // ver 4.1.0
 	//---  
 	public static final String  ENTITY            = "entity" ;   
 	public static final String  SELECTED_ENTITIES = "selectedEntities" ;
