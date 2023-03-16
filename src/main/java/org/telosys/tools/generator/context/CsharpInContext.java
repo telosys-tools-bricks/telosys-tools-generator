@@ -120,7 +120,7 @@ public class CsharpInContext {
 		indent++;
     	if ( attributes.isEmpty() ) {
     		//--- No attributes
-    		lb.append(indent, "return \"" + entity.getName() + " []\"");
+    		lb.append(indent, "return \"" + entity.getName() + " []\" ;");
     	}
     	else {
     		//--- Build return concat with all the given attributes 

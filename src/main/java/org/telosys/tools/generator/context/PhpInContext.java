@@ -82,12 +82,12 @@ public class PhpInContext {
 		example={ 
 			"$php.toStringMethod( $entity, 4 )" },
 		parameters = { 
-			"entity : the entity providing the attributes to be used in the 'toString' method",
+			"entity : the entity for which to generate the 'ToString' method",
 			"indentSpaces : number of spaces to be used for each indentation level"},
 		since = "4.1.0"
 			)
 	public String toStringMethod( EntityInContext entity, int indentSpaces ) {
-		return toStringMethod(entity.getAttributes(), indentSpaces );
+		return toStringMethod(entity, entity.getAttributes(), indentSpaces );
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -98,14 +98,18 @@ public class PhpInContext {
 			"(except non-printable attributes)"
 			},
 		example={ 
-			"$php.toStringMethod( $attributes, 4 )" },
+			"$php.toStringMethod( $entity, $attributes, 4 )" },
 		parameters = { 
+			"entity : the entity for which to generate the 'toString' method",
 			"attributes : list of attributes to be used in the 'toString' method",
 			"indentSpaces : number of spaces to be used for each indentation level"},
 		since = "4.1.0"
 			)
-	public String toStringMethod( List<AttributeInContext> attributes, int indentSpaces ) {
+	public String toStringMethod( EntityInContext entity, List<AttributeInContext> attributes, int indentSpaces ) {
 
+    	if ( entity == null ) {
+    		throw new IllegalArgumentException("$php.toStringMethod(..) : entity arg is null");
+    	}
     	if ( attributes == null ) {
     		throw new IllegalArgumentException("$php.toStringMethod(..) : attributes arg is null");
     	}
@@ -114,12 +118,12 @@ public class PhpInContext {
 		lb.append(indent, "public function __toString() { ");
 		indent++;
     	if ( attributes.isEmpty() ) {
-    		lb.append(indent, "return \"\" ;");
+    		//--- No attributes    		
+    		lb.append(indent, "return \"" + entity.getName() + " []\" ;");
     	}
     	else {
-    		lb.append(indent, "return ");
-    		//--- All the given attributes 
-   			toStringForAttributes( attributes, lb, indent );
+    		//--- Build return concat with all the given attributes 
+   			toStringForAttributes( entity, attributes, lb, indent );
     	}
 		indent--;
 		lb.append(indent, "}");
@@ -128,14 +132,13 @@ public class PhpInContext {
     
 	//-------------------------------------------------------------------------------------
     /**
-     * Uses the given attributes except if their type is not usable   
+     * Builds the string to be returned using the given attributes
+     * @param entity
      * @param attributes
      * @param lb
      * @param indent
-     * @return
      */
-    private void toStringForAttributes( List<AttributeInContext> attributes, LinesBuilder lb, int indent  ) 
-    {    	
+    private void toStringForAttributes( EntityInContext entity, List<AttributeInContext> attributes, LinesBuilder lb, int indent  ) {    
     	if ( null == attributes ) return ;
     	int count = 0 ;
     	for ( AttributeInContext attribute : attributes ) {
@@ -143,7 +146,7 @@ public class PhpInContext {
     			String leftPart ;
                 if ( count == 0 ) {
                 	// first line
-                	leftPart = "  \"[\" . " ;
+                	leftPart = "return \"" + entity.getName() + " [\" . " ;
                 }
                 else {
                 	// not the first one => add separator

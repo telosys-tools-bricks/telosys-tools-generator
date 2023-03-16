@@ -10,6 +10,8 @@ import org.telosys.tools.generator.GeneratorException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import junit.env.telosys.tools.generator.fakemodel.FakeEntityBuilder;
+
 public class PhpInContextTest {
 	
 	private PhpInContext getPhpObject() {
@@ -68,11 +70,10 @@ public class PhpInContextTest {
 		attributes.add(buildAttributeNotNull("name", "string") );
 		attributes.add(buildAttributeNullable("surname", "string") );
 		
-		String s = getPhpObject().toStringMethod(attributes, 4);
+		String s = getPhpObject().toStringMethod(FakeEntityBuilder.buildEntityInContext("Foo"), attributes, 4);
 		System.out.println(s);
 		assertTrue(s.startsWith(PUBLIC_FUNCTION_TOSTRING));
-		assertTrue(s.contains(  "        return"));
-		assertTrue(s.contains(  "          \"[\" . $this->id"));
+		assertTrue(s.contains(  "        return \"Foo [\" . $this->id"));
 		assertTrue(s.contains(  "        . \"|\" . $this->name"));
 		assertTrue(s.contains(  CLOSING_BRACE));
 	}
@@ -82,11 +83,10 @@ public class PhpInContextTest {
 		List<AttributeInContext> attributes = new LinkedList<>();
 		attributes.add(buildAttributeNotNull("id", "int") );
 		
-		String s = getPhpObject().toStringMethod(attributes, 4);
+		String s = getPhpObject().toStringMethod(FakeEntityBuilder.buildEntityInContext("Foo"), attributes, 4);
 		System.out.println(s);
 		assertTrue(s.startsWith(PUBLIC_FUNCTION_TOSTRING));
-		assertTrue(s.contains(  "        return"));
-		assertTrue(s.contains(  "          \"[\" . $this->id"));
+		assertTrue(s.contains(  "        return \"Foo [\" . $this->id"));
 		assertTrue(s.contains(  CLOSING_BRACE));
 	}
 
@@ -94,10 +94,10 @@ public class PhpInContextTest {
 	public void testToStringNoAttribute() {
 		List<AttributeInContext> attributes = new LinkedList<>();
 		
-		String s = getPhpObject().toStringMethod(attributes, 4);
+		String s = getPhpObject().toStringMethod(FakeEntityBuilder.buildEntityInContext("Foo"), attributes, 4);
 		System.out.println(s);
 		assertTrue(s.startsWith(PUBLIC_FUNCTION_TOSTRING));
-		assertTrue(s.contains(  "        return \"\""));
+		assertTrue(s.contains(  "        return \"Foo []\" ;"));
 		assertTrue(s.contains(  CLOSING_BRACE));
 	}
 
