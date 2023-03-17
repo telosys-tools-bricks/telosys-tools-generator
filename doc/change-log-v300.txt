@@ -1,8 +1,0 @@
-Generator change log / v 3.0.0
-
-Templates :
-  object "$generation" removed  
-   ( class GenerationInContext.java removed )
-   getTemplatesFolderFullPath() moved in "$project"
-   
-

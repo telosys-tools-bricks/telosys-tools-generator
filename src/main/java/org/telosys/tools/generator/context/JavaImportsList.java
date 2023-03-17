@@ -118,31 +118,4 @@ public class JavaImportsList {
 		}
 	}
 	
-	/**
-	public void buildImports( EntityInContext entity ) throws GeneratorException {
-		if ( entity != null ) {
-			//--- All the attributes
-			for ( AttributeInContext attribute : entity.getAttributes() ) {
-				// register the type to be imported if necessary
-				declareType( attribute.getFullType() ); 
-			}
-			//--- All the links 
-			for ( LinkInContext link : entity.getLinks() ) {
-				if ( link.isCardinalityOneToMany() || link.isCardinalityManyToMany() ) {
-					// collection types used in your JPA 
-					// "java.util.List", "java.util.Set", "java.util.Collection" 
-//					imports.declareType( link.getFieldFullType() ); 
-					// NEW in v 3.3.0
-					String type = link.getFieldType();
-					declareCollectionType(type);
-					jpa.fieldType(LinkInContext link) ;
-				}
-				else {
-					// ManyToOne or OneToOne => bean ( "Book", "Person", ... )
-					// Supposed to be in the same package
-				}
-			}
-		}
-	}	
-	**/
 }

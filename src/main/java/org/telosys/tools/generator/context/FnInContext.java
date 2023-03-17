@@ -134,9 +134,12 @@ public class FnInContext {
 		text={	
 			"Protects each occurrence of the given char with a backslash in the given string "
 			},
+		example={ 
+			"$fn.backslash( $myVar, \"$\" )"
+			},
 		parameters = { 
 			"s : the string to be processed",
-			"c : the character to be protected with a backslash" 
+			"c : string containing a single character (the character to be protected with a backslash)" 
 			}
 	)
 	public String backslash(String s, String c) {
@@ -149,13 +152,15 @@ public class FnInContext {
 
 	
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(text={	
+	@VelocityMethod(
+		text={	
 			"Returns the XML string for the given string",
 			"Replaces special characters (&, <, >, etc) by their corresponding XML notation "
 			},
-			parameters = { "s : the string to be escaped" },
-			deprecated=false
-			)
+		parameters = { 
+			"s : the string to be escaped" 
+			}
+	)
 	public String escapeXml(String s) {
 		return XmlUtil.escapeXml(s) ;
 	}
@@ -170,11 +175,14 @@ public class FnInContext {
 	}
 
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(text={	
+	@VelocityMethod(
+		text={	
 			"Returns N tabulation characters "
 			},
-			parameters = { "n : the number of tabulations to be returned" }
-			)
+		parameters = { 
+			"n : the number of tabulations to be returned" 
+			}
+	)
 	public String tab(int n) {
 		StringBuilder sb = new StringBuilder();
 		for ( int i = 0 ; i < n ; i++ ) {
@@ -189,18 +197,19 @@ public class FnInContext {
 			"Returns a string containing a list of field names separated by a comma"
 			},
 		example={ 
-				"$fn.argumentsList( $entity.attributes )",
-				"Returns : 'id, firstName, lastName, age' "},
-		parameters = { "fields : list of fields to be added in the arguments list" },
+			"$fn.argumentsList( $entity.attributes )",
+			"Returns : 'id, firstName, lastName, age' "},
+		parameters = { 
+			"attributes : list of attributes to be added in the arguments list" },
 		since = "2.0.5"
 			)
-	public String argumentsList( List<AttributeInContext> fieldsList ) {
-		if ( fieldsList != null ) {
+	public String argumentsList( List<AttributeInContext> attributes ) {
+		if ( attributes != null ) {
 			StringBuilder sb = new StringBuilder();
 			int n = 0 ;
-			for ( AttributeInContext field : fieldsList ) {
+			for ( AttributeInContext attrib : attributes ) {
 				if ( n > 0 ) sb.append(", ");
-				sb.append( field.getName() ) ;
+				sb.append( attrib.getName() ) ;
 				n++;
 			}
 			return sb.toString();
@@ -219,19 +228,20 @@ public class FnInContext {
 			"$fn.argumentsListWithType( $entity.attributes )",
 			"Result example for Java language : 'int id, String firstName, String lastName, int age' ",
 			"Result example for Go language : 'id int32, firstName string, lastName string, age uint' "},
-		parameters = { "fields : list of fields to be added in the arguments list" },
+		parameters = { 
+			"attributes : list of attributes to be added in the arguments list" },
 		since = "2.0.5"
 			)
-	public String argumentsListWithType( List<AttributeInContext> fieldsList )  {
-		if ( fieldsList != null ) {
+	public String argumentsListWithType( List<AttributeInContext> attributes )  {
+		if ( attributes != null ) {
 //			if ( env.languageIsGo() ) {
 			if ( currentLanguageIsGolang() ) { // v 4.1.0
 				// Specific order for Go : "name type"
-				return argumentsListWithTypeAfterArg(fieldsList);
+				return argumentsListWithTypeAfterArg(attributes);
 			}
 			else {
 				// Standard order for other languages : "type name"
-				return argumentsListWithTypeBeforeArg(fieldsList);
+				return argumentsListWithTypeBeforeArg(attributes);
 			}
 		} 
 		else {
@@ -289,22 +299,23 @@ public class FnInContext {
 		example={ 
 			"$fn.argumentsListWithWrapperType( $entity.attributes )",
 			"Returns : 'Integer id, String firstName, String lastName, Integer age' "},
-		parameters = { "fields : list of fields to be added in the arguments list" },
+		parameters = { 
+			"attributes : list of attributes to be added in the arguments list" },
 		since = "3.0.0"
 			)
-	public String argumentsListWithWrapperType( List<AttributeInContext> attributesList )  {
-		if ( attributesList != null ) {
+	public String argumentsListWithWrapperType( List<AttributeInContext> attributes )  {
+		if ( attributes != null ) {
 			// if ( env.languageIsGo() ) {
 			if ( currentLanguageIsGolang() ) { // v 4.1.0
 				// Specific order for Go : "name type"
 				// No wrapper type for go : reuse function for standard types
-				return argumentsListWithTypeAfterArg(attributesList);
+				return argumentsListWithTypeAfterArg(attributes);
 			}
 			else {
 				// Standard order for other languages : "wrapper_type name"
 				StringBuilder sb = new StringBuilder();
 				int n = 0 ;
-				for ( AttributeInContext attribute : attributesList ) {
+				for ( AttributeInContext attribute : attributes ) {
 					if ( n > 0 ) sb.append(", ");
 					sb.append( attribute.getWrapperType() ) ; // attribute wrapper type 
 					sb.append( " " ) ;
@@ -328,19 +339,19 @@ public class FnInContext {
 			"$fn.argumentsListWithGetter( 'person', $entity.attributes )",
 			"Returns : 'person.getId(), person.getFirstName(), person.getLastName(), person.getAge()' "},
 		parameters = { 
-			"object : name of the object providing the getters",
-			"fields : list of fields to be added in the arguments list" },
+			"objectName : name of the object providing the getters",
+			"attributes : list of attributes to be added in the arguments list" },
 		since = "2.0.5"
 			)
-	public String argumentsListWithGetter( String objectName, List<AttributeInContext> fieldsList )  {
-		if ( fieldsList != null ) {
+	public String argumentsListWithGetter( String objectName, List<AttributeInContext> attributes )  {
+		if ( attributes != null ) {
 			StringBuilder sb = new StringBuilder();
 			int n = 0 ;
-			for ( AttributeInContext field : fieldsList ) {
+			for ( AttributeInContext attribute : attributes ) {
 				if ( n > 0 ) sb.append(", ");
 				sb.append( objectName ) ;
 				sb.append( "." ) ;
-				sb.append( field.getGetter() ) ;
+				sb.append( attribute.getGetter() ) ;
 				sb.append( "()" ) ;
 				n++;
 			}
@@ -460,17 +471,19 @@ public class FnInContext {
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
-			text={	
-				"Concatenates 2 lists ( add all the elements of the second list at the end of the first one ) ",
-				"The 2 given lists remain unchanged. The result is stored in a new list."
-				},
-			example={ 
-				"#set ( $list3 = $fn.concatLists( $list1, $list2 )  "
-				},
-			parameters = { 	"list1 : List of objects", 
-							"list2 : List of objects to be added at the end of list1"  },
-			since = "2.0.7"
-				)
+		text={	
+			"Concatenates 2 lists ( add all the elements of the second list at the end of the first one ) ",
+			"The 2 given lists remain unchanged. The result is stored in a new list."
+		},
+		example={ 
+			"#set ( $list3 = $fn.concatLists( $list1, $list2 )  "
+		},
+		parameters = {
+			"list1 : List of objects", 
+			"list2 : List of objects to be added at the end of list1"  
+		},
+		since = "2.0.7"
+		)
 	public List<?> concatLists(List<?> list1, List<?> list2)  {
 		List<Object> finalList = new LinkedList<>();
 		finalList.addAll(list1);
@@ -478,12 +491,15 @@ public class FnInContext {
 		return finalList ;
 	}
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(text={	
+	@VelocityMethod(
+		text={	
 			"Converts  all of the characters in the given string to upper case"
-			},
-			parameters = { "s : the string to be converted" },
-			since = "2.0.7"
-			)
+		},
+		parameters = { 
+			"s : the string to be converted" 
+		},
+		since = "2.0.7"
+		)
 	public String toUpperCase(String s) {
 		if ( s != null ) {
 			return s.toUpperCase();
@@ -491,12 +507,15 @@ public class FnInContext {
 		return "";
 	}
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(text={	
+	@VelocityMethod(
+		text={	
 			"Converts  all of the characters in the given string to lower case"
-			},
-			parameters = { "s : the string to be converted" },
-			since = "2.0.7"
-			)
+		},
+		parameters = { 
+			"s : the string to be converted" 
+		},
+		since = "2.0.7"
+		)
 	public String toLowerCase(String s) {
 		if ( s != null ) {
 			return s.toLowerCase();
@@ -504,12 +523,15 @@ public class FnInContext {
 		return "";
 	}
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(text={	
+	@VelocityMethod(
+		text={	
 			"Converts the first character to upper case"
-			},
-			parameters = { "s : the string to be converted" },
-			since = "2.0.7"
-			)
+		},
+		parameters = { 
+			"s : the string to be converted" 
+		},
+		since = "2.0.7"
+		)
 	public String firstCharToUpperCase(String s) {
 		if ( s != null ) {
 			return StrUtil.firstCharUC( s );
@@ -521,15 +543,18 @@ public class FnInContext {
 	// Version 2.1.0
 	//==============================================================================================
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(text={	
+	@VelocityMethod(
+		text={	
 			"Returns TRUE if the given object name is defined in the Velocity Context"
-			},
-			parameters = { "objectName : the name (or key) in the Velocity Context" },
-			example = {
-				"#if ( $fn.isDefined('myvar') ) "
-			},
-			since = "2.1.0"
-			)
+		},
+		parameters = { 
+			"objectName : the name (or key) in the Velocity Context" 
+		},
+		example = {
+			"#if ( $fn.isDefined('myvar') ) "
+		},
+		since = "2.1.0"
+		)
 	public boolean isDefined(String objectName) {
 		Object o = generatorContext.get(objectName);
 		return ( o != null );
@@ -559,10 +584,11 @@ public class FnInContext {
 			"changing the first letter to upper case"
 			},
 			parameters = { 
-				"string : the string to be capitalized"
+				"s : the string to be capitalized"
 			},
 			example = {
-				"$fn.capitalize($var)" },
+				"$fn.capitalize($var)" 
+			},
 			since = "2.1.0"
 			)
 	public String capitalize(String str) {
@@ -581,10 +607,11 @@ public class FnInContext {
 			"changing the first letter to lower case"
 			},
 			parameters = { 
-				"string : the string to be uncapitalized"
+				"s : the string to be uncapitalized"
 			},
 			example = {
-				"$fn.uncapitalize($var) " },
+				"$fn.uncapitalize($var) " 
+			},
 			since = "2.1.0"
 			)
 	public String uncapitalize(String str) {
@@ -647,8 +674,8 @@ public class FnInContext {
 			"Builds a list of N integer consecutive values starting with the given value"
 			},
 			parameters = { 
-				"int : the number of values to be created",
-				"int : the first value of the list"
+				"n : the number of values to be created",
+				"firstValue : the first value of the list"
 			},
 			example = {
 				"#set ( $values = $fn.buildIntValues(10,0) ) ## 10 values from 0 to 9",
@@ -674,50 +701,52 @@ public class FnInContext {
 	}
 
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(text={	
+	@VelocityMethod(
+		text={	
 			"Builds a list of N integer consecutive values starting with 1"
-			},
-			parameters = { 
-				"int : the number of values to be created"
-			},
-			example = {
-				"#set ( $values = $fn.buildIntValues(5) ) ## 5 values from 1 to 5",
-				"Values size = $values.size() ",
-				"#foreach( $v in $values )",
-				" . value = $v",
-				"#end",
-				"#set($last = ( $values.size() - 1) )",
-				"#foreach ( $i in [0..$last] )",
-				" . value($i) = $values.get($i)" ,
-				"#end"
-			},
-			since = "3.0.0"
-			)
+		},
+		parameters = { 
+			"n : the number of values to be created"
+		},
+		example = {
+			"#set ( $values = $fn.buildIntValues(5) ) ## 5 values from 1 to 5",
+			"Values size = $values.size() ",
+			"#foreach( $v in $values )",
+			" . value = $v",
+			"#end",
+			"#set($last = ( $values.size() - 1) )",
+			"#foreach ( $i in [0..$last] )",
+			" . value($i) = $values.get($i)" ,
+			"#end"
+		},
+		since = "3.0.0"
+		)
 	public List<Integer> buildIntValues(final int n) {
 		return buildIntValues(n, 1);
 	}
 	
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(text={	
+	@VelocityMethod(
+		text={	
 			"Builds a list of N integer consecutive values starting with the given value"
-			},
-			parameters = { 
-				"collection : the collection determining the number of values (collection size)",
-				"int : the first value of the list"
-			},
-			example = {
-				"#set ( $values = $fn.buildIntValues($entity.attributes, 0) ) ",
-				"Values size = $values.size() ",
-				"#foreach( $v in $values )",
-				" . value = $v",
-				"#end",
-				"#set($last = ( $values.size() - 1) )",
-				"#foreach ( $i in [0..$last] )",
-				" . value($i) = $values.get($i)" ,
-				"#end"
-			},
-			since = "3.0.0"
-			)
+		},
+		parameters = { 
+			"collection : the collection determining the number of values (collection size)",
+			"firstValue : the first value of the list"
+		},
+		example = {
+			"#set ( $values = $fn.buildIntValues($entity.attributes, 0) ) ",
+			"Values size = $values.size() ",
+			"#foreach( $v in $values )",
+			" . value = $v",
+			"#end",
+			"#set($last = ( $values.size() - 1) )",
+			"#foreach ( $i in [0..$last] )",
+			" . value($i) = $values.get($i)" ,
+			"#end"
+		},
+		since = "3.0.0"
+		)
 	public List<Integer> buildIntValues(final Collection<?> collection, final int firstValue) {
 		return buildIntValues(collection.size(), firstValue);
 	}
@@ -782,24 +811,25 @@ public class FnInContext {
 	}
 
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(text={	
+	@VelocityMethod(
+		text={	
 			"Returns a string built by joining all the elements of the given collection",
 			"the 'separator' is added between each element",
 			"the 'prefix' is added before each element",
 			"the 'suffix' is added after each element"
-			},
-			parameters = { 
-				"collection : the collection (any kind of objects : Collection<?>)",
-				"separator  : the separator string (or void) ",
-				"prefix     : the prefix string (or void) ",
-				"suffix     : the suffix string (or void) "
-			},
-			example = {
-				"#set ( $v = $fn.joinWithPrefixSuffix( $myList, \";\", \"[\", \"]\" ) ) ",
-				"#set ( $v = $fn.joinWithPrefixSuffix( $myList, \", \", \"\", \".class\" ) ) "
-			},
-			since = "3.3.0"
-			)
+		},
+		parameters = { 
+			"collection : the collection (any kind of objects : Collection<?>)",
+			"separator  : the separator string (or void) ",
+			"prefix     : the prefix string (or void) ",
+			"suffix     : the suffix string (or void) "
+		},
+		example = {
+			"#set ( $v = $fn.joinWithPrefixSuffix( $myList, \";\", \"[\", \"]\" ) ) ",
+			"#set ( $v = $fn.joinWithPrefixSuffix( $myList, \", \", \"\", \".class\" ) ) "
+		},
+		since = "3.3.0"
+		)
 	public String joinWithPrefixSuffix(Collection<?> collection, String separator, 
 			String prefix, String suffix) {
 		StringBuilder sb = new StringBuilder();

@@ -18,7 +18,6 @@ package org.telosys.tools.generator.context;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
@@ -48,12 +47,12 @@ public class Java {
 			"$java.equalsMethod( $entity.name, $entity.attributes )" },
 		parameters = { 
 			"className : the Java class name (simple name or full name)",
-			"fieldsList : list of fields to be used in the equals method"},
+			"attributes : list of attributes to be used in the equals method"},
 		since = "2.0.7"
 			)
-	public String equalsMethod( String className, List<AttributeInContext> fieldsList ) {
+	public String equalsMethod( String className, List<AttributeInContext> attributes ) {
 		
-		return equalsMethod( className , fieldsList, new LinesBuilder() ); 
+		return equalsMethod( className , attributes, new LinesBuilder() ); 
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -66,13 +65,13 @@ public class Java {
 			"$java.equalsMethod( $entity.name, $entity.attributes, 4 )" },
 		parameters = { 
 			"className : the Java class name (simple name or full name)",
-			"fieldsList : list of fields to be used in the equals method",
+			"attributes : list of attributes to be used in the equals method",
 			"indentSpaces : number of spaces to be used for each indentation level"},
 		since = "2.0.7"
 			)
-	public String equalsMethod( String className, List<AttributeInContext> fieldsList, int indentSpaces ) {
+	public String equalsMethod( String className, List<AttributeInContext> attributes, int indentSpaces ) {
 		
-		return equalsMethod( className , fieldsList, new LinesBuilder(indentSpaces) ); 
+		return equalsMethod( className , attributes, new LinesBuilder(indentSpaces) ); 
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -144,11 +143,11 @@ public class Java {
 				"$java.hashCode( $entity.name, $entity.attributes )" },
 			parameters = { 
 				"className  : the Java class name (simple name or full name)",
-				"fieldsList : list of fields to be used in the equals method"},
+				"attributes : list of attributes to be used in the equals method"},
 			since = "2.0.7"
 				)
-	public String hashCodeMethod( String className, List<AttributeInContext> fieldsList ) {
-		return hashCodeMethod(fieldsList, new LinesBuilder() ); 
+	public String hashCodeMethod( String className, List<AttributeInContext> attributes ) {
+		return hashCodeMethod(attributes, new LinesBuilder() ); 
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -161,12 +160,12 @@ public class Java {
 				"$java.hashCode( $entity.name, $entity.attributes, 4 )" },
 			parameters = { 
 				"className  : the Java class name (simple name or full name)",
-				"fieldsList : list of fields to be used in the equals method",
+				"attributes : list of attributes to be used in the equals method",
 				"indentSpaces : number of spaces to be used for each indentation level"},
 			since = "2.0.7"
 				)
-	public String hashCodeMethod( String className, List<AttributeInContext> fieldsList, int indentSpaces ) {
-		return hashCodeMethod(fieldsList, new LinesBuilder(indentSpaces) ); 
+	public String hashCodeMethod( String className, List<AttributeInContext> attributes, int indentSpaces ) {
+		return hashCodeMethod(attributes, new LinesBuilder(indentSpaces) ); 
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -265,8 +264,9 @@ public class Java {
 	@VelocityMethod(
 			text={	
 				"Returns the list of Java classes to be imported for the given entity",
-				"The imports are determined using all the entity attributes  ",
-				"and all the 'OneToMany' any 'ManyToMany' links found in the entity"
+				"The imports are determined using all the entity attributes and links ",
+				"Examples for attributes : 'java.time.LocalDateTime', 'java.math.BigDecimal', etc",
+				"Examples for links : 'java.util.List', etc"
 				},
 			example={ 
 				"#foreach( $import in $java.imports($entity) )",
@@ -276,7 +276,7 @@ public class Java {
 				"entity : entity to be used " },
 			since = "2.0.7"
 				)
-	public List<String> imports( EntityInContext entity ) throws GeneratorException {
+	public List<String> imports( EntityInContext entity ) {
 		if ( entity != null ) {
 			JavaImportsList imports = new JavaImportsList();
 			//--- All the attributes
@@ -287,10 +287,6 @@ public class Java {
 			//--- All the links 
 			for ( LinkInContext link : entity.getLinks() ) {
 				if ( link.isCardinalityOneToMany() || link.isCardinalityManyToMany() ) {
-					// collection types used in your JPA 
-					// "java.util.List", "java.util.Set", "java.util.Collection" 
-//					imports.declareType( link.getFieldFullType() ); 
-					// NEW in v 3.3.0
 					String type = link.getFieldType();
 					if ( type.contains("Set<") && type.contains(">") ) {
 						imports.declareType("java.util.Set");
@@ -421,23 +417,22 @@ public class Java {
 		indent++;
 		lb.append(indent, "StringBuilder sb = new StringBuilder(); ");
 		
-		int count = 0 ;
 		lb.append(indent, "sb.append(\"[\"); ");
 		//--- PRIMARY KEY attributes ( composite key or not )
 		if ( entity.hasCompositePrimaryKey() && ( embeddedIdName != null ) ) {
 			// Embedded id 
-			count = count + toStringForEmbeddedId( embeddedIdName, lb, indent );
+			toStringForEmbeddedId( embeddedIdName, lb, indent );
 		}
 		else {
 			// No embedded id ( or no name for it )
 			List<AttributeInContext> keyAttributes = entity.getKeyAttributes() ;
-			count = count + toStringForAttributes( keyAttributes, lb, indent );
+			toStringForAttributes( keyAttributes, lb, indent );
 		}
 		lb.append(indent, "sb.append(\"]:\"); ");
 		
 		//--- NON KEY attributes ( all the attributes that are not in the Primary Key )
 		if ( nonKeyAttributes != null ) {
-			count = count + toStringForAttributes( nonKeyAttributes, lb, indent );
+			toStringForAttributes( nonKeyAttributes, lb, indent );
 		}
 				
 		lb.append(indent, "return sb.toString(); ");
