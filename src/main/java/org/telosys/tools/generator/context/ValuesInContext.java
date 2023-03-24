@@ -24,9 +24,9 @@ import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.generic.model.languages.literals.LiteralValue;
-import org.telosys.tools.generic.model.languages.literals.LiteralValuesProvider;
-import org.telosys.tools.generic.model.languages.types.LanguageType;
+import org.telosys.tools.generator.languages.literals.LiteralValue;
+import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
+import org.telosys.tools.generator.languages.types.LanguageType;
 
 /**
  * This object holds a set of generated literal values for the given attributes <br>

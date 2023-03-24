@@ -28,14 +28,15 @@ import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.exceptions.GeneratorSqlException;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generator.languages.types.AttributeTypeInfo;
+import org.telosys.tools.generator.languages.types.AttributeTypeInfoImpl;
+import org.telosys.tools.generator.languages.types.LanguageType;
+import org.telosys.tools.generator.languages.types.TypeConverter;
 import org.telosys.tools.generic.model.Attribute;
 import org.telosys.tools.generic.model.ForeignKeyPart;
 import org.telosys.tools.generic.model.TagContainer;
 import org.telosys.tools.generic.model.enums.BooleanValue;
 import org.telosys.tools.generic.model.enums.GeneratedValueStrategy;
-import org.telosys.tools.generic.model.languages.types.AttributeTypeInfo;
-import org.telosys.tools.generic.model.languages.types.LanguageType;
-import org.telosys.tools.generic.model.languages.types.TypeConverter;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 /**
@@ -190,7 +191,7 @@ public class AttributeInContext {
 		
 		this.name   = attribute.getName(); 		
 		this.neutralType     = attribute.getNeutralType() ; 
-		this.attributeTypeInfo = new AttributeTypeInfo(attribute) ; 
+		this.attributeTypeInfo = new AttributeTypeInfoImpl(attribute) ; 
 		this.initialValue    = StrUtil.notNull( attribute.getInitialValue() ); 
 		this.defaultValue    = StrUtil.notNull( attribute.getDefaultValue() );
 		
