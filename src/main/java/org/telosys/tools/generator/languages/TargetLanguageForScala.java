@@ -15,6 +15,9 @@
  */
 package org.telosys.tools.generator.languages;
 
+import java.util.List;
+
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProviderForScala;
 import org.telosys.tools.generator.languages.types.TypeConverter;
@@ -48,5 +51,27 @@ public class TargetLanguageForScala extends TargetLanguage {
 	public LiteralValuesProvider getLiteralValuesProvider() {
 		return literalValuesProvider;
 	}
+	
+	@Override
+	public String argumentsListWithType(List<AttributeInContext> attributes) {
+		if ( attributes == null ) return "";
+		// example : "id: Int, name: String"
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			// example : id: Int, name: String"
+			if ( n > 0 ) sb.append(", ");
+			sb.append( attribute.getName() ) ; // arg name first
+			sb.append( ": " ) ;
+			sb.append( attribute.getType() ) ; // arg type after 
+			n++;
+		}
+		return sb.toString();
+	}
 
+	@Override
+	public String argumentsListWithWrapperType( List<AttributeInContext> attributes ) {
+		// No wrapper type in Scala => same behavior as with basic types
+		return argumentsListWithType(attributes);
+	}
 }

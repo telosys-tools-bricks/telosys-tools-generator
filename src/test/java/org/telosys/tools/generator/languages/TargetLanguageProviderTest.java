@@ -136,10 +136,8 @@ public class TargetLanguageProviderTest  {
 		Assert.assertEquals("", tl.argumentsListWithType(null) );
 		// id is not null => no '?'
 		Assert.assertEquals("id: Int, name: String?, flag: Boolean?, birthDate: LocalDate?", tl.argumentsListWithType(attributes) );
-//		//
-//		Assert.assertEquals("", tl.argumentsListWithWrapperType(ATTRIBUTES_VOID_LIST) );
-//		Assert.assertEquals("", tl.argumentsListWithWrapperType(null) );
-//		Assert.assertEquals("Int32 id, String? name, Boolean? flag", tl.argumentsListWithWrapperType(attributes) );
+		// same result with wrapper type
+		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) );
 	}
 
 	@Test
@@ -157,10 +155,22 @@ public class TargetLanguageProviderTest  {
 	}
 
 	@Test
-	public void testScala() {
+	public void testScala() throws GeneratorException {
 		check("SCALA");
 		check(" Scala");
 		check("scala ");
+		EnvInContext env = new EnvInContext();
+		env.setLanguage("Scala"); // required for test 
+		TargetLanguage tl = env.getTargetLanguage();
+		Assert.assertEquals(TargetLanguageForScala.class.getSimpleName(), tl.getClass().getSimpleName());
+		
+		List<AttributeInContext> attributes = FakeAttributeBuilder.buildAttributes(env);		
+		// test : argumentsListWithType
+		Assert.assertEquals("", tl.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
+		Assert.assertEquals("", tl.argumentsListWithType(null) );
+		Assert.assertEquals("id: Int, name: String, flag: Boolean, birthDate: LocalDate", tl.argumentsListWithType(attributes) );
+		// same result with wrapper type
+		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) );
 	}
 
 	@Test

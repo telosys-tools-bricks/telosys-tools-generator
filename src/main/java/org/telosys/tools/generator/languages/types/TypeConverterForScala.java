@@ -33,14 +33,14 @@ public class TypeConverterForScala extends TypeConverter {
 		super("Scala");
 		
 		//--- Primitive types : "AnyVal" Scala types are considered as "primitive types"
-		declarePrimitiveType( buildPrimitiveType(NeutralType.BOOLEAN,  "Boolean",     "Boolean" ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.BYTE,     "Byte",        "Byte"    ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.SHORT,    "Short",       "Short"   ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.INTEGER,  "Int",         "Int"     ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.LONG,     "Long",        "Long"    ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.FLOAT,    "Float",       "Float"   ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.DOUBLE,   "Double",      "Double"  ) );		
-		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY,   "Array[Byte]", "Array[Byte]" )  ); 
+		declarePrimitiveType( buildPrimitiveType(NeutralType.BOOLEAN,  "Boolean" ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.BYTE,     "Byte"    ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.SHORT,    "Short"   ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.INTEGER,  "Int"     ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.LONG,     "Long"    ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.FLOAT,    "Float"   ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.DOUBLE,   "Double"  ) );		
+		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY,   "Array[Byte]" )  ); 
 		// No primitive type for STRING, DECIMAL, DATE, TIME, TIMESTAMP
 		
 		//--- No unsigned primitive types : 
@@ -59,8 +59,9 @@ public class TypeConverterForScala extends TypeConverter {
 		declareObjectType( buildObjectType(NeutralType.TIMESTAMP, "LocalDateTime", "java.time.LocalDateTime" ) );
 	}
 
-	private LanguageType buildPrimitiveType(String neutralType, String primitiveType, String wrapperType) {
-		return new LanguageType(neutralType, primitiveType,  primitiveType, true, wrapperType );
+	private LanguageType buildPrimitiveType(String neutralType, String primitiveType) {
+		// same type for all (simpleType = fullType = wrapperType)
+		return new LanguageType(neutralType, primitiveType,  primitiveType, true, primitiveType );
 	}
 
 	private LanguageType buildObjectType(String neutralType, String simpleType, String fullType) {

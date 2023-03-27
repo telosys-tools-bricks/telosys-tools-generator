@@ -55,11 +55,10 @@ public class TargetLanguageForKotlin extends TargetLanguage {
 	@Override
 	public String argumentsListWithType(List<AttributeInContext> attributes) {
 		if ( attributes == null ) return "";
-		// example : "name: string?, age: int"
 		StringBuilder sb = new StringBuilder();
 		int n = 0 ;
 		for ( AttributeInContext attribute : attributes ) {
-			// example : "name string, age int"
+			// example : "name: string?, age: int"
 			if ( n > 0 ) sb.append(", ");
 			sb.append( attribute.getName() ) ; // arg name first
 			sb.append( ": " ) ;
@@ -72,5 +71,10 @@ public class TargetLanguageForKotlin extends TargetLanguage {
 		return sb.toString();
 	}
 
+	@Override
+	public String argumentsListWithWrapperType( List<AttributeInContext> attributes ) {
+		// No wrapper type in Kotlin => same behavior as with basic types
+		return argumentsListWithType(attributes);
+	}
 
 }
