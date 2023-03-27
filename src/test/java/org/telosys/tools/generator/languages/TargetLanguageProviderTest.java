@@ -17,6 +17,8 @@ import junit.env.telosys.tools.generator.fakemodel.FakeAttributeBuilder;
 public class TargetLanguageProviderTest  {
 
 	private static final List<AttributeInContext> ATTRIBUTES_VOID_LIST = new LinkedList<>();
+	private static final String LIST_OF_ARG_NAMES = "id, name, flag, birthDate";
+
 
 	private void check(String languageName) {
 		assertTrue(TargetLanguageProvider.isDefinedLanguage(languageName));
@@ -114,10 +116,23 @@ public class TargetLanguageProviderTest  {
 	}
 
 	@Test
-	public void testJavaScript() {
+	public void testJavaScript() throws GeneratorException {
 		check("JavaScript");
 		check(" javascript");
 		check("JAVASCRIPT  ");
+		EnvInContext env = new EnvInContext();
+		env.setLanguage("JavaScript"); // required for test 
+		TargetLanguage tl = env.getTargetLanguage();
+		Assert.assertEquals(TargetLanguageForJavaScript.class.getSimpleName(), tl.getClass().getSimpleName());
+		
+		List<AttributeInContext> attributes = FakeAttributeBuilder.buildAttributes(env);		
+		//
+		Assert.assertEquals("", tl.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
+		Assert.assertEquals("", tl.argumentsListWithType(null) );
+		// no type => just arg names
+		Assert.assertEquals(LIST_OF_ARG_NAMES, tl.argumentsListWithType(attributes) );
+		// same result with wrapper type
+		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) );
 	}
 
 	@Test
@@ -148,10 +163,23 @@ public class TargetLanguageProviderTest  {
 	}
 
 	@Test
-	public void testPython() {
+	public void testPython() throws GeneratorException {
 		check("PYTHON");
 		check(" Python");
 		check("python ");
+		EnvInContext env = new EnvInContext();
+		env.setLanguage("Python"); // required for test 
+		TargetLanguage tl = env.getTargetLanguage();
+		Assert.assertEquals(TargetLanguageForPython.class.getSimpleName(), tl.getClass().getSimpleName());
+		
+		List<AttributeInContext> attributes = FakeAttributeBuilder.buildAttributes(env);		
+		//
+		Assert.assertEquals("", tl.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
+		Assert.assertEquals("", tl.argumentsListWithType(null) );
+		// no type => just arg names
+		Assert.assertEquals(LIST_OF_ARG_NAMES, tl.argumentsListWithType(attributes) );
+		// same result with wrapper type
+		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) );
 	}
 
 	@Test

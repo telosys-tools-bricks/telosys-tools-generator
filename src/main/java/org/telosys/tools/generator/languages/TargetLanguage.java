@@ -49,6 +49,25 @@ public abstract class TargetLanguage {
 	 * @return
 	 */
 	public abstract LiteralValuesProvider getLiteralValuesProvider();
+
+	/**
+	 * Builds a simple arguments list with only arguments name (no type)
+	 * @param attributes
+	 * @return
+	 */
+	protected String argumentsList(List<AttributeInContext> attributes) {
+		if ( attributes == null ) return "";
+		// No type, example : "name, age"
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext field : attributes ) {
+			// example : "name string, age int"
+			if ( n > 0 ) sb.append(", ");
+			sb.append( field.getName() ) ; 
+			n++;
+		}
+		return sb.toString();
+	}
 	
 	/**
 	 * Build arguments list (override this method in language if necessary)<br>

@@ -15,6 +15,9 @@
  */
 package org.telosys.tools.generator.languages;
 
+import java.util.List;
+
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProviderForJavaScript;
 import org.telosys.tools.generator.languages.types.TypeConverter;
@@ -48,5 +51,16 @@ public class TargetLanguageForJavaScript extends TargetLanguage {
 	public LiteralValuesProvider getLiteralValuesProvider() {
 		return literalValuesProvider;
 	}
-
+	
+	@Override
+	public String argumentsListWithType(List<AttributeInContext> attributes) {
+		// No type => just arg names
+		return argumentsList(attributes);
+	}
+	
+	@Override
+	public String argumentsListWithWrapperType(List<AttributeInContext> attributes) {
+		// No type => just arg names
+		return argumentsList(attributes);
+	}	
 }
