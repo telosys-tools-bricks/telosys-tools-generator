@@ -18,11 +18,13 @@ package org.telosys.tools.generator.context;
 import java.io.File;
 
 import org.telosys.tools.commons.StrUtil;
+import org.telosys.tools.commons.exception.TelosysRuntimeException;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.context.tools.SqlInContextBuilder;
+import org.telosys.tools.generator.languages.TargetLanguage;
 import org.telosys.tools.generator.languages.TargetLanguageProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.types.TypeConverter;
@@ -38,9 +40,6 @@ import org.telosys.tools.generator.languages.types.TypeConverter;
  )
 //-------------------------------------------------------------------------------------
 public class EnvInContext {
-	
-	private static final String JAVA       = "JAVA" ;
-	private static final String GO         = "GO" ;
 	
 	private String entityClassNamePrefix = "" ;
 	private String entityClassNameSuffix = "" ;
@@ -169,23 +168,23 @@ public class EnvInContext {
 	}
 	
 	//-------------------------------------------------------------------------------------
-	
-//	/**
-//	 * Returns TRUE if the current language is Java
-//	 * @return
-//	 */
-//	protected boolean languageIsJava() {
-//		return JAVA.equalsIgnoreCase(this.language) ;
-//	}
-//	/**
-//	 * Returns TRUE if the current language is GoLang
-//	 * @return
-//	 */
-//	protected boolean languageIsGo() {
-//		return GO.equalsIgnoreCase(this.language) ;
-//	}
-//	
-	//-------------------------------------------------------------------------------------
+	/**
+	 * Returns the TargetLanguage for the current language defined in '$env'
+	 * @return the TargetLanguage (never null)
+	 */
+	public TargetLanguage getTargetLanguage() { // v 4.1.0 
+		TargetLanguage targetLanguage = TargetLanguageProvider.getTargetLanguage(this.language);
+		if ( targetLanguage == null ) {
+			// by default use JAVA
+			targetLanguage = TargetLanguageProvider.getTargetLanguage("JAVA");
+			if ( targetLanguage == null ) {
+				// cannot happen
+				throw new TelosysRuntimeException("Cannot get TargetLanguage (even with default language name)");
+			}
+		}
+		return targetLanguage ;
+	}
+
 	/**
 	 * Returns the TypeConverter corresponding to the current language <br>
 	 * and with the specific collection type if any
@@ -193,14 +192,7 @@ public class EnvInContext {
 	 * @since ver 3.0.0
 	 */
 	public TypeConverter getTypeConverter() { // keep 'public' for debug in '.vm' files
-//		TypeConverter typeConverter = createTypeConverterForCurrentLanguage();
-//		// set specific collection type if any 
-//		if ( specificCollectionType != null ) {
-//			typeConverter.setSpecificCollectionType(specificCollectionType);
-//		}
-//		return typeConverter;
-
-		TypeConverter typeConverter = TargetLanguageProvider.getTypeConverter(this.language); // v 4.1.0
+		TypeConverter typeConverter = getTargetLanguage().getTypeConverter(); // v 4.1.0
 		// set specific collection type if any 
 		if ( specificCollectionType != null ) {
 			typeConverter.setSpecificCollectionType(specificCollectionType);
@@ -208,80 +200,13 @@ public class EnvInContext {
 		return typeConverter;		
 	}
 	
-//	private TypeConverter createTypeConverterForCurrentLanguage()  {
-//		String languageUC = this.language.toUpperCase() ;
-//		if ( JAVA.equals(languageUC) ) {
-//			return new TypeConverterForJava() ;
-//		}
-//		else if ( CSHARP.equals(languageUC) ) {
-//			return new TypeConverterForCSharp() ; 
-//		}
-//		else if ( GO.equals(languageUC) ) {
-//			return new TypeConverterForGo() ; 
-//		}
-//		else if ( TYPESCRIPT.equals(languageUC) ) {
-//			return new TypeConverterForTypeScript() ;
-//		}
-//		else if ( JAVASCRIPT.equals(languageUC) ) {
-//			return new TypeConverterForJavaScript() ;
-//		}
-//		else if ( PYTHON.equals(languageUC) ) {
-//			return new TypeConverterForPython() ;
-//		}
-//		else if ( PHP.equals(languageUC) ) {
-//			return new TypeConverterForPHP() ;
-//		}
-//		else if ( CPLUSPLUS.equals(languageUC) ) {
-//			return new TypeConverterForCPlusPlus() ;
-//		}
-//		else if ( SCALA.equals(languageUC) ) {
-//			return new TypeConverterForScala() ;
-//		}
-//		else {
-//			// By default : Java  ( not supposed to happen ) 
-//			return new TypeConverterForJava() ;
-//		}
-//	}
-
 	/**
 	 * Returns the LiteralValuesProvider for the current language
 	 * @return
 	 * @since ver 3.0.0
 	 */
-	public LiteralValuesProvider getLiteralValuesProvider()  {
-//		String languageUC = this.language.toUpperCase() ;
-//		if ( JAVA.equals(languageUC) ) {
-//			return new LiteralValuesProviderForJava() ;
-//		}
-//		else if ( CSHARP.equals(languageUC) ) {
-//			return new LiteralValuesProviderForCSharp() ;
-//		}
-//		else if ( GO.equals(languageUC) ) {
-//			return new LiteralValuesProviderForGo() ;
-//		}
-//		else if ( JAVASCRIPT.equals(languageUC) ) {
-//			return new LiteralValuesProviderForJavaScript() ;
-//		}
-//		else if ( TYPESCRIPT.equals(languageUC) ) {
-//			return new LiteralValuesProviderForTypeScript() ;
-//		}
-//		else if ( PYTHON.equals(languageUC) ) {
-//			return new LiteralValuesProviderForPython();
-//		}
-//		else if ( PHP.equals(languageUC) ) {
-//			return new LiteralValuesProviderForPHP();
-//		}
-//		else if ( CPLUSPLUS.equals(languageUC) ) {
-//			return new LiteralValuesProviderForCPlusPlus() ;
-//		}
-//		else if ( SCALA.equals(languageUC) ) {
-//			return new LiteralValuesProviderForScala() ;
-//		}
-//		else {
-//			// By default : Java  ( not supposed to happen ) 
-//			return new LiteralValuesProviderForJava() ;
-//		}
-		return TargetLanguageProvider.getLiteralValuesProvider(this.language); // v 4.1.0
+	public LiteralValuesProvider getLiteralValuesProvider()  { // keep 'public' for debug in '.vm' files
+		return getTargetLanguage().getLiteralValuesProvider(); // v 4.1.0
 	}
 	
 	//-------------------------------------------------------------------------------------

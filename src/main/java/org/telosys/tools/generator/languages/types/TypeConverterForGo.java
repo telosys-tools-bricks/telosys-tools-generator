@@ -32,44 +32,44 @@ public class TypeConverterForGo extends TypeConverter {
 		super("Go");
 		
 		//--- Primitive types :
-		declarePrimitiveType( buildPrimitiveType(NeutralType.STRING,   "string",  "string"  ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.BOOLEAN,  "bool",    "bool"    ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.BYTE,     "byte",    "byte"    ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.SHORT,    "int16",   "int16"   ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.INTEGER,  "int32",   "int32"   ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.LONG,     "int64",   "int64"   ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.FLOAT,    "float32", "float32" ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.DOUBLE,   "float64", "float64" ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.DECIMAL,  "float64", "float64" ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.STRING,   "string"  ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.BOOLEAN,  "bool"    ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.BYTE,     "byte"    ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.SHORT,    "int16"   ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.INTEGER,  "int32"   ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.LONG,     "int64"   ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.FLOAT,    "float32" ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.DOUBLE,   "float64" ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.DECIMAL,  "float64" ) );
 		// DATE => No primitive type
 		// TIME => No primitive type
 		// TIMESTAMP => No primitive type
-		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY, "[]byte", "[]byte" )  ); // No Wrapper type for binary / byte[] ?
+		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY, "[]byte" )  ); // No Wrapper type for binary / byte[] ?
 		
 		//--- Unsigned primitive types : 
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.BYTE,    "uint8",   "uint8"  ) );
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.SHORT,   "uint16",  "uint16" ) );
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.INTEGER, "uint32",  "uint32" ) );
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.LONG,    "uint64",  "uint64" ) );
+		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.BYTE,    "uint8"  ) );
+		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.SHORT,   "uint16" ) );
+		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.INTEGER, "uint32" ) );
+		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.LONG,    "uint64" ) );
 
 		//--- Object types : for GO "object types" are used for "structures" define in a "package" ( when "import" is required )
-		declareObjectType( buildObjectType(NeutralType.DATE,      "time.Time",  "time.Time" ) );
-		declareObjectType( buildObjectType(NeutralType.TIME,      "time.Time",  "time.Time" ) );
-		declareObjectType( buildObjectType(NeutralType.TIMESTAMP, "time.Time",  "time.Time" ) );
+		declareObjectType( buildObjectType(NeutralType.DATE,      "time.Time" ) );
+		declareObjectType( buildObjectType(NeutralType.TIME,      "time.Time" ) );
+		declareObjectType( buildObjectType(NeutralType.TIMESTAMP, "time.Time" ) );
 	}
 
-	private LanguageType buildPrimitiveType(String neutralType, String primitiveType, String wrapperType) {
-		return new LanguageType(neutralType, primitiveType,  primitiveType, true, wrapperType );
+	private LanguageType buildPrimitiveType(String neutralType, String type) {
+		return new LanguageType(neutralType, type,  type, true, type );
 	}
 
-	private LanguageType buildObjectType(String neutralType, String simpleType, String fullType) {
-		return new LanguageType(neutralType, simpleType,  fullType, false, simpleType );
+	private LanguageType buildObjectType(String neutralType, String type) {
+		return new LanguageType(neutralType, type,  type, false, type );
 	}
 	
 	@Override
 	public List<String> getComments() {
 		List<String> l = new LinkedList<>();
-		l.add("'@UnsignedType'  has effect only for byte, short, int, long ");
+		l.add("'@UnsignedType'  has effect only for: byte, short, int, long ");
 		l.add("");
 		l.add("'@NotNull'  has no effect ");
 		l.add("'@PrimitiveType'  has no effect ");

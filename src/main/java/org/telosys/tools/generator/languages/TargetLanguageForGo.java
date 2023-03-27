@@ -15,6 +15,9 @@
  */
 package org.telosys.tools.generator.languages;
 
+import java.util.List;
+
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProviderForGo;
 import org.telosys.tools.generator.languages.types.TypeConverter;
@@ -49,4 +52,28 @@ public class TargetLanguageForGo extends TargetLanguage {
 		return literalValuesProvider;
 	}
 
+	@Override
+	public String argumentsListWithType(List<AttributeInContext> attributes) {
+		if ( attributes == null ) return "";
+		// example : "name string, age int"
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext field : attributes ) {
+			// example : "name string, age int"
+			if ( n > 0 ) sb.append(", ");
+			sb.append( field.getName() ) ; // arg name first
+			sb.append( " " ) ;
+			sb.append( field.getType() ) ; // arg type after 
+			n++;
+		}
+		return sb.toString();
+	}
+
+	@Override
+	public String argumentsListWithWrapperType(List<AttributeInContext> attributes) {
+		// No wrapper type in GO => use basic method
+		return argumentsListWithType(attributes);
+	}
+	
+	
 }

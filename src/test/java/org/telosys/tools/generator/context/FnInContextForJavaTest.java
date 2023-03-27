@@ -197,7 +197,7 @@ public class FnInContextForJavaTest {
 		envInContext.setLanguage("C#");
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
-		Assert.assertEquals("int id, string name, bool flag", fn.argumentsListWithType(attributes) );
+		Assert.assertEquals("int? id, string? name, bool? flag", fn.argumentsListWithType(attributes) );
 		Assert.assertEquals("", fn.argumentsListWithType(null) );
 		Assert.assertEquals("", fn.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
 	}
@@ -261,7 +261,7 @@ public class FnInContextForJavaTest {
 		envInContext.setLanguage("C#");
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
-		Assert.assertEquals("System.Int32 id, System.String name, System.Boolean flag", fn.argumentsListWithWrapperType(attributes) );
+		Assert.assertEquals("Int32? id, String? name, Boolean? flag", fn.argumentsListWithWrapperType(attributes) );
 		Assert.assertEquals("", fn.argumentsListWithWrapperType(null) );
 		Assert.assertEquals("", fn.argumentsListWithWrapperType(ATTRIBUTES_VOID_LIST) );
 	}

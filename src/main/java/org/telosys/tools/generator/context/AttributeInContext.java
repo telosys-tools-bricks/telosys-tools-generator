@@ -353,17 +353,14 @@ public class AttributeInContext {
 
 	//-------------------------------------------------------------------------------------
 	/**
-	 * Returns the "java type" to use <br>
-	 * usually the simple type ( "int", "BigDecimal", "Date" ) <br>
-	 * sometimes the full type ( if the simple type is ambiguous )
+	 * Returns the "target language type" to use for the attribute 
 	 * @return
 	 */
 	@VelocityMethod(
 		text={	
-			"Returns the recommended type for the attribute",
-			"usually the simple type ( 'int', 'BigDecimal', 'Date' ) ",
-			"sometimes the full type ( if the simple type is considered as ambiguous )",
-			"Examples for Java : 'int', 'BigDecimal', 'Date', 'java.util.Date', 'java.sql.Date' "
+			"Returns the target language type for the attribute",
+			"Examples for Java : 'int', 'BigDecimal', 'LocalDate' ",
+			"Examples for Golang : 'string', 'int32', 'float32'"
 			}
 	)
 	public String getType() {

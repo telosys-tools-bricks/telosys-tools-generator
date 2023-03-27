@@ -21,17 +21,6 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 		return new TypeConverterForCSharp() ;
 	}
 	
-//	private LanguageType getType(AttributeTypeInfo typeInfo ) {
-//		LanguageType lt = getTypeConverter().getType(typeInfo);
-//		System.out.println( typeInfo + " --> " + lt );
-//		return lt ;
-//	}
-//	
-//	private LanguageType getType(String neutralType, int typeInfo ) {
-//		AttributeTypeInfo attributeTypeInfo = new AttributeTypeInfo(neutralType, typeInfo);
-//		return getType(attributeTypeInfo);
-//	}
-	
 	private void checkPrimitiveType( LanguageType lt, String primitiveType, String wrapperType) {
 		assertNotNull(lt);
 		assertTrue ( lt.isPrimitiveType() ) ;
@@ -52,31 +41,26 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 	public void testString() {
 		System.out.println("--- ");
 		
-		checkPrimitiveType( getType(NeutralType.STRING, NONE ),            "string", "System.String");
-		checkPrimitiveType( getType(NeutralType.STRING, NOT_NULL ),        "string", "System.String");
-		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE ),  "string", "System.String");
-		checkPrimitiveType( getType(NeutralType.STRING, UNSIGNED_TYPE ),   "string", "System.String");
-		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "string", "System.String");
-//		checkPrimitiveType( getType(NeutralType.STRING, SQL_TYPE),         "string", "System.String" );
+		checkPrimitiveType( getType(NeutralType.STRING, NONE ),            "string", "String");
+		checkPrimitiveType( getType(NeutralType.STRING, NOT_NULL ),        "string", "String");
+		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE ),  "string", "String");
+		checkPrimitiveType( getType(NeutralType.STRING, UNSIGNED_TYPE ),   "string", "String");
+		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "string", "String");
 		
 		checkObjectType( getType(NeutralType.STRING, OBJECT_TYPE),            "String", "System.String" );
-//		checkObjectType( getType(NeutralType.STRING, OBJECT_TYPE + SQL_TYPE), "String", "System.String" );
 	}
 
 	@Test
 	public void testBoolean() {
 		System.out.println("--- ");
 				
-		checkPrimitiveType( getType( NeutralType.BOOLEAN, NONE ),                  "bool", "System.Boolean" );
-		checkPrimitiveType( getType( NeutralType.BOOLEAN, NOT_NULL ),              "bool", "System.Boolean");
-		checkPrimitiveType( getType( NeutralType.BOOLEAN, PRIMITIVE_TYPE ),        "bool", "System.Boolean");
-		checkPrimitiveType( getType( NeutralType.BOOLEAN, UNSIGNED_TYPE ),         "bool", "System.Boolean");
-		checkPrimitiveType( getType( NeutralType.BOOLEAN, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "bool", "System.Boolean");
-//		checkPrimitiveType( getType( NeutralType.BOOLEAN, SQL_TYPE),               "bool", "System.Boolean" );
-//		checkPrimitiveType( getType( NeutralType.BOOLEAN, NOT_NULL + SQL_TYPE),    "bool", "System.Boolean" );
+		checkPrimitiveType( getType( NeutralType.BOOLEAN, NONE ),                  "bool", "Boolean" );
+		checkPrimitiveType( getType( NeutralType.BOOLEAN, NOT_NULL ),              "bool", "Boolean");
+		checkPrimitiveType( getType( NeutralType.BOOLEAN, PRIMITIVE_TYPE ),        "bool", "Boolean");
+		checkPrimitiveType( getType( NeutralType.BOOLEAN, UNSIGNED_TYPE ),         "bool", "Boolean");
+		checkPrimitiveType( getType( NeutralType.BOOLEAN, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "bool", "Boolean");
 		
 		checkObjectType( getType( NeutralType.BOOLEAN, OBJECT_TYPE),            "Boolean", "System.Boolean" );
-//		checkObjectType( getType( NeutralType.BOOLEAN, OBJECT_TYPE + SQL_TYPE), "Boolean", "System.Boolean" );
 		checkObjectType( getType( NeutralType.BOOLEAN, NOT_NULL + OBJECT_TYPE), "Boolean", "System.Boolean" );
 
 	}
@@ -84,8 +68,8 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 	@Test
 	public void testShort() {
 		System.out.println("--- ");
-		checkPrimitiveType( getType( NeutralType.SHORT, NONE ),              "short",  "System.Int16" );
-		checkPrimitiveType( getType( NeutralType.SHORT, UNSIGNED_TYPE ),     "ushort", "System.UInt16");
+		checkPrimitiveType( getType( NeutralType.SHORT, NONE ),              "short",  "Int16" );
+		checkPrimitiveType( getType( NeutralType.SHORT, UNSIGNED_TYPE ),     "ushort", "UInt16");
 		
 		checkObjectType( getType( NeutralType.SHORT, OBJECT_TYPE ),          "Int16",  "System.Int16");
 	}
@@ -94,8 +78,8 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 	public void testDecimal() {
 		System.out.println("--- ");
 
-		checkPrimitiveType( getType( NeutralType.DECIMAL, NONE ),              "decimal",  "System.Decimal" );
-		checkPrimitiveType( getType( NeutralType.DECIMAL, UNSIGNED_TYPE ),     "decimal", "System.Decimal");
+		checkPrimitiveType( getType( NeutralType.DECIMAL, NONE ),              "decimal", "Decimal" );
+		checkPrimitiveType( getType( NeutralType.DECIMAL, UNSIGNED_TYPE ),     "decimal", "Decimal");
 		
 		checkObjectType( getType( NeutralType.DECIMAL, OBJECT_TYPE ),          "Decimal",  "System.Decimal");
 	}

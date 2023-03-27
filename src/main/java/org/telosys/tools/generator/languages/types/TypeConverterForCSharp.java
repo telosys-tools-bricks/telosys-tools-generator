@@ -54,25 +54,25 @@ public class TypeConverterForCSharp extends TypeConverter {
 		// no ObjectType for NeutralType.BINARY
 
 		//--- Primitive types :
-		declarePrimitiveType( buildPrimitiveType(NeutralType.STRING,   "string",  "System.String"  ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.BOOLEAN,  "bool",    "System.Boolean" ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.BYTE,     "sbyte",   "System.SByte"   ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.SHORT,    "short",   "System.Int16"   ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.INTEGER,  "int",     "System.Int32"   ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.LONG,     "long",    "System.Int64"   ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.FLOAT,    "float",   "System.Single"  ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.DOUBLE,   "double",  "System.Double"  ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.DECIMAL,  "decimal", "System.Decimal" ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.STRING,   "string",  "String"  ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.BOOLEAN,  "bool",    "Boolean" ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.BYTE,     "sbyte",   "SByte"   ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.SHORT,    "short",   "Int16"   ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.INTEGER,  "int",     "Int32"   ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.LONG,     "long",    "Int64"   ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.FLOAT,    "float",   "Single"  ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.DOUBLE,   "double",  "Double"  ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.DECIMAL,  "decimal", "Decimal" ) );
 		// DATE => No primitive type
 		// TIME => No primitive type
 		// TIMESTAMP => No primitive type
 		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY, "byte[]", "byte[]" )  ); // No Wrapper type for binary / byte[] ?
 		
 		//--- Unsigned primitive types : 
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.BYTE,    "byte",   "System.Byte"   ) );
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.SHORT,   "ushort", "System.UInt16" ) );
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.INTEGER, "uint",   "System.UInt32" ) );
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.LONG,    "ulong",  "System.UInt64" ) );
+		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.BYTE,    "byte",   "Byte"   ) );
+		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.SHORT,   "ushort", "UInt16" ) );
+		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.INTEGER, "uint",   "UInt32" ) );
+		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.LONG,    "ulong",  "UInt64" ) );
 	}
 
 	private LanguageType buildPrimitiveType(String neutralType, String primitiveType, String wrapperType) {
@@ -80,7 +80,7 @@ public class TypeConverterForCSharp extends TypeConverter {
 	}
 
 	private LanguageType buildObjectType(String neutralType, String simpleType, String fullType) {
-		return new LanguageType(neutralType, simpleType,  fullType, false, simpleType );
+		return new LanguageType(neutralType, simpleType,  fullType, false, simpleType ); // wrapper type = simple type
 	}
 	
 	@Override

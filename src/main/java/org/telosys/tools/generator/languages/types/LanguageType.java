@@ -20,7 +20,7 @@ package org.telosys.tools.generator.languages.types;
  * The simple and full type have the same value if there's no notion of "package", "namespace", etc <br>
  * Examples : <br>
  * For Java language : "String" and "java.lang.String" or "short" and "short" <br>
- * For c# language : "Int16" and "System.Int16"<br>
+ * For Go language   : string", int32, float32<br>
  * etc <br>
  * 
  * @author Laurent Guerin

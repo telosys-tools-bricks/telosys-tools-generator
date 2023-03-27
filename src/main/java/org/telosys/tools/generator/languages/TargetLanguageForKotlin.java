@@ -15,6 +15,9 @@
  */
 package org.telosys.tools.generator.languages;
 
+import java.util.List;
+
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProviderForKotlin;
 import org.telosys.tools.generator.languages.types.TypeConverter;
@@ -48,5 +51,26 @@ public class TargetLanguageForKotlin extends TargetLanguage {
 	public LiteralValuesProvider getLiteralValuesProvider() {
 		return literalValuesProvider;
 	}
+	
+	@Override
+	public String argumentsListWithType(List<AttributeInContext> attributes) {
+		if ( attributes == null ) return "";
+		// example : "name: string?, age: int"
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			// example : "name string, age int"
+			if ( n > 0 ) sb.append(", ");
+			sb.append( attribute.getName() ) ; // arg name first
+			sb.append( ": " ) ;
+			sb.append( attribute.getType() ) ; // arg type after 
+			if ( ! attribute.isNotNull() ) {
+				sb.append( "?" ) ;  // nullable => add '?' at the end of the type, eg "String?"
+			}			
+			n++;
+		}
+		return sb.toString();
+	}
+
 
 }

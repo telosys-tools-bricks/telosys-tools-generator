@@ -15,6 +15,9 @@
  */
 package org.telosys.tools.generator.languages;
 
+import java.util.List;
+
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProviderForCSharp;
 import org.telosys.tools.generator.languages.types.TypeConverter;
@@ -47,6 +50,44 @@ public class TargetLanguageForCSharp extends TargetLanguage {
 	@Override
 	public LiteralValuesProvider getLiteralValuesProvider() {
 		return literalValuesProvider;
+	}
+
+	@Override
+	public String argumentsListWithType(List<AttributeInContext> attributes) {
+		if ( attributes == null ) return "";
+		// example : "name string, age int"
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			// example : "name string, age int"
+			if ( n > 0 ) sb.append(", ");
+			sb.append( attribute.getType() ) ; // arg type FIRST 
+			if ( ! attribute.isNotNull() ) {
+				sb.append( "?" ) ;  // nullable => add '?' at the end of the type, eg "int?"
+			}
+			sb.append( " " ) ;
+			sb.append( attribute.getName() ) ; // arg name AFTER
+			n++;
+		}
+		return sb.toString();
+	}
+	
+	@Override
+	public String argumentsListWithWrapperType(List<AttributeInContext> attributes) {
+		if ( attributes == null ) return "";
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			if ( n > 0 ) sb.append(", ");
+			sb.append( attribute.getWrapperType() ) ; //  arg type first : WRAPPER type 
+			if ( ! attribute.isNotNull() ) {
+				sb.append( "?" ) ;  // nullable => add '?' at the end of the type, eg "String?"
+			}
+			sb.append( " " ) ;
+			sb.append( attribute.getName() ) ; // arg name after
+			n++;
+		}
+		return sb.toString();		
 	}
 
 }

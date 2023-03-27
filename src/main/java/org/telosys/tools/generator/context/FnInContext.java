@@ -33,6 +33,7 @@ import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.exceptions.GeneratorFunctionException;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.engine.GeneratorContext;
+import org.telosys.tools.generator.languages.TargetLanguage;
 
 /**
  * Set of functions usable in Velocity template with $fn.functionName(...) 
@@ -222,7 +223,8 @@ public class FnInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns a string containing a list of fields (type and name) separated by a comma"
+			"Returns a string containing a list of arguments (usually a list of 'type and name' separated by a comma)",
+			"The resulting string depends on the current target language (eg: args are different for Java and Go) "
 			},
 		example={ 
 			"$fn.argumentsListWithType( $entity.attributes )",
@@ -233,63 +235,56 @@ public class FnInContext {
 		since = "2.0.5"
 			)
 	public String argumentsListWithType( List<AttributeInContext> attributes )  {
+		// since v 4.1.0 all the job is done in TargetLanguage
 		if ( attributes != null ) {
-//			if ( env.languageIsGo() ) {
-			if ( currentLanguageIsGolang() ) { // v 4.1.0
-				// Specific order for Go : "name type"
-				return argumentsListWithTypeAfterArg(attributes);
-			}
-			else {
-				// Standard order for other languages : "type name"
-				return argumentsListWithTypeBeforeArg(attributes);
-			}
+			return env.getTargetLanguage().argumentsListWithType(attributes);
 		} 
 		else {
 			return "" ;
 		}
 	}
 
-	private boolean currentLanguageIsGolang() {
-		return "Go".equalsIgnoreCase( env.getLanguage() );
-	}
+//	private boolean currentLanguageIsGolang() {
+//		return "Go".equalsIgnoreCase( env.getLanguage() );
+//	}
 	
-	/**
-	 * Returns a list of arguments with the type BEFORE the argument name<br>
-	 * Standard syntax for most languages
-	 * @param fieldsList
-	 * @return
-	 */
-	private String argumentsListWithTypeBeforeArg( List<AttributeInContext> fieldsList )  {
-		StringBuilder sb = new StringBuilder();
-		int n = 0 ;
-		for ( AttributeInContext field : fieldsList ) {
-			if ( n > 0 ) sb.append(", ");
-			sb.append( field.getType() ) ;
-			sb.append( " " ) ;
-			sb.append( field.getName() ) ;
-			n++;
-		}
-		return sb.toString();
-	}
+//	/**
+//	 * Returns a list of arguments with the type BEFORE the argument name<br>
+//	 * Standard syntax for most languages
+//	 * @param fieldsList
+//	 * @return
+//	 */
+//	private String argumentsListWithTypeBeforeArg( List<AttributeInContext> fieldsList )  {
+//		StringBuilder sb = new StringBuilder();
+//		int n = 0 ;
+//		for ( AttributeInContext field : fieldsList ) {
+//			if ( n > 0 ) sb.append(", ");
+//			sb.append( field.getType() ) ;
+//			sb.append( " " ) ;
+//			sb.append( field.getName() ) ;
+//			n++;
+//		}
+//		return sb.toString();
+//	}
 	
-	/**
-	 * Returns a list of arguments with the type AFTER the argument name<br>
-	 * Typically for GoLang
-	 * @param fieldsList
-	 * @return
-	 */
-	private String argumentsListWithTypeAfterArg( List<AttributeInContext> fieldsList )  {
-		StringBuilder sb = new StringBuilder();
-		int n = 0 ;
-		for ( AttributeInContext field : fieldsList ) {
-			if ( n > 0 ) sb.append(", ");
-			sb.append( field.getName() ) ;
-			sb.append( " " ) ;
-			sb.append( field.getType() ) ;
-			n++;
-		}
-		return sb.toString();
-	}
+//	/**
+//	 * Returns a list of arguments with the type AFTER the argument name<br>
+//	 * Typically for GoLang
+//	 * @param fieldsList
+//	 * @return
+//	 */
+//	private String argumentsListWithTypeAfterArg( List<AttributeInContext> fieldsList )  {
+//		StringBuilder sb = new StringBuilder();
+//		int n = 0 ;
+//		for ( AttributeInContext field : fieldsList ) {
+//			if ( n > 0 ) sb.append(", ");
+//			sb.append( field.getName() ) ;
+//			sb.append( " " ) ;
+//			sb.append( field.getType() ) ;
+//			n++;
+//		}
+//		return sb.toString();
+//	}
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -305,25 +300,8 @@ public class FnInContext {
 			)
 	public String argumentsListWithWrapperType( List<AttributeInContext> attributes )  {
 		if ( attributes != null ) {
-			// if ( env.languageIsGo() ) {
-			if ( currentLanguageIsGolang() ) { // v 4.1.0
-				// Specific order for Go : "name type"
-				// No wrapper type for go : reuse function for standard types
-				return argumentsListWithTypeAfterArg(attributes);
-			}
-			else {
-				// Standard order for other languages : "wrapper_type name"
-				StringBuilder sb = new StringBuilder();
-				int n = 0 ;
-				for ( AttributeInContext attribute : attributes ) {
-					if ( n > 0 ) sb.append(", ");
-					sb.append( attribute.getWrapperType() ) ; // attribute wrapper type 
-					sb.append( " " ) ;
-					sb.append( attribute.getName() ) ; // attribute name
-					n++;
-				}
-				return sb.toString();
-			}
+			// since v 4.1.0 all the job is done in TargetLanguage
+			return env.getTargetLanguage().argumentsListWithWrapperType(attributes);
 		} 
 		else {
 			return "" ;

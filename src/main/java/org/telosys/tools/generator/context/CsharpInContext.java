@@ -120,11 +120,11 @@ public class CsharpInContext {
 		indent++;
     	if ( attributes.isEmpty() ) {
     		//--- No attributes
-    		lb.append(indent, "return \"" + entity.getName() + " []\" ;");
+    		lb.append(indent, "return \"" + entity.getName() + " [no attribute]\" ;");
     	}
     	else {
     		//--- Build return concat with all the given attributes 
-   			toStringForAttributes( entity, attributes, lb, indent );
+    		toStringForAttributesWithStringBuilder( entity, attributes, lb, indent );
     	}
 		indent--;
 		lb.append(indent, "}");
@@ -163,6 +163,38 @@ public class CsharpInContext {
     	}
     	// last line
 		lb.append(indent, "+ \"]\" ; "  ); //  '+ "]" ;'
+    }
+    
+    /**
+     * Builds the string to be returned using the given attributes
+     * @param entity
+     * @param attributes
+     * @param lb
+     * @param indent
+     */
+    private void toStringForAttributesWithStringBuilder( EntityInContext entity, List<AttributeInContext> attributes, LinesBuilder lb, int indent  ) 
+    {    	
+    	if ( null == attributes ) return ;
+    	int count = 0 ;
+    	// first lines
+		lb.append(indent, "System.Text.StringBuilder sb = new System.Text.StringBuilder();"); 
+		lb.append(indent, "sb.Append(\"" + entity.getName() + "[\");");  // example: sb.Append("Employee[");	
+    	for ( AttributeInContext attribute : attributes ) {
+    		if ( usableInToString( attribute ) ) {
+                if ( count > 0 ) {
+                	lb.append(indent, "sb.Append(\"|\");"); // not the first one => append separator before
+                }
+    			lb.append(indent, "sb.Append(\"" + attribute.getName() + "=\").Append(" + attribute.getName() + ");"); 
+    			// example: sb.Append("firstName=").Append(firstName);
+    			count++ ;
+    		}
+    		else {
+    			lb.append(indent, "// attribute '" + attribute.getName() + "' (type " + attribute.getType() + ") not usable in ToString() " );
+    		}
+    	}
+    	// last line
+    	lb.append(indent, "sb.Append(\"]\");" ); 
+		lb.append(indent, "return sb.ToString();" );
     }
     
     /**
