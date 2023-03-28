@@ -15,6 +15,9 @@
  */
 package org.telosys.tools.generator.languages;
 
+import java.util.List;
+
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProviderForJava;
 import org.telosys.tools.generator.languages.types.TypeConverter;
@@ -49,4 +52,30 @@ public class TargetLanguageForJava extends TargetLanguage {
 		return literalValuesProvider;
 	}
 
+	@Override
+	public String argumentsList(List<AttributeInContext> attributes) {
+		return commonArgumentsListWithoutType(attributes);
+	}
+	
+	@Override
+	public String argumentsListWithType(List<AttributeInContext> attributes) {
+		return commonArgumentsListWithType(attributes);
+	}
+
+	@Override
+	public String argumentsListWithWrapperType( List<AttributeInContext> attributes ) {
+	if ( attributes == null ) return "";
+	StringBuilder sb = new StringBuilder();
+	int n = 0 ;
+	for ( AttributeInContext attribute : attributes ) {
+		if ( n > 0 ) sb.append(", ");
+		sb.append( attribute.getWrapperType() ) ; //  arg type first : WRAPPER type 
+		sb.append( " " ) ;
+		sb.append( attribute.getName() ) ; // arg name after
+		n++;
+	}
+	return sb.toString();		
+}
+
+	
 }

@@ -49,13 +49,37 @@ public abstract class TargetLanguage {
 	 * @return
 	 */
 	public abstract LiteralValuesProvider getLiteralValuesProvider();
+	
+	/**
+	 * Build simple arguments list (only argument names, no type) <br>
+	 * Returns a list of arguments in the expected form for the current language<br>
+	 * @param attributes
+	 * @return
+	 */
+	public abstract String argumentsList( List<AttributeInContext> attributes ) ;
+
+	/**
+	 * Build arguments list with associated basic type <br>
+	 * Returns a list of arguments with argument type and argument name in the expected form for the current language<br>
+	 * @param attributes
+	 * @return
+	 */
+	public abstract String argumentsListWithType( List<AttributeInContext> attributes ) ;
+
+	/**
+	 * Build arguments list with associated wrapper type <br>
+	 * Returns a list of arguments with : argument type and argument name in the expected form for the current language <br>
+	 * @param attributes
+	 * @return
+	 */
+	public abstract String argumentsListWithWrapperType( List<AttributeInContext> attributes ) ;
 
 	/**
 	 * Builds a simple arguments list with only arguments name (no type)
 	 * @param attributes
 	 * @return
 	 */
-	protected String argumentsList(List<AttributeInContext> attributes) {
+	protected final String commonArgumentsListWithoutType(List<AttributeInContext> attributes) {
 		if ( attributes == null ) return "";
 		// No type, example : "name, age"
 		StringBuilder sb = new StringBuilder();
@@ -68,14 +92,13 @@ public abstract class TargetLanguage {
 		}
 		return sb.toString();
 	}
-	
+
 	/**
-	 * Build arguments list (override this method in language if necessary)<br>
-	 * Returns a list of arguments with : argument type and argument name <br>
+	 * Builds arguments list with the form : "arg1-type arg1-name, arg2-type arg2-name, ..."
 	 * @param attributes
 	 * @return
 	 */
-	public String argumentsListWithType( List<AttributeInContext> attributes ) {
+	protected final String commonArgumentsListWithType( List<AttributeInContext> attributes ) {
 		if ( attributes == null ) return "";
 		StringBuilder sb = new StringBuilder();
 		int n = 0 ;
@@ -83,29 +106,10 @@ public abstract class TargetLanguage {
 			if ( n > 0 ) sb.append(", ");
 			sb.append( attribute.getType() ) ; // arg type first
 			sb.append( " " ) ;
-			sb.append( attribute.getName() ) ; // arg name after
+			sb.append( attribute.getName() ) ; // arg name after type
 			n++;
 		}
 		return sb.toString();
 	}
 
-	/**
-	 * Build arguments list (override this method in language if necessary)<br>
-	 * Returns a list of arguments with : argument type and argument name <br>
-	 * @param attributes
-	 * @return
-	 */
-	public String argumentsListWithWrapperType( List<AttributeInContext> attributes ) {
-		if ( attributes == null ) return "";
-		StringBuilder sb = new StringBuilder();
-		int n = 0 ;
-		for ( AttributeInContext attribute : attributes ) {
-			if ( n > 0 ) sb.append(", ");
-			sb.append( attribute.getWrapperType() ) ; //  arg type first : WRAPPER type 
-			sb.append( " " ) ;
-			sb.append( attribute.getName() ) ; // arg name after
-			n++;
-		}
-		return sb.toString();		
-	}
 }

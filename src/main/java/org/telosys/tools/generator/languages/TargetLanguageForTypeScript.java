@@ -15,6 +15,9 @@
  */
 package org.telosys.tools.generator.languages;
 
+import java.util.List;
+
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProviderForTypeScript;
 import org.telosys.tools.generator.languages.types.TypeConverter;
@@ -47,6 +50,34 @@ public class TargetLanguageForTypeScript extends TargetLanguage {
 	@Override
 	public LiteralValuesProvider getLiteralValuesProvider() {
 		return literalValuesProvider;
+	}
+
+	@Override
+	public String argumentsList(List<AttributeInContext> attributes) {
+		return commonArgumentsListWithoutType(attributes);
+	}
+	
+	@Override
+	public String argumentsListWithType(List<AttributeInContext> attributes) {
+		if ( attributes == null ) return "";
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			// example : "name: string, age: number"
+			if ( n > 0 ) sb.append(", ");
+			sb.append( attribute.getName() ) ; // arg name first
+			sb.append( ": " ) ;
+			sb.append( attribute.getType() ) ; // arg type after 
+			n++;
+		}
+		return sb.toString();
+	}
+
+	@Override
+	public String argumentsListWithWrapperType(List<AttributeInContext> attributes) {
+		// NB: recomandation "do not use wrappers" 
+		// return args with basic types
+		return this.argumentsListWithType(attributes);
 	}
 
 }

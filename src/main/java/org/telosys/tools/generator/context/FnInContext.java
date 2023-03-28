@@ -33,7 +33,6 @@ import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.exceptions.GeneratorFunctionException;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.engine.GeneratorContext;
-import org.telosys.tools.generator.languages.TargetLanguage;
 
 /**
  * Set of functions usable in Velocity template with $fn.functionName(...) 
@@ -205,15 +204,22 @@ public class FnInContext {
 		since = "2.0.5"
 			)
 	public String argumentsList( List<AttributeInContext> attributes ) {
+//		if ( attributes != null ) {
+//			StringBuilder sb = new StringBuilder();
+//			int n = 0 ;
+//			for ( AttributeInContext attrib : attributes ) {
+//				if ( n > 0 ) sb.append(", ");
+//				sb.append( attrib.getName() ) ;
+//				n++;
+//			}
+//			return sb.toString();
+//		} 
+//		else {
+//			return "" ;
+//		}
+		// since v 4.1.0 all the job is done in TargetLanguage
 		if ( attributes != null ) {
-			StringBuilder sb = new StringBuilder();
-			int n = 0 ;
-			for ( AttributeInContext attrib : attributes ) {
-				if ( n > 0 ) sb.append(", ");
-				sb.append( attrib.getName() ) ;
-				n++;
-			}
-			return sb.toString();
+			return env.getTargetLanguage().argumentsList(attributes);
 		} 
 		else {
 			return "" ;

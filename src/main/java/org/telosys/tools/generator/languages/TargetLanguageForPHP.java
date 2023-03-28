@@ -15,6 +15,9 @@
  */
 package org.telosys.tools.generator.languages;
 
+import java.util.List;
+
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProviderForPHP;
 import org.telosys.tools.generator.languages.types.TypeConverter;
@@ -48,5 +51,47 @@ public class TargetLanguageForPHP extends TargetLanguage {
 	public LiteralValuesProvider getLiteralValuesProvider() {
 		return literalValuesProvider;
 	}
+
+	@Override
+	public String argumentsList(List<AttributeInContext> attributes) {
+		if ( attributes == null ) return "";
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			// example : "function add($a, $b, $x)"
+			if ( n > 0 ) sb.append(", ");
+			// AFTER : the name "$xx"
+			sb.append( "$" ).append( attribute.getName() ) ;
+			n++;
+		}
+		return sb.toString();
+	}
+	
+	@Override
+	public String argumentsListWithType(List<AttributeInContext> attributes) {
+		if ( attributes == null ) return "";
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			// example : "function add(int $a, int $b, ?string $s)"
+			if ( n > 0 ) sb.append(", ");
+			// FIRST : the type 
+			if ( ! attribute.isNotNull() ) {
+				sb.append( "?" ) ;  // nullable => add '?' before the type, eg "?int"
+			}
+			sb.append( attribute.getType() ) ; 
+			sb.append( " " ) ;
+			// AFTER : the name "$xx"
+			sb.append( "$" ).append( attribute.getName() ) ;
+			n++;
+		}
+		return sb.toString();
+	}
+	
+	@Override
+	public String argumentsListWithWrapperType(List<AttributeInContext> attributes) {
+		// No wrapper type => same behavior as with basic types
+		return argumentsListWithType(attributes); 
+	}	
 
 }

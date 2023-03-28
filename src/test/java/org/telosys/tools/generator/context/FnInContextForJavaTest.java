@@ -155,6 +155,18 @@ public class FnInContextForJavaTest {
 		Assert.assertEquals("", fn.argumentsList(ATTRIBUTES_VOID_LIST) );
 	}
 	@Test
+	public void testArgumentsListForCPlusPlus() throws GeneratorException { // C++
+		EnvInContext envInContext = new EnvInContext();
+		envInContext.setLanguage("C++");
+		Assert.assertEquals("C++", envInContext.getLanguage().toUpperCase() );
+		
+		List<AttributeInContext> attributes = buildAttributes(envInContext);
+		FnInContext fn = new FnInContext(null, envInContext);
+		Assert.assertEquals("id, name, flag", fn.argumentsList(attributes) );
+		Assert.assertEquals("", fn.argumentsList(null) );
+		Assert.assertEquals("", fn.argumentsList(ATTRIBUTES_VOID_LIST) );
+	}
+	@Test
 	public void testArgumentsListForCSharp() throws GeneratorException { // C#
 		EnvInContext envInContext = new EnvInContext();
 		envInContext.setLanguage("C#");
@@ -175,6 +187,18 @@ public class FnInContextForJavaTest {
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
 		Assert.assertEquals("id, name, flag", fn.argumentsList(attributes) );
+		Assert.assertEquals("", fn.argumentsList(null) );
+		Assert.assertEquals("", fn.argumentsList(ATTRIBUTES_VOID_LIST) );
+	}
+	@Test
+	public void testArgumentsListForPHP() throws GeneratorException { // PHP
+		EnvInContext envInContext = new EnvInContext();
+		envInContext.setLanguage("PHP");
+		Assert.assertEquals("PHP", envInContext.getLanguage().toUpperCase() );
+
+		List<AttributeInContext> attributes = buildAttributes(envInContext);
+		FnInContext fn = new FnInContext(null, envInContext);
+		Assert.assertEquals("$id, $name, $flag", fn.argumentsList(attributes) );
 		Assert.assertEquals("", fn.argumentsList(null) );
 		Assert.assertEquals("", fn.argumentsList(ATTRIBUTES_VOID_LIST) );
 	}
@@ -207,7 +231,7 @@ public class FnInContextForJavaTest {
 		envInContext.setLanguage("TypeScript");
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
-		Assert.assertEquals("number id, string name, boolean flag", fn.argumentsListWithType(attributes) );
+		Assert.assertEquals("id: number, name: string, flag: boolean", fn.argumentsListWithType(attributes) );
 		Assert.assertEquals("", fn.argumentsListWithType(null) );
 		Assert.assertEquals("", fn.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
 	}
@@ -271,7 +295,7 @@ public class FnInContextForJavaTest {
 		envInContext.setLanguage("TypeScript");
 		List<AttributeInContext> attributes = buildAttributes(envInContext);
 		FnInContext fn = new FnInContext(null, envInContext);
-		Assert.assertEquals("Number id, String name, Boolean flag", fn.argumentsListWithWrapperType(attributes) );
+		Assert.assertEquals("id: number, name: string, flag: boolean", fn.argumentsListWithWrapperType(attributes) );
 		Assert.assertEquals("", fn.argumentsListWithWrapperType(null) );
 		Assert.assertEquals("", fn.argumentsListWithWrapperType(ATTRIBUTES_VOID_LIST) );
 	}

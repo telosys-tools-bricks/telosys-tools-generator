@@ -53,6 +53,11 @@ public class TargetLanguageForScala extends TargetLanguage {
 	}
 	
 	@Override
+	public String argumentsList(List<AttributeInContext> attributes) {
+		return commonArgumentsListWithoutType(attributes);
+	}
+	
+	@Override
 	public String argumentsListWithType(List<AttributeInContext> attributes) {
 		if ( attributes == null ) return "";
 		// example : "id: Int, name: String"

@@ -53,14 +53,19 @@ public class TargetLanguageForJavaScript extends TargetLanguage {
 	}
 	
 	@Override
+	public String argumentsList(List<AttributeInContext> attributes) {
+		return commonArgumentsListWithoutType(attributes);
+	}
+	
+	@Override
 	public String argumentsListWithType(List<AttributeInContext> attributes) {
 		// No type => just arg names
-		return argumentsList(attributes);
+		return commonArgumentsListWithoutType(attributes);
 	}
 	
 	@Override
 	public String argumentsListWithWrapperType(List<AttributeInContext> attributes) {
 		// No type => just arg names
-		return argumentsList(attributes);
+		return commonArgumentsListWithoutType(attributes);
 	}	
 }
