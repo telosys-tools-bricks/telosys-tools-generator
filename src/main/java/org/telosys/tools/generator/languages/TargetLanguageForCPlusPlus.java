@@ -68,4 +68,10 @@ public class TargetLanguageForCPlusPlus extends TargetLanguage {
 		return commonArgumentsListWithType(attributes);
 	}
 
+	@Override
+	public String argumentsListFormObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
+		// standard getters in C++ : 'getXxx()' and 'isXxx()' 
+		return commonArgumentsListFromObjectWithGetter(objectName, attributes);
+	}
+
 }

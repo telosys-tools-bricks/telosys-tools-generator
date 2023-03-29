@@ -64,18 +64,23 @@ public class TargetLanguageForJava extends TargetLanguage {
 
 	@Override
 	public String argumentsListWithWrapperType( List<AttributeInContext> attributes ) {
-	if ( attributes == null ) return "";
-	StringBuilder sb = new StringBuilder();
-	int n = 0 ;
-	for ( AttributeInContext attribute : attributes ) {
-		if ( n > 0 ) sb.append(", ");
-		sb.append( attribute.getWrapperType() ) ; //  arg type first : WRAPPER type 
-		sb.append( " " ) ;
-		sb.append( attribute.getName() ) ; // arg name after
-		n++;
+		if ( attributes == null ) return "";
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			if ( n > 0 ) sb.append(", ");
+			sb.append( attribute.getWrapperType() ) ; //  arg type first : WRAPPER type 
+			sb.append( " " ) ;
+			sb.append( attribute.getName() ) ; // arg name after
+			n++;
+		}
+		return sb.toString();		
 	}
-	return sb.toString();		
-}
 
-	
+	@Override
+	public String argumentsListFormObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
+		// standard getters in Java : 'getXxx()' and 'isXxx()' 
+		return commonArgumentsListFromObjectWithGetter(objectName, attributes);
+	}
+
 }

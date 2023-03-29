@@ -31,8 +31,6 @@ public abstract class TargetLanguage {
 	
 	/**
 	 * Constructor
-	 * @param typeConverter
-	 * @param literalValuesProvider
 	 */
 	protected TargetLanguage() {
 		super();
@@ -75,6 +73,14 @@ public abstract class TargetLanguage {
 	public abstract String argumentsListWithWrapperType( List<AttributeInContext> attributes ) ;
 
 	/**
+	 * Build arguments list with object name + associated getter if any <br>
+	 * @param objectName
+	 * @param attributes
+	 * @return
+	 */
+	public abstract String argumentsListFormObjectWithGetter( String objectName, List<AttributeInContext> attributes ) ;
+	
+	/**
 	 * Builds a simple arguments list with only arguments name (no type)
 	 * @param attributes
 	 * @return
@@ -111,5 +117,45 @@ public abstract class TargetLanguage {
 		}
 		return sb.toString();
 	}
-
+	
+	/**
+	 * Builds arguments list with the form : "obj.arg1, obj.arg2, obj.arg3, ..."
+	 * @param objectName
+	 * @param attributes
+	 * @return
+	 */
+	protected final String commonArgumentsListFromObject( String objectName, List<AttributeInContext> attributes ) {
+		if ( attributes == null ) return "";
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			if ( n > 0 ) sb.append(", ");
+			sb.append( objectName ) ;
+			sb.append( "." ) ;
+			sb.append( attribute.getName() ) ; 
+			n++;
+		}
+		return sb.toString();		
+	}
+	
+	/**
+	 * Builds arguments list with the form : "obj.getArg1(), obj.isArg2(), obj.getArg3(), ..."
+	 * @param objectName
+	 * @param attributes
+	 * @return
+	 */
+	protected final String commonArgumentsListFromObjectWithGetter( String objectName, List<AttributeInContext> attributes ) {
+		if ( attributes == null ) return "";
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			if ( n > 0 ) sb.append(", ");
+			sb.append( objectName ) ;
+			sb.append( "." ) ;
+			sb.append( attribute.getGetter() ) ; // can be 'getXxxx' or 'isXxxx'
+			sb.append( "()" ) ;
+			n++;
+		}
+		return sb.toString();
+	}
 }

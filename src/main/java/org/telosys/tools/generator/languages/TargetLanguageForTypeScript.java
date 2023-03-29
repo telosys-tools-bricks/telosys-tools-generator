@@ -80,4 +80,9 @@ public class TargetLanguageForTypeScript extends TargetLanguage {
 		return this.argumentsListWithType(attributes);
 	}
 
+	@Override
+	public String argumentsListFormObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
+		// no getters => just 'obj.xxx, obj.yyy' 
+		return commonArgumentsListFromObject(objectName, attributes);
+	}	
 }

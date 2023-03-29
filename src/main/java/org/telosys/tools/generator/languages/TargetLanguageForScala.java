@@ -79,4 +79,11 @@ public class TargetLanguageForScala extends TargetLanguage {
 		// No wrapper type in Scala => same behavior as with basic types
 		return argumentsListWithType(attributes);
 	}
+
+	@Override
+	public String argumentsListFormObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
+		// no getters => just 'obj.xxx, obj.yyy' 
+		return commonArgumentsListFromObject(objectName, attributes);
+	}
+	
 }

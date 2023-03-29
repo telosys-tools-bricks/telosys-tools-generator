@@ -194,29 +194,20 @@ public class FnInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns a string containing a list of field names separated by a comma"
+			"Returns a string containing a list of field names separated by a comma",
+			"The resulting string depends on the current target language (eg: args are different for Java and PHP) ",
+			"NB: do not forget to define the current language : ",
+			"#set ( $env.language = '..' ) "
 			},
 		example={ 
 			"$fn.argumentsList( $entity.attributes )",
-			"Returns : 'id, firstName, lastName, age' "},
+			"Result example : 'id, firstName, lastName, age' (for most languages) ",
+			"Result example : '$id, $firstName, $lastName, $age' (for languages with '$' prefix) "},
 		parameters = { 
 			"attributes : list of attributes to be added in the arguments list" },
 		since = "2.0.5"
 			)
 	public String argumentsList( List<AttributeInContext> attributes ) {
-//		if ( attributes != null ) {
-//			StringBuilder sb = new StringBuilder();
-//			int n = 0 ;
-//			for ( AttributeInContext attrib : attributes ) {
-//				if ( n > 0 ) sb.append(", ");
-//				sb.append( attrib.getName() ) ;
-//				n++;
-//			}
-//			return sb.toString();
-//		} 
-//		else {
-//			return "" ;
-//		}
 		// since v 4.1.0 all the job is done in TargetLanguage
 		if ( attributes != null ) {
 			return env.getTargetLanguage().argumentsList(attributes);
@@ -230,7 +221,9 @@ public class FnInContext {
 	@VelocityMethod(
 		text={	
 			"Returns a string containing a list of arguments (usually a list of 'type and name' separated by a comma)",
-			"The resulting string depends on the current target language (eg: args are different for Java and Go) "
+			"The resulting string depends on the current target language (eg: args are different for Java and Go) ",
+			"NB: do not forget to define the current language : ",
+			"#set ( $env.language = '..' ) "
 			},
 		example={ 
 			"$fn.argumentsListWithType( $entity.attributes )",
@@ -250,52 +243,13 @@ public class FnInContext {
 		}
 	}
 
-//	private boolean currentLanguageIsGolang() {
-//		return "Go".equalsIgnoreCase( env.getLanguage() );
-//	}
-	
-//	/**
-//	 * Returns a list of arguments with the type BEFORE the argument name<br>
-//	 * Standard syntax for most languages
-//	 * @param fieldsList
-//	 * @return
-//	 */
-//	private String argumentsListWithTypeBeforeArg( List<AttributeInContext> fieldsList )  {
-//		StringBuilder sb = new StringBuilder();
-//		int n = 0 ;
-//		for ( AttributeInContext field : fieldsList ) {
-//			if ( n > 0 ) sb.append(", ");
-//			sb.append( field.getType() ) ;
-//			sb.append( " " ) ;
-//			sb.append( field.getName() ) ;
-//			n++;
-//		}
-//		return sb.toString();
-//	}
-	
-//	/**
-//	 * Returns a list of arguments with the type AFTER the argument name<br>
-//	 * Typically for GoLang
-//	 * @param fieldsList
-//	 * @return
-//	 */
-//	private String argumentsListWithTypeAfterArg( List<AttributeInContext> fieldsList )  {
-//		StringBuilder sb = new StringBuilder();
-//		int n = 0 ;
-//		for ( AttributeInContext field : fieldsList ) {
-//			if ( n > 0 ) sb.append(", ");
-//			sb.append( field.getName() ) ;
-//			sb.append( " " ) ;
-//			sb.append( field.getType() ) ;
-//			n++;
-//		}
-//		return sb.toString();
-//	}
-	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns a string containing a list of fields (wrapper type and name) separated by a comma"
+			"Returns a string containing a list of fields (wrapper type and name) separated by a comma",
+			"The resulting string depends on the current target language (some languages don't have wrappers) ",
+			"NB: do not forget to define the current language : ",
+			"#set ( $env.language = '..' ) "
 			},
 		example={ 
 			"$fn.argumentsListWithWrapperType( $entity.attributes )",
@@ -317,7 +271,10 @@ public class FnInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns a string containing a list of fields getters separated by a comma"
+			"Returns a string containing a list of fields getters separated by a comma",
+			"The resulting string depends on the current target language (some languages don't have getters) ",
+			"NB: do not forget to define the current language : ",
+			"#set ( $env.language = '..' ) "
 			},
 		example={ 
 			"$fn.argumentsListWithGetter( 'person', $entity.attributes )",
@@ -329,17 +286,19 @@ public class FnInContext {
 			)
 	public String argumentsListWithGetter( String objectName, List<AttributeInContext> attributes )  {
 		if ( attributes != null ) {
-			StringBuilder sb = new StringBuilder();
-			int n = 0 ;
-			for ( AttributeInContext attribute : attributes ) {
-				if ( n > 0 ) sb.append(", ");
-				sb.append( objectName ) ;
-				sb.append( "." ) ;
-				sb.append( attribute.getGetter() ) ;
-				sb.append( "()" ) ;
-				n++;
-			}
-			return sb.toString();
+//			StringBuilder sb = new StringBuilder();
+//			int n = 0 ;
+//			for ( AttributeInContext attribute : attributes ) {
+//				if ( n > 0 ) sb.append(", ");
+//				sb.append( objectName ) ;
+//				sb.append( "." ) ;
+//				sb.append( attribute.getGetter() ) ;
+//				sb.append( "()" ) ;
+//				n++;
+//			}
+//			return sb.toString();
+			// since v 4.1.0 all the job is done in TargetLanguage
+			return env.getTargetLanguage().argumentsListFormObjectWithGetter(objectName, attributes);
 		} 
 		else {
 			return "" ;

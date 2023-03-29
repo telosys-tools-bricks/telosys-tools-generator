@@ -82,4 +82,10 @@ public class TargetLanguageForKotlin extends TargetLanguage {
 		return argumentsListWithType(attributes);
 	}
 
+	@Override
+	public String argumentsListFormObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
+		// no getters => just 'obj.xxx, obj.yyy' 
+		return commonArgumentsListFromObject(objectName, attributes);
+	}
+
 }

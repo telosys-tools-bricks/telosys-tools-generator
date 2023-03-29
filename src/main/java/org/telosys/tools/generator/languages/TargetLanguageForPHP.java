@@ -92,6 +92,23 @@ public class TargetLanguageForPHP extends TargetLanguage {
 	public String argumentsListWithWrapperType(List<AttributeInContext> attributes) {
 		// No wrapper type => same behavior as with basic types
 		return argumentsListWithType(attributes); 
+	}
+
+	@Override
+	public String argumentsListFormObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
+		// no getters  => just '$obj->xxx, $obj->yyy' 
+		if ( attributes == null ) return "";
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			if ( n > 0 ) sb.append(", ");
+			sb.append( "$" ) ;
+			sb.append( objectName ) ;
+			sb.append( "->" ) ;
+			sb.append( attribute.getName() ) ; 
+			n++;
+		}
+		return sb.toString();
 	}	
 
 }

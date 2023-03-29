@@ -68,4 +68,11 @@ public class TargetLanguageForJavaScript extends TargetLanguage {
 		// No type => just arg names
 		return commonArgumentsListWithoutType(attributes);
 	}	
+
+	@Override
+	public String argumentsListFormObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
+		// no getters => just 'obj.xxx, obj.yyy' 
+		return commonArgumentsListFromObject(objectName, attributes);
+	}
+	
 }
