@@ -96,7 +96,7 @@ public class TargetLanguageForCSharp extends TargetLanguage {
 	}
 
 	@Override
-	public String argumentsListFormObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
+	public String argumentsListFromObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
 		// getters are useless in C# but can be used sometimes : 'getXxx()' and 'isXxx()' 
 		return commonArgumentsListFromObjectWithGetter(objectName, attributes);
 	}

@@ -82,7 +82,7 @@ public class TargetLanguageForGo extends TargetLanguage {
 	}
 
 	@Override
-	public String argumentsListFormObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
+	public String argumentsListFromObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
 		// no getters in Go => just 'obj.Xxx, obj.Yyy' 
 		if ( attributes == null ) return "";
 		StringBuilder sb = new StringBuilder();

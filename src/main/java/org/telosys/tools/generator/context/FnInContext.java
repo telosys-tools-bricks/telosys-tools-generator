@@ -298,7 +298,7 @@ public class FnInContext {
 //			}
 //			return sb.toString();
 			// since v 4.1.0 all the job is done in TargetLanguage
-			return env.getTargetLanguage().argumentsListFormObjectWithGetter(objectName, attributes);
+			return env.getTargetLanguage().argumentsListFromObjectWithGetter(objectName, attributes);
 		} 
 		else {
 			return "" ;

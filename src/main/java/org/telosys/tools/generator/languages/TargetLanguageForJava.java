@@ -78,7 +78,7 @@ public class TargetLanguageForJava extends TargetLanguage {
 	}
 
 	@Override
-	public String argumentsListFormObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
+	public String argumentsListFromObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
 		// standard getters in Java : 'getXxx()' and 'isXxx()' 
 		return commonArgumentsListFromObjectWithGetter(objectName, attributes);
 	}

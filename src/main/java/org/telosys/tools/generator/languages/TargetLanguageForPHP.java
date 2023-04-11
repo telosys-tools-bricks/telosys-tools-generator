@@ -95,7 +95,7 @@ public class TargetLanguageForPHP extends TargetLanguage {
 	}
 
 	@Override
-	public String argumentsListFormObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
+	public String argumentsListFromObjectWithGetter(String objectName, List<AttributeInContext> attributes) {
 		// no getters  => just '$obj->xxx, $obj->yyy' 
 		if ( attributes == null ) return "";
 		StringBuilder sb = new StringBuilder();

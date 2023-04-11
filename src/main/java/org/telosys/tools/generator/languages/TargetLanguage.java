@@ -78,7 +78,7 @@ public abstract class TargetLanguage {
 	 * @param attributes
 	 * @return
 	 */
-	public abstract String argumentsListFormObjectWithGetter( String objectName, List<AttributeInContext> attributes ) ;
+	public abstract String argumentsListFromObjectWithGetter( String objectName, List<AttributeInContext> attributes ) ;
 	
 	/**
 	 * Builds a simple arguments list with only arguments name (no type)
