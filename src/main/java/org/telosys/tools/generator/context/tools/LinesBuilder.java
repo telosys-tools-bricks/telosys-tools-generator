@@ -17,71 +17,88 @@ package org.telosys.tools.generator.context.tools;
 
 public class LinesBuilder {
 	
-	private static final int TYPE_TABS   = 1 ;
-	private static final int TYPE_SPACES = 2 ;
-
-	private final StringBuilder sb ;
-	
-	private final int type ;
-	private final int indentationSize ;
+	private final StringBuilder sb ;	
+	private final String indentationValue ;
 	
 	/**
-	 * Constructor for TABS indentation
+	 * Default constructor (use TABS indentation)
 	 */
 	public LinesBuilder() {
-		super();
-		this.sb = new StringBuilder() ;
-		this.type = TYPE_TABS ;
-		this.indentationSize = 0; // Not used
+		this("\t");
 	}
 	
 	/**
-	 * Constructor for SPACES indentation
-	 * @param indentationSize
+	 * Constructor with indentation value to use
+	 * @param indentationValue
 	 */
-	public LinesBuilder(int indentationSize) {
+	public LinesBuilder(String indentationValue) {
 		super();
 		this.sb = new StringBuilder() ;
-		this.type = TYPE_SPACES ;
-		this.indentationSize = indentationSize; // Number of spaces
+		this.indentationValue = indentationValue ;
 	}
 
-	public void append(int indentationLevel, String line) {
-		sb.append( getIndentation(indentationLevel) );
+//	/**
+//	 * Constructor for SPACES indentation
+//	 * @param nSpaces number of spaces to build indentation value
+//	 */
+//	public LinesBuilder(int nSpaces) {
+//		super();
+//		this.sb = new StringBuilder() ;
+//		this.indentationValue = buildIndentationWithSpaces(nSpaces) ;
+//	}
+//	private String buildIndentationWithSpaces(int nSpaces) {
+//		StringBuilder spaces = new StringBuilder();
+//		for ( int n = 0 ; n < nSpaces ; n++ ) {
+//			spaces.append(" ");
+//		}
+//		return spaces.toString();
+//	}
+
+	/**
+	 * Appends the given line after the given indentation string
+	 * @param indentationString  a string to be put before the given line 
+	 * @param line
+	 */
+	public void append(String indentationString, String line) {
+		sb.append( indentationString );
 		sb.append( line );
 		sb.append( "\n" );
 	}
 
+	/**
+	 * Appends the given line after the indentation for the given level
+	 * @param indentationLevel
+	 * @param line
+	 */
+	public void append(int indentationLevel, String line) {
+		sb.append( getIndentationForLevel(indentationLevel) );
+		sb.append( line );
+		sb.append( "\n" );
+	}
+	
+	/**
+	 * Returns indentation to use for the given level
+	 * @param indentLevel
+	 * @return
+	 */
+	private String getIndentationForLevel(int indentLevel) {
+		StringBuilder sbIndent = new StringBuilder();
+		for ( int level = 0 ; level < indentLevel ; level++ ) {
+			sbIndent.append(this.indentationValue);
+		}
+		return sbIndent.toString();
+	}
+
 	@Override
 	public String toString() {
+		if ( sb.length() > 0 ) {
+			// remove last "\n" if any
+			int last = sb.length() - 1;
+			if ( sb.charAt(last) == '\n' ) {
+				sb.setLength(last);
+			}
+		}
 		return sb.toString();
 	}
 
-	public String getIndentation(int indentLevel) {
-		if ( TYPE_SPACES == type ) {
-			return getIndentationWithSpaces(indentLevel);
-		}
-		else {
-			return getIndentationWithTabulations(indentLevel);
-		}
-	}
-
-	private String getIndentationWithSpaces(int indentLevel) {
-		StringBuilder spaces = new StringBuilder();
-		for ( int level = 0 ; level < indentLevel ; level++ ) {
-			for ( int n = 0 ; n < indentationSize ; n++ ) {
-				spaces.append(" ");
-			}
-		}
-		return spaces.toString();
-	}
-
-	private String getIndentationWithTabulations(int indentLevel) {
-		StringBuilder tabs = new StringBuilder();
-		for ( int level = 0 ; level < indentLevel ; level++ ) {
-			tabs.append("\t");
-		}
-		return tabs.toString();
-	}
-	
 }

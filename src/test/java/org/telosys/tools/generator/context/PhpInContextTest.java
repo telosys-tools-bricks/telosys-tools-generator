@@ -60,8 +60,10 @@ public class PhpInContextTest {
 		assertEquals("",         getPhpObject().nullableType( buildAttributeNullable("x", "time") ) );
 	}
 	
-	private static final String PUBLIC_FUNCTION_TOSTRING = "    public function __toString() {" ;
-	private static final String CLOSING_BRACE = "    }";
+	private static final String TABS_PUBLIC_FUNCTION_TOSTRING = "\t\tpublic function __toString() {" ;
+	private static final String TABS_CLOSING_BRACE = "\t\t}";
+	private static final String SPACES_PUBLIC_FUNCTION_TOSTRING = "    public function __toString() {" ;
+	private static final String SPACES_CLOSING_BRACE = "    }";
 	
 	@Test 
 	public void testToString() throws GeneratorException {
@@ -69,13 +71,22 @@ public class PhpInContextTest {
 		attributes.add(buildAttributeNotNull("id", "int") );
 		attributes.add(buildAttributeNotNull("name", "string") );
 		attributes.add(buildAttributeNullable("surname", "string") );
+		EntityInContext entity = FakeEntityBuilder.buildEntityInContext("Foo");
+		PhpInContext php = getPhpObject();
 		
-		String s = getPhpObject().toStringMethod(FakeEntityBuilder.buildEntityInContext("Foo"), attributes, 4);
+		String s = php.toStringMethod(entity, attributes, 2);
 		System.out.println(s);
-		assertTrue(s.startsWith(PUBLIC_FUNCTION_TOSTRING));
-		assertTrue(s.contains(  "        return \"Foo [\" . $this->id"));
-		assertTrue(s.contains(  "        . \"|\" . $this->name"));
-		assertTrue(s.contains(  CLOSING_BRACE));
+		assertTrue(s.startsWith(TABS_PUBLIC_FUNCTION_TOSTRING));
+		assertTrue(s.contains(  "\t\t\treturn \"Foo [\" . $this->id"));
+		assertTrue(s.contains(  "\t\t\t. \"|\" . $this->name"));
+		assertTrue(s.endsWith(  TABS_CLOSING_BRACE));
+		
+		s = php.toStringMethod(entity, attributes, 2, "  "); // indentation = 2 spaces
+		System.out.println(s);
+		assertTrue(s.startsWith(SPACES_PUBLIC_FUNCTION_TOSTRING));
+		assertTrue(s.contains(  "      return \"Foo [\" . $this->id")); // 3x2 = 6 spaces
+		assertTrue(s.contains(  "      . \"|\" . $this->name"));
+		assertTrue(s.endsWith(  SPACES_CLOSING_BRACE));
 	}
 	
 	@Test 
@@ -83,22 +94,22 @@ public class PhpInContextTest {
 		List<AttributeInContext> attributes = new LinkedList<>();
 		attributes.add(buildAttributeNotNull("id", "int") );
 		
-		String s = getPhpObject().toStringMethod(FakeEntityBuilder.buildEntityInContext("Foo"), attributes, 4);
+		String s = getPhpObject().toStringMethod(FakeEntityBuilder.buildEntityInContext("Foo"), attributes, 2);
 		System.out.println(s);
-		assertTrue(s.startsWith(PUBLIC_FUNCTION_TOSTRING));
-		assertTrue(s.contains(  "        return \"Foo [\" . $this->id"));
-		assertTrue(s.contains(  CLOSING_BRACE));
+		assertTrue(s.startsWith(TABS_PUBLIC_FUNCTION_TOSTRING)); 
+		assertTrue(s.contains(  "\t\t\treturn \"Foo [\" . $this->id"));
+		assertTrue(s.endsWith(  TABS_CLOSING_BRACE));
 	}
 
 	@Test 
 	public void testToStringNoAttribute() {
 		List<AttributeInContext> attributes = new LinkedList<>();
 		
-		String s = getPhpObject().toStringMethod(FakeEntityBuilder.buildEntityInContext("Foo"), attributes, 4);
+		String s = getPhpObject().toStringMethod(FakeEntityBuilder.buildEntityInContext("Foo"), attributes, 2);
 		System.out.println(s);
-		assertTrue(s.startsWith(PUBLIC_FUNCTION_TOSTRING));
-		assertTrue(s.contains(  "        return \"Foo []\" ;"));
-		assertTrue(s.contains(  CLOSING_BRACE));
+		assertTrue(s.startsWith(TABS_PUBLIC_FUNCTION_TOSTRING));
+		assertTrue(s.contains(  "\t\t\treturn \"Foo []\" ;"));
+		assertTrue(s.endsWith(  TABS_CLOSING_BRACE));
 	}
 
 }

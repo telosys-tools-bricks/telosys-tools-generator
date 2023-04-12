@@ -52,23 +52,44 @@ public class CsharpInContextTest {
 		assertEquals("TimeOnly?", getCsharpObject().nullableType( buildAttributeNullable("x", "time") ) );
 	}
 	
-	private static final String PUBLIC_FUNCTION_TOSTRING = "    public override string ToString()" ;
-	private static final String CLOSING_BRACE = "    }";
+	private static final String TABS_PUBLIC_FUNCTION_TOSTRING = "\t\tpublic override string ToString()" ;
+	private static final String TABS_CLOSING_BRACE = "\t\t}";
+	private static final String SPACES_PUBLIC_FUNCTION_TOSTRING = "    public override string ToString()" ;
+	private static final String SPACES_CLOSING_BRACE = "    }";
 	
 	@Test 
 	public void testToString() throws GeneratorException {
-		List<AttributeInContext> attributes = new LinkedList<>();
-		attributes.add(buildAttributeNotNull("id", "int") );
-		attributes.add(buildAttributeNotNull("name", "string") );
-		attributes.add(buildAttributeNullable("surname", "string") );
+		List<AttributeInContext> allAttributes = new LinkedList<>();
+		allAttributes.add(buildAttributeNotNull("id", "int") );
+		allAttributes.add(buildAttributeNotNull("name", "string") );
+		allAttributes.add(buildAttributeNullable("surname", "string") );
+		List<AttributeInContext> keyAttributes = new LinkedList<>();
+		keyAttributes.add(allAttributes.get(0) );
+
+		CsharpInContext csharp = getCsharpObject();
 		
-		String s = getCsharpObject().toStringMethod(FakeEntityBuilder.buildEntityInContext("Foo"), attributes, 4);
+		EntityInContext entity = FakeEntityBuilder.buildEntityInContext("Foo");
+		String s = csharp.toStringMethod(entity, allAttributes, 2);
 		System.out.println(s);
-		assertTrue(s.startsWith(PUBLIC_FUNCTION_TOSTRING));
-		//assertTrue(s.contains(  "        return \"Foo [\" + id"));
-		//assertTrue(s.contains(  "        + \"|\" + name"));
-		//assertTrue(s.contains(  "        + \"]\" ;" ));
-		assertTrue(s.contains(  CLOSING_BRACE));
+		assertTrue(s.startsWith(TABS_PUBLIC_FUNCTION_TOSTRING));
+		assertTrue(s.contains(  "\t\t\tsb.Append(\"Foo[\");"               )); // Indent = 3 TABS ( 2 +1 ) 
+		assertTrue(s.contains(  "\t\t\tsb.Append(\"id=\").Append(id);"     )); // Indent = 3 TABS ( 2 +1 ) 
+		assertTrue(s.contains(  "\t\t\tsb.Append(\"name=\").Append(name);" )); // Indent = 3 TABS ( 2 +1 ) 
+		assertTrue(s.endsWith(TABS_CLOSING_BRACE));
+
+		s = csharp.toStringMethod(entity, keyAttributes, 2);
+		System.out.println(s);
+		assertTrue(s.startsWith(TABS_PUBLIC_FUNCTION_TOSTRING));
+		assertTrue(s.contains(  "\t\t\tsb.Append(\"Foo[\");"               )); // Indent = 3 TABS ( 2 +1 ) 
+		assertTrue(s.contains(  "\t\t\tsb.Append(\"id=\").Append(id);"     )); // Indent = 3 TABS ( 2 +1 ) 
+		assertTrue(s.endsWith(TABS_CLOSING_BRACE));
+
+		s = csharp.toStringMethod(entity, keyAttributes, 2, "  ");
+		System.out.println(s);
+		assertTrue(s.startsWith(SPACES_PUBLIC_FUNCTION_TOSTRING));
+		assertTrue(s.contains(  "      sb.Append(\"Foo[\");"               )); // Indent = 6 SPACES (level = 2 +1 ) 
+		assertTrue(s.contains(  "      sb.Append(\"id=\").Append(id);"     ));  
+		assertTrue(s.endsWith(SPACES_CLOSING_BRACE));
 	}
 	
 	@Test 
@@ -76,23 +97,23 @@ public class CsharpInContextTest {
 		List<AttributeInContext> attributes = new LinkedList<>();
 		attributes.add(buildAttributeNotNull("id", "int") );
 		
-		String s = getCsharpObject().toStringMethod(FakeEntityBuilder.buildEntityInContext("Foo"), attributes, 4);
+		String s = getCsharpObject().toStringMethod(FakeEntityBuilder.buildEntityInContext("Foo"), attributes, 2);
 		System.out.println(s);
-		assertTrue(s.startsWith(PUBLIC_FUNCTION_TOSTRING));
-		//assertTrue(s.contains(  "        return \"Foo [\" + id"));
-		//assertTrue(s.contains(  "        + \"]\" ;" ));
-		assertTrue(s.contains(  CLOSING_BRACE));
+		assertTrue(s.startsWith(TABS_PUBLIC_FUNCTION_TOSTRING));
+		assertTrue(s.contains(  "\t\t\tsb.Append(\"Foo[\");"            )); // Indent = 3 TABS ( 2 +1 ) 
+		assertTrue(s.contains(  "\t\t\tsb.Append(\"id=\").Append(id);"  )); // Indent = 3 TABS ( 2 +1 ) 
+		assertTrue(s.endsWith(  TABS_CLOSING_BRACE));
 	}
 
 	@Test 
 	public void testToStringNoAttribute() {
 		List<AttributeInContext> attributes = new LinkedList<>();
 		
-		String s = getCsharpObject().toStringMethod(FakeEntityBuilder.buildEntityInContext("Foo"), attributes, 4);
+		String s = getCsharpObject().toStringMethod(FakeEntityBuilder.buildEntityInContext("Foo"), attributes, 2);
 		System.out.println(s);
-		assertTrue(s.startsWith(PUBLIC_FUNCTION_TOSTRING));
-		assertTrue(s.contains(  "return \"Foo [no attribute]\" ;"));
-		assertTrue(s.contains(  CLOSING_BRACE));
+		assertTrue(s.startsWith(TABS_PUBLIC_FUNCTION_TOSTRING));
+		assertTrue(s.contains(  "\t\t\treturn \"Foo [no attribute]\" ;")); // Indent = 3 TABS ( 2 +1 ) 
+		assertTrue(s.endsWith(  TABS_CLOSING_BRACE));
 	}
 
 }

@@ -37,6 +37,14 @@ public class Java {
 
 	private static final List<String> VOID_STRINGS_LIST = new LinkedList<>();
 
+	private String buildIndentationWithSpaces(int nSpaces) {
+		StringBuilder spaces = new StringBuilder();
+		for ( int n = 0 ; n < nSpaces ; n++ ) {
+			spaces.append(" ");
+		}
+		return spaces.toString();
+	}
+	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -71,7 +79,7 @@ public class Java {
 			)
 	public String equalsMethod( String className, List<AttributeInContext> attributes, int indentSpaces ) {
 		
-		return equalsMethod( className , attributes, new LinesBuilder(indentSpaces) ); 
+		return equalsMethod( className , attributes, new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) ); 
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -165,7 +173,7 @@ public class Java {
 			since = "2.0.7"
 				)
 	public String hashCodeMethod( String className, List<AttributeInContext> attributes, int indentSpaces ) {
-		return hashCodeMethod(attributes, new LinesBuilder(indentSpaces) ); 
+		return hashCodeMethod(attributes, new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) ); 
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -346,7 +354,7 @@ public class Java {
 			)
 	public String toStringMethod( List<AttributeInContext> attributes, int indentSpaces ) {
 
-		LinesBuilder lb = new LinesBuilder(indentSpaces) ;
+		LinesBuilder lb = new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) ;
 		int indent = 1 ;
 		lb.append(indent, "public String toString() { ");
 		
@@ -404,7 +412,7 @@ public class Java {
 	public String toStringMethod( EntityInContext entity, List<AttributeInContext> nonKeyAttributes, 
 			String embeddedIdName, int indentSpaces )  {
 		
-		return toStringMethod( entity , nonKeyAttributes, embeddedIdName, new LinesBuilder(indentSpaces) ); 
+		return toStringMethod( entity , nonKeyAttributes, embeddedIdName, new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) ); 
 	}
 	
 	//-------------------------------------------------------------------------------------

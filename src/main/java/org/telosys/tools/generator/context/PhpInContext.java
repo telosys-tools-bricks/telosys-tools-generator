@@ -76,45 +76,99 @@ public class PhpInContext {
 	@VelocityMethod(
 		text={	
 			"Returns a string containing all the code for a PHP '__toString()' method",
-			"Generates a 'toString' method using all the attributes of the given entity",
-			"(except non-printable attributes)"
+			"Generates a '__toString' method using all the attributes of the given entity",
+			"(except non-printable attributes)",
+			"Indentation with tabs (1 tab for each indentation level)"
 			},
 		example={ 
-			"$php.toStringMethod( $entity, 4 )" },
+			"$php.toStringMethod( $entity, 2 )" },
 		parameters = { 
 			"entity : the entity for which to generate the 'ToString' method",
-			"indentSpaces : number of spaces to be used for each indentation level"},
+			"indentationLevel : initial indentation level"},
 		since = "4.1.0"
 			)
-	public String toStringMethod( EntityInContext entity, int indentSpaces ) {
-		return toStringMethod(entity, entity.getAttributes(), indentSpaces );
+	public String toStringMethod( EntityInContext entity, int indentationLevel ) {
+		return buildToStringMethod( entity, entity.getAttributes(), indentationLevel, new LinesBuilder() ); 
 	}
-	
+
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Returns a string containing all the code for a PHP '__toString()' method",
-			"Generates a 'toString' method using all the given attributes ",
-			"(except non-printable attributes)"
+			"Generates a '__toString' method using all the attributes of the given entity",
+			"(except non-printable attributes)",
+			"Indentation with spaces (1 'indentationString' for each indentation level)"
 			},
 		example={ 
-			"$php.toStringMethod( $entity, $attributes, 4 )" },
+			"$php.toStringMethod( $entity, 2, '  ' )" },
 		parameters = { 
-			"entity : the entity for which to generate the 'toString' method",
-			"attributes : list of attributes to be used in the 'toString' method",
-			"indentSpaces : number of spaces to be used for each indentation level"},
+			"entity : the entity for which to generate the 'ToString' method",
+			"indentationLevel : initial indentation level",
+			"indentationString : string to use for each indentation (usually N spaces)"},
 		since = "4.1.0"
 			)
-	public String toStringMethod( EntityInContext entity, List<AttributeInContext> attributes, int indentSpaces ) {
+	public String toStringMethod( EntityInContext entity, int indentationLevel, String indentationString ) {
+		return buildToStringMethod( entity, entity.getAttributes(), indentationLevel, new LinesBuilder(indentationString) ); 
+	}
+        
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing all the code for a PHP '__toString()' method",
+			"Generates a '__toString' method using the given attributes ",
+			"(except non-printable attributes)",
+			"Indent with tabs (1 tab for each indentation level)"
+			},
+		example={ 
+			"$php.toStringMethod( $entity, $attributes, 2 )" },
+		parameters = { 
+			"entity : the entity for which to generate the 'ToString' method",
+			"attributes : list of attributes to be used in the 'ToString' method",
+			"indentationLevel : initial indentation level"},
+		since = "4.1.0"
+			)
+	public String toStringMethod( EntityInContext entity, List<AttributeInContext> attributes, int indentationLevel ) {
+		return buildToStringMethod( entity, attributes, indentationLevel, new LinesBuilder() ); 
+	}
+    
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing all the code for a PHP '__toString()' method",
+			"Generates a '__toString' method using the given attributes ",
+			"(except non-printable attributes)",
+			"Indentation with spaces (1 'indentationString' for each indentation level)"
+			},
+		example={ 
+			"$php.toStringMethod( $entity, $attributes, 2, '  ' )" },
+		parameters = { 
+			"entity : the entity for which to generate the 'ToString' method",
+			"attributes : list of attributes to be used in the 'ToString' method",
+			"indentationLevel : initial indentation level",
+			"indentationString : string to use for each indentation (usually N spaces) "},
+		since = "4.1.0"
+			)
+	public String toStringMethod( EntityInContext entity, List<AttributeInContext> attributes, int indentationLevel, String indentationString ) {
+		return buildToStringMethod( entity, attributes, indentationLevel, new LinesBuilder(indentationString) ); 
+	}
 
+	//-------------------------------------------------------------------------------------
+	/**
+	 * Builds the string to be returned using the given attributes and the LinesBuilder
+	 * @param entity
+	 * @param attributes
+	 * @param indentLevel
+	 * @param lb
+	 * @return
+	 */
+	private String buildToStringMethod( EntityInContext entity, List<AttributeInContext> attributes, int indentLevel, LinesBuilder lb ) {
     	if ( entity == null ) {
     		throw new IllegalArgumentException("$php.toStringMethod(..) : entity arg is null");
     	}
     	if ( attributes == null ) {
     		throw new IllegalArgumentException("$php.toStringMethod(..) : attributes arg is null");
     	}
-		LinesBuilder lb = new LinesBuilder(indentSpaces) ;
-		int indent = 1 ;
+		int indent = indentLevel ;
 		lb.append(indent, "public function __toString() { ");
 		indent++;
     	if ( attributes.isEmpty() ) {
@@ -129,6 +183,63 @@ public class PhpInContext {
 		lb.append(indent, "}");
 		return lb.toString();
 	}
+//	
+//	@VelocityMethod(
+//		text={	
+//			"Returns a string containing all the code for a PHP '__toString()' method",
+//			"Generates a 'toString' method using all the attributes of the given entity",
+//			"(except non-printable attributes)"
+//			},
+//		example={ 
+//			"$php.toStringMethod( $entity, 4 )" },
+//		parameters = { 
+//			"entity : the entity for which to generate the 'ToString' method",
+//			"indentSpaces : number of spaces to be used for each indentation level"},
+//		since = "4.1.0"
+//			)
+//	public String toStringMethod( EntityInContext entity, int indentSpaces ) {
+//		return toStringMethod(entity, entity.getAttributes(), indentSpaces );
+//	}
+//	
+	//-------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns a string containing all the code for a PHP '__toString()' method",
+//			"Generates a 'toString' method using all the given attributes ",
+//			"(except non-printable attributes)"
+//			},
+//		example={ 
+//			"$php.toStringMethod( $entity, $attributes, 4 )" },
+//		parameters = { 
+//			"entity : the entity for which to generate the 'toString' method",
+//			"attributes : list of attributes to be used in the 'toString' method",
+//			"indentSpaces : number of spaces to be used for each indentation level"},
+//		since = "4.1.0"
+//			)
+//	public String toStringMethod( EntityInContext entity, List<AttributeInContext> attributes, int indentSpaces ) {
+//
+//    	if ( entity == null ) {
+//    		throw new IllegalArgumentException("$php.toStringMethod(..) : entity arg is null");
+//    	}
+//    	if ( attributes == null ) {
+//    		throw new IllegalArgumentException("$php.toStringMethod(..) : attributes arg is null");
+//    	}
+//		LinesBuilder lb = new LinesBuilder(indentSpaces) ;
+//		int indent = 1 ;
+//		lb.append(indent, "public function __toString() { ");
+//		indent++;
+//    	if ( attributes.isEmpty() ) {
+//    		//--- No attributes    		
+//    		lb.append(indent, "return \"" + entity.getName() + " []\" ;");
+//    	}
+//    	else {
+//    		//--- Build return concat with all the given attributes 
+//   			toStringForAttributes( entity, attributes, lb, indent );
+//    	}
+//		indent--;
+//		lb.append(indent, "}");
+//		return lb.toString();
+//	}
     
 	//-------------------------------------------------------------------------------------
     /**
@@ -164,8 +275,8 @@ public class PhpInContext {
     }
     
     /**
-     * Returns true if the given type is usable in a 'toString' method
-     * @param sType
+     * Returns true if the given attribute is usable in a 'toString' method
+     * @param attribute
      * @return
      */
     private boolean usableInToString( AttributeInContext attribute ) {

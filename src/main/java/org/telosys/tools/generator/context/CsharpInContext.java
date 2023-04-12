@@ -77,44 +77,98 @@ public class CsharpInContext {
 		text={	
 			"Returns a string containing all the code for a C# 'ToString()' method",
 			"Generates a 'ToString' method using all the attributes of the given entity",
-			"(except non-printable attributes)"
+			"(except non-printable attributes)",
+			"Indentation with tabs (1 tab for each indentation level)"
 			},
 		example={ 
-			"$csharp.toStringMethod( $entity, 4 )" },
+			"$csharp.toStringMethod( $entity, 2 )" },
 		parameters = { 
 			"entity : the entity for which to generate the 'ToString' method",
-			"indentSpaces : number of spaces to be used for each indentation level"},
+			"indentationLevel : initial indentation level"},
 		since = "4.1.0"
 			)
-	public String toStringMethod( EntityInContext entity, int indentSpaces ) {
-		return toStringMethod(entity, entity.getAttributes(), indentSpaces );
+	public String toStringMethod( EntityInContext entity, int indentationLevel ) {
+		return buildToStringMethod( entity, entity.getAttributes(), indentationLevel, new LinesBuilder() ); 
 	}
-	
+
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Returns a string containing all the code for a C# 'ToString()' method",
-			"Generates a 'ToString' method using all the given attributes ",
-			"(except non-printable attributes)"
+			"Generates a 'ToString' method using all the attributes of the given entity",
+			"(except non-printable attributes)",
+			"Indentation with spaces (1 'indentationString' for each indentation level)"
 			},
 		example={ 
-			"$csharp.toStringMethod( $entity, $attributes, 4 )" },
+			"$csharp.toStringMethod( $entity, 2, '  ' )" },
+		parameters = { 
+			"entity : the entity for which to generate the 'ToString' method",
+			"indentationLevel : initial indentation level",
+			"indentationString : string to use for each indentation (usually N spaces)"},
+		since = "4.1.0"
+			)
+	public String toStringMethod( EntityInContext entity, int indentationLevel, String indentationString ) {
+		return buildToStringMethod( entity, entity.getAttributes(), indentationLevel, new LinesBuilder(indentationString) ); 
+	}
+        
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing all the code for a C# 'ToString()' method",
+			"Generates a 'ToString' method using the given attributes ",
+			"(except non-printable attributes)",
+			"Indent with tabs (1 tab for each indentation level)"
+			},
+		example={ 
+			"$csharp.toStringMethod( $entity, $attributes, 2 )" },
 		parameters = { 
 			"entity : the entity for which to generate the 'ToString' method",
 			"attributes : list of attributes to be used in the 'ToString' method",
-			"indentSpaces : number of spaces to be used for each indentation level"},
+			"indentationLevel : initial indentation level"},
 		since = "4.1.0"
 			)
-	public String toStringMethod( EntityInContext entity, List<AttributeInContext> attributes, int indentSpaces ) {
-
+	public String toStringMethod( EntityInContext entity, List<AttributeInContext> attributes, int indentationLevel ) {
+		return buildToStringMethod( entity, attributes, indentationLevel, new LinesBuilder() ); 
+	}
+    
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing all the code for a C# 'ToString()' method",
+			"Generates a 'ToString' method using the given attributes ",
+			"(except non-printable attributes)",
+			"Indentation with spaces (1 'indentationString' for each indentation level)"
+			},
+		example={ 
+			"$csharp.toStringMethod( $entity, $attributes, 2, '  ' )" },
+		parameters = { 
+			"entity : the entity for which to generate the 'ToString' method",
+			"attributes : list of attributes to be used in the 'ToString' method",
+			"indentationLevel : initial indentation level",
+			"indentationString : string to use for each indentation (usually N spaces) "},
+		since = "4.1.0"
+			)
+	public String toStringMethod( EntityInContext entity, List<AttributeInContext> attributes, int indentationLevel, String indentationString ) {
+		return buildToStringMethod( entity, attributes, indentationLevel, new LinesBuilder(indentationString) ); 
+	}
+    
+	//-------------------------------------------------------------------------------------
+	/**
+	 * Builds the string to be returned using the given attributes and the LinesBuilder
+	 * @param entity
+	 * @param attributes
+	 * @param indentLevel
+	 * @param lb
+	 * @return
+	 */
+	private String buildToStringMethod( EntityInContext entity, List<AttributeInContext> attributes, int indentLevel, LinesBuilder lb ) {
     	if ( entity == null ) {
     		throw new IllegalArgumentException("$csharp.toStringMethod(..) : entity arg is null");
     	}
     	if ( attributes == null ) {
     		throw new IllegalArgumentException("$csharp.toStringMethod(..) : attributes arg is null");
     	}
-		LinesBuilder lb = new LinesBuilder(indentSpaces) ;
-		int indent = 1 ;
+		int indent = indentLevel ;
 		lb.append(indent, "public override string ToString()");
 		lb.append(indent, "{");
 		indent++;
@@ -124,7 +178,7 @@ public class CsharpInContext {
     	}
     	else {
     		//--- Build return concat with all the given attributes 
-    		toStringForAttributesWithStringBuilder( entity, attributes, lb, indent );
+    		buildToStringMethodWithStringBuilder( entity, attributes, indent, lb );
     	}
 		indent--;
 		lb.append(indent, "}");
@@ -132,69 +186,37 @@ public class CsharpInContext {
 	}
     
 	//-------------------------------------------------------------------------------------
-    /**
-     * Builds the string to be returned using the given attributes
-     * @param entity
-     * @param attributes
-     * @param lb
-     * @param indent
-     */
-    private void toStringForAttributes( EntityInContext entity, List<AttributeInContext> attributes, LinesBuilder lb, int indent  ) 
-    {    	
-    	if ( null == attributes ) return ;
-    	int count = 0 ;
-    	for ( AttributeInContext attribute : attributes ) {
-    		if ( usableInToString( attribute ) ) {
-    			String leftPart ;
-                if ( count == 0 ) {
-                	// first line
-                	leftPart = "return \"" + entity.getName() + " [\"" ; // 'return "EntityName ["' 
-                }
-                else {
-                	// not the first one 
-        			leftPart = "+ \"|\"" ; //  '+ "|"'
-                }
-    			lb.append(indent, leftPart + " + " + attribute.getName() );
-    			count++ ;
-    		}
-    		else {
-    			lb.append(indent, "// attribute '" + attribute.getName() + "' not in ToString() ");
-    		}
-    	}
-    	// last line
-		lb.append(indent, "+ \"]\" ; "  ); //  '+ "]" ;'
-    }
     
     /**
      * Builds the string to be returned using the given attributes
      * @param entity
      * @param attributes
      * @param lb
-     * @param indent
+     * @param indentationLevel
      */
-    private void toStringForAttributesWithStringBuilder( EntityInContext entity, List<AttributeInContext> attributes, LinesBuilder lb, int indent  ) 
+    private void buildToStringMethodWithStringBuilder( EntityInContext entity, List<AttributeInContext> attributes, int indentationLevel, LinesBuilder lb) 
     {    	
     	if ( null == attributes ) return ;
     	int count = 0 ;
     	// first lines
-		lb.append(indent, "System.Text.StringBuilder sb = new System.Text.StringBuilder();"); 
-		lb.append(indent, "sb.Append(\"" + entity.getName() + "[\");");  // example: sb.Append("Employee[");	
+		lb.append(indentationLevel, "System.Text.StringBuilder sb = new System.Text.StringBuilder();"); 
+		lb.append(indentationLevel, "sb.Append(\"" + entity.getName() + "[\");");  // append the class name, example : sb.Append("Employee[")
     	for ( AttributeInContext attribute : attributes ) {
     		if ( usableInToString( attribute ) ) {
                 if ( count > 0 ) {
-                	lb.append(indent, "sb.Append(\"|\");"); // not the first one => append separator before
+                	lb.append(indentationLevel, "sb.Append(\"|\");"); // not the first one => append separator before
                 }
-    			lb.append(indent, "sb.Append(\"" + attribute.getName() + "=\").Append(" + attribute.getName() + ");"); 
-    			// example: sb.Append("firstName=").Append(firstName);
+    			lb.append(indentationLevel, "sb.Append(\"" + attribute.getName() + "=\").Append(" + attribute.getName() + ");"); 
+    			// example: sb.Append("firstName=").Append(firstName) 
     			count++ ;
     		}
     		else {
-    			lb.append(indent, "// attribute '" + attribute.getName() + "' (type " + attribute.getType() + ") not usable in ToString() " );
+    			lb.append(indentationLevel, "// attribute '" + attribute.getName() + "' (type " + attribute.getType() + ") not usable in ToString() " );
     		}
     	}
     	// last line
-    	lb.append(indent, "sb.Append(\"]\");" ); 
-		lb.append(indent, "return sb.ToString();" );
+    	lb.append(indentationLevel, "sb.Append(\"]\");" ); 
+		lb.append(indentationLevel, "return sb.ToString();" );
     }
     
     /**
