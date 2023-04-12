@@ -74,7 +74,7 @@ public class CsharpInContextTest {
 		assertTrue(s.startsWith(TABS_PUBLIC_FUNCTION_TOSTRING));
 		assertTrue(s.contains(  "\t\t\tsb.Append(\"Foo[\");"               )); // Indent = 3 TABS ( 2 +1 ) 
 		assertTrue(s.contains(  "\t\t\tsb.Append(\"id=\").Append(id);"     )); // Indent = 3 TABS ( 2 +1 ) 
-		assertTrue(s.contains(  "\t\t\tsb.Append(\"name=\").Append(name);" )); // Indent = 3 TABS ( 2 +1 ) 
+		assertTrue(s.contains(  "\t\t\tsb.Append(separator).Append(\"name=\").Append(name);" )); // Indent = 3 TABS ( 2 +1 ) 
 		assertTrue(s.endsWith(TABS_CLOSING_BRACE));
 
 		s = csharp.toStringMethod(entity, keyAttributes, 2);
@@ -84,11 +84,12 @@ public class CsharpInContextTest {
 		assertTrue(s.contains(  "\t\t\tsb.Append(\"id=\").Append(id);"     )); // Indent = 3 TABS ( 2 +1 ) 
 		assertTrue(s.endsWith(TABS_CLOSING_BRACE));
 
-		s = csharp.toStringMethod(entity, keyAttributes, 2, "  ");
+		s = csharp.toStringMethod(entity, allAttributes, 2, "  ");
 		System.out.println(s);
 		assertTrue(s.startsWith(SPACES_PUBLIC_FUNCTION_TOSTRING));
 		assertTrue(s.contains(  "      sb.Append(\"Foo[\");"               )); // Indent = 6 SPACES (level = 2 +1 ) 
 		assertTrue(s.contains(  "      sb.Append(\"id=\").Append(id);"     ));  
+		assertTrue(s.contains(  "      sb.Append(separator).Append(\"name=\").Append(name);" )); 
 		assertTrue(s.endsWith(SPACES_CLOSING_BRACE));
 	}
 	

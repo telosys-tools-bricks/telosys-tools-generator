@@ -199,14 +199,20 @@ public class CsharpInContext {
     	if ( null == attributes ) return ;
     	int count = 0 ;
     	// first lines
+    	lb.append(indentationLevel, "string separator = \"|\";");
 		lb.append(indentationLevel, "System.Text.StringBuilder sb = new System.Text.StringBuilder();"); 
 		lb.append(indentationLevel, "sb.Append(\"" + entity.getName() + "[\");");  // append the class name, example : sb.Append("Employee[")
     	for ( AttributeInContext attribute : attributes ) {
     		if ( usableInToString( attribute ) ) {
+    			String startOfLine = "";
                 if ( count > 0 ) {
-                	lb.append(indentationLevel, "sb.Append(\"|\");"); // not the first one => append separator before
+                	//lb.append(indentationLevel, "sb.Append(separator);"); // not the first one => append separator before
+                	startOfLine = "sb.Append(separator)" ; // not the first one => append separator before
                 }
-    			lb.append(indentationLevel, "sb.Append(\"" + attribute.getName() + "=\").Append(" + attribute.getName() + ");"); 
+                else {
+                	startOfLine = "sb" ; // first one => no separator before
+                }
+    			lb.append(indentationLevel, startOfLine + ".Append(\"" + attribute.getName() + "=\").Append(" + attribute.getName() + ");"); 
     			// example: sb.Append("firstName=").Append(firstName) 
     			count++ ;
     		}
