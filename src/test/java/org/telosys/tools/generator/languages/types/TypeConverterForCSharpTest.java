@@ -47,7 +47,8 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 		checkPrimitiveType( getType(NeutralType.STRING, UNSIGNED_TYPE ),   "string", "String");
 		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "string", "String");
 		
-		checkObjectType( getType(NeutralType.STRING, OBJECT_TYPE),            "String", "System.String" );
+		checkObjectType( getType(NeutralType.STRING, OBJECT_TYPE),                 "String", "System.String" );
+		checkObjectType( getType(NeutralType.STRING, OBJECT_TYPE + UNSIGNED_TYPE), "String", "System.String" );
 	}
 
 	@Test
@@ -66,12 +67,43 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 	}
 
 	@Test
+	public void testByte() {
+		System.out.println("--- ");
+		checkPrimitiveType( getType( NeutralType.BYTE, NONE ),              "sbyte", "SByte" );
+		checkPrimitiveType( getType( NeutralType.BYTE, UNSIGNED_TYPE ),     "byte",  "Byte"  );
+		
+		checkObjectType( getType( NeutralType.BYTE, OBJECT_TYPE ),                 "SByte", "System.SByte");
+		checkObjectType( getType( NeutralType.BYTE, OBJECT_TYPE + UNSIGNED_TYPE ), "Byte",  "System.Byte");
+	}
+
+	@Test
 	public void testShort() {
 		System.out.println("--- ");
 		checkPrimitiveType( getType( NeutralType.SHORT, NONE ),              "short",  "Int16" );
 		checkPrimitiveType( getType( NeutralType.SHORT, UNSIGNED_TYPE ),     "ushort", "UInt16");
 		
-		checkObjectType( getType( NeutralType.SHORT, OBJECT_TYPE ),          "Int16",  "System.Int16");
+		checkObjectType( getType( NeutralType.SHORT, OBJECT_TYPE ),                 "Int16",  "System.Int16");
+		checkObjectType( getType( NeutralType.SHORT, OBJECT_TYPE + UNSIGNED_TYPE ), "UInt16", "System.UInt16");
+	}
+
+	@Test
+	public void testInteger() {
+		System.out.println("--- ");
+		checkPrimitiveType( getType( NeutralType.INTEGER, NONE ),              "int",  "Int32" );
+		checkPrimitiveType( getType( NeutralType.INTEGER, UNSIGNED_TYPE ),     "uint", "UInt32");
+		
+		checkObjectType( getType( NeutralType.INTEGER, OBJECT_TYPE ),                 "Int32",  "System.Int32" );
+		checkObjectType( getType( NeutralType.INTEGER, OBJECT_TYPE + UNSIGNED_TYPE ), "UInt32", "System.UInt32");
+	}
+
+	@Test
+	public void testLong() {
+		System.out.println("--- ");
+		checkPrimitiveType( getType( NeutralType.LONG, NONE ),              "long",  "Int64" );
+		checkPrimitiveType( getType( NeutralType.LONG, UNSIGNED_TYPE ),     "ulong", "UInt64");
+		
+		checkObjectType( getType( NeutralType.LONG, OBJECT_TYPE ),                 "Int64",  "System.Int64" );
+		checkObjectType( getType( NeutralType.LONG, OBJECT_TYPE + UNSIGNED_TYPE ), "UInt64", "System.UInt64");
 	}
 
 	@Test
@@ -81,7 +113,8 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( NeutralType.DECIMAL, NONE ),              "decimal", "Decimal" );
 		checkPrimitiveType( getType( NeutralType.DECIMAL, UNSIGNED_TYPE ),     "decimal", "Decimal");
 		
-		checkObjectType( getType( NeutralType.DECIMAL, OBJECT_TYPE ),          "Decimal",  "System.Decimal");
+		checkObjectType( getType( NeutralType.DECIMAL, OBJECT_TYPE ),                  "Decimal",  "System.Decimal");
+		checkObjectType( getType( NeutralType.DECIMAL, OBJECT_TYPE  + UNSIGNED_TYPE ), "Decimal",  "System.Decimal");
 	}
 
 	@Test
@@ -112,5 +145,13 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 		checkObjectType( getType( NeutralType.TIMESTAMP, OBJECT_TYPE ),    "DateTime",  "System.DateTime" );
 		checkObjectType( getType( NeutralType.TIMESTAMP, NOT_NULL ),       "DateTime",  "System.DateTime" );
 	}
-
+	
+	@Test
+	public void testBinary() {
+		System.out.println("--- ");
+		checkPrimitiveType( getType( NeutralType.BINARY, NONE ),           "byte[]",  "byte[]" );
+		checkPrimitiveType( getType( NeutralType.BINARY, UNSIGNED_TYPE ),  "byte[]",  "byte[]" );
+		checkPrimitiveType( getType( NeutralType.BINARY, OBJECT_TYPE ),    "byte[]",  "byte[]" );
+		checkPrimitiveType( getType( NeutralType.BINARY, NOT_NULL ),       "byte[]",  "byte[]" );
+	}
 }

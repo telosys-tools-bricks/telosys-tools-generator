@@ -15,6 +15,7 @@
  */
 package org.telosys.tools.generator.languages.types;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,6 +35,9 @@ import org.telosys.tools.generic.model.types.NeutralType;
  */
 public class TypeConverterForCSharp extends TypeConverter {
 
+	private final HashMap<String, LanguageType> unsignedTypes = new HashMap<>(); 
+
+	
 	public TypeConverterForCSharp() {
 		super("C#");
 		
@@ -69,10 +73,16 @@ public class TypeConverterForCSharp extends TypeConverter {
 		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY, "byte[]", "byte[]" )  ); // No Wrapper type for binary / byte[] ?
 		
 		//--- Unsigned primitive types : 
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.BYTE,    "byte",   "Byte"   ) );
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.SHORT,   "ushort", "UInt16" ) );
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.INTEGER, "uint",   "UInt32" ) );
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.LONG,    "ulong",  "UInt64" ) );
+		unsignedTypes.put( "sbyte", buildPrimitiveType(NeutralType.BYTE,    "byte",   "Byte"   ) );
+		unsignedTypes.put( "short", buildPrimitiveType(NeutralType.SHORT,   "ushort", "UInt16" ) );
+		unsignedTypes.put( "int",   buildPrimitiveType(NeutralType.INTEGER, "uint",   "UInt32" ) );
+		unsignedTypes.put( "long",  buildPrimitiveType(NeutralType.LONG,    "ulong",  "UInt64" ) );
+
+		//--- Unsigned object types : 
+		unsignedTypes.put( "SByte", buildObjectType(NeutralType.BYTE,    "Byte",    "System.Byte"   ) );
+		unsignedTypes.put( "Int16", buildObjectType(NeutralType.SHORT,   "UInt16",  "System.UInt16" ) );
+		unsignedTypes.put( "Int32", buildObjectType(NeutralType.INTEGER, "UInt32",  "System.UInt32" ) );
+		unsignedTypes.put( "Int64", buildObjectType(NeutralType.LONG,    "UInt64",  "System.UInt64" ) );
 	}
 
 	private LanguageType buildPrimitiveType(String neutralType, String primitiveType, String wrapperType) {
@@ -95,47 +105,64 @@ public class TypeConverterForCSharp extends TypeConverter {
 	}
 
 	@Override
-	public LanguageType getType(AttributeTypeInfo attributeTypeInfo) {
+	public LanguageType getType(AttributeTypeInfo attributeTypeInfo) {		
+		// Get the standard type 
+		LanguageType languageType = getStandardType(attributeTypeInfo);
 		
-		log("type info : " + attributeTypeInfo );
-		
-		log("STEP 1" );
-		//--- 1) Process explicit requirements first (if any)
 		// An object type is explicitly required ( @ObjectType )
 		if ( attributeTypeInfo.isObjectTypeExpected() ) {
-			LanguageType lt = getObjectType(attributeTypeInfo.getNeutralType() ) ;
-			if ( lt != null ) {
-				// FOUND
-				log("1) object type found" );
-				return lt ;
-			}
+			languageType = getObjectType(languageType );
 		}
-		log("1) object type not found" );
-
+		
 		// An unsigned type is explicitly required ( @UnsignedType )
 		if ( attributeTypeInfo.isUnsignedTypeExpected() ) {
-			LanguageType lt = getPrimitiveType(attributeTypeInfo.getNeutralType(), true ) ;
-			if ( lt != null ) {
-				// FOUND
-				log("1) primitive type found" );
-				return lt ;
-			}
+			languageType = getUnsignedType(languageType);
 		}
-		log("1) primitive type not found" );
-
-		log("STEP 2 " );
-		//--- 2) Process standard type conversion
-		// return the standard "pseudo primitive type" : string, short, int, bool, float, ...
+		return languageType;
+	}
+	
+	public LanguageType getStandardType(AttributeTypeInfo attributeTypeInfo) {
+		// Try to get primitive type 
 		LanguageType lt = getPrimitiveType(attributeTypeInfo.getNeutralType(), false ) ;
 		if ( lt != null ) {
 			return lt;
 		}
+		// Try to get object type 
 		lt = getObjectType(attributeTypeInfo.getNeutralType() ) ;
 		if ( lt != null ) {
 			return lt;
 		}
-		// Still not found !!!
+		// Still not found => ERROR !!!
 		throw new TelosysTypeNotFoundException(getLanguageName(), attributeTypeInfo);
+	}
+
+	/**
+	 * Try to get an object type for the given current type (return same current type if no object type)
+	 * @param currentType
+	 * @return
+	 */
+	public LanguageType getObjectType(LanguageType currentType ) {
+		LanguageType objectType = getObjectType(currentType.getNeutralType() ) ;
+		if ( objectType != null ) {
+			return objectType ; // FOUND
+		}
+		else {
+			return currentType; // Not found : keep current type
+		}
+	}
+	/**
+	 * Try to get an unsigned type for the given current type (return same current type if no object type)
+	 * @param currentType
+	 * @return
+	 */
+	public LanguageType getUnsignedType(LanguageType currentType ) {
+		LanguageType unsignedType = unsignedTypes.get( currentType.getSimpleType() );
+		if ( unsignedType != null ) {
+			return unsignedType ; // FOUND
+		}
+		else {
+			return currentType; // Not found : keep current type
+		}
 	}
 	
 	//--------------------------------------------------------------------------------------------
