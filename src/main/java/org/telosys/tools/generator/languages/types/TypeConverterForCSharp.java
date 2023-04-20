@@ -118,10 +118,18 @@ public class TypeConverterForCSharp extends TypeConverter {
 		if ( attributeTypeInfo.isUnsignedTypeExpected() ) {
 			languageType = getUnsignedType(languageType);
 		}
+
+		// If attribute is nullable => nullable type with '?' at the end
+		if ( ! attributeTypeInfo.isNotNull() ) {
+			// Nullable 
+			languageType = getNullableType(languageType);
+		}
+
+		// Return resulting type
 		return languageType;
 	}
 	
-	public LanguageType getStandardType(AttributeTypeInfo attributeTypeInfo) {
+	private LanguageType getStandardType(AttributeTypeInfo attributeTypeInfo) {
 		// Try to get primitive type 
 		LanguageType lt = getPrimitiveType(attributeTypeInfo.getNeutralType(), false ) ;
 		if ( lt != null ) {
@@ -141,7 +149,7 @@ public class TypeConverterForCSharp extends TypeConverter {
 	 * @param currentType
 	 * @return
 	 */
-	public LanguageType getObjectType(LanguageType currentType ) {
+	private LanguageType getObjectType(LanguageType currentType ) {
 		LanguageType objectType = getObjectType(currentType.getNeutralType() ) ;
 		if ( objectType != null ) {
 			return objectType ; // FOUND
@@ -155,7 +163,7 @@ public class TypeConverterForCSharp extends TypeConverter {
 	 * @param currentType
 	 * @return
 	 */
-	public LanguageType getUnsignedType(LanguageType currentType ) {
+	private LanguageType getUnsignedType(LanguageType currentType ) {
 		LanguageType unsignedType = unsignedTypes.get( currentType.getSimpleType() );
 		if ( unsignedType != null ) {
 			return unsignedType ; // FOUND
@@ -163,6 +171,16 @@ public class TypeConverterForCSharp extends TypeConverter {
 		else {
 			return currentType; // Not found : keep current type
 		}
+	}
+	
+	private static final String NULLABLE_MARK = "?";
+	private LanguageType getNullableType(LanguageType currentType ) {
+		return new LanguageType(
+				currentType.getNeutralType(),
+				currentType.getSimpleType() + NULLABLE_MARK,
+				currentType.getFullType() + NULLABLE_MARK,
+				currentType.isPrimitiveType(),
+				currentType.getWrapperType() + NULLABLE_MARK);
 	}
 	
 	//--------------------------------------------------------------------------------------------

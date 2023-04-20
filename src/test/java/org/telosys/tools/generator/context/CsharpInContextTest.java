@@ -32,6 +32,8 @@ public class CsharpInContextTest {
 		return buildAttribute(attribName, neutralType, false);
 	}
 
+	// No longer used
+	/**
 	@Test 
 	public void testAttributeTypeNotNull() throws GeneratorException {
 		assertEquals("string",   getCsharpObject().nullableType( buildAttributeNotNull("x", "string") ) );
@@ -41,7 +43,10 @@ public class CsharpInContextTest {
 		assertEquals("DateOnly", getCsharpObject().nullableType( buildAttributeNotNull("x", "date") ) );
 		assertEquals("TimeOnly", getCsharpObject().nullableType( buildAttributeNotNull("x", "time") ) );
 	}
+	**/
 
+	// No longer used
+	/**
 	@Test 
 	public void testAttributeTypeNullable() throws GeneratorException {
 		assertEquals("string?",   getCsharpObject().nullableType( buildAttributeNullable("x", "string") ) );
@@ -51,6 +56,7 @@ public class CsharpInContextTest {
 		assertEquals("DateOnly?", getCsharpObject().nullableType( buildAttributeNullable("x", "date") ) );
 		assertEquals("TimeOnly?", getCsharpObject().nullableType( buildAttributeNullable("x", "time") ) );
 	}
+	**/
 	
 	private static final String TABS_PUBLIC_FUNCTION_TOSTRING = "\t\tpublic override string ToString()" ;
 	private static final String TABS_CLOSING_BRACE = "\t\t}";

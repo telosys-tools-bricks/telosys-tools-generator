@@ -67,9 +67,10 @@ public class TargetLanguageForCSharp extends TargetLanguage {
 			// example : "name string, age int"
 			if ( n > 0 ) sb.append(", ");
 			sb.append( attribute.getType() ) ; // arg type FIRST 
-			if ( ! attribute.isNotNull() ) {
-				sb.append( "?" ) ;  // nullable => add '?' at the end of the type, eg "int?"
-			}
+// moved in attribute.getType()
+//			if ( ! attribute.isNotNull() ) {
+//				sb.append( "?" ) ;  // nullable => add '?' at the end of the type, eg "int?"
+//			}
 			sb.append( " " ) ;
 			sb.append( attribute.getName() ) ; // arg name AFTER
 			n++;
@@ -85,9 +86,10 @@ public class TargetLanguageForCSharp extends TargetLanguage {
 		for ( AttributeInContext attribute : attributes ) {
 			if ( n > 0 ) sb.append(", ");
 			sb.append( attribute.getWrapperType() ) ; //  arg type first : WRAPPER type 
-			if ( ! attribute.isNotNull() ) {
-				sb.append( "?" ) ;  // nullable => add '?' at the end of the type, eg "String?"
-			}
+// moved in attribute.getType()
+//			if ( ! attribute.isNotNull() ) {
+//				sb.append( "?" ) ;  // nullable => add '?' at the end of the type, eg "String?"
+//			}
 			sb.append( " " ) ;
 			sb.append( attribute.getName() ) ; // arg name after
 			n++;
