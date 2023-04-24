@@ -16,23 +16,12 @@ import static org.junit.Assert.assertTrue;
 
 public class TypeConverterForGoTest extends AbstractTypeTest {
 
+	//---------------------------------------------------------------
 	@Override
-	protected TypeConverter getTypeConverter() {
-		return new TypeConverterForGo() ;
+	protected String getLanguageName() {
+		return "Go" ;
 	}
-	
-//	private LanguageType getType(String neutralType, int typeInfo ) {
-//		AttributeTypeInfo attributeTypeInfo = new AttributeTypeInfo(neutralType, typeInfo);
-//		System.out.println("AttributeTypeInfo : " + attributeTypeInfo);
-//		return getType(attributeTypeInfo);
-//	}
-//
-//	private LanguageType getType(AttributeTypeInfo typeInfo ) {
-//		System.out.println( typeInfo + " --> " + typeInfo );
-//		LanguageType lt = getTypeConverter().getType(typeInfo);
-//		return lt ;
-//	}
-//	
+	//---------------------------------------------------------------
 	
 	private void checkPrimitiveType( LanguageType lt, String primitiveType, String wrapperType) {
 		assertNotNull(lt);
@@ -59,8 +48,6 @@ public class TypeConverterForGoTest extends AbstractTypeTest {
 		checkPrimitiveType( getType(NeutralType.STRING, UNSIGNED_TYPE ),   "string", "string");
 		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "string", "string");
 		checkPrimitiveType( getType(NeutralType.STRING, OBJECT_TYPE),            "string", "string" );
-//		checkPrimitiveType( getType(NeutralType.STRING, SQL_TYPE),               "string", "string" );
-//		checkPrimitiveType( getType(NeutralType.STRING, OBJECT_TYPE + SQL_TYPE), "string", "string" );
 	}
 
 	@Test
@@ -72,10 +59,7 @@ public class TypeConverterForGoTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( NeutralType.BOOLEAN, UNSIGNED_TYPE ),          "bool", "bool" );
 		checkPrimitiveType( getType( NeutralType.BOOLEAN, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "bool", "bool");
 		checkPrimitiveType( getType( NeutralType.BOOLEAN, OBJECT_TYPE),             "bool", "bool" );
-//		checkPrimitiveType( getType( NeutralType.BOOLEAN, SQL_TYPE),                "bool", "bool" );
-//		checkPrimitiveType( getType( NeutralType.BOOLEAN, OBJECT_TYPE + SQL_TYPE),  "bool", "bool" );
 		checkPrimitiveType( getType( NeutralType.BOOLEAN, NOT_NULL + OBJECT_TYPE),  "bool", "bool" );
-//		checkPrimitiveType( getType( NeutralType.BOOLEAN, NOT_NULL + SQL_TYPE),     "bool", "bool" );
 	}
 
 	@Test
@@ -85,10 +69,7 @@ public class TypeConverterForGoTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( NeutralType.BYTE, NOT_NULL ),              "byte", "byte" );
 		checkPrimitiveType( getType( NeutralType.BYTE, PRIMITIVE_TYPE ),        "byte", "byte" );
 		checkPrimitiveType( getType( NeutralType.BYTE, OBJECT_TYPE),            "byte", "byte" );
-//		checkPrimitiveType( getType( NeutralType.BYTE, SQL_TYPE),               "byte", "byte" );
-//		checkPrimitiveType( getType( NeutralType.BYTE, OBJECT_TYPE + SQL_TYPE), "byte", "byte" );
 		checkPrimitiveType( getType( NeutralType.BYTE, NOT_NULL + OBJECT_TYPE), "byte", "byte" );
-//		checkPrimitiveType( getType( NeutralType.BYTE, NOT_NULL + SQL_TYPE),    "byte", "byte" );
 		// UNSIGNED 
 		checkPrimitiveType( getType( NeutralType.BYTE, UNSIGNED_TYPE ),                  "uint8", "uint8");
 		checkPrimitiveType( getType( NeutralType.BYTE, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "uint8", "uint8");
@@ -102,10 +83,7 @@ public class TypeConverterForGoTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( NeutralType.SHORT, NOT_NULL ),              "int16", "int16" );
 		checkPrimitiveType( getType( NeutralType.SHORT, PRIMITIVE_TYPE ),        "int16", "int16" );
 		checkPrimitiveType( getType( NeutralType.SHORT, OBJECT_TYPE),            "int16", "int16" );
-//		checkPrimitiveType( getType( NeutralType.SHORT, SQL_TYPE),               "int16", "int16" );
-//		checkPrimitiveType( getType( NeutralType.SHORT, OBJECT_TYPE + SQL_TYPE), "int16", "int16" );
 		checkPrimitiveType( getType( NeutralType.SHORT, NOT_NULL + OBJECT_TYPE), "int16", "int16" );
-//		checkPrimitiveType( getType( NeutralType.SHORT, NOT_NULL + SQL_TYPE),    "int16", "int16" );
 		// UNSIGNED 
 		checkPrimitiveType( getType( NeutralType.SHORT, UNSIGNED_TYPE ),                  "uint16", "uint16");
 		checkPrimitiveType( getType( NeutralType.SHORT, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "uint16", "uint16");
@@ -119,10 +97,7 @@ public class TypeConverterForGoTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( NeutralType.INTEGER, NOT_NULL ),              "int32", "int32" );
 		checkPrimitiveType( getType( NeutralType.INTEGER, PRIMITIVE_TYPE ),        "int32", "int32" );
 		checkPrimitiveType( getType( NeutralType.INTEGER, OBJECT_TYPE),            "int32", "int32" );
-//		checkPrimitiveType( getType( NeutralType.INTEGER, SQL_TYPE),               "int32", "int32" );
-//		checkPrimitiveType( getType( NeutralType.INTEGER, OBJECT_TYPE + SQL_TYPE), "int32", "int32" );
 		checkPrimitiveType( getType( NeutralType.INTEGER, NOT_NULL + OBJECT_TYPE), "int32", "int32" );
-//		checkPrimitiveType( getType( NeutralType.INTEGER, NOT_NULL + SQL_TYPE),    "int32", "int32" );
 		// UNSIGNED 
 		checkPrimitiveType( getType( NeutralType.INTEGER, UNSIGNED_TYPE ),                  "uint32", "uint32");
 		checkPrimitiveType( getType( NeutralType.INTEGER, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "uint32", "uint32");
@@ -136,10 +111,7 @@ public class TypeConverterForGoTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( NeutralType.LONG, NOT_NULL ),              "int64", "int64");
 		checkPrimitiveType( getType( NeutralType.LONG, PRIMITIVE_TYPE ),        "int64", "int64");
 		checkPrimitiveType( getType( NeutralType.LONG, OBJECT_TYPE),            "int64", "int64" );
-//		checkPrimitiveType( getType( NeutralType.LONG, SQL_TYPE),               "int64", "int64" );
-//		checkPrimitiveType( getType( NeutralType.LONG, OBJECT_TYPE + SQL_TYPE), "int64", "int64" );
 		checkPrimitiveType( getType( NeutralType.LONG, NOT_NULL + OBJECT_TYPE), "int64", "int64" );
-//		checkPrimitiveType( getType( NeutralType.LONG, NOT_NULL + SQL_TYPE),    "int64", "int64" );
 		// UNSIGNED 
 		checkPrimitiveType( getType( NeutralType.LONG, UNSIGNED_TYPE ),                  "uint64", "uint64");
 		checkPrimitiveType( getType( NeutralType.LONG, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "uint64", "uint64");
@@ -153,10 +125,7 @@ public class TypeConverterForGoTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( NeutralType.FLOAT, NOT_NULL ),              "float32", "float32");
 		checkPrimitiveType( getType( NeutralType.FLOAT, PRIMITIVE_TYPE ),        "float32", "float32");
 		checkPrimitiveType( getType( NeutralType.FLOAT, OBJECT_TYPE),            "float32", "float32" );
-//		checkPrimitiveType( getType( NeutralType.FLOAT, SQL_TYPE),               "float32", "float32" );
-//		checkPrimitiveType( getType( NeutralType.FLOAT, OBJECT_TYPE + SQL_TYPE), "float32", "float32" );
 		checkPrimitiveType( getType( NeutralType.FLOAT, NOT_NULL + OBJECT_TYPE), "float32", "float32" );
-//		checkPrimitiveType( getType( NeutralType.FLOAT, NOT_NULL + SQL_TYPE),    "float32", "float32" );
 		// UNSIGNED : no difference 
 		checkPrimitiveType( getType( NeutralType.FLOAT, UNSIGNED_TYPE ),                  "float32", "float32");
 		checkPrimitiveType( getType( NeutralType.FLOAT, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "float32", "float32");
@@ -170,10 +139,7 @@ public class TypeConverterForGoTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( NeutralType.DOUBLE, NOT_NULL ),              "float64", "float64");
 		checkPrimitiveType( getType( NeutralType.DOUBLE, PRIMITIVE_TYPE ),        "float64", "float64");
 		checkPrimitiveType( getType( NeutralType.DOUBLE, OBJECT_TYPE),            "float64", "float64" );
-//		checkPrimitiveType( getType( NeutralType.DOUBLE, SQL_TYPE),               "float64", "float64" );
-//		checkPrimitiveType( getType( NeutralType.DOUBLE, OBJECT_TYPE + SQL_TYPE), "float64", "float64" );
 		checkPrimitiveType( getType( NeutralType.DOUBLE, NOT_NULL + OBJECT_TYPE), "float64", "float64" );
-//		checkPrimitiveType( getType( NeutralType.DOUBLE, NOT_NULL + SQL_TYPE),    "float64", "float64" );
 		// UNSIGNED  : no difference 
 		checkPrimitiveType( getType( NeutralType.DOUBLE, UNSIGNED_TYPE ),                  "float64", "float64");
 		checkPrimitiveType( getType( NeutralType.DOUBLE, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "float64", "float64");
@@ -187,10 +153,7 @@ public class TypeConverterForGoTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( NeutralType.DECIMAL, NOT_NULL ),              "float64", "float64");
 		checkPrimitiveType( getType( NeutralType.DECIMAL, PRIMITIVE_TYPE ),        "float64", "float64");
 		checkPrimitiveType( getType( NeutralType.DECIMAL, OBJECT_TYPE),            "float64", "float64" );
-//		checkPrimitiveType( getType( NeutralType.DECIMAL, SQL_TYPE),               "float64", "float64" );
-//		checkPrimitiveType( getType( NeutralType.DECIMAL, OBJECT_TYPE + SQL_TYPE), "float64", "float64" );
 		checkPrimitiveType( getType( NeutralType.DECIMAL, NOT_NULL + OBJECT_TYPE), "float64", "float64" );
-//		checkPrimitiveType( getType( NeutralType.DECIMAL, NOT_NULL + SQL_TYPE),    "float64", "float64" );
 		// UNSIGNED  : no difference 
 		checkPrimitiveType( getType( NeutralType.DECIMAL, UNSIGNED_TYPE ),                  "float64", "float64");
 		checkPrimitiveType( getType( NeutralType.DECIMAL, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "float64", "float64");
@@ -204,10 +167,7 @@ public class TypeConverterForGoTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( NeutralType.BINARY, NOT_NULL ),              "[]byte", "[]byte");
 		checkPrimitiveType( getType( NeutralType.BINARY, PRIMITIVE_TYPE ),        "[]byte", "[]byte");
 		checkPrimitiveType( getType( NeutralType.BINARY, OBJECT_TYPE),            "[]byte", "[]byte" );
-//		checkPrimitiveType( getType( NeutralType.BINARY, SQL_TYPE),               "[]byte", "[]byte" );
-//		checkPrimitiveType( getType( NeutralType.BINARY, OBJECT_TYPE + SQL_TYPE), "[]byte", "[]byte" );
 		checkPrimitiveType( getType( NeutralType.BINARY, NOT_NULL + OBJECT_TYPE), "[]byte", "[]byte" );
-//		checkPrimitiveType( getType( NeutralType.BINARY, NOT_NULL + SQL_TYPE),    "[]byte", "[]byte" );
 		// UNSIGNED  : no difference 
 		checkPrimitiveType( getType( NeutralType.BINARY, UNSIGNED_TYPE ),                  "[]byte", "[]byte");
 		checkPrimitiveType( getType( NeutralType.BINARY, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "[]byte", "[]byte");
@@ -221,10 +181,7 @@ public class TypeConverterForGoTest extends AbstractTypeTest {
 		checkObjectType( getType( NeutralType.DATE, NOT_NULL ),                       "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.DATE, PRIMITIVE_TYPE ),                 "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.DATE, OBJECT_TYPE),                     "time.Time", "time.Time" );
-//		checkObjectType( getType( NeutralType.DATE, SQL_TYPE),                        "time.Time", "time.Time" );
-//		checkObjectType( getType( NeutralType.DATE, OBJECT_TYPE + SQL_TYPE),          "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.DATE, NOT_NULL + OBJECT_TYPE),          "time.Time", "time.Time" );
-//		checkObjectType( getType( NeutralType.DATE, NOT_NULL + SQL_TYPE),             "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.DATE, UNSIGNED_TYPE ),                  "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.DATE, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.DATE, OBJECT_TYPE + UNSIGNED_TYPE ),    "time.Time", "time.Time" );
@@ -237,10 +194,7 @@ public class TypeConverterForGoTest extends AbstractTypeTest {
 		checkObjectType( getType( NeutralType.TIME, NOT_NULL ),                       "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.TIME, PRIMITIVE_TYPE ),                 "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.TIME, OBJECT_TYPE),                     "time.Time", "time.Time" );
-//		checkObjectType( getType( NeutralType.TIME, SQL_TYPE),                        "time.Time", "time.Time" );
-//		checkObjectType( getType( NeutralType.TIME, OBJECT_TYPE + SQL_TYPE),          "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.TIME, NOT_NULL + OBJECT_TYPE),          "time.Time", "time.Time" );
-//		checkObjectType( getType( NeutralType.TIME, NOT_NULL + SQL_TYPE),             "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.TIME, UNSIGNED_TYPE ),                  "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.TIME, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.TIME, OBJECT_TYPE + UNSIGNED_TYPE ),    "time.Time", "time.Time" );
@@ -253,10 +207,7 @@ public class TypeConverterForGoTest extends AbstractTypeTest {
 		checkObjectType( getType( NeutralType.TIMESTAMP, NOT_NULL ),                       "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.TIMESTAMP, PRIMITIVE_TYPE ),                 "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.TIMESTAMP, OBJECT_TYPE),                     "time.Time", "time.Time" );
-//		checkObjectType( getType( NeutralType.TIMESTAMP, SQL_TYPE),                        "time.Time", "time.Time" );
-//		checkObjectType( getType( NeutralType.TIMESTAMP, OBJECT_TYPE + SQL_TYPE),          "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.TIMESTAMP, NOT_NULL + OBJECT_TYPE),          "time.Time", "time.Time" );
-//		checkObjectType( getType( NeutralType.TIMESTAMP, NOT_NULL + SQL_TYPE),             "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.TIMESTAMP, UNSIGNED_TYPE ),                  "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.TIMESTAMP, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "time.Time", "time.Time" );
 		checkObjectType( getType( NeutralType.TIMESTAMP, OBJECT_TYPE + UNSIGNED_TYPE ),    "time.Time", "time.Time" );

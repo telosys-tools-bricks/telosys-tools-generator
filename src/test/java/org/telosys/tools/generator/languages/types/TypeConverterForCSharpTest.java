@@ -16,15 +16,13 @@ import static org.junit.Assert.assertTrue;
 
 public class TypeConverterForCSharpTest extends AbstractTypeTest {
 
+	//---------------------------------------------------------------
 	@Override
-	protected TypeConverter getTypeConverter() {
-		return new TypeConverterForCSharp() ;
+	protected String getLanguageName() {
+		return "C#" ;
 	}
+	//---------------------------------------------------------------
 	
-	private void println(String s) {
-		System.out.println(s);
-	}
-
 	private void checkPrimitiveType( LanguageType lt, String primitiveType, String wrapperType) {
 		assertNotNull(lt);
 		assertTrue ( lt.isPrimitiveType() ) ;
@@ -68,7 +66,6 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 		
 		checkObjectType( getType( NeutralType.BOOLEAN, OBJECT_TYPE),            "Boolean?", "System.Boolean?" );
 		checkObjectType( getType( NeutralType.BOOLEAN, NOT_NULL + OBJECT_TYPE), "Boolean", "System.Boolean" );
-
 	}
 
 	@Test

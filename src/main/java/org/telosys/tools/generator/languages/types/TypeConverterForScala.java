@@ -103,11 +103,11 @@ public class TypeConverterForScala extends TypeConverter {
 	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "List" ;
 	private static final String STANDARD_COLLECTION_FULL_TYPE   = "scala.List" ;
 	
-	@Override
-	public void setSpecificCollectionType(String specificCollectionType) {
-		this.setSpecificCollectionFullType(specificCollectionType) ;
-		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
-	}
+//	@Override
+//	public void setSpecificCollectionType(String specificCollectionType) {
+//		this.setSpecificCollectionFullType(specificCollectionType) ;
+//		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
+//	}
 
 	@Override
 	public String getCollectionType(String elementType) {

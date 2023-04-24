@@ -2,8 +2,6 @@ package org.telosys.tools.generator.languages.literals;
 
 import org.junit.Test;
 import org.telosys.tools.generator.languages.types.LanguageType;
-import org.telosys.tools.generator.languages.types.TypeConverter;
-import org.telosys.tools.generator.languages.types.TypeConverterForGo;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
@@ -11,12 +9,10 @@ import static org.junit.Assert.assertEquals;
 public class LiteralValuesProviderForGoTest extends AbstractLiteralsTest {
 	
 	//----------------------------------------------------------------------------------
-	protected TypeConverter getTypeConverter() {
-		return new TypeConverterForGo() ;
-	}
-	protected LiteralValuesProvider getLiteralValuesProvider() {
-		return new LiteralValuesProviderForGo() ;
-	}
+	@Override
+	protected String getLanguageName() {
+		return "Go" ;
+	}	
 	//----------------------------------------------------------------------------------
 
 	@Test

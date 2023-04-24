@@ -17,8 +17,8 @@ package org.telosys.tools.generator.languages;
 
 import java.util.HashMap;
 
-import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
-import org.telosys.tools.generator.languages.types.TypeConverter;
+import org.telosys.tools.commons.exception.TelosysRuntimeException;
+import org.telosys.tools.generator.context.EnvInContext;
 
 /**
  *  
@@ -53,7 +53,7 @@ public final class TargetLanguageProvider {
 	 * @param languageName
 	 * @return
 	 */
-	private static String languageKey(String languageName) {
+	private static String getLanguageKey(String languageName) {
 		return languageName.toUpperCase().trim();
 	}
 
@@ -63,45 +63,81 @@ public final class TargetLanguageProvider {
 	 * @return
 	 */
 	public static boolean isDefinedLanguage(String languageName) {
-		return languages.get(languageKey(languageName)) != null ;
+		return languages.get(getLanguageKey(languageName)) != null ;
 	}
 	
 	/**
-	 * Returns the TargetLanguage for the given language name 
+	 * Returns the TargetLanguage for the language define in the given environment 
 	 * Java TargetLanguage is the default language if the given name is unknown 
 	 * @param languageName
 	 * @return
 	 */
-	public static TargetLanguage getTargetLanguage(String languageName) {
-		if (languageName != null) {
-			TargetLanguage targetLanguage = languages.get( languageKey(languageName) );
-			if ( targetLanguage == null ) {
-				// by default use JAVA
-				targetLanguage = languages.get( "JAVA" );
-			}
-			return targetLanguage ;
+	public static TargetLanguage getTargetLanguage(EnvInContext env) {
+		if (env != null) {
+			TargetLanguage targetLanguage = getTargetLanguage(env.getLanguage()) ;
+			targetLanguage.setEnv(env); // Inject current "env" 
+			return targetLanguage;
 		}
 		else {
-			throw new IllegalArgumentException("getTargetLanguage(..) : language name is null") ;
+			throw new TelosysRuntimeException("Cannot get target language : env is null") ;
 		}
 	}
 
 	/**
-	 * Returns the TypeConverter for the given language name (Java by default)
+	 * Returns the TargetLanguage for the given language name 
+	 * Java is the default language if the given name is null or void
 	 * @param languageName
-	 * @return
+	 * @return the target language (never null, exception if unknown language)
 	 */
-	public static TypeConverter getTypeConverter(String languageName) {
-		return getTargetLanguage(languageName).getTypeConverter();
+	private static TargetLanguage getTargetLanguage(String languageName) {
+		if (languageName != null) {
+			String languageKey = getLanguageKey(languageName);
+			if ( languageKey.length() > 0 ) {
+				TargetLanguage targetLanguage = languages.get( languageKey );
+				if ( targetLanguage != null ) {
+					// Target language found 
+					return targetLanguage ;
+				}
+				else {
+					throw new TelosysRuntimeException("Unknown target language : '" + languageKey + "'") ;
+				}
+			}
+			else {
+				// Language is blanc or void 
+				return getDefaultTargetLanguage();
+			}
+		}
+		else {
+			// Language is null 
+			return getDefaultTargetLanguage();
+		}
 	}
 	
-	/**
-	 * Returns the LiteralValuesProvider for the given language name (Java by default)
-	 * @param languageName
-	 * @return
-	 */
-	public static LiteralValuesProvider getLiteralValuesProvider(String languageName) {
-		return getTargetLanguage(languageName).getLiteralValuesProvider();
+	private static TargetLanguage getDefaultTargetLanguage() {
+		TargetLanguage targetLanguage = languages.get( "JAVA" );
+		if ( targetLanguage != null ) {
+			return targetLanguage;
+		}
+		else {
+			throw new TelosysRuntimeException("Cannot get default target language (JAVA)") ;
+		}
 	}
+//	/**
+//	 * Returns the TypeConverter for the given language name (Java by default)
+//	 * @param languageName
+//	 * @return
+//	 */
+//	public static TypeConverter getTypeConverter(String languageName) {
+//		return getTargetLanguage(languageName).getTypeConverter();
+//	}
+//	
+//	/**
+//	 * Returns the LiteralValuesProvider for the given language name (Java by default)
+//	 * @param languageName
+//	 * @return
+//	 */
+//	public static LiteralValuesProvider getLiteralValuesProvider(String languageName) {
+//		return getTargetLanguage(languageName).getLiteralValuesProvider();
+//	}
 
 }

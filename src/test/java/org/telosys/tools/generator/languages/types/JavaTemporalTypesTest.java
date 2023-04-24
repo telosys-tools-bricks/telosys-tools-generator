@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Tests with Java 8+ temporal types 
- * see : https://www.baeldung.com/hibernate-date-time 
  *
  */
 public class JavaTemporalTypesTest  {

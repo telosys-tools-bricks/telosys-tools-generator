@@ -18,8 +18,10 @@ package org.telosys.tools.generator.languages;
 import java.util.List;
 
 import org.telosys.tools.generator.context.AttributeInContext;
+import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.types.TypeConverter;
+import org.telosys.tools.generator.languages.types.TypeConverterForCPlusPlus;
 
 /**
  *  
@@ -28,25 +30,54 @@ import org.telosys.tools.generator.languages.types.TypeConverter;
  */
 public abstract class TargetLanguage {
 	
+	private final TypeConverter         typeConverter;
+	private final LiteralValuesProvider literalValuesProvider ;
+
+	private EnvInContext env;
 	
 	/**
 	 * Constructor
 	 */
-	protected TargetLanguage() {
+	protected TargetLanguage(TypeConverter typeConverter, LiteralValuesProvider literalValuesProvider) {
 		super();
+		this.typeConverter = typeConverter;
+		this.literalValuesProvider = literalValuesProvider;
 	}
 
+	/**
+	 * Setter to inject current '$env'
+	 * @param env
+	 */
+	protected void setEnv(EnvInContext env) {
+		this.env = env;
+		this.typeConverter.setEnv(env);
+	}
+	/**
+	 * Returns the current '$env'
+	 * @return
+	 */
+	protected EnvInContext getEnv() {
+		return this.env;
+	}
+	
 	/**
 	 * Returns the TypeConverter 
 	 * @return
 	 */
-	public abstract TypeConverter getTypeConverter();
+//	public abstract TypeConverter getTypeConverter();
+	public final TypeConverter getTypeConverter() {
+		return typeConverter;
+	}
 
 	/**
 	 * Returns the LiteralValuesProvider 
 	 * @return
 	 */
-	public abstract LiteralValuesProvider getLiteralValuesProvider();
+//	public abstract LiteralValuesProvider getLiteralValuesProvider();
+	public final LiteralValuesProvider getLiteralValuesProvider() {
+		return literalValuesProvider;
+	}
+	
 	
 	/**
 	 * Build simple arguments list (only argument names, no type) <br>

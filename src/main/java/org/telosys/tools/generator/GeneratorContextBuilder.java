@@ -56,7 +56,7 @@ public class GeneratorContextBuilder {
 
 	private final TelosysToolsCfg     telosysToolsCfg ;
 	private final TelosysToolsLogger  logger ;
-	private final GeneratorContext    generatorContext ;
+//	private final GeneratorContext    generatorContext ;
 	
 	private Model                     model = null ;
 	private ModelInContext            modelInContext = null ;
@@ -80,26 +80,36 @@ public class GeneratorContextBuilder {
 		}
 		this.telosysToolsCfg = telosysToolsCfg;
 
-		generatorContext = new GeneratorContext(); 		
+//		generatorContext = new GeneratorContext(); 		
 	}
 	
-	public GeneratorContext getGeneratorContext() {
-		return generatorContext ;		
+//	public GeneratorContext getGeneratorContext() {
+//		return generatorContext ;		
+//	}
+
+	private void initProjectVariables(GeneratorContext generatorContext) {
+		//--- Get all the project variables and put them in the context	
+		Variable[] projectVariables = telosysToolsCfg.getAllVariables();
+		log("initProjectVariables() : Project variables count = " + ( projectVariables != null ? projectVariables.length : 0 ) );
+		//--- Set the project variables in the context ( if any )
+		if ( projectVariables != null ) {
+			for ( int i = 0 ; i < projectVariables.length ; i++ ) {
+				Variable var = projectVariables[i];
+				generatorContext.put( var.getName(), var.getValue() );
+			}
+		}
 	}
 
 	/**
-	 * Initializes a "basic generator context" with the given model <br>
-	 * without embedded generator, targets and selected entities <br>
+	 * Initializes the context with basic objects
+	 * @param generatorContext
 	 * @param model
 	 * @param bundleName
 	 * @return
 	 */
-	public GeneratorContext initBasicContext( Model model, String bundleName ) { // databasesConfigurations removed in V 3.0.0 #LGU
+	private void initBasicObjects(GeneratorContext generatorContext, Model model, String bundleName ) {
 		
-		log("GeneratorContextBuilder : initContext() ...");
-
-		// Since v 3.0 _velocityContext has been replaced by _generatorContext
-		//--- Special Characters  [LGU 2012-11-29 ]
+		//--- Special Characters
 		generatorContext.put(ContextName.DOLLAR , "$"  );
 		generatorContext.put(ContextName.SHARP,   "#"  );
 		generatorContext.put(ContextName.AMP,     "&"  ); // ampersand 
@@ -112,16 +122,16 @@ public class GeneratorContextBuilder {
 		generatorContext.put(ContextName.NEWLINE, "\n"  ); // #LGU 2017-08-16
 		generatorContext.put(ContextName.TAB,     "\t"  ); // #LGU 2017-08-16
 		
-		//--- Get all the project variables and put them in the context	
-		Variable[] projectVariables = telosysToolsCfg.getAllVariables(); // v 3.0.0
-		log("initContext() : Project variables count = " + ( projectVariables != null ? projectVariables.length : 0 ) );
-		//--- Set the project variables in the context ( if any )
-		if ( projectVariables != null ) {
-			for ( int i = 0 ; i < projectVariables.length ; i++ ) {
-				Variable var = projectVariables[i];
-				generatorContext.put( var.getName(), var.getValue() );
-			}
-		}
+//		//--- Get all the project variables and put them in the context	
+//		Variable[] projectVariables = telosysToolsCfg.getAllVariables();
+//		log("initContext() : Project variables count = " + ( projectVariables != null ? projectVariables.length : 0 ) );
+//		//--- Set the project variables in the context ( if any )
+//		if ( projectVariables != null ) {
+//			for ( int i = 0 ; i < projectVariables.length ; i++ ) {
+//				Variable var = projectVariables[i];
+//				generatorContext.put( var.getName(), var.getValue() );
+//			}
+//		}
 		
 		//--- Set "$env" object ( environment configuration )
 		EnvInContext env = new EnvInContext() ;
@@ -133,11 +143,12 @@ public class GeneratorContextBuilder {
 		generatorContext.put(ContextName.NOW,             new NowInContext()); // Current date and time ( ver 3.3.0 )
 		generatorContext.put(ContextName.CONST,           new Const()); // Constants (static values)
 		generatorContext.put(ContextName.FN,              new FnInContext(generatorContext, env)); // Utility functions
+		generatorContext.put(ContextName.H2,              new H2InContext());  // JDBC factory ( ver 2.1.1 )
+		
 		generatorContext.put(ContextName.JAVA,            new Java());  // Java utility functions
 		generatorContext.put(ContextName.JPA,             new JpaInContext());   // JPA utility functions
 		generatorContext.put(ContextName.JDBC_FACTORY,    new JdbcFactoryInContext());  // JDBC factory ( ver 2.1.1 )
 		generatorContext.put(ContextName.BEAN_VALIDATION, new BeanValidation()); // Bean Validation utility functions
-		generatorContext.put(ContextName.H2,              new H2InContext());  // JDBC factory ( ver 2.1.1 )
 		generatorContext.put(ContextName.HTML,            new HtmlInContext());  // HTML utilities ( ver 3.0.0 )
 		generatorContext.put(ContextName.PHP,             new PhpInContext());  // PHP utilities ( ver 4.1.0 )
 		generatorContext.put(ContextName.CSHARP,          new CsharpInContext());  // C# utilities ( ver 4.1.0 )
@@ -148,21 +159,21 @@ public class GeneratorContextBuilder {
 		generatorContext.put(ContextName.LOADER, loader);
 		
 		//--- Set the "$project" variable in the context
-		generatorContext.put(ContextName.PROJECT, new ProjectInContext(telosysToolsCfg)); // ver 3.0.0
+		generatorContext.put(ContextName.PROJECT, new ProjectInContext(telosysToolsCfg)); 
 
-		//--- Set "$model" object : full model with  all the entities (v 2.0.7)
+		//--- Set "$model" object : full model with  all the entities 
 		this.model = model ;
-		this.modelInContext = new ModelInContext(model, telosysToolsCfg, env ); // v 3.3.0
+		this.modelInContext = new ModelInContext(model, telosysToolsCfg, env ); 
 		generatorContext.put(ContextName.MODEL, modelInContext); 
 		
 		//--- Set "$bundle" object ( new in v 3.3.0 ) 
 		BundleInContext bundle = new BundleInContext(bundleName); // v 3.3.0
 		generatorContext.put(ContextName.BUNDLE, bundle); // v 3.0.0
 		
-		//--- Version 3.4.0 ) 
+		//--- Set "$factory" object (version 3.4.0) 
 		generatorContext.put(ContextName.FACTORY, new FactoryInContext());  // v 3.4.0
 
-		return generatorContext ;
+		// return generatorContext ;
 	}
 	
 	/**
@@ -177,27 +188,30 @@ public class GeneratorContextBuilder {
 	 */
 	public GeneratorContext initFullContext( Model model, String bundleName,
 			List<String> selectedEntitiesNames, Target target, List<Target> generatedTargets ) throws GeneratorException {
-		
-		//--- Initialize a basic context
-		initBasicContext(model, bundleName); // databasesConfigurations removed in V 3.0.0 #LGU
-		
-		//--- Add further elements
-		setEmbeddedGenerator(selectedEntitiesNames, bundleName, generatedTargets);
-		setSelectedEntities(selectedEntitiesNames);
-		setTargetAndCurrentEntity(target);
 
+		//--- New context 
+		GeneratorContext generatorContext = new GeneratorContext();
+		//--- Init with specific variables
+		initProjectVariables(generatorContext);
+		//--- Initialize with basic objects
+		initBasicObjects(generatorContext, model, bundleName);		
+		//--- Init with further elements
+		setEmbeddedGenerator(generatorContext, selectedEntitiesNames, bundleName, generatedTargets);
+		setSelectedEntities(generatorContext, selectedEntitiesNames);
+		setTargetAndCurrentEntity(generatorContext, target);
+		//--- Keep context in 'holder'
 		return generatorContext ;
 	}
 	
 	//-------------------------------------------------------------------------------------------------------
-	private void setSelectedEntities(List<String> selectedEntitiesNames) throws GeneratorException {
+	private void setSelectedEntities(GeneratorContext generatorContext, List<String> selectedEntitiesNames) throws GeneratorException {
 		//--- Set "$selectedEntities" ( list of all the selected entities )
 		List<EntityInContext> selectedEntities = modelInContext.getEntities(selectedEntitiesNames); 
 		generatorContext.put(ContextName.SELECTED_ENTITIES, selectedEntities);
 	}
 	
 	//-------------------------------------------------------------------------------------------------------
-	private void setTargetAndCurrentEntity(Target target) {
+	private void setTargetAndCurrentEntity(GeneratorContext generatorContext, Target target) {
 		//--- Set "$target" object in the context 
 		generatorContext.put(ContextName.TARGET, target);
 		
@@ -215,7 +229,7 @@ public class GeneratorContextBuilder {
 	}
 	
 	//-------------------------------------------------------------------------------------------------------
-	private void setEmbeddedGenerator(List<String> selectedEntitiesNames, String bundleName, List<Target> generatedTargets) {
+	private void setEmbeddedGenerator(GeneratorContext generatorContext, List<String> selectedEntitiesNames, String bundleName, List<Target> generatedTargets) {
 		//--- Set the "$generator"  in the context ( "real" embedded generator )
 		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator( telosysToolsCfg, bundleName, logger,
 				this.model, selectedEntitiesNames, generatedTargets );

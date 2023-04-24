@@ -2,8 +2,6 @@ package org.telosys.tools.generator.languages.literals;
 
 import org.junit.Test;
 import org.telosys.tools.generator.languages.types.LanguageType;
-import org.telosys.tools.generator.languages.types.TypeConverter;
-import org.telosys.tools.generator.languages.types.TypeConverterForCSharp;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
@@ -12,12 +10,8 @@ public class LiteralValuesProviderForCSharpTest extends AbstractLiteralsTest {
 	
 	//----------------------------------------------------------------------------------
 	@Override
-	protected TypeConverter getTypeConverter() {
-		return new TypeConverterForCSharp() ;
-	}
-	@Override
-	protected LiteralValuesProvider getLiteralValuesProvider() {
-		return new LiteralValuesProviderForCSharp() ;
+	protected String getLanguageName() {
+		return "C#" ;
 	}
 	//----------------------------------------------------------------------------------
 

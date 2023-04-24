@@ -2,8 +2,6 @@ package org.telosys.tools.generator.languages.literals;
 
 import org.junit.Test;
 import org.telosys.tools.generator.languages.types.LanguageType;
-import org.telosys.tools.generator.languages.types.TypeConverter;
-import org.telosys.tools.generator.languages.types.TypeConverterForJavaScript;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
@@ -11,12 +9,10 @@ import static org.junit.Assert.assertEquals;
 public class LiteralValuesProviderForTypeScriptTest extends AbstractLiteralsTest {
 	
 	//----------------------------------------------------------------------------------
-	protected TypeConverter getTypeConverter() {
-		return new TypeConverterForJavaScript() ;
-	}
-	protected LiteralValuesProvider getLiteralValuesProvider() {
-		return new LiteralValuesProviderForJavaScript() ;
-	}
+	@Override
+	protected String getLanguageName() {
+		return "TypeScript" ;
+	}	
 	//----------------------------------------------------------------------------------
 
 	@Test

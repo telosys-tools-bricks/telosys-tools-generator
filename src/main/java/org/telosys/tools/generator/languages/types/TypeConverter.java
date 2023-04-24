@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.telosys.tools.commons.logger.ConsoleLogger;
+import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generic.model.Attribute;
 
 /**
@@ -39,6 +40,7 @@ public abstract class TypeConverter {
 	}
 
 	private final String languageName ;
+	private EnvInContext env ;
 	
 	private final HashMap<String, LanguageType> primitiveTypes         = new HashMap<>();
 	private final HashMap<String, LanguageType> primitiveUnsignedTypes = new HashMap<>();
@@ -56,7 +58,14 @@ public abstract class TypeConverter {
 		super();
 		this.languageName = languageName;
 	}
-
+	
+	public void setEnv(EnvInContext env) {
+		this.env = env;
+	}
+	protected EnvInContext getEnv() {
+		return env;
+	}
+	
 	//--- Standard/Specific COLLECTION SIMPLE TYPE
 	protected void setSpecificCollectionSimpleType(String type) {
 		specificCollectionSimpleType = type;
@@ -196,11 +205,11 @@ public abstract class TypeConverter {
 	// Collection type ( since v 3.3.0 )
 	//--------------------------------------------------------------------------------------------
 	
-	/**
-	 * Force a specific collection type (instead of standard type used by default)
-	 * @param specificCollectionType
-	 */
-	public abstract void setSpecificCollectionType(String specificCollectionType);
+//	/**
+//	 * Force a specific collection type (instead of standard type used by default)
+//	 * @param specificCollectionType
+//	 */
+//	public abstract void setSpecificCollectionType(String specificCollectionType);
 
 	/**
 	 * Returns the type for a collection of the given element <br>

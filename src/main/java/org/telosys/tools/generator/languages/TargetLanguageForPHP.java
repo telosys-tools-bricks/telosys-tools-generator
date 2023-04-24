@@ -30,27 +30,33 @@ import org.telosys.tools.generator.languages.types.TypeConverterForPHP;
  */
 public class TargetLanguageForPHP extends TargetLanguage {
 	
-	private final LiteralValuesProvider literalValuesProvider ;
-
+//	private final LiteralValuesProvider literalValuesProvider ;
+//
+//	/**
+//	 * Constructor
+//	 */
+//	protected TargetLanguageForPHP() {
+//		super();
+//		this.literalValuesProvider = new LiteralValuesProviderForPHP();
+//	}
 	/**
 	 * Constructor
 	 */
 	protected TargetLanguageForPHP() {
-		super();
-		this.literalValuesProvider = new LiteralValuesProviderForPHP();
+		super(new TypeConverterForPHP(), new LiteralValuesProviderForPHP());
 	}
 
-	@Override
-	public TypeConverter getTypeConverter() {
-		// NB create a new instance for each "get" 
-		// because it can be changed at run-time with setSpecificCollectionType(..)
-		return new TypeConverterForPHP();
-	}
-
-	@Override
-	public LiteralValuesProvider getLiteralValuesProvider() {
-		return literalValuesProvider;
-	}
+//	@Override
+//	public TypeConverter getTypeConverter() {
+//		// NB create a new instance for each "get" 
+//		// because it can be changed at run-time with setSpecificCollectionType(..)
+//		return new TypeConverterForPHP();
+//	}
+//
+//	@Override
+//	public LiteralValuesProvider getLiteralValuesProvider() {
+//		return literalValuesProvider;
+//	}
 
 	@Override
 	public String argumentsList(List<AttributeInContext> attributes) {

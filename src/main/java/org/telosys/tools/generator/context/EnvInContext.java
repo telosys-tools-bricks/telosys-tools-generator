@@ -52,6 +52,8 @@ public class EnvInContext {
 	private File   databaseConvFile = null ;  // v 3.4.0
 	private SqlInContext sqlInContext = null;   // v 3.4.0
 	
+	private boolean typeWithNullableMark = true ; // v 4.1.0 
+	
 	//-------------------------------------------------------------------------------------
 	// CONSTRUCTOR
 	//-------------------------------------------------------------------------------------
@@ -62,83 +64,52 @@ public class EnvInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Set the entity class name prefix",
+			"'entityClassNamePrefix' property defines the prefix to add before entity class name",
 			"Once the 'prefix' is defined in the 'environment object' ",
 			"it is automatically applied when the entity class name is retrieved"
 			},
 		example={ 
-			"#set ( $env.entityClassNamePrefix = 'Bean' )" },
-		parameters = { 
-			"prefix : the prefix to be used" 
+			"#set ( $env.entityClassNamePrefix = 'Bean' )" 
 			},
 		since = "2.1.0"
 			)
 	public void setEntityClassNamePrefix( String prefix ) {
 		this.entityClassNamePrefix = prefix ;
 	}
-
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the current entity class name prefix.",
-			"The default value is a void string (never null)"
-			},
-		example={ 
-			"$env.entityClassNamePrefix" 
-			},
-		since = "2.1.0"
-			)
 	public String getEntityClassNamePrefix() {
 		return this.entityClassNamePrefix;
 	}
-
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Set the entity class name suffix",
+			"'entityClassNameSuffix' property defines the suffix to add after entity class name",
 			"Once the 'suffix' is defined in the 'environment object' ",
 			"it is automatically applied when the entity class name is retrieved"
 			},
 		example={ 
-			"#set ( $env.entityClassNameSuffix = 'Entity' )" },
-		parameters = { 
-			"suffix : the suffix to be used" 
+			"#set ( $env.entityClassNameSuffix = 'Entity' )" 
 			},
 		since = "2.1.0"
 			)
 	public void setEntityClassNameSuffix( String suffix ) {
 		this.entityClassNameSuffix = suffix ;
 	}
-
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the current entity class name suffix.",
-			"The default value is a void string (never null)"
-			},
-		example={ 
-			"$env.entityClassNameSuffix" 
-			},
-		since = "2.1.0"
-			)
 	public String getEntityClassNameSuffix() {
 		return this.entityClassNameSuffix;
 	}
-
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Set the language for the current code generation",
+			"'language' property defines the target language for the current code generation",
 			"See documentation for all supported languages ('Java', 'C#', 'Go', 'Python', 'JavaScript', 'TypeScript', etc) ",
 			"The current language is 'Java' by default ",
-			"This information is used determine language peculiarities like types and literal values"
+			"This information is used determine language peculiarities like types and literal values",
+			"(throws an exception if the language is unknown)"
 			},
 		example={ 
 			"#set ( $env.language = 'C#' ) ",
-			"$env.setLanguage('C#') " 
-			},
-		parameters = { 
-			"language : the language to be used (not case sensitive) " 
+			"#set ( $env.language = 'PHP' ) ",
+			"Current target language is $env.language"
 			},
 		since = "3.0.0"
 			)
@@ -151,38 +122,112 @@ public class EnvInContext {
 			throw new GeneratorException("Unknown language '" + language + "'");			
 		}
 	}
-	
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the current language",
-			"The default value is 'Java' (never null)"
-			},
-		example={ 
-			"$env.language" 
-			},
-		since = "3.0.0"
-			)
 	public String getLanguage() {
 		return language;
 	}
 	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"'collectionType' property defines a specific collection type for the current code generation",
+			"The given type will be used as the new default type for collections "
+			},
+		example={ 
+			"#set ( $env.collectionType = 'java.util.Set' )    ## for Java ",
+			"#set ( $env.collectionType = 'java.util.Vector' ) ## for Java ",
+			"#set ( $env.collectionType = 'Collection' )       ## for C# ",
+			"Current collection type is $env.collectionType"
+			},
+		since = "3.3.0"
+			)
+	public void setCollectionType(String specificCollectionType) {
+		this.specificCollectionType = specificCollectionType;
+	}
+	public String getCollectionType() {
+		return this.specificCollectionType != null ? this.specificCollectionType : "" ;
+	}
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"'database' property defines the target database for SQL generation",
+			"The given database name will be used for SQL conversions (types and names)",
+			"(throws an exception if the database is unknown)"
+			},
+		example={ 
+			"#set ( $env.database = 'postgresql' )  ",
+			"#set ( $env.database = 'mysql' )  ",
+			},
+		since = "3.4.0"
+			)
+	public void setDatabase(String dbName) {
+		SqlInContextBuilder.checkDbName(dbName);
+		this.database = dbName;
+		this.sqlInContext = null; // Reset 
+	}
+	public String getDatabase() {
+		return this.database;
+	}	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"'databaseConvFile' property defines the file containing the specific rules to be used for SQL generation",
+			"The given rules will be used for SQL conversions (types and names)",
+			"(throws an exception if the file cannot be found)"
+			},
+		example={ 
+			"#set ( $env.databaseConvFile = $fn.fileFromBundle('oracle.properties') )  ",
+			"#set ( $env.databaseConvFile = $fn.fileFromBundle('mydb.properties') )  ",
+			},
+		since = "3.4.0"
+			)
+	public void setDatabaseConvFile(FileInContext fileInContext) {
+		File dbFile = fileInContext.getFile();
+		SqlInContextBuilder.checkDbFile(dbFile);
+		this.databaseConvFile = dbFile ;
+		this.sqlInContext = null; // Reset 
+	}
+	public File getDatabaseConvFile() {
+		return this.databaseConvFile;
+	}
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"'typeWithNullableMark' property defines if the 'nullable mark' must be used or not",
+			"This property is useful only for target languages like C#, Kotlin or PHP.", 
+			"With this kind of languages a '?' is added at the end the type (eg C# : 'string?')",
+			"or at the beginning (eg PHP: '?string') if the attribute is nullable",
+			"The default value is 'true', it can be set to 'false' to avoid the 'nullable mark' in the type"
+			},
+		example={ 
+			"#set ( $env.typeWithNullableMark = false ) ",
+			"Use type with nullable mark : $env.typeWithNullableMark"
+			},
+		since = "4.1.0"
+			)
+	public void setTypeWithNullableMark(boolean v) {
+		this.typeWithNullableMark = v;
+	}
+	public boolean getTypeWithNullableMark() {
+		return this.typeWithNullableMark ;
+	}
+	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Returns the TargetLanguage for the current language defined in '$env'
 	 * @return the TargetLanguage (never null)
 	 */
 	public TargetLanguage getTargetLanguage() { // v 4.1.0 
-		TargetLanguage targetLanguage = TargetLanguageProvider.getTargetLanguage(this.language);
-		if ( targetLanguage == null ) {
-			// by default use JAVA
-			targetLanguage = TargetLanguageProvider.getTargetLanguage("JAVA");
-			if ( targetLanguage == null ) {
-				// cannot happen
-				throw new TelosysRuntimeException("Cannot get TargetLanguage (even with default language name)");
-			}
-		}
-		return targetLanguage ;
+//		TargetLanguage targetLanguage = TargetLanguageProvider.getTargetLanguage(this.language);
+//		if ( targetLanguage == null ) {
+//			// by default use JAVA
+//			targetLanguage = TargetLanguageProvider.getTargetLanguage("JAVA");
+//			if ( targetLanguage == null ) {
+//				// cannot happen
+//				throw new TelosysRuntimeException("Cannot get TargetLanguage (even with default language name)");
+//			}
+//		}
+//		return targetLanguage ;
+		return TargetLanguageProvider.getTargetLanguage(this); // v 4.1.0
 	}
 
 	/**
@@ -192,12 +237,13 @@ public class EnvInContext {
 	 * @since ver 3.0.0
 	 */
 	public TypeConverter getTypeConverter() { // keep 'public' for debug in '.vm' files
-		TypeConverter typeConverter = getTargetLanguage().getTypeConverter(); // v 4.1.0
-		// set specific collection type if any 
-		if ( specificCollectionType != null ) {
-			typeConverter.setSpecificCollectionType(specificCollectionType);
-		}
-		return typeConverter;		
+//		TypeConverter typeConverter = getTargetLanguage().getTypeConverter(); // v 4.1.0
+//		// set specific collection type if any 
+//		if ( specificCollectionType != null ) {
+//			typeConverter.setSpecificCollectionType(specificCollectionType);
+//		}
+//		return typeConverter;		
+		return getTargetLanguage().getTypeConverter(); // v 4.1.0
 	}
 	
 	/**
@@ -209,84 +255,6 @@ public class EnvInContext {
 		return getTargetLanguage().getLiteralValuesProvider(); // v 4.1.0
 	}
 	
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Set a specific collection type for the current code generation",
-			"The given type will be used as the new default type for the collections "
-			},
-		example={ 
-			"#set ( $env.collectionType = 'java.util.Set' )    ## for Java ",
-			"#set ( $env.collectionType = 'java.util.Vector' ) ## for Java ",
-			"#set ( $env.collectionType = 'Collection' )       ## for C# ",
-			},
-		parameters = { 
-			"specificCollectionType : the type to be used (full type if any) " 
-			},
-		since = "3.3.0"
-			)
-	public void setCollectionType(String specificCollectionType) {
-		this.specificCollectionType = specificCollectionType;
-	}
-
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns the current specific collection type"
-			},
-		example={ 
-			"$env.collectionType" 
-			},
-		since = "3.3.0"
-			)
-	public String getCollectionType() {
-		return this.specificCollectionType != null ? this.specificCollectionType : "" ;
-	}
-	
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-			text={	
-				"Define the target database for SQL generation",
-				"The given database name will be used for SQL conversions (types and names)",
-				"(throws an exception if the database is unknown)"
-				},
-			example={ 
-				"#set ( $env.database = 'postgresql' )  ",
-				"#set ( $env.database = 'mysql' )  ",
-				},
-			since = "3.4.0"
-				)
-	public void setDatabase(String dbName) {
-		SqlInContextBuilder.checkDbName(dbName);
-		this.database = dbName;
-		this.sqlInContext = null; // Reset 
-	}
-	public String getDatabase() {
-		return this.database;
-	}
-	
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-			text={	
-				"Define the file containing the specific rules to be used for SQL generation",
-				"The given rules will be used for SQL conversions (types and names)",
-				"(throws an exception if the file cannot be found)"
-				},
-			example={ 
-				"#set ( $env.databaseConvFile = $fn.fileFromBundle('oracle.properties') )  ",
-				"#set ( $env.databaseConvFile = $fn.fileFromBundle('mydb.properties') )  ",
-				},
-			since = "3.4.0"
-				)
-	public void setDatabaseConvFile(FileInContext fileInContext) {
-		File dbFile = fileInContext.getFile();
-		SqlInContextBuilder.checkDbFile(dbFile);
-		this.databaseConvFile = dbFile ;
-		this.sqlInContext = null; // Reset 
-	}
-	public File getDatabaseConvFile() {
-		return this.databaseConvFile;
-	}
 	
 	public SqlInContext getSql() {
 		// the current "sql" is reset whenever the database name/file changes

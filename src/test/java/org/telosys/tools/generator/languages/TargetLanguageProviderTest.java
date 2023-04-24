@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.telosys.tools.commons.exception.TelosysRuntimeException;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.context.EnvInContext;
@@ -22,24 +23,15 @@ public class TargetLanguageProviderTest  {
 
 	private void check(String languageName) {
 		assertTrue(TargetLanguageProvider.isDefinedLanguage(languageName));
-		assertNotNull( TargetLanguageProvider.getTargetLanguage(languageName) );
-		assertNotNull( TargetLanguageProvider.getTargetLanguage(languageName).getTypeConverter() );
-		assertNotNull( TargetLanguageProvider.getTargetLanguage(languageName).getLiteralValuesProvider() );
-		assertNotNull( TargetLanguageProvider.getTypeConverter(languageName) );
-		assertNotNull( TargetLanguageProvider.getLiteralValuesProvider(languageName) );
+		EnvInContext env = new EnvInContext();
+		assertNotNull( TargetLanguageProvider.getTargetLanguage(env) );
+		assertNotNull( TargetLanguageProvider.getTargetLanguage(env).getTypeConverter() );
+		assertNotNull( TargetLanguageProvider.getTargetLanguage(env).getLiteralValuesProvider() );
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=TelosysRuntimeException.class)
 	public void testGetTargetLanguageWithNull() {
 		TargetLanguageProvider.getTargetLanguage(null);
-	}
-	@Test(expected=IllegalArgumentException.class)
-	public void testGetTypeConverterWithNull() {
-		TargetLanguageProvider.getTypeConverter(null);
-	}
-	@Test(expected=IllegalArgumentException.class)
-	public void testGetLiteralValuesProviderWithNull() {
-		TargetLanguageProvider.getLiteralValuesProvider(null);
 	}
 
 	@Test

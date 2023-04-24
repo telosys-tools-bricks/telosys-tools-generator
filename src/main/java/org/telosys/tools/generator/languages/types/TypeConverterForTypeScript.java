@@ -167,11 +167,11 @@ public class TypeConverterForTypeScript extends TypeConverter {
 	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "Array" ; // or "Set" ?
 	private static final String STANDARD_COLLECTION_FULL_TYPE   = "Array" ; // or "Set" ?
 	
-	@Override
-	public void setSpecificCollectionType(String specificCollectionType) {
-		this.setSpecificCollectionFullType(specificCollectionType) ;
-		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
-	}
+//	@Override
+//	public void setSpecificCollectionType(String specificCollectionType) {
+//		this.setSpecificCollectionFullType(specificCollectionType) ;
+//		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
+//	}
 
 	@Override
 	public String getCollectionType(String elementType) {

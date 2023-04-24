@@ -106,11 +106,11 @@ public class TypeConverterForGo extends TypeConverter {
 	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "[]" ; // Slice
 	private static final String STANDARD_COLLECTION_FULL_TYPE   = "[]" ; // Slice
 	
-	@Override
-	public void setSpecificCollectionType(String specificCollectionType) {
-		this.setSpecificCollectionFullType(specificCollectionType) ;
-		this.setSpecificCollectionSimpleType(specificCollectionType);
-	}
+//	@Override
+//	public void setSpecificCollectionType(String specificCollectionType) {
+//		this.setSpecificCollectionFullType(specificCollectionType) ;
+//		this.setSpecificCollectionSimpleType(specificCollectionType);
+//	}
 
 	@Override
 	public String getCollectionType(String elementType) {

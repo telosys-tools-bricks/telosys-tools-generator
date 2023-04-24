@@ -6,10 +6,7 @@ import static org.telosys.tools.generator.languages.types.AttributeTypeConst.OBJ
 import static org.telosys.tools.generator.languages.types.AttributeTypeConst.PRIMITIVE_TYPE;
 import static org.telosys.tools.generator.languages.types.AttributeTypeConst.UNSIGNED_TYPE;
 
-import java.math.BigDecimal;
-
 import org.junit.Test;
-import org.telosys.tools.commons.JavaTypeUtil;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
@@ -17,304 +14,258 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class TypeConverterForJavaTest { // specific test case 
-	
-	private static final String LOCAL_DATE      = TypeConverterForJava.LOCAL_DATE_CLASS; 
-	private static final String LOCAL_TIME      = TypeConverterForJava.LOCAL_TIME_CLASS; 
-	private static final String LOCAL_DATE_TIME = TypeConverterForJava.LOCAL_DATE_TIME_CLASS; 
+public class TypeConverterForJavaTest extends AbstractTypeTest {
 
-	private LanguageType getType(TypeConverter tc, AttributeTypeInfo typeInfo ) {
-		LanguageType lt = tc.getType(typeInfo);
-		System.out.println( typeInfo + " --> " + lt );
-		return lt ;
-	}
+	private static final String STRING = "String";
+	private static final String JAVA_LANG_STRING = "java.lang.String";
 	
-	private LanguageType getType(TypeConverter tc, String neutralType, int typeInfo ) {
-		AttributeTypeInfo attributeTypeInfo = new AttributeTypeInfoForTest(neutralType, typeInfo);
-		return getType(tc, attributeTypeInfo);
-	}
+	private static final String BOOLEAN_PRIMITIVE = "boolean" ;
+	private static final String BOOLEAN = "Boolean" ;
+	private static final String JAVA_LANG_BOOLEAN = "java.lang.Boolean";
+
+	private static final String BYTE_PRIMITIVE = "byte" ;
+	private static final String BYTE = "Byte" ;
+	private static final String JAVA_LANG_BYTE = "java.lang.Byte";
 	
-	private void check( LanguageType lt, Class<?> clazz ) {
-		assertNotNull(lt);
-		assertEquals(clazz.getSimpleName(), lt.getSimpleType() );
-		assertEquals(clazz.getCanonicalName(), lt.getFullType() );
-		if ( clazz.isPrimitive() ) {
-			assertTrue ( lt.isPrimitiveType() ) ;
-		}
-		else {
-			assertFalse ( lt.isPrimitiveType() ) ;
-		}
+	private static final String SHORT_PRIMITIVE = "short" ;
+	private static final String SHORT = "Short" ;
+	private static final String JAVA_LANG_SHORT = "java.lang.Short";
+	
+	private static final String INTEGER_PRIMITIVE = "int" ;
+	private static final String INTEGER = "Integer" ;
+	private static final String JAVA_LANG_INTEGER = "java.lang.Integer";
+
+	private static final String LONG_PRIMITIVE = "long" ;
+	private static final String LONG = "Long" ;
+	private static final String JAVA_LANG_LONG = "java.lang.Long";
+	
+	private static final String FLOAT_PRIMITIVE = "float" ;
+	private static final String FLOAT = "Float" ;
+	private static final String JAVA_LANG_FLOAT = "java.lang.Float";
+	
+	private static final String DOUBLE_PRIMITIVE = "double" ;
+	private static final String DOUBLE = "Double" ;
+	private static final String JAVA_LANG_DOUBLE = "java.lang.Double";
+
+	private static final String DECIMAL = "BigDecimal" ;
+	private static final String JAVA_LANG_DECIMAL = "java.math.BigDecimal";
+	
+	private static final String LOCALDATE = "LocalDate" ;
+	private static final String JAVA_TIME_LOCALDATE = "java.time.LocalDate";
+
+	private static final String LOCALTIME = "LocalTime" ;
+	private static final String JAVA_TIME_LOCALTIME = "java.time.LocalTime";
+
+	private static final String LOCALDATETIME = "LocalDateTime" ;
+	private static final String JAVA_TIME_LOCALDATETIME = "java.time.LocalDateTime";
+
+	private static final String BYTE_ARRAY = "byte[]" ;
+	
+	//---------------------------------------------------------------
+	@Override
+	protected String getLanguageName() {
+		return "Java" ;
 	}
-	private void checkLocalDate( LanguageType lt ) {
+	//---------------------------------------------------------------
+	
+	private void checkPrimitiveType( LanguageType lt, String primitiveType, String wrapperType) {
 		assertNotNull(lt);
-		assertEquals(JavaTypeUtil.shortType(LOCAL_DATE), lt.getSimpleType() );
-		assertEquals(LOCAL_DATE, lt.getFullType() );
-		assertFalse ( lt.isPrimitiveType() ) ;
+		assertTrue ( lt.isPrimitiveType() ) ;
+		assertEquals(primitiveType, lt.getSimpleType() );
+		assertEquals(primitiveType, lt.getFullType() );
+		assertEquals(wrapperType, lt.getWrapperType() );
 	}
-	private void checkLocalTime( LanguageType lt ) {
+
+	private void checkObjectType( LanguageType lt, String simpleType, String fullType) {
 		assertNotNull(lt);
-		assertEquals(JavaTypeUtil.shortType(LOCAL_TIME), lt.getSimpleType() );
-		assertEquals(LOCAL_TIME, lt.getFullType() );
 		assertFalse ( lt.isPrimitiveType() ) ;
-	}
-	private void checkLocalDateTime( LanguageType lt ) {
-		assertNotNull(lt);
-		assertEquals(JavaTypeUtil.shortType(LOCAL_DATE_TIME), lt.getSimpleType() );
-		assertEquals(LOCAL_DATE_TIME, lt.getFullType() );
-		assertFalse ( lt.isPrimitiveType() ) ;
+		assertEquals(simpleType, lt.getSimpleType() );
+		assertEquals(fullType,   lt.getFullType() );
+		assertEquals(simpleType, lt.getWrapperType() );
 	}
 	
 	@Test
 	public void testString() {
-		System.out.println("--- ");
-		TypeConverter tc = new TypeConverterForJava() ;
-		
-		check( getType(tc, NeutralType.STRING, NONE ), String.class);
-		check( getType(tc, NeutralType.STRING, NOT_NULL ), String.class);
-		
-		check( getType(tc, NeutralType.STRING, PRIMITIVE_TYPE ), String.class);
-		check( getType(tc, NeutralType.STRING, UNSIGNED_TYPE ), String.class);
-		check( getType(tc, NeutralType.STRING, PRIMITIVE_TYPE + UNSIGNED_TYPE ), String.class);
-		
-		check( getType(tc, NeutralType.STRING, OBJECT_TYPE), String.class);
-//		check( getType(tc, NeutralType.STRING, SQL_TYPE ), String.class);
-//		check( getType(tc, NeutralType.STRING, OBJECT_TYPE + SQL_TYPE), String.class);
+		println("--- ");
+		checkObjectType( getType(NeutralType.STRING, NONE ),                            STRING, JAVA_LANG_STRING);
+		checkObjectType( getType(NeutralType.STRING, NOT_NULL ),                        STRING, JAVA_LANG_STRING);
+		checkObjectType( getType(NeutralType.STRING, PRIMITIVE_TYPE ),                  STRING, JAVA_LANG_STRING);
+		checkObjectType( getType(NeutralType.STRING, UNSIGNED_TYPE ),                   STRING, JAVA_LANG_STRING);
+		checkObjectType( getType(NeutralType.STRING, PRIMITIVE_TYPE + UNSIGNED_TYPE ),  STRING, JAVA_LANG_STRING);
+		checkObjectType( getType(NeutralType.STRING, OBJECT_TYPE),                      STRING, JAVA_LANG_STRING );
 	}
 
 	@Test
-	public void testBoolean() {
-		System.out.println("--- ");
-		TypeConverter tc = new TypeConverterForJava() ;
+	public void testBoolean() { 
+		println("--- ");
+		checkObjectType( getType( NeutralType.BOOLEAN, NONE ),                   BOOLEAN, JAVA_LANG_BOOLEAN );
+		checkObjectType( getType( NeutralType.BOOLEAN, UNSIGNED_TYPE ),          BOOLEAN, JAVA_LANG_BOOLEAN );
+		checkObjectType( getType( NeutralType.BOOLEAN, OBJECT_TYPE),             BOOLEAN, JAVA_LANG_BOOLEAN );
+		checkObjectType( getType( NeutralType.BOOLEAN, NOT_NULL + OBJECT_TYPE),  BOOLEAN, JAVA_LANG_BOOLEAN );
 		
-		// Default type :
-		check( getType(tc, NeutralType.BOOLEAN, NONE ), Boolean.class);
-		// Unsigned type : no effect
-		check( getType(tc, NeutralType.BOOLEAN, UNSIGNED_TYPE ), Boolean.class);
+		checkPrimitiveType( getType( NeutralType.BOOLEAN, NOT_NULL ),                       BOOLEAN_PRIMITIVE, BOOLEAN );
+		checkPrimitiveType( getType( NeutralType.BOOLEAN, PRIMITIVE_TYPE ),                 BOOLEAN_PRIMITIVE, BOOLEAN );
+		checkPrimitiveType( getType( NeutralType.BOOLEAN, PRIMITIVE_TYPE + UNSIGNED_TYPE ), BOOLEAN_PRIMITIVE, BOOLEAN );
+	}
 
-		// Primitive type 
-		check( getType(tc, NeutralType.BOOLEAN, PRIMITIVE_TYPE ), boolean.class);
-		check( getType(tc, NeutralType.BOOLEAN, NOT_NULL ), boolean.class);
-		check( getType(tc, NeutralType.BOOLEAN, PRIMITIVE_TYPE + NOT_NULL ), boolean.class);
-		// not compatible (primitive type has priority)
-//		check( getType(tc, NeutralType.BOOLEAN, PRIMITIVE_TYPE + SQL_TYPE  ), boolean.class);
-		check( getType(tc, NeutralType.BOOLEAN, PRIMITIVE_TYPE + OBJECT_TYPE  ), boolean.class);
-		// Unsigned type : no effect
-		check( getType(tc, NeutralType.BOOLEAN, PRIMITIVE_TYPE + UNSIGNED_TYPE  ), boolean.class);
+	@Test
+	public void testByte() {
+		println("--- ");
+		checkObjectType( getType( NeutralType.BYTE, NONE ),                        BYTE, JAVA_LANG_BYTE );
+		checkObjectType( getType( NeutralType.BYTE, UNSIGNED_TYPE ),               BYTE, JAVA_LANG_BYTE );		
+		checkObjectType( getType( NeutralType.BYTE, OBJECT_TYPE),                  BYTE, JAVA_LANG_BYTE );
+		checkObjectType( getType( NeutralType.BYTE, OBJECT_TYPE + NOT_NULL),       BYTE, JAVA_LANG_BYTE );
+		checkObjectType( getType( NeutralType.BYTE, OBJECT_TYPE + UNSIGNED_TYPE ), BYTE, JAVA_LANG_BYTE );
 
-		
-		// Object type ( wrapper ) 
-		check( getType(tc, NeutralType.BOOLEAN, OBJECT_TYPE ), Boolean.class);
-//		check( getType(tc, NeutralType.BOOLEAN, SQL_TYPE ), Boolean.class);		
-		check( getType(tc, NeutralType.BOOLEAN, OBJECT_TYPE + NOT_NULL ), Boolean.class);
-//		check( getType(tc, NeutralType.BOOLEAN, OBJECT_TYPE + SQL_TYPE ), Boolean.class);
-//		check( getType(tc, NeutralType.BOOLEAN, SQL_TYPE + NOT_NULL ), Boolean.class);
-		// Unsigned type : no effect
-		check( getType(tc, NeutralType.BOOLEAN, OBJECT_TYPE + UNSIGNED_TYPE ), Boolean.class);
-//		check( getType(tc, NeutralType.BOOLEAN, SQL_TYPE + UNSIGNED_TYPE ), Boolean.class);
+		checkPrimitiveType( getType( NeutralType.BYTE, NOT_NULL ),                       BYTE_PRIMITIVE, BYTE );
+		checkPrimitiveType( getType( NeutralType.BYTE, PRIMITIVE_TYPE ),                 BYTE_PRIMITIVE, BYTE );
+		checkPrimitiveType( getType( NeutralType.BYTE, PRIMITIVE_TYPE + NOT_NULL),       BYTE_PRIMITIVE, BYTE );
+		checkPrimitiveType( getType( NeutralType.BYTE, PRIMITIVE_TYPE + UNSIGNED_TYPE ), BYTE_PRIMITIVE, BYTE );
 	}
 
 	@Test
 	public void testShort() {
-		System.out.println("--- ");
-		TypeConverter tc = new TypeConverterForJava() ;
-		
-		// Default type :
-		check( getType(tc, NeutralType.SHORT, NONE ), Short.class);
-		// Unsigned type : no effect
-		check( getType(tc, NeutralType.SHORT, UNSIGNED_TYPE ), Short.class);
+		println("--- ");
+		checkObjectType( getType( NeutralType.SHORT, NONE ),                        SHORT, JAVA_LANG_SHORT );
+		checkObjectType( getType( NeutralType.SHORT, UNSIGNED_TYPE ),               SHORT, JAVA_LANG_SHORT );		
+		checkObjectType( getType( NeutralType.SHORT, OBJECT_TYPE),                  SHORT, JAVA_LANG_SHORT );
+		checkObjectType( getType( NeutralType.SHORT, OBJECT_TYPE + NOT_NULL),       SHORT, JAVA_LANG_SHORT );
+		checkObjectType( getType( NeutralType.SHORT, OBJECT_TYPE + UNSIGNED_TYPE ), SHORT, JAVA_LANG_SHORT );
 
-		// Primitive type 
-		check( getType(tc, NeutralType.SHORT, PRIMITIVE_TYPE   ), short.class);
-		check( getType(tc, NeutralType.SHORT, NOT_NULL   ), short.class);
-		check( getType(tc, NeutralType.SHORT, PRIMITIVE_TYPE + NOT_NULL  ), short.class);
-		// not compatible (primitive type has priority)
-		//check( getType(tc, NeutralType.SHORT, PRIMITIVE_TYPE + SQL_TYPE  ), short.class);
-		check( getType(tc, NeutralType.SHORT, PRIMITIVE_TYPE + OBJECT_TYPE  ), short.class);
-		// Unsigned type : no effect
-		check( getType(tc, NeutralType.SHORT, PRIMITIVE_TYPE + UNSIGNED_TYPE  ), short.class);
+		checkPrimitiveType( getType( NeutralType.SHORT, NOT_NULL ),                       SHORT_PRIMITIVE, SHORT );
+		checkPrimitiveType( getType( NeutralType.SHORT, PRIMITIVE_TYPE ),                 SHORT_PRIMITIVE, SHORT );
+		checkPrimitiveType( getType( NeutralType.SHORT, PRIMITIVE_TYPE + NOT_NULL),       SHORT_PRIMITIVE, SHORT );
+		checkPrimitiveType( getType( NeutralType.SHORT, PRIMITIVE_TYPE + UNSIGNED_TYPE ), SHORT_PRIMITIVE, SHORT );
+	}
 
-		// Object type ( wrapper ) 
-		check( getType(tc, NeutralType.SHORT, OBJECT_TYPE ), Short.class);
-		check( getType(tc, NeutralType.SHORT, OBJECT_TYPE + NOT_NULL), Short.class);
-//		check( getType(tc, NeutralType.SHORT, SQL_TYPE), Short.class);
-//		check( getType(tc, NeutralType.SHORT, SQL_TYPE + NOT_NULL), Short.class);
-//		check( getType(tc, NeutralType.SHORT, SQL_TYPE + OBJECT_TYPE), Short.class);
-		// Unsigned type : no effect
-		check( getType(tc, NeutralType.SHORT, OBJECT_TYPE + UNSIGNED_TYPE ), Short.class);
-//		check( getType(tc, NeutralType.SHORT, SQL_TYPE + UNSIGNED_TYPE ), Short.class);
+	@Test
+	public void testInteger() {
+		println("--- ");
+		checkObjectType( getType( NeutralType.INTEGER, NONE ),                        INTEGER, JAVA_LANG_INTEGER );
+		checkObjectType( getType( NeutralType.INTEGER, UNSIGNED_TYPE ),               INTEGER, JAVA_LANG_INTEGER );		
+		checkObjectType( getType( NeutralType.INTEGER, OBJECT_TYPE),                  INTEGER, JAVA_LANG_INTEGER );
+		checkObjectType( getType( NeutralType.INTEGER, OBJECT_TYPE + NOT_NULL),       INTEGER, JAVA_LANG_INTEGER );
+		checkObjectType( getType( NeutralType.INTEGER, OBJECT_TYPE + UNSIGNED_TYPE ), INTEGER, JAVA_LANG_INTEGER );
+
+		checkPrimitiveType( getType( NeutralType.INTEGER, NOT_NULL ),                       INTEGER_PRIMITIVE, INTEGER );
+		checkPrimitiveType( getType( NeutralType.INTEGER, PRIMITIVE_TYPE ),                 INTEGER_PRIMITIVE, INTEGER );
+		checkPrimitiveType( getType( NeutralType.INTEGER, PRIMITIVE_TYPE + NOT_NULL),       INTEGER_PRIMITIVE, INTEGER );
+		checkPrimitiveType( getType( NeutralType.INTEGER, PRIMITIVE_TYPE + UNSIGNED_TYPE ), INTEGER_PRIMITIVE, INTEGER );
+	}
+
+	@Test
+	public void testLong() {
+		println("--- ");
+		checkObjectType( getType( NeutralType.LONG, NONE ),                        LONG, JAVA_LANG_LONG );
+		checkObjectType( getType( NeutralType.LONG, UNSIGNED_TYPE ),               LONG, JAVA_LANG_LONG );		
+		checkObjectType( getType( NeutralType.LONG, OBJECT_TYPE),                  LONG, JAVA_LANG_LONG );
+		checkObjectType( getType( NeutralType.LONG, OBJECT_TYPE + NOT_NULL),       LONG, JAVA_LANG_LONG );
+		checkObjectType( getType( NeutralType.LONG, OBJECT_TYPE + UNSIGNED_TYPE ), LONG, JAVA_LANG_LONG );
+
+		checkPrimitiveType( getType( NeutralType.LONG, NOT_NULL ),                       LONG_PRIMITIVE, LONG );
+		checkPrimitiveType( getType( NeutralType.LONG, PRIMITIVE_TYPE ),                 LONG_PRIMITIVE, LONG );
+		checkPrimitiveType( getType( NeutralType.LONG, PRIMITIVE_TYPE + NOT_NULL),       LONG_PRIMITIVE, LONG );
+		checkPrimitiveType( getType( NeutralType.LONG, PRIMITIVE_TYPE + UNSIGNED_TYPE ), LONG_PRIMITIVE, LONG );
+	}
+
+	@Test
+	public void testFloat() {
+		println("--- ");
+		checkObjectType( getType( NeutralType.FLOAT, NONE ),                        FLOAT, JAVA_LANG_FLOAT );
+		checkObjectType( getType( NeutralType.FLOAT, UNSIGNED_TYPE ),               FLOAT, JAVA_LANG_FLOAT );		
+		checkObjectType( getType( NeutralType.FLOAT, OBJECT_TYPE),                  FLOAT, JAVA_LANG_FLOAT );
+		checkObjectType( getType( NeutralType.FLOAT, OBJECT_TYPE + NOT_NULL),       FLOAT, JAVA_LANG_FLOAT );
+		checkObjectType( getType( NeutralType.FLOAT, OBJECT_TYPE + UNSIGNED_TYPE ), FLOAT, JAVA_LANG_FLOAT );
+
+		checkPrimitiveType( getType( NeutralType.FLOAT, NOT_NULL ),                       FLOAT_PRIMITIVE, FLOAT );
+		checkPrimitiveType( getType( NeutralType.FLOAT, PRIMITIVE_TYPE ),                 FLOAT_PRIMITIVE, FLOAT );
+		checkPrimitiveType( getType( NeutralType.FLOAT, PRIMITIVE_TYPE + NOT_NULL),       FLOAT_PRIMITIVE, FLOAT );
+		checkPrimitiveType( getType( NeutralType.FLOAT, PRIMITIVE_TYPE + UNSIGNED_TYPE ), FLOAT_PRIMITIVE, FLOAT );
+	}
+
+	@Test
+	public void testDouble() {
+		println("--- ");
+		checkObjectType( getType( NeutralType.DOUBLE, NONE ),                        DOUBLE, JAVA_LANG_DOUBLE );
+		checkObjectType( getType( NeutralType.DOUBLE, UNSIGNED_TYPE ),               DOUBLE, JAVA_LANG_DOUBLE );		
+		checkObjectType( getType( NeutralType.DOUBLE, OBJECT_TYPE),                  DOUBLE, JAVA_LANG_DOUBLE );
+		checkObjectType( getType( NeutralType.DOUBLE, OBJECT_TYPE + NOT_NULL),       DOUBLE, JAVA_LANG_DOUBLE );
+		checkObjectType( getType( NeutralType.DOUBLE, OBJECT_TYPE + UNSIGNED_TYPE ), DOUBLE, JAVA_LANG_DOUBLE );
+
+		checkPrimitiveType( getType( NeutralType.DOUBLE, NOT_NULL ),                       DOUBLE_PRIMITIVE, DOUBLE );
+		checkPrimitiveType( getType( NeutralType.DOUBLE, PRIMITIVE_TYPE ),                 DOUBLE_PRIMITIVE, DOUBLE );
+		checkPrimitiveType( getType( NeutralType.DOUBLE, PRIMITIVE_TYPE + NOT_NULL),       DOUBLE_PRIMITIVE, DOUBLE );
+		checkPrimitiveType( getType( NeutralType.DOUBLE, PRIMITIVE_TYPE + UNSIGNED_TYPE ), DOUBLE_PRIMITIVE, DOUBLE );
 	}
 
 	@Test
 	public void testDecimal() {
-		System.out.println("--- ");
-		TypeConverter tc = new TypeConverterForJava() ;
-		
-		// Supposed to always return BigDecimal (in any cases) 
-		check( getType(tc, NeutralType.DECIMAL, NONE ), BigDecimal.class);
-		check( getType(tc, NeutralType.DECIMAL, NOT_NULL ), BigDecimal.class);
-		
-		check( getType(tc, NeutralType.DECIMAL, PRIMITIVE_TYPE ), BigDecimal.class);
-		check( getType(tc, NeutralType.DECIMAL, UNSIGNED_TYPE ), BigDecimal.class);
-		check( getType(tc, NeutralType.DECIMAL, PRIMITIVE_TYPE + UNSIGNED_TYPE ), BigDecimal.class);
-		
-		check( getType(tc, NeutralType.DECIMAL, OBJECT_TYPE ), BigDecimal.class);
-//		check( getType(tc, NeutralType.DECIMAL, SQL_TYPE ), BigDecimal.class);		
-		check( getType(tc, NeutralType.DECIMAL, NOT_NULL + OBJECT_TYPE ), BigDecimal.class);
-//		check( getType(tc, NeutralType.DECIMAL, NOT_NULL + SQL_TYPE ), BigDecimal.class);
+		println("--- ");
+		checkObjectType( getType(NeutralType.DECIMAL, NONE ),                           DECIMAL, JAVA_LANG_DECIMAL);
+		checkObjectType( getType(NeutralType.DECIMAL, NOT_NULL ),                       DECIMAL, JAVA_LANG_DECIMAL);
+		checkObjectType( getType(NeutralType.DECIMAL, UNSIGNED_TYPE ),                  DECIMAL, JAVA_LANG_DECIMAL);
+		checkObjectType( getType(NeutralType.DECIMAL, PRIMITIVE_TYPE ),                 DECIMAL, JAVA_LANG_DECIMAL);
+		checkObjectType( getType(NeutralType.DECIMAL, PRIMITIVE_TYPE + UNSIGNED_TYPE ), DECIMAL, JAVA_LANG_DECIMAL);
+		checkObjectType( getType(NeutralType.DECIMAL, PRIMITIVE_TYPE + NOT_NULL ),      DECIMAL, JAVA_LANG_DECIMAL);
+		checkObjectType( getType(NeutralType.DECIMAL, OBJECT_TYPE),                     DECIMAL, JAVA_LANG_DECIMAL);
+		checkObjectType( getType(NeutralType.DECIMAL, OBJECT_TYPE + UNSIGNED_TYPE ),    DECIMAL, JAVA_LANG_DECIMAL);
+		checkObjectType( getType(NeutralType.DECIMAL, OBJECT_TYPE + NOT_NULL ),         DECIMAL, JAVA_LANG_DECIMAL);
 	}
 
 	@Test
 	public void testDate() {
-		System.out.println("--- ");
-		TypeConverter tc = new TypeConverterForJava() ;
-		
-		// Supposed to always return LocalDate (in any cases) 
-		checkLocalDate( getType(tc, NeutralType.DATE, NONE ));
-		checkLocalDate( getType(tc, NeutralType.DATE, NOT_NULL ));
-		
-		checkLocalDate( getType(tc, NeutralType.DATE, PRIMITIVE_TYPE ));
-		checkLocalDate( getType(tc, NeutralType.DATE, UNSIGNED_TYPE ));
-		checkLocalDate( getType(tc, NeutralType.DATE, PRIMITIVE_TYPE + UNSIGNED_TYPE ));
-		
-		checkLocalDate( getType(tc, NeutralType.DATE, OBJECT_TYPE ));
-		checkLocalDate( getType(tc, NeutralType.DATE, NOT_NULL + OBJECT_TYPE ));
+		println("--- ");
+		checkObjectType( getType(NeutralType.DATE, NONE ),                           LOCALDATE, JAVA_TIME_LOCALDATE);
+		checkObjectType( getType(NeutralType.DATE, NOT_NULL ),                       LOCALDATE, JAVA_TIME_LOCALDATE);
+		checkObjectType( getType(NeutralType.DATE, UNSIGNED_TYPE ),                  LOCALDATE, JAVA_TIME_LOCALDATE);
+		checkObjectType( getType(NeutralType.DATE, PRIMITIVE_TYPE ),                 LOCALDATE, JAVA_TIME_LOCALDATE);
+		checkObjectType( getType(NeutralType.DATE, PRIMITIVE_TYPE + UNSIGNED_TYPE ), LOCALDATE, JAVA_TIME_LOCALDATE);
+		checkObjectType( getType(NeutralType.DATE, PRIMITIVE_TYPE + NOT_NULL ),      LOCALDATE, JAVA_TIME_LOCALDATE);
+		checkObjectType( getType(NeutralType.DATE, OBJECT_TYPE),                     LOCALDATE, JAVA_TIME_LOCALDATE);
+		checkObjectType( getType(NeutralType.DATE, OBJECT_TYPE + UNSIGNED_TYPE ),    LOCALDATE, JAVA_TIME_LOCALDATE);
+		checkObjectType( getType(NeutralType.DATE, OBJECT_TYPE + NOT_NULL ),         LOCALDATE, JAVA_TIME_LOCALDATE);
 	}
 
 	@Test
 	public void testTime() {
-		System.out.println("--- ");
-		TypeConverter tc = new TypeConverterForJava() ;
-		
-		// Supposed to always return LocalTime (in any cases) 
-		checkLocalTime( getType(tc, NeutralType.TIME, NONE ));
-		checkLocalTime( getType(tc, NeutralType.TIME, NOT_NULL ));
-		
-		checkLocalTime( getType(tc, NeutralType.TIME, PRIMITIVE_TYPE ));
-		checkLocalTime( getType(tc, NeutralType.TIME, UNSIGNED_TYPE ));
-		checkLocalTime( getType(tc, NeutralType.TIME, PRIMITIVE_TYPE + UNSIGNED_TYPE ));
-		
-		checkLocalTime( getType(tc, NeutralType.TIME, OBJECT_TYPE ));
-		checkLocalTime( getType(tc, NeutralType.TIME, NOT_NULL + OBJECT_TYPE ));
+		println("--- ");
+		checkObjectType( getType(NeutralType.TIME, NONE ),                           LOCALTIME, JAVA_TIME_LOCALTIME);
+		checkObjectType( getType(NeutralType.TIME, NOT_NULL ),                       LOCALTIME, JAVA_TIME_LOCALTIME);
+		checkObjectType( getType(NeutralType.TIME, UNSIGNED_TYPE ),                  LOCALTIME, JAVA_TIME_LOCALTIME);
+		checkObjectType( getType(NeutralType.TIME, PRIMITIVE_TYPE ),                 LOCALTIME, JAVA_TIME_LOCALTIME);
+		checkObjectType( getType(NeutralType.TIME, PRIMITIVE_TYPE + UNSIGNED_TYPE ), LOCALTIME, JAVA_TIME_LOCALTIME);
+		checkObjectType( getType(NeutralType.TIME, PRIMITIVE_TYPE + NOT_NULL ),      LOCALTIME, JAVA_TIME_LOCALTIME);
+		checkObjectType( getType(NeutralType.TIME, OBJECT_TYPE),                     LOCALTIME, JAVA_TIME_LOCALTIME);
+		checkObjectType( getType(NeutralType.TIME, OBJECT_TYPE + UNSIGNED_TYPE ),    LOCALTIME, JAVA_TIME_LOCALTIME);
+		checkObjectType( getType(NeutralType.TIME, OBJECT_TYPE + NOT_NULL ),         LOCALTIME, JAVA_TIME_LOCALTIME);
 	}
 
 	@Test
 	public void testTimestamp() {
-		System.out.println("--- ");
-		TypeConverter tc = new TypeConverterForJava() ;
-		
-		// Supposed to always return LocalDateTime (in any cases) 
-		checkLocalDateTime( getType(tc, NeutralType.TIMESTAMP, NONE ));
-		checkLocalDateTime( getType(tc, NeutralType.TIMESTAMP, NOT_NULL ));
-		
-		checkLocalDateTime( getType(tc, NeutralType.TIMESTAMP, PRIMITIVE_TYPE ));
-		checkLocalDateTime( getType(tc, NeutralType.TIMESTAMP, UNSIGNED_TYPE ));
-		checkLocalDateTime( getType(tc, NeutralType.TIMESTAMP, PRIMITIVE_TYPE + UNSIGNED_TYPE ));
-		
-		checkLocalDateTime( getType(tc, NeutralType.TIMESTAMP, OBJECT_TYPE ));
-		checkLocalDateTime( getType(tc, NeutralType.TIMESTAMP, NOT_NULL + OBJECT_TYPE ));
+		println("--- ");
+		checkObjectType( getType(NeutralType.TIMESTAMP, NONE ),                           LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.TIMESTAMP, NOT_NULL ),                       LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.TIMESTAMP, UNSIGNED_TYPE ),                  LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.TIMESTAMP, PRIMITIVE_TYPE ),                 LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.TIMESTAMP, PRIMITIVE_TYPE + UNSIGNED_TYPE ), LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.TIMESTAMP, PRIMITIVE_TYPE + NOT_NULL ),      LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.TIMESTAMP, OBJECT_TYPE),                     LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.TIMESTAMP, OBJECT_TYPE + UNSIGNED_TYPE ),    LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.TIMESTAMP, OBJECT_TYPE + NOT_NULL ),         LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
 	}
-
-//	@Test
-//	public void testLongText() {
-//		System.out.println("--- ");
-//		TypeConverter tc = new TypeConverterForJava() ;
-//		
-//		// Supposed to always return BigDecimal (in any cases) 
-//		check( getType(tc, NeutralType.LONGTEXT, NONE ), String.class);
-//		check( getType(tc, NeutralType.LONGTEXT, NOT_NULL ), String.class);
-//		
-//		check( getType(tc, NeutralType.LONGTEXT, PRIMITIVE_TYPE ), String.class);
-//		check( getType(tc, NeutralType.LONGTEXT, UNSIGNED_TYPE ), String.class);
-//		check( getType(tc, NeutralType.LONGTEXT, PRIMITIVE_TYPE + UNSIGNED_TYPE ), String.class);
-//		
-//		check( getType(tc, NeutralType.LONGTEXT, OBJECT_TYPE ), String.class);
-//		check( getType(tc, NeutralType.LONGTEXT, NOT_NULL + OBJECT_TYPE ), String.class);
-//
-//		check( getType(tc, NeutralType.LONGTEXT, SQL_TYPE ), java.sql.Clob.class);	 // SQL CLOB	
-//		check( getType(tc, NeutralType.LONGTEXT, NOT_NULL + SQL_TYPE ), java.sql.Clob.class); // SQL CLOB	
-//		check( getType(tc, NeutralType.LONGTEXT, OBJECT_TYPE + SQL_TYPE ), java.sql.Clob.class); // SQL CLOB	
-//		
-//		check( getType(tc, NeutralType.LONGTEXT, PRIMITIVE_TYPE + OBJECT_TYPE ), String.class); // not compatible (no Prim type => String)
-//		check( getType(tc, NeutralType.LONGTEXT, PRIMITIVE_TYPE + SQL_TYPE ), java.sql.Clob.class); // not compatible (no Prim type => SQL CLOB)	
-//	}
 
 	@Test
 	public void testBinary() {
-		System.out.println("--- ");
-		TypeConverter tc = new TypeConverterForJava() ;
-		
-		// 
-		check( getType(tc, NeutralType.BINARY, NONE ),      byte[].class);
-		check( getType(tc, NeutralType.BINARY, NOT_NULL ),  byte[].class);
-		
-		check( getType(tc, NeutralType.BINARY, PRIMITIVE_TYPE ),  byte[].class);
-		check( getType(tc, NeutralType.BINARY, UNSIGNED_TYPE ),  byte[].class);
-		check( getType(tc, NeutralType.BINARY, PRIMITIVE_TYPE + UNSIGNED_TYPE ),  byte[].class);
-		
-		check( getType(tc, NeutralType.BINARY, OBJECT_TYPE ),  byte[].class);
-		check( getType(tc, NeutralType.BINARY, NOT_NULL + OBJECT_TYPE ),  byte[].class);
-
-//		check( getType(tc, NeutralType.BINARY, SQL_TYPE ), java.sql.Blob.class);	 // SQL BLOB	
-//		check( getType(tc, NeutralType.BINARY, NOT_NULL + SQL_TYPE ), java.sql.Blob.class); // SQL BLOB	
-//		check( getType(tc, NeutralType.BINARY, OBJECT_TYPE + SQL_TYPE ), java.sql.Blob.class); // SQL BLOB	
-//		
-//		check( getType(tc, NeutralType.BINARY, PRIMITIVE_TYPE + SQL_TYPE ), byte[].class); // not compatible (primitive type has priority)	
+		println("--- ");
+		checkObjectType( getType(NeutralType.BINARY, NONE ),                           BYTE_ARRAY, BYTE_ARRAY);
+		checkObjectType( getType(NeutralType.BINARY, NOT_NULL ),                       BYTE_ARRAY, BYTE_ARRAY);
+		checkObjectType( getType(NeutralType.BINARY, UNSIGNED_TYPE ),                  BYTE_ARRAY, BYTE_ARRAY);
+		checkObjectType( getType(NeutralType.BINARY, PRIMITIVE_TYPE ),                 BYTE_ARRAY, BYTE_ARRAY);
+		checkObjectType( getType(NeutralType.BINARY, PRIMITIVE_TYPE + UNSIGNED_TYPE ), BYTE_ARRAY, BYTE_ARRAY);
+		checkObjectType( getType(NeutralType.BINARY, PRIMITIVE_TYPE + NOT_NULL ),      BYTE_ARRAY, BYTE_ARRAY);
+		checkObjectType( getType(NeutralType.BINARY, OBJECT_TYPE),                     BYTE_ARRAY, BYTE_ARRAY);
+		checkObjectType( getType(NeutralType.BINARY, OBJECT_TYPE + UNSIGNED_TYPE ),    BYTE_ARRAY, BYTE_ARRAY);
+		checkObjectType( getType(NeutralType.BINARY, OBJECT_TYPE + NOT_NULL ),         BYTE_ARRAY, BYTE_ARRAY);
 	}
 
-	@Test
-	public void testPrimitiveTypes() {
-		System.out.println("--- ");
-		TypeConverter tc = new TypeConverterForJava() ;
-		LanguageType lt ;
-		
-		lt = getType(tc, NeutralType.BOOLEAN, PRIMITIVE_TYPE ) ;
-		assertEquals("boolean", lt.getSimpleType());
-		assertEquals("boolean", lt.getFullType());
-		assertEquals("Boolean", lt.getWrapperType());
-		assertTrue(lt.isPrimitiveType());
-		
-		lt = getType(tc, NeutralType.SHORT, PRIMITIVE_TYPE ) ;
-		assertEquals("short", lt.getSimpleType());
-		assertEquals("short", lt.getFullType());
-		assertEquals("Short", lt.getWrapperType());
-		assertTrue(lt.isPrimitiveType());
-
-		lt = getType(tc, NeutralType.INTEGER, PRIMITIVE_TYPE ) ;
-		assertEquals("int", lt.getSimpleType());
-		assertEquals("int", lt.getFullType());
-		assertEquals("Integer", lt.getWrapperType());
-		assertTrue(lt.isPrimitiveType());
-
-		lt = getType(tc, NeutralType.LONG, PRIMITIVE_TYPE ) ;
-		assertEquals("long", lt.getSimpleType());
-		assertEquals("long", lt.getFullType());
-		assertEquals("Long", lt.getWrapperType());
-		assertTrue(lt.isPrimitiveType());
-	}
-	
-	@Test
-	public void testObjectTypes() {
-		System.out.println("--- ");
-		TypeConverter tc = new TypeConverterForJava() ;
-		LanguageType lt ;
-		
-		lt = getType(tc, NeutralType.BOOLEAN, OBJECT_TYPE ) ;
-		assertEquals("Boolean", lt.getSimpleType());
-		assertEquals("java.lang.Boolean", lt.getFullType());
-		assertEquals("Boolean", lt.getWrapperType());
-		assertFalse(lt.isPrimitiveType());
-
-		lt = getType(tc, NeutralType.SHORT, OBJECT_TYPE ) ;
-		assertEquals("Short", lt.getSimpleType());
-		assertEquals("java.lang.Short", lt.getFullType());
-		assertEquals("Short", lt.getWrapperType());
-		assertFalse(lt.isPrimitiveType());
-
-		lt = getType(tc, NeutralType.INTEGER, OBJECT_TYPE ) ;
-		assertEquals("Integer", lt.getSimpleType());
-		assertEquals("java.lang.Integer", lt.getFullType());
-		assertEquals("Integer", lt.getWrapperType());
-		assertFalse(lt.isPrimitiveType());
-
-	}
 }

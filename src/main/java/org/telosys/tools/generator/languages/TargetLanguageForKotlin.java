@@ -30,28 +30,34 @@ import org.telosys.tools.generator.languages.types.TypeConverterForKotlin;
  */
 public class TargetLanguageForKotlin extends TargetLanguage {
 	
-	private final LiteralValuesProvider literalValuesProvider ;
-
+//	private final LiteralValuesProvider literalValuesProvider ;
+//
+//	/**
+//	 * Constructor
+//	 */
+//	protected TargetLanguageForKotlin() {
+//		super();
+//		this.literalValuesProvider = new LiteralValuesProviderForKotlin();
+//	}
 	/**
 	 * Constructor
 	 */
 	protected TargetLanguageForKotlin() {
-		super();
-		this.literalValuesProvider = new LiteralValuesProviderForKotlin();
+		super(new TypeConverterForKotlin(), new LiteralValuesProviderForKotlin());
 	}
 
-	@Override
-	public TypeConverter getTypeConverter() {
-		// NB create a new instance for each "get" 
-		// because it can be changed at run-time with setSpecificCollectionType(..)
-		return new TypeConverterForKotlin();
-	}
-
-	@Override
-	public LiteralValuesProvider getLiteralValuesProvider() {
-		return literalValuesProvider;
-	}
-	
+//	@Override
+//	public TypeConverter getTypeConverter() {
+//		// NB create a new instance for each "get" 
+//		// because it can be changed at run-time with setSpecificCollectionType(..)
+//		return new TypeConverterForKotlin();
+//	}
+//
+//	@Override
+//	public LiteralValuesProvider getLiteralValuesProvider() {
+//		return literalValuesProvider;
+//	}
+//	
 	@Override
 	public String argumentsList(List<AttributeInContext> attributes) {
 		return commonArgumentsListWithoutType(attributes);

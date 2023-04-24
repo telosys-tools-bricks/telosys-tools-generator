@@ -30,27 +30,34 @@ import org.telosys.tools.generator.languages.types.TypeConverterForCSharp;
  */
 public class TargetLanguageForCSharp extends TargetLanguage {
 	
-	private final LiteralValuesProvider literalValuesProvider ;
+//	private final LiteralValuesProvider literalValuesProvider ;
+//
+//	/**
+//	 * Constructor
+//	 */
+//	protected TargetLanguageForCSharp() {
+//		super();
+//		this.literalValuesProvider = new LiteralValuesProviderForCSharp();
+//	}
 
 	/**
 	 * Constructor
 	 */
 	protected TargetLanguageForCSharp() {
-		super();
-		this.literalValuesProvider = new LiteralValuesProviderForCSharp();
+		super(new TypeConverterForCSharp(), new LiteralValuesProviderForCSharp());
 	}
 
-	@Override
-	public TypeConverter getTypeConverter() {
-		// NB create a new instance for each "get" 
-		// because it can be changed at run-time with setSpecificCollectionType(..)
-		return new TypeConverterForCSharp();
-	}
-
-	@Override
-	public LiteralValuesProvider getLiteralValuesProvider() {
-		return literalValuesProvider;
-	}
+//	@Override
+//	public TypeConverter getTypeConverter() {
+//		// NB create a new instance for each "get" 
+//		// because it can be changed at run-time with setSpecificCollectionType(..)
+//		return new TypeConverterForCSharp();
+//	}
+//
+//	@Override
+//	public LiteralValuesProvider getLiteralValuesProvider() {
+//		return literalValuesProvider;
+//	}
 
 	@Override
 	public String argumentsList(List<AttributeInContext> attributes) {

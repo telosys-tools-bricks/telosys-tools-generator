@@ -16,10 +16,12 @@ import static org.junit.Assert.assertTrue;
 
 public class TypeConverterForPHPTest extends AbstractTypeTest {
 
+	//---------------------------------------------------------------
 	@Override
-	protected TypeConverter getTypeConverter() {
-		return new TypeConverterForPHP();
+	protected String getLanguageName() {
+		return "PHP" ;
 	}
+	//---------------------------------------------------------------
 	
 	private void checkObjectType( LanguageType lt, String simpleType, String fullType) {
 		assertNotNull(lt);

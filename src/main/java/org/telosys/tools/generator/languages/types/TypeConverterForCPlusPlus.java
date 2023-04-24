@@ -109,11 +109,11 @@ public class TypeConverterForCPlusPlus extends TypeConverter {
 	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "[]" ;  // not applicable
 	private static final String STANDARD_COLLECTION_FULL_TYPE   = "[]" ;  // not applicable
 	
-	@Override
-	public void setSpecificCollectionType(String specificCollectionType) {
-		this.setSpecificCollectionFullType(specificCollectionType) ;
-		this.setSpecificCollectionSimpleType(specificCollectionType);
-	}
+//	@Override
+//	public void setSpecificCollectionType(String specificCollectionType) {
+//		this.setSpecificCollectionFullType(specificCollectionType) ;
+//		this.setSpecificCollectionSimpleType(specificCollectionType);
+//	}
 
 	@Override
 	public String getCollectionType(String elementType) {

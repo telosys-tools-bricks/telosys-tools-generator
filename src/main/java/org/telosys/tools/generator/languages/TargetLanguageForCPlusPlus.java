@@ -30,27 +30,28 @@ import org.telosys.tools.generator.languages.types.TypeConverterForCPlusPlus;
  */
 public class TargetLanguageForCPlusPlus extends TargetLanguage {
 	
-	private final LiteralValuesProvider literalValuesProvider ;
+//	private final LiteralValuesProvider literalValuesProvider ;
 
 	/**
 	 * Constructor
 	 */
 	protected TargetLanguageForCPlusPlus() {
-		super();
-		this.literalValuesProvider = new LiteralValuesProviderForCPlusPlus();
+//		super();
+//		this.literalValuesProvider = new LiteralValuesProviderForCPlusPlus();
+		super(new TypeConverterForCPlusPlus(), new LiteralValuesProviderForCPlusPlus());
 	}
 
-	@Override
-	public TypeConverter getTypeConverter() {
-		// NB create a new instance for each "get" 
-		// because it can be changed at run-time with setSpecificCollectionType(..)
-		return new TypeConverterForCPlusPlus();
-	}
+//	@Override
+//	public TypeConverter getTypeConverter() {
+//		// NB create a new instance for each "get" 
+//		// because it can be changed at run-time with setSpecificCollectionType(..)
+//		return new TypeConverterForCPlusPlus();
+//	}
 
-	@Override
-	public LiteralValuesProvider getLiteralValuesProvider() {
-		return literalValuesProvider;
-	}
+//	@Override
+//	public LiteralValuesProvider getLiteralValuesProvider() {
+//		return literalValuesProvider;
+//	}
 	
 	@Override
 	public String argumentsList(List<AttributeInContext> attributes) {

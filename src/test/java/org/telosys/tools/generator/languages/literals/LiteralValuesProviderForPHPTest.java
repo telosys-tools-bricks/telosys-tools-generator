@@ -1,12 +1,7 @@
 package org.telosys.tools.generator.languages.literals;
 
 import org.junit.Test;
-import org.telosys.tools.generator.languages.types.AttributeTypeConst;
-import org.telosys.tools.generator.languages.types.AttributeTypeInfo;
-import org.telosys.tools.generator.languages.types.AttributeTypeInfoForTest;
 import org.telosys.tools.generator.languages.types.LanguageType;
-import org.telosys.tools.generator.languages.types.TypeConverter;
-import org.telosys.tools.generator.languages.types.TypeConverterForPHP;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
@@ -14,12 +9,10 @@ import static org.junit.Assert.assertEquals;
 public class LiteralValuesProviderForPHPTest extends AbstractLiteralsTest {
 	
 	//----------------------------------------------------------------------------------
-	protected TypeConverter getTypeConverter() {
-		return new TypeConverterForPHP() ;
-	}
-	protected LiteralValuesProvider getLiteralValuesProvider() {
-		return new LiteralValuesProviderForPHP() ;
-	}
+	@Override
+	protected String getLanguageName() {
+		return "PHP" ;
+	}	
 	//----------------------------------------------------------------------------------
 
 	@Test

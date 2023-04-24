@@ -10,8 +10,6 @@ import java.util.Calendar;
 import org.junit.Assert;
 import org.junit.Test;
 import org.telosys.tools.generator.languages.types.LanguageType;
-import org.telosys.tools.generator.languages.types.TypeConverter;
-import org.telosys.tools.generator.languages.types.TypeConverterForJava;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
@@ -21,13 +19,9 @@ public class LiteralValuesProviderForJavaTest extends AbstractLiteralsTest {
 	
 	//----------------------------------------------------------------------------------
 	@Override
-	protected TypeConverter getTypeConverter() {
-		return new TypeConverterForJava() ;
-	}
-	@Override
-	protected LiteralValuesProvider getLiteralValuesProvider() {
-		return new LiteralValuesProviderForJava() ;
-	}
+	protected String getLanguageName() {
+		return "Java" ;
+	}	
 	//----------------------------------------------------------------------------------
 
 	private void setByte(byte v)   { /* nothing */ } 

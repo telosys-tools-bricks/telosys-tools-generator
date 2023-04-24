@@ -30,27 +30,33 @@ import org.telosys.tools.generator.languages.types.TypeConverterForScala;
  */
 public class TargetLanguageForScala extends TargetLanguage {
 	
-	private final LiteralValuesProvider literalValuesProvider ;
-
+//	private final LiteralValuesProvider literalValuesProvider ;
+//
+//	/**
+//	 * Constructor
+//	 */
+//	protected TargetLanguageForScala() {
+//		super();
+//		this.literalValuesProvider = new LiteralValuesProviderForScala();
+//	}
 	/**
 	 * Constructor
 	 */
 	protected TargetLanguageForScala() {
-		super();
-		this.literalValuesProvider = new LiteralValuesProviderForScala();
+		super(new TypeConverterForScala(), new LiteralValuesProviderForScala());
 	}
 
-	@Override
-	public TypeConverter getTypeConverter() {
-		// NB create a new instance for each "get" 
-		// because it can be changed at run-time with setSpecificCollectionType(..)
-		return new TypeConverterForScala();
-	}
-
-	@Override
-	public LiteralValuesProvider getLiteralValuesProvider() {
-		return literalValuesProvider;
-	}
+//	@Override
+//	public TypeConverter getTypeConverter() {
+//		// NB create a new instance for each "get" 
+//		// because it can be changed at run-time with setSpecificCollectionType(..)
+//		return new TypeConverterForScala();
+//	}
+//
+//	@Override
+//	public LiteralValuesProvider getLiteralValuesProvider() {
+//		return literalValuesProvider;
+//	}
 	
 	@Override
 	public String argumentsList(List<AttributeInContext> attributes) {

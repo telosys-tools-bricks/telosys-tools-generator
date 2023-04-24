@@ -16,10 +16,12 @@ import static org.junit.Assert.assertTrue;
 
 public class TypeConverterForKotlinTest extends AbstractTypeTest {
 
+	//---------------------------------------------------------------
 	@Override
-	protected TypeConverter getTypeConverter() {
-		return new TypeConverterForKotlin() ; // KOTLIN TYPES
+	protected String getLanguageName() {
+		return "Kotlin" ;
 	}
+	//---------------------------------------------------------------
 		
 	private void checkPrimitiveType( LanguageType lt, String primitiveType, String wrapperType) {
 		assertNotNull(lt);

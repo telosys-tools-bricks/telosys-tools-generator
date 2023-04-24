@@ -1,22 +1,64 @@
 package org.telosys.tools.generator.languages.types;
 
+import org.telosys.tools.commons.exception.TelosysRuntimeException;
+import org.telosys.tools.generator.GeneratorException;
+import org.telosys.tools.generator.context.EnvInContext;
+import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
+
 public abstract class AbstractTypeTest {
 
+	/**
+	 * Constructor
+	 */
 	protected AbstractTypeTest() {
 		super();
 	}
 
-	protected abstract TypeConverter getTypeConverter();
+	/**
+	 * Prints the given message
+	 * @param s
+	 */
+	protected void println(String s) {
+		System.out.println(s);
+	}	
+	
+	/**
+	 * Provides the target language name
+	 * @return
+	 */
+	protected abstract String getLanguageName();
+
+	/**
+	 * Returns an instance of EnvInContext ($env) with the expected target language
+	 * @return
+	 */
+	protected EnvInContext getEnv() {
+		EnvInContext env = new EnvInContext();
+		try {
+			env.setLanguage(getLanguageName());
+		} catch (GeneratorException e) {
+			throw new TelosysRuntimeException("Invalid language name", e);
+		}
+		return env ;
+	}
+	
+	/**
+	 * Returns the TypeConverter for the current language defined in $env
+	 * @return
+	 */
+	protected final TypeConverter getTypeConverter() {
+		return getEnv().getTypeConverter();
+	}
+
 
 	protected LanguageType getType(String neutralType, int typeInfo ) {
-		AttributeTypeInfo attributeTypeInfo = new AttributeTypeInfoForTest(neutralType, typeInfo);
-		System.out.println("AttributeTypeInfo : " + attributeTypeInfo);
-		return getType(attributeTypeInfo);
+		return getType(new AttributeTypeInfoForTest(neutralType, typeInfo));
 	}
 
 	protected LanguageType getType(AttributeTypeInfo typeInfo ) {
-		System.out.println( typeInfo + " --> " + typeInfo );
-		return getTypeConverter().getType(typeInfo);
+		LanguageType languageType = getTypeConverter().getType(typeInfo);
+		println( "AttributeTypeInfo : " + typeInfo + " --> " + languageType );
+		return languageType;
 	}
 
 }

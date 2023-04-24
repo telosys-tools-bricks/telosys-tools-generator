@@ -16,21 +16,12 @@ import static org.junit.Assert.assertTrue;
 
 public class TypeConverterForTypeScriptTest extends AbstractTypeTest {
 
+	//---------------------------------------------------------------
 	@Override
-	protected TypeConverter getTypeConverter() {
-		return new TypeConverterForTypeScript() ;
+	protected String getLanguageName() {
+		return "TypeScript" ;
 	}
-	
-//	private LanguageType getType(TypeConverter AttributeTypeInfo typeInfo ) {
-//		LanguageType lt = tc.getType(typeInfo);
-//		System.out.println( "AttributeTypeInfo : " + typeInfo + " --> " + lt );
-//		return lt ;
-//	}
-	
-//	private LanguageType getType(TypeConverter String neutralType, int typeInfo ) {
-//		AttributeTypeInfo attributeTypeInfo = new AttributeTypeInfo(neutralType, typeInfo);
-//		return getType(attributeTypeInfo);
-//	}
+	//---------------------------------------------------------------
 	
 	private void checkStringPrimitiveType(int typeInfo ) {
 		checkPrimitiveType( getType(NeutralType.STRING, typeInfo ), "string", "String");
@@ -72,8 +63,7 @@ public class TypeConverterForTypeScriptTest extends AbstractTypeTest {
 	
 	@Test
 	public void testString() {
-		System.out.println("--- ");
-		TypeConverter tc = getTypeConverter() ;
+		println("--- ");
 		
 		// Primitive type expected
 		checkStringPrimitiveType(NONE);
@@ -96,8 +86,7 @@ public class TypeConverterForTypeScriptTest extends AbstractTypeTest {
 
 	@Test
 	public void testBoolean() {
-		System.out.println("--- ");
-		TypeConverter tc = getTypeConverter() ;
+		println("--- ");
 
 		// Primitive type expected
 		checkBooleanPrimitiveType(NONE);
@@ -120,8 +109,7 @@ public class TypeConverterForTypeScriptTest extends AbstractTypeTest {
 
 	@Test
 	public void testShort() {
-		System.out.println("--- ");
-		TypeConverter tc = getTypeConverter() ;
+		println("--- ");
 		
 		// Primitive type expected
 		checkShortPrimitiveType(NONE);
@@ -144,8 +132,7 @@ public class TypeConverterForTypeScriptTest extends AbstractTypeTest {
 
 	@Test
 	public void testDecimal() {
-		System.out.println("--- ");
-		TypeConverter tc = getTypeConverter() ;
+		println("--- ");
 		
 		// Primitive type expected
 		checkDecimalPrimitiveType(NONE);
@@ -168,8 +155,7 @@ public class TypeConverterForTypeScriptTest extends AbstractTypeTest {
 
 	@Test
 	public void testDate() {
-		System.out.println("--- DATE --> Date");
-		TypeConverter tc = getTypeConverter() ;
+		println("--- DATE --> Date");
 		
 		// Supposed to always return Date (in any cases) 
 		checkDateObjectType(NONE);
@@ -191,8 +177,7 @@ public class TypeConverterForTypeScriptTest extends AbstractTypeTest {
 
 	@Test
 	public void testTime() {
-		System.out.println("--- TIME --> Date");
-		TypeConverter tc = getTypeConverter() ;
+		println("--- TIME --> Date");
 		// Supposed to always return Date (in any cases) 
 		checkTimeObjectType(NONE);
 		checkTimeObjectType(NOT_NULL);
@@ -213,8 +198,7 @@ public class TypeConverterForTypeScriptTest extends AbstractTypeTest {
 
 	@Test
 	public void testTimestamp() {
-		System.out.println("--- TIMESTAMP --> Date");
-		TypeConverter tc = getTypeConverter() ;
+		println("--- TIMESTAMP --> Date");
 		// Supposed to always return Date (in any cases) 
 		checkTimestampObjectType(NONE);
 		checkTimestampObjectType(NOT_NULL);
@@ -235,8 +219,7 @@ public class TypeConverterForTypeScriptTest extends AbstractTypeTest {
 
 	@Test
 	public void testPrimitiveTypes() {
-		System.out.println("--- ");
-		TypeConverter tc = new TypeConverterForTypeScript() ;
+		println("--- ");
 		LanguageType lt ;
 		
 		lt = getType(NeutralType.BOOLEAN, PRIMITIVE_TYPE ) ;
@@ -266,8 +249,7 @@ public class TypeConverterForTypeScriptTest extends AbstractTypeTest {
 	
 	@Test
 	public void testObjectTypes() {
-		System.out.println("--- ");
-		TypeConverter tc = new TypeConverterForTypeScript() ;
+		println("--- ");
 		LanguageType lt ;
 		
 		lt = getType(NeutralType.DATE, OBJECT_TYPE ) ;
