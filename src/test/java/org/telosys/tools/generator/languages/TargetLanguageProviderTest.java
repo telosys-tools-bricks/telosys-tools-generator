@@ -55,13 +55,17 @@ public class TargetLanguageProviderTest  {
 		List<AttributeInContext> attributes = FakeAttributeBuilder.buildAttributes(env);		
 		//
 		Assert.assertEquals("", tl.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
-		Assert.assertEquals("", tl.argumentsListWithType(null) );
-		// id is not null => no '?'
-		Assert.assertEquals("int id, string? name, bool? flag, DateOnly? birthDate", tl.argumentsListWithType(attributes) );
-		//
 		Assert.assertEquals("", tl.argumentsListWithWrapperType(ATTRIBUTES_VOID_LIST) );
+		Assert.assertEquals("", tl.argumentsListWithType(null) );
 		Assert.assertEquals("", tl.argumentsListWithWrapperType(null) );
+		// $env.typeWithNullableMark = default value = true => '?' at the end of type if nullable  ( id is not null => no '?' )
+		Assert.assertEquals("int id, string? name, bool? flag, DateOnly? birthDate", tl.argumentsListWithType(attributes) );
 		Assert.assertEquals("Int32 id, String? name, Boolean? flag, DateOnly? birthDate", tl.argumentsListWithWrapperType(attributes) );
+
+		// $env.typeWithNullableMark = false =>  no '?' at the end of type
+		env.setTypeWithNullableMark(false); 
+		Assert.assertEquals("int id, string name, bool flag, DateOnly birthDate", tl.argumentsListWithType(attributes) );
+		Assert.assertEquals("Int32 id, String name, Boolean flag, DateOnly birthDate", tl.argumentsListWithWrapperType(attributes) );		
 	}
 
 	@Test
@@ -141,17 +145,35 @@ public class TargetLanguageProviderTest  {
 		//
 		Assert.assertEquals("", tl.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
 		Assert.assertEquals("", tl.argumentsListWithType(null) );
-		// id is not null => no '?'
+		
+		// $env.typeWithNullableMark = default value = true => '?' at the end of type if nullable  ( id is not null => no '?' )
 		Assert.assertEquals("id: Int, name: String?, flag: Boolean?, birthDate: LocalDate?", tl.argumentsListWithType(attributes) );
-		// same result with wrapper type
-		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) );
+		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) ); // same result with wrapper type
+
+		// $env.typeWithNullableMark = false =>  no '?' at the end of type
+		env.setTypeWithNullableMark(false); 
+		Assert.assertEquals("id: Int, name: String, flag: Boolean, birthDate: LocalDate", tl.argumentsListWithType(attributes) );
+		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) ); // same result with wrapper type
 	}
 
 	@Test
-	public void testPHP() {
+	public void testPHP() throws GeneratorException {
 		check("PHP");
 		check(" Php");
 		check("php ");
+		EnvInContext env = new EnvInContext();
+		env.setLanguage("Php"); // required for test 
+		TargetLanguage tl = env.getTargetLanguage();
+		Assert.assertEquals(TargetLanguageForPHP.class.getSimpleName(), tl.getClass().getSimpleName());
+		
+		List<AttributeInContext> attributes = FakeAttributeBuilder.buildAttributes(env);		
+		//
+		Assert.assertEquals("", tl.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
+		Assert.assertEquals("", tl.argumentsListWithType(null) );
+		// $env.typeWithNullableMark = default value = true => '?' at the end of type if nullable  ( id is not null => no '?' )
+		Assert.assertEquals("int $id, string $name, bool $flag, $birthDate", tl.argumentsListWithType(attributes) );
+		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) ); // same result with wrapper type
+		
 	}
 
 	@Test

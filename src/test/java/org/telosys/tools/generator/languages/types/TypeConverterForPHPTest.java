@@ -48,9 +48,16 @@ public class TypeConverterForPHPTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( neutralType, NOT_NULL + UNSIGNED_TYPE ),  targetType );
 	}
 	
+	private static final String PHP_STRING          = "string";
+	private static final String PHP_STRING_NULLABLE = "string"; // TODO "?string"
 	@Test
 	public void testString() {
-		checkPrimitiveTypeExpected(NeutralType.STRING,  "string");
+		checkPrimitiveType( getType(NeutralType.STRING, NONE ),                           PHP_STRING_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE ),                 PHP_STRING_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.STRING, UNSIGNED_TYPE ),                  PHP_STRING_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE + UNSIGNED_TYPE ), PHP_STRING_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.STRING, OBJECT_TYPE),                     PHP_STRING_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.STRING, NOT_NULL ),                       PHP_STRING );
 	}
 
 	@Test

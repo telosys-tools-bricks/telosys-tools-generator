@@ -82,11 +82,11 @@ public class TargetLanguageForPHP extends TargetLanguage {
 			// example : "function add(int $a, int $b, ?string $s)"
 			if ( n > 0 ) sb.append(", ");
 			// FIRST : the type 
-			if ( ! attribute.isNotNull() ) {
-				sb.append( "?" ) ;  // nullable => add '?' before the type, eg "?int"
+			String type = attribute.getType();
+			if ( type.trim().length() > 0 ) {
+				sb.append( attribute.getType() ) ; 
+				sb.append( " " ) ;
 			}
-			sb.append( attribute.getType() ) ; 
-			sb.append( " " ) ;
 			// AFTER : the name "$xx"
 			sb.append( "$" ).append( attribute.getName() ) ;
 			n++;

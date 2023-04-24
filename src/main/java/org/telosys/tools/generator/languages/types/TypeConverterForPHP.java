@@ -36,7 +36,6 @@ public class TypeConverterForPHP extends TypeConverter {
 	public TypeConverterForPHP() {
 		super("PHP");
 		//--- PHP types added in ver 4.1.0 :
-		//--- PHP types added in ver 4.1.0 :
 		declarePrimitiveType( buildPrimitiveType(NeutralType.STRING,  PHP_STRING ) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.BOOLEAN, PHP_BOOL   ) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.BYTE,    PHP_INT) );
@@ -106,22 +105,4 @@ public class TypeConverterForPHP extends TypeConverter {
 	public String getCollectionType(String elementType) {
 		return "" ;
 	}
-//	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "" ; 
-//	private static final String STANDARD_COLLECTION_FULL_TYPE   = "" ; 
-////	@Override
-////	public void setSpecificCollectionType(String specificCollectionType) {
-////		this.setSpecificCollectionFullType(specificCollectionType) ;
-////		this.setSpecificCollectionSimpleType(specificCollectionType);
-////	}
-//
-//	
-//	@Override
-//	public String getCollectionSimpleType() {
-//		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
-//	}
-//
-//	@Override
-//	public String getCollectionFullType() {
-//		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
-//	}
 }
