@@ -7,6 +7,8 @@ import static org.telosys.tools.generator.languages.types.AttributeTypeConst.PRI
 import static org.telosys.tools.generator.languages.types.AttributeTypeConst.UNSIGNED_TYPE;
 
 import org.junit.Test;
+import org.telosys.tools.generator.GeneratorException;
+import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
@@ -128,6 +130,25 @@ public class TypeConverterForPHPTest extends AbstractTypeTest {
 	@Test
 	public void testBinary() {
 		checkVoidExpected(NeutralType.BINARY);
+	}
+	
+	@Test
+	public void testDefaultCollectionType() { 
+		TypeConverter typeConverter = getTypeConverter();
+		// Not applicable => void string
+		assertEquals("", typeConverter.getCollectionType());
+		assertEquals("", typeConverter.getCollectionType("Foo"));
+	}
+
+	@Test
+	public void testSpecificCollectionType() throws GeneratorException {
+		EnvInContext env = new EnvInContext();
+		env.setLanguage(getLanguageName());
+		env.setCollectionType("Set");
+		TypeConverter typeConverter = env.getTypeConverter();
+		// Not applicable => void string
+		assertEquals("", typeConverter.getCollectionType());
+		assertEquals("", typeConverter.getCollectionType("Foo"));
 	}
 
 }

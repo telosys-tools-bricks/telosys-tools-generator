@@ -1,17 +1,20 @@
 package org.telosys.tools.generator.languages.types;
 
-import org.junit.Test;
-import org.telosys.tools.generic.model.types.NeutralType;
-
 import static org.telosys.tools.generator.languages.types.AttributeTypeConst.NONE;
 import static org.telosys.tools.generator.languages.types.AttributeTypeConst.NOT_NULL;
 import static org.telosys.tools.generator.languages.types.AttributeTypeConst.OBJECT_TYPE;
 import static org.telosys.tools.generator.languages.types.AttributeTypeConst.PRIMITIVE_TYPE;
 import static org.telosys.tools.generator.languages.types.AttributeTypeConst.UNSIGNED_TYPE;
 
+import org.junit.Test;
+import org.telosys.tools.generator.GeneratorException;
+import org.telosys.tools.generator.context.EnvInContext;
+import org.telosys.tools.generic.model.types.NeutralType;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class TypeConverterForCSharpTest extends AbstractTypeTest {
@@ -40,7 +43,7 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 	}
 	
 	@Test
-	public void testString() {
+	public void testString() throws GeneratorException {
 		println("--- ");
 		
 		checkPrimitiveType( getType(NeutralType.STRING, NONE ),            "string?", "String?");
@@ -52,6 +55,12 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 		checkObjectType( getType(NeutralType.STRING, OBJECT_TYPE),                 "String?", "System.String?" );
 		checkObjectType( getType(NeutralType.STRING, OBJECT_TYPE + UNSIGNED_TYPE), "String?", "System.String?" );
 		checkObjectType( getType(NeutralType.STRING, OBJECT_TYPE + NOT_NULL),      "String",  "System.String" );
+		
+		EnvInContext env = getEnv();
+		env.setTypeWithNullableMark(false); // No "?" at the end of type
+		checkObjectType( getType(env, NeutralType.STRING, OBJECT_TYPE),                 "String", "System.String" );
+		checkObjectType( getType(env, NeutralType.STRING, OBJECT_TYPE + UNSIGNED_TYPE), "String", "System.String" );
+		checkObjectType( getType(env, NeutralType.STRING, OBJECT_TYPE + NOT_NULL),      "String", "System.String" );
 	}
 
 	@Test
@@ -66,6 +75,10 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 		
 		checkObjectType( getType( NeutralType.BOOLEAN, OBJECT_TYPE),            "Boolean?", "System.Boolean?" );
 		checkObjectType( getType( NeutralType.BOOLEAN, NOT_NULL + OBJECT_TYPE), "Boolean", "System.Boolean" );
+
+		EnvInContext env = getEnv();
+		env.setTypeWithNullableMark(false); // No "?" at the end of type
+		checkObjectType( getType(env, NeutralType.BOOLEAN, OBJECT_TYPE),            "Boolean", "System.Boolean" );
 	}
 
 	@Test
@@ -114,6 +127,12 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 		
 		checkObjectType( getType( NeutralType.INTEGER, NOT_NULL + OBJECT_TYPE ),                 "Int32",  "System.Int32" );
 		checkObjectType( getType( NeutralType.INTEGER, NOT_NULL + OBJECT_TYPE + UNSIGNED_TYPE ), "UInt32", "System.UInt32");
+
+		EnvInContext env = getEnv();
+		env.setTypeWithNullableMark(false); // No "?" at the end of type
+		checkPrimitiveType( getType(env, NeutralType.INTEGER, NONE ),       "int", "Int32" );
+		checkObjectType(    getType(env, NeutralType.INTEGER, OBJECT_TYPE ),            "Int32",  "System.Int32" );
+		checkObjectType(    getType(env, NeutralType.INTEGER, NOT_NULL + OBJECT_TYPE ), "Int32",  "System.Int32" );
 	}
 
 	@Test
@@ -186,4 +205,28 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( NeutralType.BINARY, OBJECT_TYPE ),    "byte[]?",  "byte[]?" );
 		checkPrimitiveType( getType( NeutralType.BINARY, NOT_NULL ),       "byte[]",  "byte[]" );
 	}
+
+	@Test
+	public void testDefaultCollectionType() {
+		println("--- ");
+		TypeConverter typeConverter = getTypeConverter();
+		assertNull(typeConverter.getSpecificCollectionType());
+		assertEquals("List", typeConverter.getCollectionType());
+		assertEquals("List<Foo>", typeConverter.getCollectionType("Foo"));
+	}
+
+	@Test
+	public void testSpecificCollectionType() throws GeneratorException {
+		println("--- ");
+		EnvInContext env = new EnvInContext();
+		env.setLanguage(getLanguageName());
+		env.setCollectionType("Collection");
+		TypeConverter typeConverter = env.getTypeConverter();
+		
+		assertNotNull(typeConverter.getSpecificCollectionType());
+		assertEquals("Collection", typeConverter.getSpecificCollectionType());
+		assertEquals("Collection", typeConverter.getCollectionType());
+		assertEquals("Collection<Foo>", typeConverter.getCollectionType("Foo"));
+	}
+	
 }

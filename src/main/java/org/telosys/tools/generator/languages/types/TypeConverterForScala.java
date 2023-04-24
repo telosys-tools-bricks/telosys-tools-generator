@@ -100,29 +100,40 @@ public class TypeConverterForScala extends TypeConverter {
 	// Collection type ( since v 3.3.0 )
 	//--------------------------------------------------------------------------------------------	
 	// The "scala.List" class is a pointer to the "scala.collection.immutable.List" class
-	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "List" ;
-	private static final String STANDARD_COLLECTION_FULL_TYPE   = "scala.List" ;
+	private static final String STANDARD_COLLECTION_TYPE = "List" ;
 	
-//	@Override
-//	public void setSpecificCollectionType(String specificCollectionType) {
-//		this.setSpecificCollectionFullType(specificCollectionType) ;
-//		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
-//	}
-
+	@Override
+	public String getCollectionType() {
+		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE) ; 
+	}
 	@Override
 	public String getCollectionType(String elementType) {
-		// Examples : 
-		// val nums: List[Int] = List(1, 2, 3, 4)
-		return getCollectionSimpleType() + "[" + elementType + "]" ; 
+		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE) + "<" + elementType + ">" ; 
 	}
 	
-	@Override
-	public String getCollectionSimpleType() {
-		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
-	}
-
-	@Override
-	public String getCollectionFullType() {
-		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
-	}
+//	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "List" ;
+//	private static final String STANDARD_COLLECTION_FULL_TYPE   = "scala.List" ;
+//	
+////	@Override
+////	public void setSpecificCollectionType(String specificCollectionType) {
+////		this.setSpecificCollectionFullType(specificCollectionType) ;
+////		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
+////	}
+//
+//	@Override
+//	public String getCollectionType(String elementType) {
+//		// Examples : 
+//		// val nums: List[Int] = List(1, 2, 3, 4)
+//		return getCollectionSimpleType() + "[" + elementType + "]" ; 
+//	}
+//	
+//	@Override
+//	public String getCollectionSimpleType() {
+//		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
+//	}
+//
+//	@Override
+//	public String getCollectionFullType() {
+//		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
+//	}
 }

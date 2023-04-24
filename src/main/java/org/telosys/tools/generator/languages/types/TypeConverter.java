@@ -18,6 +18,7 @@ package org.telosys.tools.generator.languages.types;
 import java.util.HashMap;
 import java.util.List;
 
+import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.logger.ConsoleLogger;
 import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generic.model.Attribute;
@@ -47,8 +48,8 @@ public abstract class TypeConverter {
 	
 	private final HashMap<String, LanguageType> objectTypes         = new HashMap<>();
 	
-	private String specificCollectionFullType   = null ;
-	private String specificCollectionSimpleType = null ;
+//	private String specificCollectionFullType   = null ;
+//	private String specificCollectionSimpleType = null ;
 	
 	/**
 	 * Constructor
@@ -65,31 +66,32 @@ public abstract class TypeConverter {
 	protected EnvInContext getEnv() {
 		return env;
 	}
-	
-	//--- Standard/Specific COLLECTION SIMPLE TYPE
-	protected void setSpecificCollectionSimpleType(String type) {
-		specificCollectionSimpleType = type;
-	}
-	protected String getCollectionSimpleType(String standardType) {
-		if ( specificCollectionSimpleType != null ) {
-			return specificCollectionSimpleType ; 
-		}
-		else {
-			return standardType ; 
-		}
-	}
-	//--- Standard/Specific COLLECTION FULL TYPE
-	protected void setSpecificCollectionFullType(String type) {
-		specificCollectionFullType = type;
-	}
-	public String getCollectionFullType(String standardType) {
-		if ( specificCollectionFullType != null ) {
-			return specificCollectionFullType ; 
-		}
-		else {
-			return standardType ; 
-		}
-	}
+
+//	//--- Standard/Specific COLLECTION SIMPLE TYPE
+//	protected void setSpecificCollectionSimpleType(String type) {
+//		specificCollectionSimpleType = type;
+//	}
+//	protected String getCollectionSimpleType(String standardCollectionSimpleType) {
+//		String specificCollectionType = getEnv().getCollectionType(); 
+//		if ( StrUtil.nullOrVoid(specificCollectionType) ) {
+//			return specificCollectionType ; 
+//		}
+//		else {
+//			return standardCollectionSimpleType ; 
+//		}
+//	}
+//	//--- Standard/Specific COLLECTION FULL TYPE
+//	protected void setSpecificCollectionFullType(String type) {
+//		specificCollectionFullType = type;
+//	}
+//	protected String getCollectionFullType(String standardCollectionFullType) {
+//		if ( specificCollectionFullType != null ) {
+//			return specificCollectionFullType ; 
+//		}
+//		else {
+//			return standardType ; 
+//		}
+//	}
 
 	/**
 	 * Returns the language associated with this type converter
@@ -212,25 +214,79 @@ public abstract class TypeConverter {
 //	public abstract void setSpecificCollectionType(String specificCollectionType);
 
 	/**
+	 * Returns the active collection type (standard or specific) <br>
+	 * Example for Java : returns "List" or any other specific type like "Set", "Collection", etc
+	 * @return
+	 */
+	public abstract String getCollectionType() ;
+
+	/**
 	 * Returns the type for a collection of the given element <br>
 	 * For example : returns "List<Book>" for a "Book" element in Java
 	 * @param elementType
 	 * @return
 	 */
 	public abstract String getCollectionType(String elementType) ;
-
+	
 	/**
-	 * Returns the 'simple type' used by default for a collection <br>
-	 * For example : returns "List" in Java
+	 * Determines what type of collection should be used : <br>
+	 * standard type (default) or specific type set via $env (if any) 
+	 * @param standardCollectionType default standard type
 	 * @return
 	 */
-	public abstract String getCollectionSimpleType() ;
+	protected String determineCollectionTypeToUse(String standardCollectionType) {
+		String specificCollectionType = getSpecificCollectionType();
+		if ( ! StrUtil.nullOrVoid( specificCollectionType ) ) {
+			return specificCollectionType ;
+		}
+		else {
+			return standardCollectionType ;
+		}
+	}
 
 	/**
-	 * Returns the 'full type' used by default for a collection <br>
-	 * For example : returns "java.util.List" in Java
+	 * Returns the specific collection type as set via $env object
 	 * @return
 	 */
-	public abstract String getCollectionFullType() ;
+	protected String getSpecificCollectionType() {
+		String specificCollectionType = getEnv().getCollectionType(); 
+		if ( StrUtil.nullOrVoid(specificCollectionType) ) {
+			return null ; 
+		}
+		else {
+			return specificCollectionType ; 
+		}
+	}
+	
+	/**
+	 * Returns TRUE if a nullable mark ('?' at the end/beginning of the type) can be used <br>
+	 * TRUE if the attribute is 'nullable' and the 'nullableMark' flag is active in $env 
+	 * @param attributeTypeInfo
+	 * @return
+	 */
+	protected boolean nullableMarkCanBeUsed(AttributeTypeInfo attributeTypeInfo) {
+		// If attribute is nullable and 'typeWithNullableMark' env property is TRUE
+		if ( ( ! attributeTypeInfo.isNotNull() ) && ( getEnv().getTypeWithNullableMark() == true ) ) {
+			// Nullable => nullable type with '?' at the end
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+//	/**
+//	 * Returns the 'simple type' used by default for a collection <br>
+//	 * For example : returns "List" in Java
+//	 * @return
+//	 */
+//	public abstract String getCollectionSimpleType() ;
+//
+//	/**
+//	 * Returns the 'full type' used by default for a collection <br>
+//	 * For example : returns "java.util.List" in Java
+//	 * @return
+//	 */
+//	public abstract String getCollectionFullType() ;
 	
 }

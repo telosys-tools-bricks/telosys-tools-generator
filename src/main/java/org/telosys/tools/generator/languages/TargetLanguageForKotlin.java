@@ -74,9 +74,6 @@ public class TargetLanguageForKotlin extends TargetLanguage {
 			sb.append( attribute.getName() ) ; // arg name first
 			sb.append( ": " ) ;
 			sb.append( attribute.getType() ) ; // arg type after 
-			if ( ! attribute.isNotNull() ) {
-				sb.append( "?" ) ;  // nullable => add '?' at the end of the type, eg "String?"
-			}			
 			n++;
 		}
 		return sb.toString();

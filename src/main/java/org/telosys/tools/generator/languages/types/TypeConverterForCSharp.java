@@ -140,8 +140,8 @@ public class TypeConverterForCSharp extends TypeConverter {
 			languageType = getUnsignedType(languageType);
 		}
 
-		// If attribute is nullable and 'typeWithNullableMark' env property is TRUE
-		if ( ( ! attributeTypeInfo.isNotNull() ) && ( getEnv().getTypeWithNullableMark() == true ) ) {
+		// If attribute is 'nullable' and '$env.typeWithNullableMark' is TRUE
+		if ( ( nullableMarkCanBeUsed(attributeTypeInfo) ) ) {
 			// Nullable => nullable type with '?' at the end
 			languageType = getNullableType(languageType);
 		}
@@ -207,42 +207,46 @@ public class TypeConverterForCSharp extends TypeConverter {
 	//--------------------------------------------------------------------------------------------
 	// Collection type ( since v 3.3.0 )
 	//--------------------------------------------------------------------------------------------	
-	// TODO : changeable type (via $env)
 	// Collections for C# :
 	//  - List<T>
 	//  - Collection<T>
-	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "List" ; // or "Collection" ?
-	private static final String STANDARD_COLLECTION_FULL_TYPE   = "System.Collections.Generic.List" ; // or "Collection" ?
+	private static final String STANDARD_COLLECTION_TYPE = "List" ; // or "Collection" ?
+//	private static final String STANDARD_COLLECTION_FULL_TYPE   = "System.Collections.Generic.List" ; // or "Collection" ?
 	
 //	@Override
 //	public void setSpecificCollectionType(String specificCollectionType) {
 //		this.setSpecificCollectionFullType(specificCollectionType) ;
 //		this.setSpecificCollectionSimpleType(specificCollectionType);
 //	}
+	
+	@Override
+	public String getCollectionType() {
+		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE) ; 
+	}
 
 	@Override
 	public String getCollectionType(String elementType) {
-		return getCollectionSimpleType() + "<" + elementType + ">" ; 
+		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE)  + "<" + elementType + ">" ; 
 	}
 	
-	@Override
-	public String getCollectionSimpleType() {
-		return chooseCollectionType(STANDARD_COLLECTION_SIMPLE_TYPE);
-	}
+//	@Override
+//	public String getCollectionSimpleType() {
+//		return chooseCollectionType(STANDARD_COLLECTION_SIMPLE_TYPE);
+//	}
+//
+//	@Override
+//	public String getCollectionFullType() {
+//		return chooseCollectionType(STANDARD_COLLECTION_FULL_TYPE);
+//	}
 
-	@Override
-	public String getCollectionFullType() {
-		return chooseCollectionType(STANDARD_COLLECTION_FULL_TYPE);
-	}
-
-	private String chooseCollectionType(String standardCollectionType) {
-		String specificCollectionType = getEnv().getCollectionType();
-		if ( ! StrUtil.nullOrVoid( specificCollectionType ) ) {
-			return specificCollectionType;
-		}
-		else {
-			return standardCollectionType ;
-		}
-	}
+//	private String chooseCollectionType(String standardCollectionType) {
+//		String specificCollectionType = getEnv().getCollectionType();
+//		if ( ! StrUtil.nullOrVoid( specificCollectionType ) ) {
+//			return specificCollectionType;
+//		}
+//		else {
+//			return standardCollectionType ;
+//		}
+//	}
 	
 }

@@ -3,7 +3,6 @@ package org.telosys.tools.generator.languages.types;
 import org.telosys.tools.commons.exception.TelosysRuntimeException;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.EnvInContext;
-import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 
 public abstract class AbstractTypeTest {
 
@@ -52,11 +51,22 @@ public abstract class AbstractTypeTest {
 
 
 	protected LanguageType getType(String neutralType, int typeInfo ) {
-		return getType(new AttributeTypeInfoForTest(neutralType, typeInfo));
+		return getType(this.getTypeConverter(), new AttributeTypeInfoForTest(neutralType, typeInfo));
+	}
+	protected LanguageType getType(EnvInContext env, String neutralType, int typeInfo ) {
+		return getType(env, new AttributeTypeInfoForTest(neutralType, typeInfo));
 	}
 
 	protected LanguageType getType(AttributeTypeInfo typeInfo ) {
-		LanguageType languageType = getTypeConverter().getType(typeInfo);
+//		LanguageType languageType = getTypeConverter().getType(typeInfo);
+//		println( "AttributeTypeInfo : " + typeInfo + " --> " + languageType );
+		return getType(this.getTypeConverter(), typeInfo );
+	}
+	protected LanguageType getType(EnvInContext env, AttributeTypeInfo typeInfo ) {		
+		return getType(env.getTypeConverter(), typeInfo );
+	}
+	protected LanguageType getType(TypeConverter typeConverter, AttributeTypeInfo typeInfo ) {		
+		LanguageType languageType = typeConverter.getType(typeInfo);
 		println( "AttributeTypeInfo : " + typeInfo + " --> " + languageType );
 		return languageType;
 	}

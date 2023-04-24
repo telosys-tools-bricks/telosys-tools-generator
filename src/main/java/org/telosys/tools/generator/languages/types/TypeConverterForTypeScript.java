@@ -18,7 +18,6 @@ package org.telosys.tools.generator.languages.types;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.telosys.tools.commons.JavaTypeUtil;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 /**
@@ -164,28 +163,57 @@ public class TypeConverterForTypeScript extends TypeConverter {
 	// 'Set' : A set is an ordered list of values with no duplicates
 	//    const planet = new Set<string>();
 	//    planet.add("earth");
-	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "Array" ; // or "Set" ?
-	private static final String STANDARD_COLLECTION_FULL_TYPE   = "Array" ; // or "Set" ?
 	
-//	@Override
-//	public void setSpecificCollectionType(String specificCollectionType) {
-//		this.setSpecificCollectionFullType(specificCollectionType) ;
-//		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
-//	}
+	private static final String BRACKETS = "[]";
+	private static final String ARRAY    = "Array";
+	
+	@Override
+	public String getCollectionType() {
+		String collectionType = determineCollectionTypeToUse(BRACKETS);
+		if ( BRACKETS.equals(collectionType) ) {
+			return BRACKETS;
+		}
+		else if ( ARRAY.equalsIgnoreCase(collectionType) ) {
+			return ARRAY;
+		}
+		else {
+			return BRACKETS;
+		}
+	}
 
 	@Override
 	public String getCollectionType(String elementType) {
-		return getCollectionSimpleType() + "<" + elementType + ">" ; 
+		String collectionType = getCollectionType();
+		if ( ARRAY.equalsIgnoreCase(collectionType) ) {
+			return ARRAY + "<" + elementType + ">";
+		}
+		else {
+			return elementType + BRACKETS;
+		}
 	}
 	
-	@Override
-	public String getCollectionSimpleType() {
-		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
-	}
-
-	@Override
-	public String getCollectionFullType() {
-		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
-	}
-
+//	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "Array" ; // or "Set" ?
+//	private static final String STANDARD_COLLECTION_FULL_TYPE   = "Array" ; // or "Set" ?
+//	
+////	@Override
+////	public void setSpecificCollectionType(String specificCollectionType) {
+////		this.setSpecificCollectionFullType(specificCollectionType) ;
+////		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
+////	}
+//
+//	@Override
+//	public String getCollectionType(String elementType) {
+//		return getCollectionSimpleType() + "<" + elementType + ">" ; 
+//	}
+//	
+//	@Override
+//	public String getCollectionSimpleType() {
+//		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
+//	}
+//
+//	@Override
+//	public String getCollectionFullType() {
+//		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
+//	}
+//
 }

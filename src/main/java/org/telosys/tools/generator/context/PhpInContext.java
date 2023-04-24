@@ -35,40 +35,40 @@ import org.telosys.tools.generator.context.tools.LinesBuilder;
 //-------------------------------------------------------------------------------------
 public class PhpInContext {
 
-	@VelocityMethod(
-		text={	
-			"Returns the PHP type with a question mark ('?') at the beginning if the attribute is nullable",
-			"for example: '?string' if nullable, else 'string' "
-			},
-		parameters = { 
-				"attribute : the attribute (nullable or not nullable)"
-			},
-		example = {
-				"$php.nullableType($attribute) " 
-			}
-		)
-    public String nullableType( AttributeInContext attribute ) {
-		if ( attribute != null ) {
-			String type = attribute.getType();
-			// add "?" if "nullable"			
-			if ( attribute.isNotNull() ) {
-				// NOT NULL => return type as is : "string", "int", etc
-				return type;				
-			}
-			else {
-				// NULLABLE => add "?" before the php type
-				if ( ! StrUtil.nullOrVoid(type) ) {
-					return "?" + type;
-				}
-				else {
-					return type;
-				}
-			}
-		}
-		else {	
-			throw new IllegalArgumentException("$php.nullableType(attribute) : attribute is null");
-		}
-	}
+//	@VelocityMethod(
+//		text={	
+//			"Returns the PHP type with a question mark ('?') at the beginning if the attribute is nullable",
+//			"for example: '?string' if nullable, else 'string' "
+//			},
+//		parameters = { 
+//				"attribute : the attribute (nullable or not nullable)"
+//			},
+//		example = {
+//				"$php.nullableType($attribute) " 
+//			}
+//		)
+//    public String nullableType( AttributeInContext attribute ) {
+//		if ( attribute != null ) {
+//			String type = attribute.getType();
+//			// add "?" if "nullable"			
+//			if ( attribute.isNotNull() ) {
+//				// NOT NULL => return type as is : "string", "int", etc
+//				return type;				
+//			}
+//			else {
+//				// NULLABLE => add "?" before the php type
+//				if ( ! StrUtil.nullOrVoid(type) ) {
+//					return "?" + type;
+//				}
+//				else {
+//					return type;
+//				}
+//			}
+//		}
+//		else {	
+//			throw new IllegalArgumentException("$php.nullableType(attribute) : attribute is null");
+//		}
+//	}
 	
 	//-------------------------------------------------------------------------------------
 	// toString METHOD GENERATION

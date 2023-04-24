@@ -103,28 +103,40 @@ public class TypeConverterForGo extends TypeConverter {
 	//  - Array : not applicable
 	//  - Slice : []Type
 	//  - Map   : not applicable
-	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "[]" ; // Slice
-	private static final String STANDARD_COLLECTION_FULL_TYPE   = "[]" ; // Slice
-	
-//	@Override
-//	public void setSpecificCollectionType(String specificCollectionType) {
-//		this.setSpecificCollectionFullType(specificCollectionType) ;
-//		this.setSpecificCollectionSimpleType(specificCollectionType);
-//	}
+
+	@Override
+	public String getCollectionType() {
+		return "[]" ; 
+	}
 
 	@Override
 	public String getCollectionType(String elementType) {
-		return getCollectionSimpleType() + elementType ;  // "[]type"
+		// not applicable : syntax "int myarray[]" => just return "int[]"
+		return elementType + "[]";  
 	}
 	
-	@Override
-	public String getCollectionSimpleType() {
-		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
-	}
-
-	@Override
-	public String getCollectionFullType() {
-		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
-	}
+//	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "[]" ; // Slice
+//	private static final String STANDARD_COLLECTION_FULL_TYPE   = "[]" ; // Slice
+//	
+////	@Override
+////	public void setSpecificCollectionType(String specificCollectionType) {
+////		this.setSpecificCollectionFullType(specificCollectionType) ;
+////		this.setSpecificCollectionSimpleType(specificCollectionType);
+////	}
+//
+//	@Override
+//	public String getCollectionType(String elementType) {
+//		return getCollectionSimpleType() + elementType ;  // "[]type"
+//	}
+//	
+//	@Override
+//	public String getCollectionSimpleType() {
+//		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
+//	}
+//
+//	@Override
+//	public String getCollectionFullType() {
+//		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
+//	}
 
 }

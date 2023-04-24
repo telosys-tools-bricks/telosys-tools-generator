@@ -32,33 +32,33 @@ public class PhpInContextTest {
 		return buildAttributeNotNull(attribName, neutralType, false);
 	}
 
-	@Test 
-	public void testAttributeTypeNotNull() throws GeneratorException {
-		assertEquals("string",   getPhpObject().nullableType( buildAttributeNotNull("x", "string") ) );
-		assertEquals("int",      getPhpObject().nullableType( buildAttributeNotNull("x", "int") ) );
-		assertEquals("int",      getPhpObject().nullableType( buildAttributeNotNull("x", "short") ) );
-		assertEquals("DateTime", getPhpObject().nullableType( buildAttributeNotNull("x", "timestamp") ) );
-	}
-
-	@Test 
-	public void testAttributeTypeNotNullNoType() throws GeneratorException {
-		assertEquals("",         getPhpObject().nullableType( buildAttributeNotNull("x", "date") ) );
-		assertEquals("",         getPhpObject().nullableType( buildAttributeNotNull("x", "time") ) );
-	}
-
-	@Test 
-	public void testAttributeTypeNullable() throws GeneratorException {
-		assertEquals("?string",   getPhpObject().nullableType( buildAttributeNullable("x", "string") ) );
-		assertEquals("?int",      getPhpObject().nullableType( buildAttributeNullable("x", "int") ) );
-		assertEquals("?int",      getPhpObject().nullableType( buildAttributeNullable("x", "short") ) );
-		assertEquals("?DateTime", getPhpObject().nullableType( buildAttributeNullable("x", "timestamp") ) );
-	}
-
-	@Test 
-	public void testAttributeTypeNullableNoType() throws GeneratorException {
-		assertEquals("",         getPhpObject().nullableType( buildAttributeNullable("x", "date") ) );
-		assertEquals("",         getPhpObject().nullableType( buildAttributeNullable("x", "time") ) );
-	}
+//	@Test 
+//	public void testAttributeTypeNotNull() throws GeneratorException {
+//		assertEquals("string",   getPhpObject().nullableType( buildAttributeNotNull("x", "string") ) );
+//		assertEquals("int",      getPhpObject().nullableType( buildAttributeNotNull("x", "int") ) );
+//		assertEquals("int",      getPhpObject().nullableType( buildAttributeNotNull("x", "short") ) );
+//		assertEquals("DateTime", getPhpObject().nullableType( buildAttributeNotNull("x", "timestamp") ) );
+//	}
+//
+//	@Test 
+//	public void testAttributeTypeNotNullNoType() throws GeneratorException {
+//		assertEquals("",         getPhpObject().nullableType( buildAttributeNotNull("x", "date") ) );
+//		assertEquals("",         getPhpObject().nullableType( buildAttributeNotNull("x", "time") ) );
+//	}
+//
+//	@Test 
+//	public void testAttributeTypeNullable() throws GeneratorException {
+//		assertEquals("?string",   getPhpObject().nullableType( buildAttributeNullable("x", "string") ) );
+//		assertEquals("?int",      getPhpObject().nullableType( buildAttributeNullable("x", "int") ) );
+//		assertEquals("?int",      getPhpObject().nullableType( buildAttributeNullable("x", "short") ) );
+//		assertEquals("?DateTime", getPhpObject().nullableType( buildAttributeNullable("x", "timestamp") ) );
+//	}
+//
+//	@Test 
+//	public void testAttributeTypeNullableNoType() throws GeneratorException {
+//		assertEquals("",         getPhpObject().nullableType( buildAttributeNullable("x", "date") ) );
+//		assertEquals("",         getPhpObject().nullableType( buildAttributeNullable("x", "time") ) );
+//	}
 	
 	private static final String TABS_PUBLIC_FUNCTION_TOSTRING = "\t\tpublic function __toString() {" ;
 	private static final String TABS_CLOSING_BRACE = "\t\t}";

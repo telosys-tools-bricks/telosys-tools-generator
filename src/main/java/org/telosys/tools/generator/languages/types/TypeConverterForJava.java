@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.telosys.tools.commons.JavaTypeUtil;
+import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 /**
@@ -194,28 +195,41 @@ public class TypeConverterForJava extends TypeConverter {
 	//--------------------------------------------------------------------------------------------
 	// Collection type ( since v 3.3.0 )
 	//--------------------------------------------------------------------------------------------	
-	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "List" ;
-	private static final String STANDARD_COLLECTION_FULL_TYPE   = "java.util.List" ;
+	private static final String STANDARD_COLLECTION_TYPE = "List" ;
+	// private static final String STANDARD_COLLECTION_FULL_TYPE   = "java.util.List" ;
 	
-//	@Override
-//	public void setSpecificCollectionType(String specificCollectionType) {
-//		this.setSpecificCollectionFullType(specificCollectionType) ;
-//		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
-//	}
+	@Override
+	public String getCollectionType() {
+		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE) ; 
+	}
 
 	@Override
 	public String getCollectionType(String elementType) {
-		return getCollectionSimpleType() + "<" + elementType + ">" ; 
+		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE) + "<" + elementType + ">" ; 
 	}
 	
-	@Override
-	public String getCollectionSimpleType() {
-		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
-	}
-
-	@Override
-	public String getCollectionFullType() {
-		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
-	}
-
+//	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "List" ;
+//	private static final String STANDARD_COLLECTION_FULL_TYPE   = "java.util.List" ;
+//	
+////	@Override
+////	public void setSpecificCollectionType(String specificCollectionType) {
+////		this.setSpecificCollectionFullType(specificCollectionType) ;
+////		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
+////	}
+//
+//	@Override
+//	public String getCollectionType(String elementType) {
+//		return getCollectionSimpleType() + "<" + elementType + ">" ; 
+//	}
+//	
+//	@Override
+//	public String getCollectionSimpleType() {
+//		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
+//	}
+//
+//	@Override
+//	public String getCollectionFullType() {
+//		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
+//	}
+//
 }

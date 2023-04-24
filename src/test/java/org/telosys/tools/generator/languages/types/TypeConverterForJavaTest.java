@@ -7,6 +7,9 @@ import static org.telosys.tools.generator.languages.types.AttributeTypeConst.PRI
 import static org.telosys.tools.generator.languages.types.AttributeTypeConst.UNSIGNED_TYPE;
 
 import org.junit.Test;
+import org.telosys.tools.commons.exception.TelosysRuntimeException;
+import org.telosys.tools.generator.GeneratorException;
+import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
@@ -267,5 +270,24 @@ public class TypeConverterForJavaTest extends AbstractTypeTest {
 		checkObjectType( getType(NeutralType.BINARY, OBJECT_TYPE + UNSIGNED_TYPE ),    BYTE_ARRAY, BYTE_ARRAY);
 		checkObjectType( getType(NeutralType.BINARY, OBJECT_TYPE + NOT_NULL ),         BYTE_ARRAY, BYTE_ARRAY);
 	}
+	
+	@Test
+	public void testDefaultCollectionType() {
+		println("--- ");
+		TypeConverter typeConverter = getTypeConverter();
+		assertEquals("List", typeConverter.getCollectionType());
+		assertEquals("List<Foo>", typeConverter.getCollectionType("Foo"));
+	}
 
+	@Test
+	public void testSpecificCollectionType() throws GeneratorException {
+		println("--- ");
+		EnvInContext env = new EnvInContext();
+		env.setLanguage(getLanguageName());
+		env.setCollectionType("Set");
+		TypeConverter typeConverter = env.getTypeConverter();
+		
+		assertEquals("Set", typeConverter.getCollectionType());
+		assertEquals("Set<Foo>", typeConverter.getCollectionType("Foo"));
+	}
 }

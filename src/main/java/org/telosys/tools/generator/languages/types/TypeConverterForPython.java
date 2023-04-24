@@ -78,8 +78,17 @@ public class TypeConverterForPython extends TypeConverter {
 	// Collection type ( since v 3.3.0 )
 	//--------------------------------------------------------------------------------------------
 	// NOT APPLICABLE FOR 'PYTHON' :
-	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "" ; 
-	private static final String STANDARD_COLLECTION_FULL_TYPE   = "" ; 
+	@Override
+	public String getCollectionType() {
+		return "" ;
+	}
+	@Override
+	public String getCollectionType(String elementType) {
+		return "" ;
+	}
+	
+//	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "" ; 
+//	private static final String STANDARD_COLLECTION_FULL_TYPE   = "" ; 
 
 //	@Override
 //	public void setSpecificCollectionType(String specificCollectionType) {
@@ -87,19 +96,19 @@ public class TypeConverterForPython extends TypeConverter {
 //		this.setSpecificCollectionSimpleType(specificCollectionType);
 //	}
 
-	@Override
-	public String getCollectionType(String elementType) {
-		return getCollectionSimpleType() ;
-	}
-	
-	@Override
-	public String getCollectionSimpleType() {
-		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
-	}
-
-	@Override
-	public String getCollectionFullType() {
-		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
-	}
+//	@Override
+//	public String getCollectionType(String elementType) {
+//		return getCollectionSimpleType() ;
+//	}
+//	
+//	@Override
+//	public String getCollectionSimpleType() {
+//		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
+//	}
+//
+//	@Override
+//	public String getCollectionFullType() {
+//		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
+//	}
 
 }

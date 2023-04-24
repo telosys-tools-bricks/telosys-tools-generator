@@ -106,8 +106,8 @@ public class TypeConverterForCPlusPlus extends TypeConverter {
 	// Collections for C++ :
 	//  - standard array : "int myarray[]" or "int myarray[40]"
 	//  - array library  : "#include <array>" / "array<int,3> myarray {10,20,30};"
-	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "[]" ;  // not applicable
-	private static final String STANDARD_COLLECTION_FULL_TYPE   = "[]" ;  // not applicable
+//	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "[]" ;  // not applicable
+//	private static final String STANDARD_COLLECTION_FULL_TYPE   = "[]" ;  // not applicable
 	
 //	@Override
 //	public void setSpecificCollectionType(String specificCollectionType) {
@@ -116,18 +116,24 @@ public class TypeConverterForCPlusPlus extends TypeConverter {
 //	}
 
 	@Override
-	public String getCollectionType(String elementType) {
-		return elementType + getCollectionSimpleType()  ;  // not applicable : syntax "int myarray[]" => just return "int[]"
-	}
-	
-	@Override
-	public String getCollectionSimpleType() {
-		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
+	public String getCollectionType() {
+		return "[]" ; 
 	}
 
 	@Override
-	public String getCollectionFullType() {
-		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
+	public String getCollectionType(String elementType) {
+		// not applicable : syntax "int myarray[]" => just return "int[]"
+		return elementType + "[]";  
 	}
+	
+//	@Override
+//	public String getCollectionSimpleType() {
+//		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
+//	}
+//
+//	@Override
+//	public String getCollectionFullType() {
+//		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
+//	}
 
 }

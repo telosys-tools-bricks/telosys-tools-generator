@@ -7,6 +7,8 @@ import static org.telosys.tools.generator.languages.types.AttributeTypeConst.PRI
 import static org.telosys.tools.generator.languages.types.AttributeTypeConst.UNSIGNED_TYPE;
 
 import org.junit.Test;
+import org.telosys.tools.generator.GeneratorException;
+import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
@@ -270,4 +272,38 @@ public class TypeConverterForTypeScriptTest extends AbstractTypeTest {
 		assertEquals("Date", lt.getWrapperType());
 		assertFalse(lt.isPrimitiveType());
 	}
+
+	@Test
+	public void testDefaultCollectionType() { 
+		TypeConverter typeConverter = getTypeConverter();
+		// "[]" shorthand syntax by default 
+		assertEquals("[]", typeConverter.getCollectionType());
+		assertEquals("Foo[]", typeConverter.getCollectionType("Foo"));
+	}
+
+	@Test
+	public void testSpecificCollectionType() throws GeneratorException {
+		EnvInContext env = new EnvInContext();
+		env.setLanguage(getLanguageName());
+		TypeConverter typeConverter = env.getTypeConverter();
+		
+		// "Array" is the only alternative to "[]" in TypeScript 
+		env.setCollectionType("Array");
+		assertEquals("Array", typeConverter.getCollectionType());
+		assertEquals("Array<Foo>", typeConverter.getCollectionType("Foo"));
+		env.setCollectionType("Array");
+
+		// "Array" is the only alternative to "[]" in TypeScript 
+		env.setCollectionType("Other");
+		assertEquals("[]", typeConverter.getCollectionType());
+		assertEquals("Foo[]", typeConverter.getCollectionType("Foo"));
+		env.setCollectionType("Array");
+
+		// "Array" is not case sensitive 
+		env.setCollectionType("ARRAY");
+		assertEquals("Array", typeConverter.getCollectionType());
+		assertEquals("Array<Foo>", typeConverter.getCollectionType("Foo"));
+		env.setCollectionType("Array");
+	}
+	
 }

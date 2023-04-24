@@ -15,6 +15,7 @@
  */
 package org.telosys.tools.generator.languages.types;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,6 +51,8 @@ public class TypeConverterForKotlin extends TypeConverter {
 	public static final String JAVA_LOCALTIME     = "java.time.LocalTime" ;
 	public static final String JAVA_LOCALDATETIME = "java.time.LocalDateTime" ;	
 	
+	private final HashMap<String, LanguageType> unsignedTypes = new HashMap<>();
+	
 	public TypeConverterForKotlin() {
 		super("Kotlin");
 		
@@ -64,17 +67,23 @@ public class TypeConverterForKotlin extends TypeConverter {
 		declarePrimitiveType( buildPrimitiveType(NeutralType.DOUBLE,  KOTLIN_DOUBLE) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY,  KOTLIN_BYTEARRAY) );
 
-		//--- Primitive types for "UNSIGNED" option 
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.BYTE,    KOTLIN_UBYTE  ) );
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.SHORT,   KOTLIN_USHORT ) );
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.INTEGER, KOTLIN_UINT   ) );
-		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.LONG,    KOTLIN_ULONG  ) );
+//		//--- Primitive types for "UNSIGNED" option 
+//		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.BYTE,    KOTLIN_UBYTE  ) );
+//		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.SHORT,   KOTLIN_USHORT ) );
+//		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.INTEGER, KOTLIN_UINT   ) );
+//		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.LONG,    KOTLIN_ULONG  ) );
 		
 		//--- Object types : Java types used in Kotlin are considered as "object types"		
 		declareObjectType( buildObjectType(NeutralType.DECIMAL,   JAVA_BIGDECIMAL) );
 		declareObjectType( buildObjectType(NeutralType.DATE,      JAVA_LOCALDATE) );
 		declareObjectType( buildObjectType(NeutralType.TIME,      JAVA_LOCALTIME) );
 		declareObjectType( buildObjectType(NeutralType.TIMESTAMP, JAVA_LOCALDATETIME) );
+		
+		//--- Unsigned primitive types : 
+		unsignedTypes.put( KOTLIN_BYTE,  buildPrimitiveType(NeutralType.BYTE,    KOTLIN_UBYTE  ) );
+		unsignedTypes.put( KOTLIN_SHORT, buildPrimitiveType(NeutralType.SHORT,   KOTLIN_USHORT ) );
+		unsignedTypes.put( KOTLIN_INT,   buildPrimitiveType(NeutralType.INTEGER, KOTLIN_UINT   ) );
+		unsignedTypes.put( KOTLIN_LONG,  buildPrimitiveType(NeutralType.LONG,    KOTLIN_ULONG  ) );
 	}
 
 	private LanguageType buildPrimitiveType(String neutralType, String primitiveType)  {
@@ -107,49 +116,130 @@ public class TypeConverterForKotlin extends TypeConverter {
 	@Override
 	public LanguageType getType(AttributeTypeInfo attributeTypeInfo) {
 		
-		// Search first in primitive types (with optionally "unsigned option" )
-		LanguageType lt = getPrimitiveType(attributeTypeInfo.getNeutralType(), attributeTypeInfo.isUnsignedTypeExpected() ) ; 
-		if ( lt != null ) { // FOUND
-			return lt ;
+//		// Search first in primitive types (with optionally "unsigned option" )
+//		LanguageType lt = getPrimitiveType(attributeTypeInfo.getNeutralType(), attributeTypeInfo.isUnsignedTypeExpected() ) ; 
+//		if ( lt != null ) { // FOUND
+//			return lt ;
+//		}
+//		else { // NOT FOUND in primitive types
+//			// Search in object types
+//			lt = getObjectType(attributeTypeInfo.getNeutralType() ) ;
+//			if ( lt != null ) { // FOUND
+//				return lt ;
+//			}
+//			else {
+//				// Still not found !!!
+//				throw new TelosysTypeNotFoundException(getLanguageName(), attributeTypeInfo);
+//			}		
+//		}
+		// Get the standard type 
+		LanguageType languageType = getStandardType(attributeTypeInfo);
+		
+		// An object type is explicitly required ( @ObjectType )
+		if ( attributeTypeInfo.isObjectTypeExpected() ) {
+			languageType = getObjectType(languageType );
 		}
-		else { // NOT FOUND in primitive types
-			// Search in object types
-			lt = getObjectType(attributeTypeInfo.getNeutralType() ) ;
-			if ( lt != null ) { // FOUND
-				return lt ;
-			}
-			else {
-				// Still not found !!!
-				throw new TelosysTypeNotFoundException(getLanguageName(), attributeTypeInfo);
-			}		
+		
+		// An unsigned type is explicitly required ( @UnsignedType )
+		if ( attributeTypeInfo.isUnsignedTypeExpected() ) {
+			languageType = getUnsignedType(languageType);
+		}
+
+		// If attribute is 'nullable' and '$env.typeWithNullableMark' is TRUE
+		if ( ( nullableMarkCanBeUsed(attributeTypeInfo) ) ) {
+			// Nullable => nullable type with '?' at the end
+			languageType = getNullableType(languageType);
+		}
+
+		// Return resulting type
+		return languageType;
+	}
+	private LanguageType getStandardType(AttributeTypeInfo attributeTypeInfo) {
+		// Try to get primitive type 
+		LanguageType lt = getPrimitiveType(attributeTypeInfo.getNeutralType(), false ) ;
+		if ( lt != null ) {
+			return lt;
+		}
+		// Try to get object type 
+		lt = getObjectType(attributeTypeInfo.getNeutralType() ) ;
+		if ( lt != null ) {
+			return lt;
+		}
+		// Still not found => ERROR !!!
+		throw new TelosysTypeNotFoundException(getLanguageName(), attributeTypeInfo);
+	}
+	/**
+	 * Try to get an object type for the given current type (return same current type if no object type)
+	 * @param currentType
+	 * @return
+	 */
+	private LanguageType getObjectType(LanguageType currentType ) {
+		LanguageType objectType = getObjectType(currentType.getNeutralType() ) ;
+		if ( objectType != null ) {
+			return objectType ; // FOUND
+		}
+		else {
+			return currentType; // Not found : keep current type
 		}
 	}
-	
+	/**
+	 * Try to get an unsigned type for the given current type (return same current type if no object type)
+	 * @param currentType
+	 * @return
+	 */
+	private LanguageType getUnsignedType(LanguageType currentType ) {
+		LanguageType unsignedType = unsignedTypes.get( currentType.getSimpleType() );
+		if ( unsignedType != null ) {
+			return unsignedType ; // FOUND
+		}
+		else {
+			return currentType; // Not found : keep current type
+		}
+	}
+	private static final String NULLABLE_MARK = "?";
+	private LanguageType getNullableType(LanguageType currentType ) {
+		return new LanguageType(
+				currentType.getNeutralType(),
+				currentType.getSimpleType() + NULLABLE_MARK,
+				currentType.getFullType() + NULLABLE_MARK,
+				currentType.isPrimitiveType(),
+				currentType.getWrapperType() + NULLABLE_MARK);
+	}
+
 	//--------------------------------------------------------------------------------------------
 	// Collection type ( since v 3.3.0 )
 	//--------------------------------------------------------------------------------------------	
-	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "List" ;
-	private static final String STANDARD_COLLECTION_FULL_TYPE   = "List" ; // no import required
+	private static final String STANDARD_COLLECTION_TYPE = "List" ; // no import required in Kotlin
 	
-//	@Override
-//	public void setSpecificCollectionType(String specificCollectionType) {
-//		this.setSpecificCollectionFullType(specificCollectionType) ;
-//		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
-//	}
-
+	@Override
+	public String getCollectionType() {
+		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE) ; 
+	}
+	
 	@Override
 	public String getCollectionType(String elementType) {
-		return getCollectionSimpleType() + "<" + elementType + ">" ; 
+		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE) + "<" + elementType + ">" ; 
 	}
 	
-	@Override
-	public String getCollectionSimpleType() {
-		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
-	}
-
-	@Override
-	public String getCollectionFullType() {
-		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
-	}
-
+////	@Override
+////	public void setSpecificCollectionType(String specificCollectionType) {
+////		this.setSpecificCollectionFullType(specificCollectionType) ;
+////		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
+////	}
+//
+//	@Override
+//	public String getCollectionType(String elementType) {
+//		return getCollectionSimpleType() + "<" + elementType + ">" ; 
+//	}
+//	
+//	@Override
+//	public String getCollectionSimpleType() {
+//		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
+//	}
+//
+//	@Override
+//	public String getCollectionFullType() {
+//		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
+//	}
+//
 }
