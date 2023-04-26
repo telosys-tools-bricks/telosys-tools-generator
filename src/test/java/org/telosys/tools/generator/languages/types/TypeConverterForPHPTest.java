@@ -41,15 +41,8 @@ public class TypeConverterForPHPTest extends AbstractTypeTest {
 		assertEquals(primitiveType, lt.getWrapperType() );
 	}
 
-	private void checkPrimitiveTypeExpected(String neutralType, String targetType) {
-		checkPrimitiveType( getType( neutralType, NOT_NULL ),                  targetType );
-		checkPrimitiveType( getType( neutralType, NOT_NULL + PRIMITIVE_TYPE),  targetType );
-		checkPrimitiveType( getType( neutralType, NOT_NULL + OBJECT_TYPE ),    targetType );
-		checkPrimitiveType( getType( neutralType, NOT_NULL + UNSIGNED_TYPE ),  targetType );
-	}
-	
 	private static final String PHP_STRING          = "string";
-	private static final String PHP_STRING_NULLABLE = "string"; // TODO "?string"
+	private static final String PHP_STRING_NULLABLE = "?string";
 	@Test
 	public void testString() {
 		checkPrimitiveType( getType(NeutralType.STRING, NONE ),                           PHP_STRING_NULLABLE );
@@ -58,60 +51,111 @@ public class TypeConverterForPHPTest extends AbstractTypeTest {
 		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE + UNSIGNED_TYPE ), PHP_STRING_NULLABLE );
 		checkPrimitiveType( getType(NeutralType.STRING, OBJECT_TYPE),                     PHP_STRING_NULLABLE );
 		checkPrimitiveType( getType(NeutralType.STRING, NOT_NULL ),                       PHP_STRING );
+		// force $env.typeWithNullableMark = false
+		EnvInContext env = getEnv();
+		env.setTypeWithNullableMark(false);
+		TypeConverter tc = env.getTypeConverter();
+		checkPrimitiveType( tc.getType(new AttributeTypeInfoForTest(NeutralType.STRING, NONE)), PHP_STRING );
 	}
 
+	//----------------------------------------------------------------------------------
+	private static final String PHP_BOOL          = "bool";
+	private static final String PHP_BOOL_NULLABLE = "?bool";
 	@Test
 	public void testBoolean() {
-		checkPrimitiveTypeExpected(NeutralType.BOOLEAN,  "bool");
+		checkPrimitiveType( getType(NeutralType.BOOLEAN, NONE ),                           PHP_BOOL_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.BOOLEAN, PRIMITIVE_TYPE ),                 PHP_BOOL_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.BOOLEAN, UNSIGNED_TYPE ),                  PHP_BOOL_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.BOOLEAN, PRIMITIVE_TYPE + UNSIGNED_TYPE ), PHP_BOOL_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.BOOLEAN, OBJECT_TYPE),                     PHP_BOOL_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.BOOLEAN, NOT_NULL ),                       PHP_BOOL );
+		// force $env.typeWithNullableMark = false
+		EnvInContext env = getEnv();
+		env.setTypeWithNullableMark(false);
+		TypeConverter tc = env.getTypeConverter();
+		checkPrimitiveType( tc.getType(new AttributeTypeInfoForTest(NeutralType.BOOLEAN, NONE)), PHP_BOOL );
 	}
 
+	//----------------------------------------------------------------------------------
+	private static final String PHP_INT          = "int";
+	private static final String PHP_INT_NULLABLE = "?int";
+	private void checkIntTypeExpected(String neutralType) {
+		checkPrimitiveType( getType(neutralType, NONE ),                           PHP_INT_NULLABLE );
+		checkPrimitiveType( getType(neutralType, PRIMITIVE_TYPE ),                 PHP_INT_NULLABLE );
+		checkPrimitiveType( getType(neutralType, UNSIGNED_TYPE ),                  PHP_INT_NULLABLE );
+		checkPrimitiveType( getType(neutralType, PRIMITIVE_TYPE + UNSIGNED_TYPE ), PHP_INT_NULLABLE );
+		checkPrimitiveType( getType(neutralType, OBJECT_TYPE),                     PHP_INT_NULLABLE );
+		checkPrimitiveType( getType(neutralType, NOT_NULL ),                       PHP_INT );
+	}
 	@Test
 	public void testByte() {
-		checkPrimitiveTypeExpected(NeutralType.BYTE,  "int");
+		checkIntTypeExpected(NeutralType.BYTE);
 	}
-
 	@Test
 	public void testShort() {
-		checkPrimitiveTypeExpected(NeutralType.SHORT,  "int");
+		checkIntTypeExpected(NeutralType.SHORT);
 	}
-
 	@Test
 	public void testInteger() {
-		checkPrimitiveTypeExpected(NeutralType.INTEGER,  "int");
+		checkIntTypeExpected(NeutralType.INTEGER);
 	}
-
 	@Test
 	public void testLong() {
-		checkPrimitiveTypeExpected(NeutralType.LONG,  "int");
+		checkIntTypeExpected(NeutralType.LONG);
 	}
 
+	//----------------------------------------------------------------------------------
+	private static final String PHP_FLOAT          = "float";
+	private static final String PHP_FLOAT_NULLABLE = "?float";
+	private void checkFloatTypeExpected(String neutralType) {
+		checkPrimitiveType( getType(neutralType, NONE ),                           PHP_FLOAT_NULLABLE );
+		checkPrimitiveType( getType(neutralType, PRIMITIVE_TYPE ),                 PHP_FLOAT_NULLABLE );
+		checkPrimitiveType( getType(neutralType, UNSIGNED_TYPE ),                  PHP_FLOAT_NULLABLE );
+		checkPrimitiveType( getType(neutralType, PRIMITIVE_TYPE + UNSIGNED_TYPE ), PHP_FLOAT_NULLABLE );
+		checkPrimitiveType( getType(neutralType, OBJECT_TYPE),                     PHP_FLOAT_NULLABLE );
+		checkPrimitiveType( getType(neutralType, NOT_NULL ),                       PHP_FLOAT );
+	}
 	@Test
 	public void testFloat() {
-		checkPrimitiveTypeExpected(NeutralType.FLOAT,  "float");
+		checkFloatTypeExpected(NeutralType.FLOAT);
 	}
-
 	@Test
 	public void testDouble() {
-		checkPrimitiveTypeExpected(NeutralType.DOUBLE,  "float");
+		checkFloatTypeExpected(NeutralType.DOUBLE);
 	}
-
 	@Test
 	public void testDecimal() {
-		checkPrimitiveTypeExpected(NeutralType.DECIMAL,  "float");
+		checkFloatTypeExpected(NeutralType.DECIMAL);
 	}
 
+	//----------------------------------------------------------------------------------
+	private static final String PHP_DATETIME          = "DateTime";
+	private static final String PHP_DATETIME_NULLABLE = "?DateTime";
 	private void checkDateTimeExpected(String neutralType) {
-		checkObjectType( getType( neutralType, NOT_NULL ),                 "DateTime", "\\DateTime");
-		checkObjectType( getType( neutralType, NOT_NULL + PRIMITIVE_TYPE), "DateTime", "\\DateTime" );
-		checkObjectType( getType( neutralType, NOT_NULL + OBJECT_TYPE),    "DateTime", "\\DateTime" );
-		checkObjectType( getType( neutralType, NOT_NULL + UNSIGNED_TYPE ), "DateTime", "\\DateTime");
+		checkObjectType( getType(neutralType, NONE ),                           PHP_DATETIME_NULLABLE, PHP_DATETIME_NULLABLE );
+		checkObjectType( getType(neutralType, PRIMITIVE_TYPE ),                 PHP_DATETIME_NULLABLE, PHP_DATETIME_NULLABLE );
+		checkObjectType( getType(neutralType, UNSIGNED_TYPE ),                  PHP_DATETIME_NULLABLE, PHP_DATETIME_NULLABLE );
+		checkObjectType( getType(neutralType, PRIMITIVE_TYPE + UNSIGNED_TYPE ), PHP_DATETIME_NULLABLE, PHP_DATETIME_NULLABLE );
+		checkObjectType( getType(neutralType, OBJECT_TYPE),                     PHP_DATETIME_NULLABLE, PHP_DATETIME_NULLABLE );
+		checkObjectType( getType(neutralType, NOT_NULL ),                  PHP_DATETIME, PHP_DATETIME );
+		checkObjectType( getType(neutralType, NOT_NULL + PRIMITIVE_TYPE),  PHP_DATETIME, PHP_DATETIME );
+		checkObjectType( getType(neutralType, NOT_NULL + OBJECT_TYPE),     PHP_DATETIME, PHP_DATETIME );
+		checkObjectType( getType(neutralType, NOT_NULL + UNSIGNED_TYPE ),  PHP_DATETIME, PHP_DATETIME );
 	}
-
+	@Test
+	public void testDate() {
+		checkDateTimeExpected(NeutralType.DATE);
+	}
+	@Test
+	public void testTime() {
+		checkDateTimeExpected(NeutralType.TIME);
+	}
 	@Test
 	public void testTimestamp() {
 		checkDateTimeExpected(NeutralType.TIMESTAMP);
 	}
 
+	//----------------------------------------------------------------------------------
 	private void checkVoidExpected(String neutralType) {
 		checkObjectType( getType( neutralType, NONE ),                  "", "" );
 		checkObjectType( getType( neutralType, PRIMITIVE_TYPE ),        "", "" );
@@ -123,22 +167,12 @@ public class TypeConverterForPHPTest extends AbstractTypeTest {
 		checkObjectType( getType( neutralType, NOT_NULL + OBJECT_TYPE ),    "", "");
 		checkObjectType( getType( neutralType, NOT_NULL + UNSIGNED_TYPE),   "", "");
 	}
-
-	@Test
-	public void testDate() {
-		checkVoidExpected(NeutralType.DATE);
-	}
-
-	@Test
-	public void testTime() {
-		checkVoidExpected(NeutralType.TIME);
-	}
-
 	@Test
 	public void testBinary() {
 		checkVoidExpected(NeutralType.BINARY);
 	}
 	
+	//----------------------------------------------------------------------------------
 	@Test
 	public void testDefaultCollectionType() { 
 		TypeConverter typeConverter = getTypeConverter();

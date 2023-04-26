@@ -46,9 +46,10 @@ public class TypeConverterForPHP extends TypeConverter {
 		declarePrimitiveType( buildPrimitiveType(NeutralType.DOUBLE,  PHP_FLOAT ) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.DECIMAL, PHP_FLOAT ) );
 		
-		declareObjectType( buildObjectType(NeutralType.DATE,      "", "" ) ); 
-		declareObjectType( buildObjectType(NeutralType.TIME,      "", "" ) );
-		declareObjectType( buildObjectType(NeutralType.TIMESTAMP, "DateTime", "\\DateTime" ) ); // backslash is "global namespace" 
+		declareObjectType( buildObjectType(NeutralType.DATE,      "DateTime", "DateTime" ) ); 
+		declareObjectType( buildObjectType(NeutralType.TIME,      "DateTime", "DateTime" ) );
+		declareObjectType( buildObjectType(NeutralType.TIMESTAMP, "DateTime", "DateTime" ) );  
+		
 		declareObjectType( buildObjectType(NeutralType.BINARY,    "", "" ) ); 		
 	}
 	
@@ -78,19 +79,52 @@ public class TypeConverterForPHP extends TypeConverter {
 	
 	@Override
 	public LanguageType getType(AttributeTypeInfo attributeTypeInfo) {
-		// Search a "primitive type" first 
-		LanguageType languageType = getPrimitiveType(attributeTypeInfo.getNeutralType() ) ; 
-		if ( languageType != null ) { // FOUND
-			return languageType ;
+		// Get the standard type 
+		LanguageType languageType = getStandardType(attributeTypeInfo);
+		
+		// No wrapper object type in PHP ( @ObjectType )
+		// No unsigned type in PHP( @UnsignedType )
+		
+		// If attribute is 'nullable' and '$env.typeWithNullableMark' is TRUE
+		if ( ( nullableMarkCanBeUsed(attributeTypeInfo) ) ) {
+			// Nullable => nullable type with '?' at the beginning
+			languageType = getNullableType(languageType);
+		}
+
+		// Return resulting type
+		return languageType;
+
+	}
+
+	private LanguageType getStandardType(AttributeTypeInfo attributeTypeInfo) {
+		// Try to get primitive type 
+		LanguageType lt = getPrimitiveType(attributeTypeInfo.getNeutralType() ) ;
+		if ( lt != null ) {
+			return lt;
+		}
+		// Try to get object type 
+		lt = getObjectType(attributeTypeInfo.getNeutralType() ) ;
+		if ( lt != null ) {
+			return lt;
+		}
+		// Still not found => ERROR !!!
+		throw new TelosysTypeNotFoundException(getLanguageName(), attributeTypeInfo);
+	}
+	private static final String NULLABLE_MARK = "?";
+	private LanguageType getNullableType(LanguageType currentType ) {
+		if ( currentType.isEmpty() ) {
+			// empty type => keep it void
+			return currentType;
 		}
 		else {
-			// if "primitive type" not found search an "object type" : date, timestamp
-			languageType = getObjectType(attributeTypeInfo.getNeutralType() ) ;
-			if ( languageType != null ) { // FOUND
-				return languageType ;
-			}
+			// not empty type => add '?'
+			return new LanguageType(
+					currentType.getNeutralType(),
+					NULLABLE_MARK + currentType.getSimpleType(),
+					NULLABLE_MARK + currentType.getFullType(),
+					currentType.isPrimitiveType(),
+					NULLABLE_MARK + currentType.getWrapperType());
 		}
-		throw new TelosysTypeNotFoundException(getLanguageName(), attributeTypeInfo);
 	}
 	
 	//--------------------------------------------------------------------------------------------

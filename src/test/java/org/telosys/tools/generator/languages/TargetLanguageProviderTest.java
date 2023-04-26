@@ -171,9 +171,12 @@ public class TargetLanguageProviderTest  {
 		Assert.assertEquals("", tl.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
 		Assert.assertEquals("", tl.argumentsListWithType(null) );
 		// $env.typeWithNullableMark = default value = true => '?' at the end of type if nullable  ( id is not null => no '?' )
-		Assert.assertEquals("int $id, string $name, bool $flag, $birthDate", tl.argumentsListWithType(attributes) );
+		Assert.assertEquals("int $id, ?string $name, ?bool $flag, ?DateTime $birthDate", tl.argumentsListWithType(attributes) );
 		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) ); // same result with wrapper type
-		
+		// $env.typeWithNullableMark = false =>  no '?' in the type
+		env.setTypeWithNullableMark(false); 
+		Assert.assertEquals("int $id, string $name, bool $flag, DateTime $birthDate", tl.argumentsListWithType(attributes) );
+		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) ); // same result with wrapper type
 	}
 
 	@Test

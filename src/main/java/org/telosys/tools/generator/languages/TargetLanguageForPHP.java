@@ -81,13 +81,13 @@ public class TargetLanguageForPHP extends TargetLanguage {
 		for ( AttributeInContext attribute : attributes ) {
 			// example : "function add(int $a, int $b, ?string $s)"
 			if ( n > 0 ) sb.append(", ");
-			// FIRST : the type 
+			// argument type 
 			String type = attribute.getType();
 			if ( type.trim().length() > 0 ) {
-				sb.append( attribute.getType() ) ; 
+				sb.append( type ) ; 
 				sb.append( " " ) ;
 			}
-			// AFTER : the name "$xx"
+			// argument name "$xx"
 			sb.append( "$" ).append( attribute.getName() ) ;
 			n++;
 		}

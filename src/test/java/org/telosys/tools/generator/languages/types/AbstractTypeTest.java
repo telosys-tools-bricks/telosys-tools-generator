@@ -58,8 +58,6 @@ public abstract class AbstractTypeTest {
 	}
 
 	protected LanguageType getType(AttributeTypeInfo typeInfo ) {
-//		LanguageType languageType = getTypeConverter().getType(typeInfo);
-//		println( "AttributeTypeInfo : " + typeInfo + " --> " + languageType );
 		return getType(this.getTypeConverter(), typeInfo );
 	}
 	protected LanguageType getType(EnvInContext env, AttributeTypeInfo typeInfo ) {		
