@@ -37,23 +37,6 @@ public class LinesBuilder {
 		this.indentationValue = indentationValue ;
 	}
 
-//	/**
-//	 * Constructor for SPACES indentation
-//	 * @param nSpaces number of spaces to build indentation value
-//	 */
-//	public LinesBuilder(int nSpaces) {
-//		super();
-//		this.sb = new StringBuilder() ;
-//		this.indentationValue = buildIndentationWithSpaces(nSpaces) ;
-//	}
-//	private String buildIndentationWithSpaces(int nSpaces) {
-//		StringBuilder spaces = new StringBuilder();
-//		for ( int n = 0 ; n < nSpaces ; n++ ) {
-//			spaces.append(" ");
-//		}
-//		return spaces.toString();
-//	}
-
 	/**
 	 * Appends the given line after the given indentation string
 	 * @param indentationString  a string to be put before the given line 

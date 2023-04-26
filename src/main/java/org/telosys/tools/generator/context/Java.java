@@ -323,184 +323,330 @@ public class Java {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns a string containing all the code for a Java 'toString' method",
+			"Returns a string containing all the code for a Java 'toString()' method",
 			"Generates a 'toString' method using all the attributes of the given entity",
-			"(excluded types are 'array', 'Clob', 'Blob', and 'Long Text String') "
+			"(except non-printable attributes)",
+			"Indentation with TABS (1 tab for each indentation level)"
 			},
 		example={ 
-			"$java.toStringMethod( $entity, 4 )" },
+			"$java.toStringMethod( $entity, 2 )" },
 		parameters = { 
-			"entity : the entity providing the attributes to be used in the 'toString' method",
-			"indentSpaces : number of spaces to be used for each indentation level"},
-		since = "2.1.0"
+			"entity : the entity for which to generate the 'toString' method",
+			"indentationLevel : initial indentation level" },
+		since = "4.1.0"
 			)
-	public String toStringMethod( EntityInContext entity, int indentSpaces ) {
-		return toStringMethod(entity.getAttributes(), indentSpaces );
+//	public String toStringMethod( EntityInContext entity, int indentSpaces ) {
+	public String toStringMethod( EntityInContext entity, int indentationLevel ) {
+//		return toStringMethod(entity.getAttributes(), indentSpaces );
+		return buildToStringMethod( entity, entity.getAttributes(), indentationLevel, new LinesBuilder() ); 		
 	}
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns a string containing all the code for a Java 'toString' method",
-			"Generates a 'toString' method using all the given attributes ",
-			"(excluded types are 'array', 'Clob', 'Blob', and 'Long Text String') "
+			"Returns a string containing all the code for a Java 'toString()' method",
+			"Generates a 'toString' method using all the attributes of the given entity",
+			"(except non-printable attributes)",
+			"Indentation with SPACES (1 'indentationString' for each indentation level)"
 			},
 		example={ 
-			"$java.toStringMethod( $attributes, 4 )" },
+			"$csharp.toStringMethod( $entity, 2, '  ' )" },
 		parameters = { 
-			"attributes : list of attributes to be used in the 'toString' method",
-			"indentSpaces : number of spaces to be used for each indentation level"},
-		since = "2.1.0"
+			"entity : the entity for which to generate the 'toString' method",
+			"indentationLevel : initial indentation level",
+			"indentationString : string to use for each indentation (usually N spaces)"},
+		since = "4.1.0"
 			)
-	public String toStringMethod( List<AttributeInContext> attributes, int indentSpaces ) {
-
-		LinesBuilder lb = new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) ;
-		int indent = 1 ;
-		lb.append(indent, "public String toString() { ");
-		
-		indent++;
-		lb.append(indent, "StringBuilder sb = new StringBuilder(); ");
-		//--- All the given attributes 
-		if ( attributes != null ) {
-			toStringForAttributes( attributes, lb, indent );
-		}
-		lb.append(indent, "return sb.toString(); ");
-		indent--;
-		
-		lb.append(indent, "} ");
-		return lb.toString();
+	public String toStringMethod( EntityInContext entity, int indentationLevel, String indentationString ) {
+		return buildToStringMethod( entity, entity.getAttributes(), indentationLevel, new LinesBuilder(indentationString) ); 
 	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing all the code for a Java 'toString()' method",
+			"Generates a 'toString' method using the given attributes ",
+			"(except non-printable attributes)",
+			"Indent with TABS (1 tab for each indentation level)"
+			},
+		example={ 
+			"$csharp.toStringMethod( $entity, $attributes, 2 )" },
+		parameters = { 
+			"entity : the entity for which to generate the 'toString' method",
+			"attributes : list of attributes to be used in the 'toString' method",
+			"indentationLevel : initial indentation level" },
+		since = "4.1.0"
+			)
+	public String toStringMethod( EntityInContext entity, List<AttributeInContext> attributes, int indentationLevel ) {
+		return buildToStringMethod( entity, attributes, indentationLevel, new LinesBuilder() ); 
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing all the code for a Java 'toString()' method",
+			"Generates a 'toString' method using the given attributes ",
+			"(except non-printable attributes)",
+			"Indentation with spaces (1 'indentationString' for each indentation level)"
+			},
+		example={ 
+			"$csharp.toStringMethod( $entity, $attributes, 2, '  ' )" },
+		parameters = { 
+			"entity : the entity for which to generate the 'toString' method",
+			"attributes : list of attributes to be used in the 'toString' method",
+			"indentationLevel : initial indentation level",
+			"indentationString : string to use for each indentation (usually N spaces) "},
+		since = "4.1.0"
+			)
+	public String toStringMethod( EntityInContext entity, List<AttributeInContext> attributes, int indentationLevel, String indentationString ) {
+		return buildToStringMethod( entity, attributes, indentationLevel, new LinesBuilder(indentationString) ); 
+	}
+
+	//-------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns a string containing all the code for a Java 'toString' method",
+//			"Generates a 'toString' method using all the given attributes ",
+//			"(excluded types are 'array', 'Clob', 'Blob', and 'Long Text String') "
+//			},
+//		example={ 
+//			"$java.toStringMethod( $attributes, 4 )" },
+//		parameters = { 
+//			"attributes : list of attributes to be used in the 'toString' method",
+//			"indentSpaces : number of spaces to be used for each indentation level"},
+//		since = "2.1.0"
+//			)
+//	public String toStringMethod( List<AttributeInContext> attributes, int indentSpaces ) {
+//
+//		LinesBuilder lb = new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) ;
+//		int indent = 1 ;
+//		lb.append(indent, "public String toString() { ");
+//		
+//		indent++;
+//		lb.append(indent, "StringBuilder sb = new StringBuilder(); ");
+//		//--- All the given attributes 
+//		if ( attributes != null ) {
+//			toStringForAttributes( attributes, lb, indent );
+//		}
+//		lb.append(indent, "return sb.toString(); ");
+//		indent--;
+//		
+//		lb.append(indent, "} ");
+//		return lb.toString();
+//	}
     
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns a string containing all the code for a Java 'toString' method",
-			"Generates a 'toString' method with the primary key attribute or the embedded key ",
-			"and the given list of 'non key' attributes if their type is usable in a 'toString' method",
-			"(excluded types are 'array', 'Clob', 'Blob', and 'Long Text String') "
-			},
-		example={ 
-			"$java.toStringMethod( $entity, $nonKeyAttributes, $embeddedIdName, 4 )" },
-		parameters = { 
-			"entity : the entity to be used",
-			"nonKeyAttributes : list of attributes that are not in the Primary Key",
-			"embeddedIdName : variable name for the embedded id (used only if the entity has a composite primary key) " },
-		since = "2.0.7"
-			)
-	public String toStringMethod( EntityInContext entity, List<AttributeInContext> nonKeyAttributes, String embeddedIdName ) {
-			
-		return toStringMethod( entity , nonKeyAttributes, embeddedIdName, new LinesBuilder() ); 
-	}
+//	@VelocityMethod(
+//		text={	
+//			"Returns a string containing all the code for a Java 'toString' method",
+//			"Generates a 'toString' method with the primary key attribute or the embedded key ",
+//			"and the given list of 'non key' attributes if their type is usable in a 'toString' method",
+//			"(excluded types are 'array', 'Clob', 'Blob', and 'Long Text String') "
+//			},
+//		example={ 
+//			"$java.toStringMethod( $entity, $nonKeyAttributes, $embeddedIdName, 4 )" },
+//		parameters = { 
+//			"entity : the entity to be used",
+//			"nonKeyAttributes : list of attributes that are not in the Primary Key",
+//			"embeddedIdName : variable name for the embedded id (used only if the entity has a composite primary key) " },
+//		since = "2.0.7"
+//			)
+//	public String toStringMethod( EntityInContext entity, List<AttributeInContext> nonKeyAttributes, String embeddedIdName ) {
+//			
+//		return toStringMethod( entity , nonKeyAttributes, embeddedIdName, new LinesBuilder() ); 
+//	}
 		
 	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns a string containing all the code for a Java 'toString' method",
-			"Generates a 'toString' method with the primary key attribute or the embedded key ",
-			"and the given list of 'non key' attributes if their type is usable in a 'toString' method",
-			"(excluded types are 'array', 'Clob', 'Blob', and 'Long Text String') "
-			},
-		example={ 
-			"$java.toStringMethod( $entity, $nonKeyAttributes, $embeddedIdName, 4 )" },
-		parameters = { 
-			"entity : the entity to be used",
-			"nonKeyAttributes : list of attributes that are not in the Primary Key",
-			"embeddedIdName : variable name for the embedded id (used only if the entity has a composite primary key) ",
-			"indentSpaces : number of spaces to be used for each indentation level"},
-		since = "2.0.7"
-			)
-	public String toStringMethod( EntityInContext entity, List<AttributeInContext> nonKeyAttributes, 
-			String embeddedIdName, int indentSpaces )  {
-		
-		return toStringMethod( entity , nonKeyAttributes, embeddedIdName, new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) ); 
-	}
+//	@VelocityMethod(
+//		text={	
+//			"Returns a string containing all the code for a Java 'toString' method",
+//			"Generates a 'toString' method with the primary key attribute or the embedded key ",
+//			"and the given list of 'non key' attributes if their type is usable in a 'toString' method",
+//			"(excluded types are 'array', 'Clob', 'Blob', and 'Long Text String') "
+//			},
+//		example={ 
+//			"$java.toStringMethod( $entity, $nonKeyAttributes, $embeddedIdName, 4 )" },
+//		parameters = { 
+//			"entity : the entity to be used",
+//			"nonKeyAttributes : list of attributes that are not in the Primary Key",
+//			"embeddedIdName : variable name for the embedded id (used only if the entity has a composite primary key) ",
+//			"indentSpaces : number of spaces to be used for each indentation level"},
+//		since = "2.0.7"
+//			)
+//	public String toStringMethod( EntityInContext entity, List<AttributeInContext> nonKeyAttributes, 
+//			String embeddedIdName, int indentSpaces )  {
+//		
+//		return toStringMethod( entity , nonKeyAttributes, embeddedIdName, new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) ); 
+//	}
 	
 	//-------------------------------------------------------------------------------------
-	private String toStringMethod( EntityInContext entity, List<AttributeInContext> nonKeyAttributes, 
-			String embeddedIdName, LinesBuilder lb )  {
+//	private String toStringMethod( EntityInContext entity, List<AttributeInContext> nonKeyAttributes, 
+//			String embeddedIdName, LinesBuilder lb )  {
+//
+//		int indent = 1 ;
+//		lb.append(indent, "public String toString() { ");
+//		
+//		indent++;
+//		lb.append(indent, "StringBuilder sb = new StringBuilder(); ");
+//		
+//		lb.append(indent, "sb.append(\"[\"); ");
+//		//--- PRIMARY KEY attributes ( composite key or not )
+//		if ( entity.hasCompositePrimaryKey() && ( embeddedIdName != null ) ) {
+//			// Embedded id 
+//			toStringForEmbeddedId( embeddedIdName, lb, indent );
+//		}
+//		else {
+//			// No embedded id ( or no name for it )
+//			List<AttributeInContext> keyAttributes = entity.getKeyAttributes() ;
+//			toStringForAttributes( keyAttributes, lb, indent );
+//		}
+//		lb.append(indent, "sb.append(\"]:\"); ");
+//		
+//		//--- NON KEY attributes ( all the attributes that are not in the Primary Key )
+//		if ( nonKeyAttributes != null ) {
+//			toStringForAttributes( nonKeyAttributes, lb, indent );
+//		}
+//				
+//		lb.append(indent, "return sb.toString(); ");
+//		
+//		indent--;
+//		lb.append(indent, "} ");
+//
+//		return lb.toString();
+//	}
+	
+//    /**
+//     * Uses the given attributes except if their type is not usable   
+//     * @param attributes
+//     * @param lb
+//     * @param indent
+//     * @return
+//     */
+//    private int toStringForAttributes( List<AttributeInContext> attributes, LinesBuilder lb, int indent  ) 
+//    {    	
+//    	if ( null == attributes ) return 0 ;
+//    	int count = 0 ;
+//    	for ( AttributeInContext attribute : attributes ) {
+//    		if ( usableInToString( attribute ) ) {
+//                if ( count > 0 ) // if it's not the first one
+//                {
+//        			lb.append(indent, "sb.append(\"|\");" );
+//                }        		
+//    			lb.append(indent, "sb.append(" + attribute.getName() + ");" );
+//    			count++ ;
+//    		}
+//    		else {
+//    			String sLongText = attribute.isLongText() ? " Long Text" : "" ; 
+//    			lb.append(indent, "// attribute '" + attribute.getName() 
+//    					+ "' not usable (type = " + attribute.getType() + sLongText + ")");
+//    		}
+//    	}
+//    	return count ;
+//    }
+    
+//    /**
+//     * Just use the embedded primary with its own 'toString'
+//     * @param embeddedIdName
+//     * @param lb
+//     * @param indent
+//     * @return
+//     */
+//    private int toStringForEmbeddedId( String embeddedIdName, LinesBuilder lb, int indent  )
+//    {
+//		lb.append(indent, "if ( " + embeddedIdName + " != null ) {  ");
+//		lb.append(indent, "    sb.append(" + embeddedIdName + ".toString());  ");
+//		lb.append(indent, "}  ");
+//		lb.append(indent, "else {  ");
+//		lb.append(indent, "    sb.append( \"(null-key)\" ); ");
+//		lb.append(indent, "}  ");
+//		return 1 ;
+//    }
 
-		int indent = 1 ;
+    /**
+     * @param attribute
+     * @return
+     * @since v 3.0.0
+     */
+    private boolean isArray( AttributeInContext attribute ) {
+    	String type = attribute.getSimpleType();
+		if ( type != null && type.trim().endsWith("]")) {
+				return true ;
+		}
+		return false ;    	
+    }
+
+	//-------------------------------------------------------------------------------------
+	/**
+	 * Returns a string containing all the code for the "toString" method
+	 * @param entity
+	 * @param attributes
+	 * @param indentLevel
+	 * @param lb
+	 * @return
+	 */
+	private String buildToStringMethod( EntityInContext entity, List<AttributeInContext> attributes, int indentLevel, LinesBuilder lb ) {
+    	if ( entity == null ) {
+    		throw new IllegalArgumentException("$java.toStringMethod(..) : entity arg is null");
+    	}
+    	if ( attributes == null ) {
+    		throw new IllegalArgumentException("$java.toStringMethod(..) : attributes arg is null");
+    	}
+		int indent = indentLevel ;
 		lb.append(indent, "public String toString() { ");
-		
 		indent++;
-		lb.append(indent, "StringBuilder sb = new StringBuilder(); ");
-		
-		lb.append(indent, "sb.append(\"[\"); ");
-		//--- PRIMARY KEY attributes ( composite key or not )
-		if ( entity.hasCompositePrimaryKey() && ( embeddedIdName != null ) ) {
-			// Embedded id 
-			toStringForEmbeddedId( embeddedIdName, lb, indent );
-		}
-		else {
-			// No embedded id ( or no name for it )
-			List<AttributeInContext> keyAttributes = entity.getKeyAttributes() ;
-			toStringForAttributes( keyAttributes, lb, indent );
-		}
-		lb.append(indent, "sb.append(\"]:\"); ");
-		
-		//--- NON KEY attributes ( all the attributes that are not in the Primary Key )
-		if ( nonKeyAttributes != null ) {
-			toStringForAttributes( nonKeyAttributes, lb, indent );
-		}
-				
-		lb.append(indent, "return sb.toString(); ");
-		
+    	if ( attributes.isEmpty() ) {
+    		//--- No attributes
+    		lb.append(indent, "return \"" + entity.getName() + " [no attribute]\" ;");
+    	}
+    	else {
+    		//--- Build return concat with all the given attributes 
+    		buildToStringMethodBody( entity, attributes, indent, lb );
+    	}
 		indent--;
-		lb.append(indent, "} ");
-
+		lb.append(indent, "}");
 		return lb.toString();
 	}
 	
     /**
-     * Uses the given attributes except if their type is not usable   
+     * Builds the body of the "toString" method using the given LinesBuilder
+     * @param entity
      * @param attributes
+     * @param indentationLevel
      * @param lb
-     * @param indent
-     * @return
      */
-    private int toStringForAttributes( List<AttributeInContext> attributes, LinesBuilder lb, int indent  ) 
+    private void buildToStringMethodBody( EntityInContext entity, List<AttributeInContext> attributes, int indentationLevel, LinesBuilder lb) 
     {    	
-    	if ( null == attributes ) return 0 ;
+    	if ( null == attributes ) return ;
     	int count = 0 ;
+    	// first lines
+    	lb.append(indentationLevel, "String separator = \"|\";");
+		lb.append(indentationLevel, "StringBuilder sb = new StringBuilder();"); 
+		lb.append(indentationLevel, "sb.append(\"" + entity.getName() + "[\");");  // append the class name, example : sb.append("Employee[")
     	for ( AttributeInContext attribute : attributes ) {
     		if ( usableInToString( attribute ) ) {
-                if ( count > 0 ) // if it's not the first one
-                {
-        			lb.append(indent, "sb.append(\"|\");" );
-                }        		
-    			lb.append(indent, "sb.append(" + attribute.getName() + ");" );
+    			String startOfLine = "";
+                if ( count > 0 ) {
+                	startOfLine = "sb.append(separator)" ; // not the first one => append separator before
+                }
+                else {
+                	startOfLine = "sb" ; // first one => no separator before
+                }
+    			lb.append(indentationLevel, startOfLine + ".append(\"" + attribute.getName() + "=\").append(" + attribute.getName() + ");"); 
+    			// example: sb.append("firstName=").append(firstName) 
     			count++ ;
     		}
     		else {
-    			String sLongText = attribute.isLongText() ? " Long Text" : "" ; 
-    			lb.append(indent, "// attribute '" + attribute.getName() 
-    					+ "' not usable (type = " + attribute.getType() + sLongText + ")");
+    			lb.append(indentationLevel, "// attribute '" + attribute.getName() + "' (type " + attribute.getType() + ") not usable in toString() " );
     		}
     	}
-    	return count ;
-    }
-    
-    /**
-     * Just use the embedded primary with its own 'toString'
-     * @param embeddedIdName
-     * @param lb
-     * @param indent
-     * @return
-     */
-    private int toStringForEmbeddedId( String embeddedIdName, LinesBuilder lb, int indent  )
-    {
-		lb.append(indent, "if ( " + embeddedIdName + " != null ) {  ");
-		lb.append(indent, "    sb.append(" + embeddedIdName + ".toString());  ");
-		lb.append(indent, "}  ");
-		lb.append(indent, "else {  ");
-		lb.append(indent, "    sb.append( \"(null-key)\" ); ");
-		lb.append(indent, "}  ");
-		return 1 ;
+    	// last line
+    	lb.append(indentationLevel, "sb.append(\"]\");" ); 
+		lb.append(indentationLevel, "return sb.toString();" );
     }
 
     /**
      * Returns true if the given type is usable in a 'toString' method
-     * @param sType
+     * @param attribute
      * @return
      */
     private boolean usableInToString( AttributeInContext attribute ) {
@@ -511,24 +657,8 @@ public class Java {
     	String sType = attribute.getType();
     	if ( null == sType ) return false ;
     	String s = sType.trim() ;
-    	if ( s.endsWith("Blob") ) return false ; 
-    	if ( s.endsWith("Clob") ) return false ; 
+    	if ( s.endsWith("Blob") || s.endsWith("Clob") ) return false ; 
     	return true ;
-    }
-    
-    /**
-     * @param attribute
-     * @return
-     * @since v 3.0.0
-     */
-    private boolean isArray( AttributeInContext attribute ) {
-    	String type = attribute.getSimpleType();
-		if ( type != null ) {
-			if ( type.trim().endsWith("]")) {
-				return true ;
-			}
-		}
-		return false ;    	
     }
     
 }
