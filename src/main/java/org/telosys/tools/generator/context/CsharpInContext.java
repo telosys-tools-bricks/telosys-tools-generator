@@ -17,7 +17,6 @@ package org.telosys.tools.generator.context;
 
 import java.util.List;
 
-import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
@@ -35,41 +34,6 @@ import org.telosys.tools.generator.context.tools.LinesBuilder;
 //-------------------------------------------------------------------------------------
 public class CsharpInContext {
 
-//	@VelocityMethod(
-//		text={	
-//			"Returns the C# type with a question mark ('?') at the end if the attribute is nullable",
-//			"for example: 'string?' if nullable, else 'string' "
-//			},
-//		parameters = { 
-//				"attribute : the attribute (nullable or not nullable)"
-//			},
-//		example = {
-//				"$csharp.nullableType($attribute) " 
-//			}
-//		)
-//    public String nullableType( AttributeInContext attribute ) {
-//		if ( attribute != null ) {
-//			String type = attribute.getType();
-//			// add "?" if "nullable"			
-//			if ( attribute.isNotNull() ) {
-//				// NOT NULL => return type as is : "string", "int", etc
-//				return type;				
-//			}
-//			else {
-//				// NULLABLE => add "?" after the csharp type
-//				if ( ! StrUtil.nullOrVoid(type) ) {
-//					return type + "?" ;
-//				}
-//				else {
-//					return type;
-//				}
-//			}
-//		}
-//		else {	
-//			throw new IllegalArgumentException("$csharp.nullableType(attribute) : attribute is null");
-//		}
-//	}
-	
 	//-------------------------------------------------------------------------------------
 	// toString METHOD GENERATION
 	//-------------------------------------------------------------------------------------

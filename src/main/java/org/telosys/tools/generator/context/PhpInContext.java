@@ -17,7 +17,6 @@ package org.telosys.tools.generator.context;
 
 import java.util.List;
 
-import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
@@ -35,41 +34,6 @@ import org.telosys.tools.generator.context.tools.LinesBuilder;
 //-------------------------------------------------------------------------------------
 public class PhpInContext {
 
-//	@VelocityMethod(
-//		text={	
-//			"Returns the PHP type with a question mark ('?') at the beginning if the attribute is nullable",
-//			"for example: '?string' if nullable, else 'string' "
-//			},
-//		parameters = { 
-//				"attribute : the attribute (nullable or not nullable)"
-//			},
-//		example = {
-//				"$php.nullableType($attribute) " 
-//			}
-//		)
-//    public String nullableType( AttributeInContext attribute ) {
-//		if ( attribute != null ) {
-//			String type = attribute.getType();
-//			// add "?" if "nullable"			
-//			if ( attribute.isNotNull() ) {
-//				// NOT NULL => return type as is : "string", "int", etc
-//				return type;				
-//			}
-//			else {
-//				// NULLABLE => add "?" before the php type
-//				if ( ! StrUtil.nullOrVoid(type) ) {
-//					return "?" + type;
-//				}
-//				else {
-//					return type;
-//				}
-//			}
-//		}
-//		else {	
-//			throw new IllegalArgumentException("$php.nullableType(attribute) : attribute is null");
-//		}
-//	}
-	
 	//-------------------------------------------------------------------------------------
 	// toString METHOD GENERATION
 	//-------------------------------------------------------------------------------------
@@ -183,63 +147,6 @@ public class PhpInContext {
 		lb.append(indent, "}");
 		return lb.toString();
 	}
-//	
-//	@VelocityMethod(
-//		text={	
-//			"Returns a string containing all the code for a PHP '__toString()' method",
-//			"Generates a 'toString' method using all the attributes of the given entity",
-//			"(except non-printable attributes)"
-//			},
-//		example={ 
-//			"$php.toStringMethod( $entity, 4 )" },
-//		parameters = { 
-//			"entity : the entity for which to generate the 'ToString' method",
-//			"indentSpaces : number of spaces to be used for each indentation level"},
-//		since = "4.1.0"
-//			)
-//	public String toStringMethod( EntityInContext entity, int indentSpaces ) {
-//		return toStringMethod(entity, entity.getAttributes(), indentSpaces );
-//	}
-//	
-	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns a string containing all the code for a PHP '__toString()' method",
-//			"Generates a 'toString' method using all the given attributes ",
-//			"(except non-printable attributes)"
-//			},
-//		example={ 
-//			"$php.toStringMethod( $entity, $attributes, 4 )" },
-//		parameters = { 
-//			"entity : the entity for which to generate the 'toString' method",
-//			"attributes : list of attributes to be used in the 'toString' method",
-//			"indentSpaces : number of spaces to be used for each indentation level"},
-//		since = "4.1.0"
-//			)
-//	public String toStringMethod( EntityInContext entity, List<AttributeInContext> attributes, int indentSpaces ) {
-//
-//    	if ( entity == null ) {
-//    		throw new IllegalArgumentException("$php.toStringMethod(..) : entity arg is null");
-//    	}
-//    	if ( attributes == null ) {
-//    		throw new IllegalArgumentException("$php.toStringMethod(..) : attributes arg is null");
-//    	}
-//		LinesBuilder lb = new LinesBuilder(indentSpaces) ;
-//		int indent = 1 ;
-//		lb.append(indent, "public function __toString() { ");
-//		indent++;
-//    	if ( attributes.isEmpty() ) {
-//    		//--- No attributes    		
-//    		lb.append(indent, "return \"" + entity.getName() + " []\" ;");
-//    	}
-//    	else {
-//    		//--- Build return concat with all the given attributes 
-//   			toStringForAttributes( entity, attributes, lb, indent );
-//    	}
-//		indent--;
-//		lb.append(indent, "}");
-//		return lb.toString();
-//	}
     
 	//-------------------------------------------------------------------------------------
     /**
