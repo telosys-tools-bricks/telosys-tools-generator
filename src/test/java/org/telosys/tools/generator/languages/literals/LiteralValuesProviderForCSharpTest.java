@@ -93,4 +93,9 @@ public class LiteralValuesProviderForCSharpTest extends AbstractLiteralsTest {
 		assertEquals(" == foo", getLiteralValuesProvider().getEqualsStatement("foo", getLanguageType(NeutralType.FLOAT )) );
 	}
 
+	@Test
+	public void testDefaultValueNotNull() {
+		assertEquals("\"\"",  getLiteralValuesProvider().getDefaultValueNotNull(getLanguageType(NeutralType.STRING )) );
+		assertEquals("false", getLiteralValuesProvider().getDefaultValueNotNull(getLanguageType(NeutralType.BOOLEAN )) );
+	}
 }
