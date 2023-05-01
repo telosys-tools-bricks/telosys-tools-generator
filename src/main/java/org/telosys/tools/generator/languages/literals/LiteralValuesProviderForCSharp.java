@@ -176,6 +176,6 @@ public class LiteralValuesProviderForCSharp extends LiteralValuesProvider {
 	public String getDefaultValueNotNull(LanguageType languageType) {
 		String type = languageType.getNeutralType();
 		String defaultValue = defaultValues.get(type);
-		return defaultValue != null ? defaultValue : "(unknown type '" + type + "')" ; 
+		return defaultValue != null ? defaultValue : NULL_LITERAL ; 
 	}
 }
