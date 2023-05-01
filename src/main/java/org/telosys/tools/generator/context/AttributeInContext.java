@@ -28,6 +28,7 @@ import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.doc.VelocityReturnType;
 import org.telosys.tools.generator.context.exceptions.GeneratorSqlException;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.types.AttributeTypeInfo;
 import org.telosys.tools.generator.languages.types.AttributeTypeInfoImpl;
 import org.telosys.tools.generator.languages.types.LanguageType;
@@ -463,11 +464,52 @@ public class AttributeInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the initial value for the attribute"
+			"Returns the initial value as is"
 			}
 	)
 	public String getInitialValue() {
 		return initialValue;
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the initialization value for the current language",
+			"Usable to initialize the attribute according with the current target language",
+			"The 'initial value' is used if defined in the model"
+			},
+		example= {
+			" $attribute.type $attribute.name = $attribute.ini ;"
+			},
+		since="4.1.0 (experimental)"
+	)
+	public String getIni() {
+		if ( this.hasInitialValue() ) {
+			// Use the specific initial value
+			String iniVal = this.getInitialValue();
+			if ( this.isStringType() ) {
+				if ( StrUtil.isQuoted( iniVal ) ) {
+					return iniVal ; // already quoted => keep it as is 
+				}
+				else {
+					return StrUtil.quote(iniVal); // add quotes
+				}
+			}
+			else {
+				return iniVal ; // supposed to be ok as is : 123, 123.45, true, false, etc 
+			}
+		}
+		else {
+			// No specific initial value => use default for target language
+			LiteralValuesProvider literalValuesProvider = envInContext.getLiteralValuesProvider();
+			if (this.isNotNull()) {
+				// not null attribute
+				return literalValuesProvider.getDefaultValueNotNull(getLanguageType());
+			} else {
+				// nullable attribute
+				return literalValuesProvider.getLiteralNull();
+			}
+		}
 	}
 	
 	//-------------------------------------------------------------------------------------

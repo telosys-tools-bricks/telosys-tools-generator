@@ -17,10 +17,12 @@ package org.telosys.tools.generator.context;
 
 import java.util.List;
 
+import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.context.tools.LinesBuilder;
+import org.telosys.tools.generator.languages.types.LanguageType;
 
 //-------------------------------------------------------------------------------------
 @VelocityObject(
@@ -33,6 +35,44 @@ import org.telosys.tools.generator.context.tools.LinesBuilder;
  )
 //-------------------------------------------------------------------------------------
 public class CsharpInContext {
+
+//	@VelocityMethod(
+//		text={	
+//			"Returns the initialization value for an attribute",
+//			""
+//			},
+//		example={ 
+//			"${attribute.name} = $csharp.initValue($attribute);" },
+//		parameters = { 
+//			"attribute : the attribute to initialize" },
+//		since = "4.1.0"
+//			)
+//	public String initValue(AttributeInContext attribute) {
+//		if ( attribute.hasInitialValue() ) {
+//			// Use the specific initial value
+//			String initialValue = attribute.getInitialValue();
+//			if ( attribute.isStringType() ) {
+//				if ( StrUtil.isQuoted( initialValue ) ) {
+//					return initialValue ; // already quoted => keep it as is 
+//				}
+//				else {
+//					return StrUtil.quote(initialValue); // add quotes
+//				}
+//			}
+//			else {
+//				return initialValue ; // supposed to be ok : 123, 123.45, true, false, etc 
+//			}
+//		}
+//		else {
+//			// No specific initial value => use default
+//			if (attribute.isNotNull()) {
+//				return attribute.getTypeDefaultValueNotNull();
+//			} else {
+//				// nullable attribute
+//				return "null";
+//			}
+//		}
+//	}
 
 	//-------------------------------------------------------------------------------------
 	// toString METHOD GENERATION

@@ -112,5 +112,13 @@ public class LiteralValuesProviderForPHP extends LiteralValuesProvider {
 		//  1 == "1": true // "1" gets casted to an integer, which is 1
 		return " == " + value ; // Value comparison 
 	}
+	
+	@Override
+	public String getDefaultValueNotNull(LanguageType languageType) {
+		String type = languageType.getSimpleType();
+//		String defaultValue = defaultValues.get(type);
+		String defaultValue = null;
+		return defaultValue != null ? defaultValue : "(unknown type '" + type + "')" ; 
+	}
 
 }

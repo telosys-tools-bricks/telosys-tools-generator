@@ -111,5 +111,13 @@ public class LiteralValuesProviderForPython extends LiteralValuesProvider {
 		// Always "==" ( whatever the type ) 
 		return " == " + value ;
 	}
+	
+	@Override
+	public String getDefaultValueNotNull(LanguageType languageType) {
+		String type = languageType.getSimpleType();
+//		String defaultValue = defaultValues.get(type);
+		String defaultValue = null;
+		return defaultValue != null ? defaultValue : "(unknown type '" + type + "')" ; 
+	}
 
 }

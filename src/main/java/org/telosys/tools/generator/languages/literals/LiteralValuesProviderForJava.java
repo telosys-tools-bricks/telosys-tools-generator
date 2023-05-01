@@ -260,5 +260,12 @@ public class LiteralValuesProviderForJava extends LiteralValuesProvider {
 //		}
 //		return sb.toString();
 //	}
+	@Override
+	public String getDefaultValueNotNull(LanguageType languageType) {
+		String type = languageType.getSimpleType();
+//		String defaultValue = defaultValues.get(type);
+		String defaultValue = null;
+		return defaultValue != null ? defaultValue : "(unknown type '" + type + "')" ; 
+	}
 
 }

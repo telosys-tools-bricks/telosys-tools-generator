@@ -206,5 +206,9 @@ public abstract class LiteralValuesProvider {
 	 * @return
 	 */
 	public abstract String getEqualsStatement(String value, LanguageType languageType) ;
+	
+	
+	public abstract String getDefaultValueNotNull(LanguageType languageType) ;
+
 
 }
