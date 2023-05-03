@@ -159,6 +159,7 @@ public class PhpInContext {
     private void toStringForAttributes( EntityInContext entity, List<AttributeInContext> attributes, LinesBuilder lb, int indent  ) {    
     	if ( null == attributes ) return ;
     	int count = 0 ;
+    	lb.append(indent, "$N = 'null';");
     	for ( AttributeInContext attribute : attributes ) {
     		if ( usableInToString( attribute ) ) {
     			String leftPart ;
@@ -170,7 +171,15 @@ public class PhpInContext {
                 	// not the first one => add separator
         			leftPart = ". \"|\" . " ;
                 }
-    			lb.append(indent, leftPart + "$this->" + attribute.getName() );
+                if ( attribute.isTemporalType() ) {
+        			lb.append(indent, leftPart + "(is_null($this->" + attribute.getName() + ") ? $N : $this->" + attribute.getName() + "->format('Y-m-d H:i:s'))" );
+                }
+                else if ( attribute.isBooleanType() ) {
+        			lb.append(indent, leftPart + "(is_null($this->" + attribute.getName() + ") ? $N : ($this->" + attribute.getName() + "? 'true' : 'false'))" );
+                }
+                else {
+        			lb.append(indent, leftPart + "(is_null($this->" + attribute.getName() + ") ? $N : $this->" + attribute.getName() + ")");
+                }
     			count++ ;
     		}
     		else {

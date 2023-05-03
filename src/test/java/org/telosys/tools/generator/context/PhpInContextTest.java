@@ -77,15 +77,16 @@ public class PhpInContextTest {
 		String s = php.toStringMethod(entity, attributes, 2);
 		System.out.println(s);
 		assertTrue(s.startsWith(TABS_PUBLIC_FUNCTION_TOSTRING));
-		assertTrue(s.contains(  "\t\t\treturn \"Foo [\" . $this->id"));
-		assertTrue(s.contains(  "\t\t\t. \"|\" . $this->name"));
+		assertTrue(s.contains(  "\t\t\treturn \"Foo [\"") );
+		assertTrue(s.contains(  "$this->id") );
+		assertTrue(s.contains(  "$this->name") );
 		assertTrue(s.endsWith(  TABS_CLOSING_BRACE));
 		
 		s = php.toStringMethod(entity, attributes, 2, "  "); // indentation = 2 spaces
 		System.out.println(s);
 		assertTrue(s.startsWith(SPACES_PUBLIC_FUNCTION_TOSTRING));
-		assertTrue(s.contains(  "      return \"Foo [\" . $this->id")); // 3x2 = 6 spaces
-		assertTrue(s.contains(  "      . \"|\" . $this->name"));
+		assertTrue(s.contains(  "      return \"Foo [\"")); // 3x2 = 6 spaces
+		assertTrue(s.contains(  "      . \"|\"" ));
 		assertTrue(s.endsWith(  SPACES_CLOSING_BRACE));
 	}
 	
@@ -97,7 +98,8 @@ public class PhpInContextTest {
 		String s = getPhpObject().toStringMethod(FakeEntityBuilder.buildEntityInContext("Foo"), attributes, 2);
 		System.out.println(s);
 		assertTrue(s.startsWith(TABS_PUBLIC_FUNCTION_TOSTRING)); 
-		assertTrue(s.contains(  "\t\t\treturn \"Foo [\" . $this->id"));
+		assertTrue(s.contains(  "\t\t\treturn \"Foo [\"" ));
+		assertTrue(s.contains(  "$this->id"));
 		assertTrue(s.endsWith(  TABS_CLOSING_BRACE));
 	}
 

@@ -16,6 +16,8 @@
 package org.telosys.tools.generator.languages.literals;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
@@ -113,12 +115,28 @@ public class LiteralValuesProviderForPHP extends LiteralValuesProvider {
 		return " == " + value ; // Value comparison 
 	}
 	
+	private static final Map<String,String> defaultValues = new HashMap<>();
+	static {
+		defaultValues.put(NeutralType.STRING,  "\"\"");  // string 
+		defaultValues.put(NeutralType.BOOLEAN, FALSE_LITERAL);  
+		defaultValues.put(NeutralType.BYTE,    "0");
+		defaultValues.put(NeutralType.SHORT,   "0");  
+		defaultValues.put(NeutralType.INTEGER, "0");  
+		defaultValues.put(NeutralType.LONG,    "0");  
+		defaultValues.put(NeutralType.FLOAT,   "0");  
+		defaultValues.put(NeutralType.DOUBLE,  "0");  
+		defaultValues.put(NeutralType.DECIMAL, "0");  
+
+		defaultValues.put(NeutralType.DATE,      "new DateTime()");  
+		defaultValues.put(NeutralType.TIME,      "new DateTime()"); 
+		defaultValues.put(NeutralType.TIMESTAMP, "new DateTime()"); 
+//		defaultValues.put(NeutralType.BINARY,    "?"); 
+	}
 	@Override
 	public String getDefaultValueNotNull(LanguageType languageType) {
-		String type = languageType.getSimpleType();
-//		String defaultValue = defaultValues.get(type);
-		String defaultValue = null;
-		return defaultValue != null ? defaultValue : "(unknown type '" + type + "')" ; 
+		String type = languageType.getNeutralType();
+		String defaultValue = defaultValues.get(type);
+		return defaultValue != null ? defaultValue : NULL_LITERAL ; 
 	}
 
 }
