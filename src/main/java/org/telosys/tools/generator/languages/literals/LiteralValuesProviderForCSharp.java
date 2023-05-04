@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 
@@ -113,52 +114,9 @@ public class LiteralValuesProviderForCSharp extends LiteralValuesProvider {
 	}
 
 	private static final Map<String,String> defaultValues = new HashMap<>();
-//	static {
-//		defaultValues.put("string", "\"\"");
-//		defaultValues.put("String", "\"\"");
-//		
-//		defaultValues.put("bool",    "false");
-//		defaultValues.put("Boolean", "false");
-//
-//		defaultValues.put("sbyte",   "0");
-//		defaultValues.put("SByte",   "0");
-//		defaultValues.put("byte",    "0");
-//		defaultValues.put("Byte",    "0");
-//
-//		defaultValues.put("short",   "0");
-//		defaultValues.put("Int16",   "0");
-//		defaultValues.put("ushort",  "0");
-//		defaultValues.put("UInt16",  "0");
-//
-//		defaultValues.put("int",     "0");
-//		defaultValues.put("Int32",   "0");
-//		defaultValues.put("uint",    "0");
-//		defaultValues.put("UInt32",  "0");
-//
-//		defaultValues.put("long",    "0");
-//		defaultValues.put("Int64",   "0");
-//		defaultValues.put("ulong",   "0");
-//		defaultValues.put("UInt64",  "0");
-//
-//		defaultValues.put("float",   "0");
-//		defaultValues.put("Single",  "0");
-//		
-//		defaultValues.put("double",  "0");
-//		defaultValues.put("Double",  "0");
-//
-//		defaultValues.put("decimal", "0");
-//		defaultValues.put("Decimal", "0");
-//
-//		defaultValues.put("DateOnly",  "new DateOnly()"); // 01/01/0001
-//		defaultValues.put("TimeOnly",  "new TimeOnly()"); // 00:00
-//		defaultValues.put("DateTime",  "new DateTime()"); // 01/01/0001 00:00:00
-//
-//		defaultValues.put("byte[]",   "new byte[0]"); // void array
-//
-//	}
 	static {
 		defaultValues.put(NeutralType.STRING,  "\"\"");  // string, String
-		defaultValues.put(NeutralType.BOOLEAN, "false"); // bool, Boolean
+		defaultValues.put(NeutralType.BOOLEAN, FALSE_LITERAL); // bool, Boolean
 		defaultValues.put(NeutralType.BYTE,    "0");  // sbyte, SByte, byte, Byte
 		defaultValues.put(NeutralType.SHORT,   "0");  // short, Int16, ushort, UInt16
 		defaultValues.put(NeutralType.INTEGER, "0");  // int, Int32, uint, UInt32
@@ -172,10 +130,22 @@ public class LiteralValuesProviderForCSharp extends LiteralValuesProvider {
 		defaultValues.put(NeutralType.TIMESTAMP, "new DateTime()"); // 01/01/0001 00:00:00
 		defaultValues.put(NeutralType.BINARY,    "new byte[0]"); // void array
 	}
+//	@Override
+//	public String getDefaultValueNotNull(LanguageType languageType) {
+//		String type = languageType.getNeutralType();
+//		String defaultValue = defaultValues.get(type);
+//		return defaultValue != null ? defaultValue : NULL_LITERAL ; 
+//	}
 	@Override
-	public String getDefaultValueNotNull(LanguageType languageType) {
-		String type = languageType.getNeutralType();
-		String defaultValue = defaultValues.get(type);
-		return defaultValue != null ? defaultValue : NULL_LITERAL ; 
+	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
+		if (attribute.isNotNull()) {
+			// not null attribute
+			String defaultValue = defaultValues.get(languageType.getNeutralType());
+			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
+		} else {
+			// nullable attribute
+			return NULL_LITERAL;
+		}
 	}
+	
 }

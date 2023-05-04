@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 
@@ -42,6 +43,7 @@ public class LiteralValuesProviderForPHP extends LiteralValuesProvider {
 	private static final String NULL_LITERAL  = "null" ;   // "NULL"  or "null"
 	private static final String TRUE_LITERAL  = "true" ;   // "TRUE"  or "true"
 	private static final String FALSE_LITERAL = "false" ;  // "FALSE" or "false" 
+	private static final String EMPTY_STRING_LITERAL = "\"\"" ; 
 	
 	@Override
 	public String getLiteralNull() {
@@ -115,28 +117,33 @@ public class LiteralValuesProviderForPHP extends LiteralValuesProvider {
 		return " == " + value ; // Value comparison 
 	}
 	
-	private static final Map<String,String> defaultValues = new HashMap<>();
+	private static final Map<String,String> notNullInitValues = new HashMap<>();
 	static {
-		defaultValues.put(NeutralType.STRING,  "\"\"");  // string 
-		defaultValues.put(NeutralType.BOOLEAN, FALSE_LITERAL);  
-		defaultValues.put(NeutralType.BYTE,    "0");
-		defaultValues.put(NeutralType.SHORT,   "0");  
-		defaultValues.put(NeutralType.INTEGER, "0");  
-		defaultValues.put(NeutralType.LONG,    "0");  
-		defaultValues.put(NeutralType.FLOAT,   "0");  
-		defaultValues.put(NeutralType.DOUBLE,  "0");  
-		defaultValues.put(NeutralType.DECIMAL, "0");  
+		notNullInitValues.put(NeutralType.STRING,  EMPTY_STRING_LITERAL);  // string 
+		notNullInitValues.put(NeutralType.BOOLEAN, FALSE_LITERAL);  
+		notNullInitValues.put(NeutralType.BYTE,    "0"); // int
+		notNullInitValues.put(NeutralType.SHORT,   "0"); // int 
+		notNullInitValues.put(NeutralType.INTEGER, "0"); // int 
+		notNullInitValues.put(NeutralType.LONG,    "0"); // int 
+		notNullInitValues.put(NeutralType.FLOAT,   "0.0");  // float
+		notNullInitValues.put(NeutralType.DOUBLE,  "0.0");  // float
+		notNullInitValues.put(NeutralType.DECIMAL, "0.0");  // float
 
-		defaultValues.put(NeutralType.DATE,      "new DateTime()");  
-		defaultValues.put(NeutralType.TIME,      "new DateTime()"); 
-		defaultValues.put(NeutralType.TIMESTAMP, "new DateTime()"); 
+		notNullInitValues.put(NeutralType.DATE,      "new DateTime()");  
+		notNullInitValues.put(NeutralType.TIME,      "new DateTime()"); 
+		notNullInitValues.put(NeutralType.TIMESTAMP, "new DateTime()"); 
 //		defaultValues.put(NeutralType.BINARY,    "?"); 
 	}
 	@Override
-	public String getDefaultValueNotNull(LanguageType languageType) {
-		String type = languageType.getNeutralType();
-		String defaultValue = defaultValues.get(type);
-		return defaultValue != null ? defaultValue : NULL_LITERAL ; 
+	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
+		if ( attribute.isNotNull() ) {
+			// not null attribute 
+			String initValue = notNullInitValues.get(languageType.getNeutralType());
+			return initValue != null ? initValue : NULL_LITERAL ; 
+		} else {
+			// nullable attribute
+			return NULL_LITERAL;
+		}
 	}
 
 }

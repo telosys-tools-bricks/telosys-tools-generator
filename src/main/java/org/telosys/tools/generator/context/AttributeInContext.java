@@ -502,13 +502,14 @@ public class AttributeInContext {
 		else {
 			// No specific initial value => use default for target language
 			LiteralValuesProvider literalValuesProvider = envInContext.getLiteralValuesProvider();
-			if (this.isNotNull()) {
-				// not null attribute
-				return literalValuesProvider.getDefaultValueNotNull(getLanguageType());
-			} else {
-				// nullable attribute
-				return literalValuesProvider.getLiteralNull();
-			}
+//			if (this.isNotNull()) {
+//				// not null attribute
+//				return literalValuesProvider.getDefaultValueNotNull(getLanguageType());
+//			} else {
+//				// nullable attribute
+//				return literalValuesProvider.getLiteralNull();
+//			}
+			return literalValuesProvider.getInitValue(this, getLanguageType());
 		}
 	}
 	

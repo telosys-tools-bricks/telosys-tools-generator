@@ -17,6 +17,7 @@ package org.telosys.tools.generator.languages.literals;
 
 import java.math.BigDecimal;
 
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 
@@ -98,12 +99,20 @@ public class LiteralValuesProviderForGo extends LiteralValuesProvider {
 		return " == " + value ;
 	}
 	
+	
 	@Override
-	public String getDefaultValueNotNull(LanguageType languageType) {
-		String type = languageType.getSimpleType();
-//		String defaultValue = defaultValues.get(type);
-		String defaultValue = null;
-		return defaultValue != null ? defaultValue : "(unknown type '" + type + "')" ; 
+	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
+		if (attribute.isNotNull()) {
+			// not null attribute
+// TODO
+//			String defaultValue = defaultValues.get(languageType.getNeutralType());
+//			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
+			return NULL_LITERAL;
+		} else {
+			// nullable attribute
+			return NULL_LITERAL;
+		}
 	}
+
 
 }

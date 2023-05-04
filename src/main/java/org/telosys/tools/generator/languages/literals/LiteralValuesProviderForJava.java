@@ -16,7 +16,10 @@
 package org.telosys.tools.generator.languages.literals;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generator.languages.types.TypeConverterForJava;
 import org.telosys.tools.generic.model.types.NeutralType;
@@ -32,6 +35,7 @@ public class LiteralValuesProviderForJava extends LiteralValuesProvider {
 	private static final String NULL_LITERAL  = "null" ; // null in Java
 	private static final String TRUE_LITERAL  = "true" ; 
 	private static final String FALSE_LITERAL = "false" ; 
+	private static final String EMPTY_STRING_LITERAL = "\"\"" ; 
 	
 	@Override
 	public String getLiteralNull() {
@@ -199,7 +203,7 @@ public class LiteralValuesProviderForJava extends LiteralValuesProvider {
 		return new LiteralValue("java.sql.Time.valueOf(\"" + timeISO + "\")", value) ; 
 	}
 	private LiteralValue generateSqlTimestampValue(int step) {
-		String timestampISO = generateYearValue(step) + "-05-21" + " " + String.format("%02d", (step%24) ) + ":46:52" ; // "2001-05-21 15:46:52" 
+		String timestampISO = generateYearValue(step) + "-05-21" + " " + String.format("%02d", (step%24) ) + ":46:53" ; // "2001-05-21 15:46:53" 
 		java.sql.Timestamp value = java.sql.Timestamp.valueOf(timestampISO);
 		return new LiteralValue("java.sql.Timestamp.valueOf(\"" + timestampISO + "\")", value) ; 
 	}
@@ -245,27 +249,32 @@ public class LiteralValuesProviderForJava extends LiteralValuesProvider {
 		}
 	}
 
-//	private String buildStringValue(int maxLength, int step) {
-//		int maxLimit = 100 ;
-//		// 'A'-'Z' : 65-90 
-//		// 'a'-'z' : 97-122 
-//		char c = 'A' ; 
-//		if ( step > 0 ) {
-//			int delta = (step-1) % 26;
-//			c = (char)('A' + delta );
-//		}
-//		StringBuilder sb = new StringBuilder();
-//		for ( int i = 0 ; i < maxLength && i < maxLimit ; i++) {
-//			sb.append(c);
-//		}
-//		return sb.toString();
-//	}
-	@Override
-	public String getDefaultValueNotNull(LanguageType languageType) {
-		String type = languageType.getSimpleType();
-//		String defaultValue = defaultValues.get(type);
-		String defaultValue = null;
-		return defaultValue != null ? defaultValue : "(unknown type '" + type + "')" ; 
-	}
+	private static final Map<String,String> notNullInitValues = new HashMap<>();	
+	static {
+		notNullInitValues.put(NeutralType.STRING,  EMPTY_STRING_LITERAL);  // string, String
+		notNullInitValues.put(NeutralType.BOOLEAN, FALSE_LITERAL); // bool, Boolean
+		notNullInitValues.put(NeutralType.BYTE,    "0" );  // byte, Byte
+		notNullInitValues.put(NeutralType.SHORT,   "0" );  // short, Short
+		notNullInitValues.put(NeutralType.INTEGER, "0" );  // int, Integer
+		notNullInitValues.put(NeutralType.LONG,    "0L");  // long, Long
+		notNullInitValues.put(NeutralType.FLOAT,   "0F");  // float, Float
+		notNullInitValues.put(NeutralType.DOUBLE,  "0D");  // double, Double
+		notNullInitValues.put(NeutralType.DECIMAL, "BigDecimal.ZERO" );  // BigDecimal (java.math.BigDecimal)
 
+		notNullInitValues.put(NeutralType.DATE,      "LocalDate.now()"); 
+		notNullInitValues.put(NeutralType.TIME,      "LocalTime.now()"); 
+		notNullInitValues.put(NeutralType.TIMESTAMP, "LocalDateTime.now()"); 
+		notNullInitValues.put(NeutralType.BINARY,    "new byte[0]"); // void array
+	}
+	@Override
+	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
+		if ( attribute.isNotNull() || languageType.isPrimitiveType() ) {
+			// not null attribute (in Java primitive type => not null value)
+			String initValue = notNullInitValues.get(languageType.getNeutralType());
+			return initValue != null ? initValue : NULL_LITERAL ; 
+		} else {
+			// nullable attribute
+			return NULL_LITERAL;
+		}
+	}
 }

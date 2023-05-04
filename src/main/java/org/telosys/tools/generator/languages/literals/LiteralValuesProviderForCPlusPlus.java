@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 
@@ -131,10 +132,22 @@ public class LiteralValuesProviderForCPlusPlus extends LiteralValuesProvider {
 //		defaultValues.put(NeutralType.TIMESTAMP, "?"); 
 		defaultValues.put(NeutralType.BINARY,    "{}"); // void array, example : char x[10] = {};
 	}
+//	@Override
+//	public String getDefaultValueNotNull(LanguageType languageType) {
+//		String type = languageType.getNeutralType();
+//		String defaultValue = defaultValues.get(type);
+//		return defaultValue != null ? defaultValue : NULL_LITERAL ; 
+//	}
+	
 	@Override
-	public String getDefaultValueNotNull(LanguageType languageType) {
-		String type = languageType.getNeutralType();
-		String defaultValue = defaultValues.get(type);
-		return defaultValue != null ? defaultValue : NULL_LITERAL ; 
+	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
+		if (attribute.isNotNull()) {
+			// not null attribute
+			String defaultValue = defaultValues.get(languageType.getNeutralType());
+			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
+		} else {
+			// nullable attribute
+			return NULL_LITERAL;
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package org.telosys.tools.generator.languages.literals;
 
 import org.junit.Test;
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 
@@ -93,9 +94,4 @@ public class LiteralValuesProviderForCSharpTest extends AbstractLiteralsTest {
 		assertEquals(" == foo", getLiteralValuesProvider().getEqualsStatement("foo", getLanguageType(NeutralType.FLOAT )) );
 	}
 
-	@Test
-	public void testDefaultValueNotNull() {
-		assertEquals("\"\"",  getLiteralValuesProvider().getDefaultValueNotNull(getLanguageType(NeutralType.STRING )) );
-		assertEquals("false", getLiteralValuesProvider().getDefaultValueNotNull(getLanguageType(NeutralType.BOOLEAN )) );
-	}
 }

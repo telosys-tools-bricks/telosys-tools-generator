@@ -16,7 +16,10 @@
 package org.telosys.tools.generator.languages.literals;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 
@@ -36,6 +39,7 @@ public class LiteralValuesProviderForScala extends LiteralValuesProvider {
 	
 	private static final String TRUE_LITERAL  = "true" ;   // Example : b1: Boolean = true 
 	private static final String FALSE_LITERAL = "false" ;  // Example : b2: Boolean = false 
+	private static final String EMPTY_STRING_LITERAL = "\"\"" ; 
 	
 	@Override
 	public String getLiteralNull() {
@@ -144,12 +148,34 @@ public class LiteralValuesProviderForScala extends LiteralValuesProvider {
 		return " == " + value ;
 	}
 
+	private static final Map<String,String> notNullInitValues = new HashMap<>();	
+	static {
+		// see https://scalaexplained.github.io/scala-explained/literals.html 
+		notNullInitValues.put(NeutralType.STRING,  EMPTY_STRING_LITERAL);  
+		notNullInitValues.put(NeutralType.BOOLEAN, FALSE_LITERAL); 
+		notNullInitValues.put(NeutralType.BYTE,    "0" );  // Byte
+		notNullInitValues.put(NeutralType.SHORT,   "0" );  // Short
+		notNullInitValues.put(NeutralType.INTEGER, "0" );  // Int
+		notNullInitValues.put(NeutralType.LONG,    "0L" );    // Long    'L' or 'l' suffix for Long
+		notNullInitValues.put(NeutralType.FLOAT,   "0.0F" );  // Float   'F' or 'f' suffix
+		notNullInitValues.put(NeutralType.DOUBLE,  "0.0D" );  // Double  'D' or 'd' suffix 
+		notNullInitValues.put(NeutralType.DECIMAL, "BigDecimal(0.0)" );  // scala.math.BigDecimal
+
+		notNullInitValues.put(NeutralType.DATE,      "LocalDate.now()");      // java.time.LocalDate
+		notNullInitValues.put(NeutralType.TIME,      "LocalTime.now()");      // java.time.LocalTime
+		notNullInitValues.put(NeutralType.TIMESTAMP, "LocalDateTime.now()");  // java.time.LocalDateTime
+		notNullInitValues.put(NeutralType.BINARY,    "Array[Byte]"); // Array[Byte]
+	}
 	@Override
-	public String getDefaultValueNotNull(LanguageType languageType) {
-		String type = languageType.getSimpleType();
-//		String defaultValue = defaultValues.get(type);
-		String defaultValue = null;
-		return defaultValue != null ? defaultValue : "(unknown type '" + type + "')" ; 
+	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
+		if ( attribute.isNotNull() ) {
+			// not null attribute 
+			String initValue = notNullInitValues.get(languageType.getNeutralType());
+			return initValue != null ? initValue : NULL_LITERAL ; 
+		} else {
+			// nullable attribute
+			return NULL_LITERAL;
+		}
 	}
 	
 }

@@ -16,7 +16,10 @@
 package org.telosys.tools.generator.languages.literals;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 
@@ -31,7 +34,8 @@ public class LiteralValuesProviderForJavaScript extends LiteralValuesProvider {
 	private static final String NULL_LITERAL  = "null" ; 
 	private static final String TRUE_LITERAL  = "true" ; 
 	private static final String FALSE_LITERAL = "false" ; 
-	
+	private static final String EMPTY_STRING_LITERAL = "\"\"" ; 
+
 	@Override
 	public String getLiteralNull() {
 		return NULL_LITERAL;
@@ -100,12 +104,33 @@ public class LiteralValuesProviderForJavaScript extends LiteralValuesProvider {
 		return " == " + value ;
 	}
 	
+	private static final Map<String,String> notNullInitValues = new HashMap<>();	
+	static {
+		notNullInitValues.put(NeutralType.STRING,  EMPTY_STRING_LITERAL);  
+		notNullInitValues.put(NeutralType.BOOLEAN, FALSE_LITERAL); 
+		notNullInitValues.put(NeutralType.BYTE,    "0" );  
+		notNullInitValues.put(NeutralType.SHORT,   "0" );  
+		notNullInitValues.put(NeutralType.INTEGER, "0" );  
+		notNullInitValues.put(NeutralType.LONG,    "0" );  
+		notNullInitValues.put(NeutralType.FLOAT,   "0.0" );  
+		notNullInitValues.put(NeutralType.DOUBLE,  "0.0" );  
+		notNullInitValues.put(NeutralType.DECIMAL, "0.0" );  
+
+//		notNullInitValues.put(NeutralType.DATE,      "??"); 
+//		notNullInitValues.put(NeutralType.TIME,      "??"); 
+//		notNullInitValues.put(NeutralType.TIMESTAMP, "??"); 
+//		notNullInitValues.put(NeutralType.BINARY,    "??"); 
+	}
 	@Override
-	public String getDefaultValueNotNull(LanguageType languageType) {
-		String type = languageType.getSimpleType();
-//		String defaultValue = defaultValues.get(type);
-		String defaultValue = null;
-		return defaultValue != null ? defaultValue : "(unknown type '" + type + "')" ; 
+	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
+		if ( attribute.isNotNull() ) {
+			// not null attribute 
+			String initValue = notNullInitValues.get(languageType.getNeutralType());
+			return initValue != null ? initValue : NULL_LITERAL ; 
+		} else {
+			// nullable attribute
+			return NULL_LITERAL;
+		}
 	}
 
 }

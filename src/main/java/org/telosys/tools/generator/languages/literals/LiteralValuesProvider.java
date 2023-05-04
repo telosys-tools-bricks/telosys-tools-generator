@@ -17,6 +17,7 @@ package org.telosys.tools.generator.languages.literals;
 
 import java.math.BigDecimal;
 
+import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 
@@ -208,7 +209,9 @@ public abstract class LiteralValuesProvider {
 	public abstract String getEqualsStatement(String value, LanguageType languageType) ;
 	
 	
-	public abstract String getDefaultValueNotNull(LanguageType languageType) ;
+	//public abstract String getDefaultValueNotNull(LanguageType languageType) ;
+	
+	public abstract String getInitValue(AttributeInContext attribute, LanguageType languageType);
 
 
 }
