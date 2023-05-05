@@ -32,7 +32,7 @@ public class TypeConverterForScala extends TypeConverter {
 	public TypeConverterForScala() {
 		super("Scala");
 		
-		//--- Primitive types : "AnyVal" Scala types are considered as "primitive types"
+		//--- Primitive types : "AnyVal" Scala types are considered as "primitive types" => NOT NULLABLE
 		declarePrimitiveType( buildPrimitiveType(NeutralType.BOOLEAN,  "Boolean" ) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.BYTE,     "Byte"    ) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.SHORT,    "Short"   ) );

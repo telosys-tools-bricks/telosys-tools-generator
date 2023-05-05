@@ -17,7 +17,9 @@ package org.telosys.tools.generator.languages.literals;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
@@ -148,34 +150,60 @@ public class LiteralValuesProviderForScala extends LiteralValuesProvider {
 		return " == " + value ;
 	}
 
+	/* Scala Language Specification:
+		0      if T is Int or one of its subrange types,
+		0L     if T is Long,
+		0.0f   if T is Float,
+		0.0d   if T is Double,
+		false  if T is Boolean,
+		()     if T is Unit,
+		null for all other types T.
+	 */
 	private static final Map<String,String> notNullInitValues = new HashMap<>();	
 	static {
 		// see https://scalaexplained.github.io/scala-explained/literals.html 
-		notNullInitValues.put(NeutralType.STRING,  EMPTY_STRING_LITERAL);  
-		notNullInitValues.put(NeutralType.BOOLEAN, FALSE_LITERAL); 
-		notNullInitValues.put(NeutralType.BYTE,    "0" );  // Byte
-		notNullInitValues.put(NeutralType.SHORT,   "0" );  // Short
-		notNullInitValues.put(NeutralType.INTEGER, "0" );  // Int
-		notNullInitValues.put(NeutralType.LONG,    "0L" );    // Long    'L' or 'l' suffix for Long
-		notNullInitValues.put(NeutralType.FLOAT,   "0.0F" );  // Float   'F' or 'f' suffix
-		notNullInitValues.put(NeutralType.DOUBLE,  "0.0D" );  // Double  'D' or 'd' suffix 
-		notNullInitValues.put(NeutralType.DECIMAL, "BigDecimal(0.0)" );  // scala.math.BigDecimal
-
-		notNullInitValues.put(NeutralType.DATE,      "LocalDate.now()");      // java.time.LocalDate
-		notNullInitValues.put(NeutralType.TIME,      "LocalTime.now()");      // java.time.LocalTime
-		notNullInitValues.put(NeutralType.TIMESTAMP, "LocalDateTime.now()");  // java.time.LocalDateTime
-		notNullInitValues.put(NeutralType.BINARY,    "Array[Byte]"); // Array[Byte]
+		// Types derived from “AnyVal” => NOT NULLABLE
+		notNullInitValues.put(NeutralType.BOOLEAN, FALSE_LITERAL); // Boolean : derived from “AnyVal” => NOT NULLABLE
+		notNullInitValues.put(NeutralType.BYTE,    "0" );          // Byte    : derived from “AnyVal” => NOT NULLABLE
+		notNullInitValues.put(NeutralType.SHORT,   "0" );          // Short   : derived from “AnyVal” => NOT NULLABLE
+		notNullInitValues.put(NeutralType.INTEGER, "0" );          // Int     : derived from “AnyVal” => NOT NULLABLE 
+		notNullInitValues.put(NeutralType.LONG,    "0L" );         // Long    : derived from “AnyVal” => NOT NULLABLE ('L' or 'l' suffix )
+		notNullInitValues.put(NeutralType.FLOAT,   "0.0F" );       // Float   : derived from “AnyVal” => NOT NULLABLE ('F' or 'f' suffix )
+		notNullInitValues.put(NeutralType.DOUBLE,  "0.0D" );       // Double  : derived from “AnyVal” => NOT NULLABLE ('D' or 'd' suffix )
+		
+		// Types derived from “AnyRef” => NULLABLE
+		notNullInitValues.put(NeutralType.STRING,    EMPTY_STRING_LITERAL);   //                           NULLABLE
+		notNullInitValues.put(NeutralType.DECIMAL,   "BigDecimal(0.0)" );     // scala.math.BigDecimal   : NULLABLE
+		notNullInitValues.put(NeutralType.DATE,      "LocalDate.now()");      // java.time.LocalDate     : NULLABLE
+		notNullInitValues.put(NeutralType.TIME,      "LocalTime.now()");      // java.time.LocalTime     : NULLABLE
+		notNullInitValues.put(NeutralType.TIMESTAMP, "LocalDateTime.now()");  // java.time.LocalDateTime : NULLABLE
+		notNullInitValues.put(NeutralType.BINARY,    "Array[Byte]");          // Array[Byte]             : NULLABLE
 	}
+	private static final String SCALA_DEFAULT_VALUE = "_"; 
+	// in Scala "_" initialises means "default value" when used in variable initialization
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
-		if ( attribute.isNotNull() ) {
+		if ( attribute.isNotNull() || isNotNullable(languageType) ) {
 			// not null attribute 
 			String initValue = notNullInitValues.get(languageType.getNeutralType());
-			return initValue != null ? initValue : NULL_LITERAL ; 
+			return initValue != null ? initValue : SCALA_DEFAULT_VALUE ; 
 		} else {
 			// nullable attribute
-			return NULL_LITERAL;
+			return NULL_LITERAL ;
 		}
 	}
-	
+	private static final Set<String> notNullableScalaTypes = new HashSet<>();
+	static {
+		// Scala types derived from “AnyVal” are NOT NULLABLE
+		notNullableScalaTypes.add(NeutralType.BOOLEAN);
+		notNullableScalaTypes.add(NeutralType.BYTE);
+		notNullableScalaTypes.add(NeutralType.SHORT);
+		notNullableScalaTypes.add(NeutralType.INTEGER);
+		notNullableScalaTypes.add(NeutralType.LONG);
+		notNullableScalaTypes.add(NeutralType.FLOAT);
+		notNullableScalaTypes.add(NeutralType.DOUBLE);
+	}
+	private boolean isNotNullable(LanguageType languageType) {
+		return notNullableScalaTypes.contains(languageType.getNeutralType());
+	}
 }
