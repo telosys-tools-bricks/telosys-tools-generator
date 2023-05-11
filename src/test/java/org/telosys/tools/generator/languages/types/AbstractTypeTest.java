@@ -18,7 +18,7 @@ public abstract class AbstractTypeTest {
 	 * @param s
 	 */
 	protected void println(String s) {
-		System.out.println(s);
+		// System.out.println(s);
 	}	
 	
 	/**

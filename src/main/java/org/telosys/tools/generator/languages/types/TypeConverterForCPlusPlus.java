@@ -45,11 +45,11 @@ public class TypeConverterForCPlusPlus extends TypeConverter {
 		declarePrimitiveType( buildPrimitiveType(NeutralType.DOUBLE,   "double",  "double"  ) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.DECIMAL,  "double",  "double"  ) );
 
-		declarePrimitiveType( buildPrimitiveType(NeutralType.DATE,      "std::tm", "std::tm" ) ); // struct tm (https://www.cplusplus.com/reference/ctime/tm/)
-		declarePrimitiveType( buildPrimitiveType(NeutralType.TIME,      "",   ""   ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.TIMESTAMP, "",   ""   ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.DATE,      "std::tm",     "std::tm"     ) ); // Date + Hour => #include <chrono> 
+		declarePrimitiveType( buildPrimitiveType(NeutralType.TIME,      "std::time_t", "std::time_t" ) ); // Time  => #include <chrono> 
+		declarePrimitiveType( buildPrimitiveType(NeutralType.TIMESTAMP, "std::tm",     "std::tm"     ) ); // Date + Hour => #include <chrono> 
 
-		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY, "", "" )  ); // example : "unsigned char abc[3];"
+		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY,    "std::vector<unsigned char>", "std::vector<unsigned char>" )  ); // #include <vector>
 		
 		//--- Unsigned primitive types : 
 		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.BYTE,    "unsigned char",   "unsigned char"  ) );
@@ -57,20 +57,12 @@ public class TypeConverterForCPlusPlus extends TypeConverter {
 		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.INTEGER, "unsigned int",    "unsigned int"   ) );
 		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.LONG,    "unsigned long",   "unsigned long"  ) );
 
-		//--- Object types : 
-		declareObjectType( buildObjectType(NeutralType.DATE,      "std::tm", "std::tm"      ) );
-		declareObjectType( buildObjectType(NeutralType.TIME,      "",  "" ) );
-		declareObjectType( buildObjectType(NeutralType.TIMESTAMP, "",  "" ) );
 	}
 
 	private LanguageType buildPrimitiveType(String neutralType, String primitiveType, String wrapperType) {
 		return new LanguageType(neutralType, primitiveType,  primitiveType, true, wrapperType );
 	}
 
-	private LanguageType buildObjectType(String neutralType, String simpleType, String fullType) {
-		return new LanguageType(neutralType, simpleType,  fullType, false, simpleType );
-	}
-	
 	@Override
 	public List<String> getComments() {
 		List<String> l = new LinkedList<>();
@@ -91,11 +83,6 @@ public class TypeConverterForCPlusPlus extends TypeConverter {
 		if ( lt != null ) {
 			return lt ;
 		}
-		// if "primitive type" not found search an "object type" : date, time, timestamp
-		lt = getObjectType( neutralType ) ;
-		if ( lt != null ) {
-			return lt;
-		}
 		// Still not found !!!
 		throw new TelosysTypeNotFoundException(getLanguageName(), attributeTypeInfo);
 	}
@@ -103,37 +90,21 @@ public class TypeConverterForCPlusPlus extends TypeConverter {
 	//--------------------------------------------------------------------------------------------
 	// Collection type ( since v 3.3.0 )
 	//--------------------------------------------------------------------------------------------	
-	// Collections for C++ :
-	//  - standard array : "int myarray[]" or "int myarray[40]"
-	//  - array library  : "#include <array>" / "array<int,3> myarray {10,20,30};"
-//	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "[]" ;  // not applicable
-//	private static final String STANDARD_COLLECTION_FULL_TYPE   = "[]" ;  // not applicable
+	// Collections for C++ : see : https://www.educba.com/c-plus-plus-vector-vs-list/ 
+	// std::list<int>   x;   // #include <list> 
+	// list<int> x;          // #include <list>   + "using namespace std;"
+	// std::vector<int> x;   // #include <vector>
+	// vector<int> x;        // #include <vector> + "using namespace std;"
 	
-//	@Override
-//	public void setSpecificCollectionType(String specificCollectionType) {
-//		this.setSpecificCollectionFullType(specificCollectionType) ;
-//		this.setSpecificCollectionSimpleType(specificCollectionType);
-//	}
-
+	private static final String STANDARD_COLLECTION_TYPE = "std::list" ; // #include <list> 
+	
 	@Override
 	public String getCollectionType() {
-		return "[]" ; 
+		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE) ; 
 	}
 
 	@Override
 	public String getCollectionType(String elementType) {
-		// not applicable : syntax "int myarray[]" => just return "int[]"
-		return elementType + "[]";  
+		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE) + "<" + elementType + ">" ; 
 	}
-	
-//	@Override
-//	public String getCollectionSimpleType() {
-//		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
-//	}
-//
-//	@Override
-//	public String getCollectionFullType() {
-//		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
-//	}
-
 }
