@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 public class BigDecimalTest  {
 
@@ -41,8 +42,10 @@ public class BigDecimalTest  {
 		
 		try {
 			d = new BigDecimal("1AA23.456") ; // OK
+			// We should not execute code below as an exception should have been raised
+			fail("An exception should have been raised due to invalid BigDecimal value");
 		} catch (NumberFormatException e) {
-			assertNull(e.getMessage());// no message
+			// Getting an exception is the expected result
 		}
 	}
 	
