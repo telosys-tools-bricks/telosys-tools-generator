@@ -13,7 +13,7 @@
 
 	<name>telosys-tools-generator</name>
 	<artifactId>telosys-tools-generator</artifactId>
-	<version>4.0.1</version> <!-- also update version in GeneratorVersion.java  -->
+	<version>4.1.0</version> <!-- also update version in GeneratorVersion.java  -->
 	<packaging>jar</packaging>
 
 	<dependencies>
@@ -30,12 +30,6 @@
 			<groupId>org.telosys</groupId>
 			<artifactId>telosys-tools-generator-engine-velocity17</artifactId>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>org.apache.velocity</groupId>
-			<artifactId>velocity</artifactId>
-		</dependency>
-		 -->
 
 		<!-- DEPENDENCIES / TESTS -->
 		<dependency>
