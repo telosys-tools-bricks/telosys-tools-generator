@@ -71,7 +71,6 @@ public abstract class AbstractLiteralsTest {
 	 */
 	protected LanguageType getLanguageType(String neutralType, int typeInfo) {
 		AttributeTypeInfo attributeTypeInfo = new AttributeTypeInfoForTest(neutralType, typeInfo);
-		println("AttributeTypeInfo : " + attributeTypeInfo);
 		return getLanguageType(attributeTypeInfo);
 	}
 
@@ -82,7 +81,16 @@ public abstract class AbstractLiteralsTest {
 	 */
 	protected LanguageType getLanguageType(String neutralType) {
 		AttributeTypeInfo attributeTypeInfo = new AttributeTypeInfoForTest(neutralType, AttributeTypeConst.NONE);
-		println("AttributeTypeInfo : " + attributeTypeInfo);
+		return getLanguageType(attributeTypeInfo);
+	}
+	
+	/**
+	 * Returns the target language type for the given neutral type with 'NOT_NULL' info
+	 * @param neutralType
+	 * @return
+	 */
+	protected LanguageType getLanguageTypeNotNull(String neutralType) {
+		AttributeTypeInfo attributeTypeInfo = new AttributeTypeInfoForTest(neutralType, AttributeTypeConst.NOT_NULL);
 		return getLanguageType(attributeTypeInfo);
 	}
 

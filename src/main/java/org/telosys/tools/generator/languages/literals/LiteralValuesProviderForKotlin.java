@@ -25,7 +25,7 @@ import org.telosys.tools.generator.languages.types.TypeConverterForKotlin;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 /**
- * Literal values provider for "C#" language
+ * Literal values provider for "Kotlin" language
  * 
  * @author Laurent GUERIN
  *
@@ -52,6 +52,25 @@ public class LiteralValuesProviderForKotlin extends LiteralValuesProvider {
 		return FALSE_LITERAL;
 	}
 
+	private boolean isSignedIntegerType( String simpleType ) {
+		if ( simpleType == null ) return false;
+		// Signed integer nullable or not : Short, Short?, Long, Long?
+		return simpleType.startsWith(TypeConverterForKotlin.KOTLIN_BYTE)  
+			|| simpleType.startsWith(TypeConverterForKotlin.KOTLIN_SHORT)
+			|| simpleType.startsWith(TypeConverterForKotlin.KOTLIN_INT)
+			|| simpleType.startsWith(TypeConverterForKotlin.KOTLIN_LONG)
+			;
+	}
+	private boolean isUnsignedIntegerType( String simpleType ) {
+		if ( simpleType == null ) return false;
+		// Unsigned integer nullable or not : UShort, UShort?, ULong, ULong? 
+		return simpleType.startsWith(TypeConverterForKotlin.KOTLIN_UBYTE)  
+			|| simpleType.startsWith(TypeConverterForKotlin.KOTLIN_USHORT)
+			|| simpleType.startsWith(TypeConverterForKotlin.KOTLIN_UINT)
+			|| simpleType.startsWith(TypeConverterForKotlin.KOTLIN_ULONG)
+			;
+	}
+	
 	@Override
 	public LiteralValue generateLiteralValue(LanguageType languageType, int maxLength, int step) {
 		
@@ -60,25 +79,19 @@ public class LiteralValuesProviderForKotlin extends LiteralValuesProvider {
 		String fullType = languageType.getFullType();
 		
 		//--- STRING
-		if ( TypeConverterForKotlin.KOTLIN_STRING.equals( simpleType ) ) {
+		if ( NeutralType.STRING.equals(neutralType) ) {
 			String value = buildStringValue(maxLength, step);
 			return new LiteralValue("\"" + value + "\"", value) ;			
 		}
 		
 		//--- STANDARD INTEGERS => NO SUFIX
-		else if (  TypeConverterForKotlin.KOTLIN_BYTE.equals( simpleType )
-				|| TypeConverterForKotlin.KOTLIN_SHORT.equals( simpleType )
-				|| TypeConverterForKotlin.KOTLIN_INT.equals( simpleType )
-				|| TypeConverterForKotlin.KOTLIN_LONG.equals( simpleType ) ) {
+		else if ( isSignedIntegerType(simpleType) ) {
 			Long value = buildIntegerValue(neutralType, step);  
 			return new LiteralValue(value.toString(), value) ; // eg : 123
 		}
 		
-		//--- UNSIGNED INTEGERS => SUFIX		
-		else if (  TypeConverterForKotlin.KOTLIN_UBYTE.equals( simpleType )
-				|| TypeConverterForKotlin.KOTLIN_USHORT.equals( simpleType )
-				|| TypeConverterForKotlin.KOTLIN_UINT.equals( simpleType )
-				|| TypeConverterForKotlin.KOTLIN_ULONG.equals( simpleType ) ) {
+		//--- UNSIGNED INTEGERS => WITH "u" SUFIX		
+		else if ( isUnsignedIntegerType(simpleType) ) {
 			Long value = buildIntegerValue(neutralType, step);  
 			return new LiteralValue(value.toString() + "u", value) ; // eg : 123u
 		}
