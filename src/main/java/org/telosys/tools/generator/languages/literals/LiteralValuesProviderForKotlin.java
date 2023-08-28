@@ -16,8 +16,11 @@
 package org.telosys.tools.generator.languages.literals;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
@@ -36,6 +39,17 @@ public class LiteralValuesProviderForKotlin extends LiteralValuesProvider {
 	private static final String TRUE_LITERAL  = "true" ; 
 	private static final String FALSE_LITERAL = "false" ; 
 	private static final String EMPTY_STRING_LITERAL = "\"\"" ; 
+	
+	private static final String[] SIGNED_TYPES_ARRAY = new String[] { 
+			TypeConverterForKotlin.KOTLIN_BYTE,     TypeConverterForKotlin.KOTLIN_SHORT,     TypeConverterForKotlin.KOTLIN_INT,     TypeConverterForKotlin.KOTLIN_LONG,
+			TypeConverterForKotlin.KOTLIN_BYTE+"?", TypeConverterForKotlin.KOTLIN_SHORT+"?", TypeConverterForKotlin.KOTLIN_INT+"?", TypeConverterForKotlin.KOTLIN_LONG+"?"};
+
+	private static final String[] UNSIGNED_TYPES_ARRAY = new String[] { 
+			TypeConverterForKotlin.KOTLIN_UBYTE,     TypeConverterForKotlin.KOTLIN_USHORT,     TypeConverterForKotlin.KOTLIN_UINT,     TypeConverterForKotlin.KOTLIN_ULONG,
+			TypeConverterForKotlin.KOTLIN_UBYTE+"?", TypeConverterForKotlin.KOTLIN_USHORT+"?", TypeConverterForKotlin.KOTLIN_UINT+"?", TypeConverterForKotlin.KOTLIN_ULONG+"?"};
+
+	private static final Set<String> SIGNED_TYPES   = new HashSet<>(Arrays.asList(SIGNED_TYPES_ARRAY));
+	private static final Set<String> UNSIGNED_TYPES = new HashSet<>(Arrays.asList(UNSIGNED_TYPES_ARRAY));
 
 	@Override
 	public String getLiteralNull() {
@@ -52,25 +66,6 @@ public class LiteralValuesProviderForKotlin extends LiteralValuesProvider {
 		return FALSE_LITERAL;
 	}
 
-	private boolean isSignedIntegerType( String simpleType ) {
-		if ( simpleType == null ) return false;
-		// Signed integer nullable or not : Short, Short?, Long, Long?
-		return simpleType.startsWith(TypeConverterForKotlin.KOTLIN_BYTE)  
-			|| simpleType.startsWith(TypeConverterForKotlin.KOTLIN_SHORT)
-			|| simpleType.startsWith(TypeConverterForKotlin.KOTLIN_INT)
-			|| simpleType.startsWith(TypeConverterForKotlin.KOTLIN_LONG)
-			;
-	}
-	private boolean isUnsignedIntegerType( String simpleType ) {
-		if ( simpleType == null ) return false;
-		// Unsigned integer nullable or not : UShort, UShort?, ULong, ULong? 
-		return simpleType.startsWith(TypeConverterForKotlin.KOTLIN_UBYTE)  
-			|| simpleType.startsWith(TypeConverterForKotlin.KOTLIN_USHORT)
-			|| simpleType.startsWith(TypeConverterForKotlin.KOTLIN_UINT)
-			|| simpleType.startsWith(TypeConverterForKotlin.KOTLIN_ULONG)
-			;
-	}
-	
 	@Override
 	public LiteralValue generateLiteralValue(LanguageType languageType, int maxLength, int step) {
 		
@@ -84,14 +79,14 @@ public class LiteralValuesProviderForKotlin extends LiteralValuesProvider {
 			return new LiteralValue("\"" + value + "\"", value) ;			
 		}
 		
-		//--- STANDARD INTEGERS => NO SUFIX
-		else if ( isSignedIntegerType(simpleType) ) {
+		//--- STANDARD INTEGERS ( signed integer nullable or not : Short, Short?, Long, Long? )=> NO SUFIX
+		else if ( SIGNED_TYPES.contains(simpleType) ) {
 			Long value = buildIntegerValue(neutralType, step);  
 			return new LiteralValue(value.toString(), value) ; // eg : 123
 		}
 		
-		//--- UNSIGNED INTEGERS => WITH "u" SUFIX		
-		else if ( isUnsignedIntegerType(simpleType) ) {
+		//--- UNSIGNED INTEGERS ( unsigned integer nullable or not : UShort, UShort?, ULong, ULong?  ) => WITH "u" SUFIX		
+		else if ( UNSIGNED_TYPES.contains(simpleType) ) {
 			Long value = buildIntegerValue(neutralType, step);  
 			return new LiteralValue(value.toString() + "u", value) ; // eg : 123u
 		}
@@ -117,15 +112,15 @@ public class LiteralValuesProviderForKotlin extends LiteralValuesProvider {
 		}
 
 		//--- DATE & TIME : "java.time.*"  
-		else if ( TypeConverterForKotlin.JAVA_LOCALDATE.equals(fullType) ) {
+		else if ( NeutralType.DATE.equals(neutralType)  ) {
 			String dateISO = buildDateISO(step) ; // "2001-06-22" 
 			return new LiteralValue("java.time.LocalDate.parse(\"" + dateISO + "\")", dateISO );
 		}
-		else if ( TypeConverterForKotlin.JAVA_LOCALTIME.equals(fullType) ) {
+		else if ( NeutralType.TIME.equals(neutralType)  ) {
 			String timeISO = buildTimeISO(step) ; // "15:46:52"
 			return new LiteralValue("java.time.LocalTime.parse(\"" + timeISO + "\")", timeISO );
 		}
-		else if ( TypeConverterForKotlin.JAVA_LOCALDATETIME.equals(fullType) ) {
+		else if ( NeutralType.TIMESTAMP.equals(neutralType) ) {
 			String dateTimeISO = buildDateTimeISO(step); // "2017-11-15T08:22:12"
 			return new LiteralValue("java.time.LocalDateTime.parse(\"" + dateTimeISO + "\")", dateTimeISO );
 		}
