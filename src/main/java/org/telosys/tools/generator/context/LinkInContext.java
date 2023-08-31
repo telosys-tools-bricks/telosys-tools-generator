@@ -725,11 +725,15 @@ public class LinkInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns true if 'insertable' flag equals the given value",
-			"The flag can be 'undefined' then then neither true nor false"
+			"Returns true if 'insertable flag' is defined and equals the given value",
+			"The flag can be 'undefined' then neither true nor false"
+		},
+		example={ 
+			"#if ( $link.insertableIs(true) )",
+			"#if ( $link.insertableIs(false) )",
 		},
 		parameters = { 
-			"value : the boolean value" 
+			"booleanValue : true or false" 
 		},
 		since="3.3.0"
 	)
@@ -759,11 +763,15 @@ public class LinkInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns true if 'updatable' flag equals the given value",
-			"The flag can be 'undefined' then then neither true nor false"
+			"Returns true if 'updatable flag' is defined and equals the given value",
+			"The flag can be 'undefined' then neither true nor false"
+		},
+		example={ 
+			"#if ( $link.updatableIs(true) )",
+			"#if ( $link.updatableIs(false) )",
 		},
 		parameters = { 
-			"value : the boolean value" 
+			"booleanValue : true or false" 
 		},
 		since="3.3.0"
 	)

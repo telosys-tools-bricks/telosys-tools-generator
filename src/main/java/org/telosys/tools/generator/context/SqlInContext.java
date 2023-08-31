@@ -131,7 +131,7 @@ public class SqlInContext {
 			""
 		},
 		example={	
-				"$sql.databaseName()"
+				"$sql.databaseName"
 			},
 		since = "3.4.0"
 	)
@@ -146,7 +146,7 @@ public class SqlInContext {
 			""
 		},
 		example={	
-				"$sql.databaseConfigFile()"
+				"$sql.databaseConfigFile"
 			},
 		since = "3.4.0"
 	)
@@ -163,9 +163,12 @@ public class SqlInContext {
 			"For example converts 'EmployeeJobs' to 'employee_jobs'",
 			""
 		},
+		parameters = { 
+			"originalName : name to be converted " 
+		},
 		example={	
-				"$sql.convertToTableName($var)"
-			},
+			"$sql.convertToTableName($var)"
+		},
 		since = "3.4.0" 
 	)
 	public String convertToTableName(String originalName) {
@@ -273,6 +276,9 @@ public class SqlInContext {
 		},
 		example={	
 				"$sql.tableName($entity)"
+			},
+		parameters = { 
+				"entity : the entity  " ,
 			},
 		since = "3.4.0"
 	)
@@ -422,6 +428,9 @@ public class SqlInContext {
 		example={	
 				"$sql.pkColumns($entity)"
 			},
+		parameters = { 
+				"entity : the entity  " ,
+			},
 		since = "3.4.0"
 	)
 	public String pkColumns(EntityInContext entity) {
@@ -454,6 +463,9 @@ public class SqlInContext {
 		example={	
 				"$sql.fkName($fk)"
 			},
+		parameters = { 
+				"foreignKey : the foreign key  " ,
+			},
 		since = "3.4.0"
 	)
 	public String fkName(ForeignKeyInContext fk) {
@@ -469,6 +481,9 @@ public class SqlInContext {
 		},
 		example={	
 				"$sql.fkTable($fk)"
+			},
+		parameters = { 
+				"foreignKey : the foreign key  " ,
 			},
 		since = "3.4.0"
 	)
@@ -488,6 +503,9 @@ public class SqlInContext {
 		example={	
 				"$sql.fkReferencedTable($fk)"
 			},
+		parameters = { 
+				"foreignKey : the foreign key  " ,
+			},
 		since = "3.4.0"
 	)
 	public String fkReferencedTable(ForeignKeyInContext fk) {
@@ -505,6 +523,9 @@ public class SqlInContext {
 		example={	
 				"$sql.fkColumns($fk)"
 			},
+		parameters = { 
+				"foreignKey : the foreign key  " ,
+			},
 		since = "3.4.0"
 	)
 	public String fkColumns(ForeignKeyInContext fk) throws GeneratorException {
@@ -520,6 +541,9 @@ public class SqlInContext {
 		},
 		example={	
 				"$sql.fkReferencedColumns($fk)"
+			},
+		parameters = { 
+				"foreignKey : the foreign key  " ,
 			},
 		since = "3.4.0"
 	)

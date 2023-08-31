@@ -31,7 +31,10 @@ import org.telosys.tools.generator.context.names.ContextName;
 //-------------------------------------------------------------------------------------
 @VelocityObject(
 		contextName= ContextName.TODAY ,
-		text = "Object providing the current system date and time ",
+		text = {
+			"Object providing the current system date and time ",
+			"(!) DEPRECATED : use '$now' instead "
+		},
 		since = ""
  )
 //-------------------------------------------------------------------------------------

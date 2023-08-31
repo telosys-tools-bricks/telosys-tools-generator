@@ -251,7 +251,7 @@ public class Java {
 			example={ 
 				"#foreach( $import in $java.imports($entity.attributes) )",
 				"import $import;",
-				"#end)" },
+				"#end" },
 			parameters = {
 				"attributes : list of attributes" },
 			since = "2.0.7"
@@ -279,7 +279,7 @@ public class Java {
 			example={ 
 				"#foreach( $import in $java.imports($entity) )",
 				"import $import;",
-				"#end)" },
+				"#end" },
 			parameters = {
 				"entity : entity to be used " },
 			since = "2.0.7"

@@ -18,9 +18,9 @@ package org.telosys.tools.generator.context;
 import java.io.File;
 
 import org.telosys.tools.commons.StrUtil;
-import org.telosys.tools.commons.exception.TelosysRuntimeException;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
+import org.telosys.tools.generator.context.doc.VelocityNoDoc;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generator.context.tools.SqlInContextBuilder;
@@ -73,11 +73,12 @@ public class EnvInContext {
 			},
 		since = "2.1.0"
 			)
-	public void setEntityClassNamePrefix( String prefix ) {
-		this.entityClassNamePrefix = prefix ;
-	}
 	public String getEntityClassNamePrefix() {
 		return this.entityClassNamePrefix;
+	}
+	@VelocityNoDoc  // $env.xxx (get/set) 
+	public void setEntityClassNamePrefix( String prefix ) {
+		this.entityClassNamePrefix = prefix ;
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -91,11 +92,12 @@ public class EnvInContext {
 			},
 		since = "2.1.0"
 			)
-	public void setEntityClassNameSuffix( String suffix ) {
-		this.entityClassNameSuffix = suffix ;
-	}
 	public String getEntityClassNameSuffix() {
 		return this.entityClassNameSuffix;
+	}
+	@VelocityNoDoc  // $env.xxx (get/set) 
+	public void setEntityClassNameSuffix( String suffix ) {
+		this.entityClassNameSuffix = suffix ;
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -113,6 +115,10 @@ public class EnvInContext {
 			},
 		since = "3.0.0"
 			)
+	public String getLanguage() {
+		return language;
+	}
+	@VelocityNoDoc  // $env.xxx (get/set) 
 	public void setLanguage( String language ) throws GeneratorException {
 		if ( TargetLanguageProvider.isDefinedLanguage(language) ) {
 			this.language = language ;
@@ -121,9 +127,6 @@ public class EnvInContext {
 			// Unknown language
 			throw new GeneratorException("Unknown language '" + language + "'");			
 		}
-	}
-	public String getLanguage() {
-		return language;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -140,11 +143,12 @@ public class EnvInContext {
 			},
 		since = "3.3.0"
 			)
-	public void setCollectionType(String specificCollectionType) {
-		this.specificCollectionType = specificCollectionType;
-	}
 	public String getCollectionType() {
 		return this.specificCollectionType != null ? this.specificCollectionType : "" ;
+	}
+	@VelocityNoDoc  // $env.xxx (get/set) 
+	public void setCollectionType(String specificCollectionType) {
+		this.specificCollectionType = specificCollectionType;
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -156,17 +160,19 @@ public class EnvInContext {
 		example={ 
 			"#set ( $env.database = 'postgresql' )  ",
 			"#set ( $env.database = 'mysql' )  ",
+			"Current database type is $env.database "
 			},
 		since = "3.4.0"
 			)
+	public String getDatabase() {
+		return this.database;
+	}	
+	@VelocityNoDoc  // $env.xxx (get/set) 
 	public void setDatabase(String dbName) {
 		SqlInContextBuilder.checkDbName(dbName);
 		this.database = dbName;
 		this.sqlInContext = null; // Reset 
 	}
-	public String getDatabase() {
-		return this.database;
-	}	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -180,14 +186,15 @@ public class EnvInContext {
 			},
 		since = "3.4.0"
 			)
+	public File getDatabaseConvFile() {
+		return this.databaseConvFile;
+	}
+	@VelocityNoDoc  // $env.xxx (get/set) 
 	public void setDatabaseConvFile(FileInContext fileInContext) {
 		File dbFile = fileInContext.getFile();
 		SqlInContextBuilder.checkDbFile(dbFile);
 		this.databaseConvFile = dbFile ;
 		this.sqlInContext = null; // Reset 
-	}
-	public File getDatabaseConvFile() {
-		return this.databaseConvFile;
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -204,11 +211,12 @@ public class EnvInContext {
 			},
 		since = "4.1.0"
 			)
-	public void setTypeWithNullableMark(boolean v) {
-		this.typeWithNullableMark = v;
-	}
 	public boolean getTypeWithNullableMark() {
 		return this.typeWithNullableMark ;
+	}
+	@VelocityNoDoc  // $env.xxx (get/set) 
+	public void setTypeWithNullableMark(boolean v) {
+		this.typeWithNullableMark = v;
 	}
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -216,17 +224,8 @@ public class EnvInContext {
 	 * Returns the TargetLanguage for the current language defined in '$env'
 	 * @return the TargetLanguage (never null)
 	 */
+	@VelocityNoDoc  // internal usage	
 	public TargetLanguage getTargetLanguage() { // v 4.1.0 
-//		TargetLanguage targetLanguage = TargetLanguageProvider.getTargetLanguage(this.language);
-//		if ( targetLanguage == null ) {
-//			// by default use JAVA
-//			targetLanguage = TargetLanguageProvider.getTargetLanguage("JAVA");
-//			if ( targetLanguage == null ) {
-//				// cannot happen
-//				throw new TelosysRuntimeException("Cannot get TargetLanguage (even with default language name)");
-//			}
-//		}
-//		return targetLanguage ;
 		return TargetLanguageProvider.getTargetLanguage(this); // v 4.1.0
 	}
 
@@ -236,13 +235,8 @@ public class EnvInContext {
 	 * @return
 	 * @since ver 3.0.0
 	 */
+	@VelocityNoDoc  // internal usage	
 	public TypeConverter getTypeConverter() { // keep 'public' for debug in '.vm' files
-//		TypeConverter typeConverter = getTargetLanguage().getTypeConverter(); // v 4.1.0
-//		// set specific collection type if any 
-//		if ( specificCollectionType != null ) {
-//			typeConverter.setSpecificCollectionType(specificCollectionType);
-//		}
-//		return typeConverter;		
 		return getTargetLanguage().getTypeConverter(); // v 4.1.0
 	}
 	
@@ -251,11 +245,23 @@ public class EnvInContext {
 	 * @return
 	 * @since ver 3.0.0
 	 */
+	@VelocityNoDoc  // internal usage	
 	public LiteralValuesProvider getLiteralValuesProvider()  { // keep 'public' for debug in '.vm' files
 		return getTargetLanguage().getLiteralValuesProvider(); // v 4.1.0
 	}
 	
 	
+	@VelocityMethod(
+		text={	
+			"Returns an instance of '$sql' object",
+			"The $sql object is based on the current 'database' or on the current 'databaseConvFile' ",
+			"(for debug information, not intended for use directly in template files)"
+			},
+		example={ 
+			"#set( $env.database = 'postgresql' ) ",
+			"#set( $sql = $env.sql ) "
+			}
+	)
 	public SqlInContext getSql() {
 		// the current "sql" is reset whenever the database name/file changes
 		if ( this.sqlInContext == null ) {

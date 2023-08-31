@@ -349,10 +349,15 @@ public class EntityInContext
 	 * Returns all the attributes defined for this class
 	 * @return
 	 */
-	@VelocityMethod ( text= { 
+	@VelocityMethod ( 
+		text= { 
 			"Returns all the attributes defined for this entity"
 		},
-		example="$entity.attributes"
+		example= {
+			"#foreach( $attribute in $entity.attributes )",
+			"...",
+			"#end"
+		}
 	)
 	@VelocityReturnType("List of 'attribute' objects")
 	public List<AttributeInContext> getAttributes() {

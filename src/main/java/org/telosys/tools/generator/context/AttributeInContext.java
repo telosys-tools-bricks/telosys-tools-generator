@@ -1354,7 +1354,7 @@ public class AttributeInContext {
 			"strategyName : can be 'AUTO', 'IDENTITY', 'SEQUENCE', 'TABLE' " 
 		},
 	example= {
-			"$attribute.hasGeneratedValueStrategy('SEQUENCE') "
+			"#if ( $attribute.hasGeneratedValueStrategy('SEQUENCE') ) "
 		},	
 	since="4.1.0"
 	)
@@ -1387,13 +1387,29 @@ public class AttributeInContext {
 	 */
 	@VelocityMethod(
 		text={	
-			"Returns the generated value allocation size usable in ORM like JPA or Doctrine",
-			"Can be used for JPA '@SequenceGenerator allocationSize' or '@TableGenerator allocationSize' "
-			}
+			"Returns the generated value allocation size usable in ORM like JPA or Doctrine (or 0 if not defined)",
+			"Can be used for JPA '@SequenceGenerator allocationSize' or '@TableGenerator allocationSize' ",
+			},
+		example= {
+			"#if ( $attribute.hasGeneratedValueAllocationSize() )",
+			"Generated value allocation size is $attribute.generatedValueAllocationSize",
+			"#end"
+			},
+		since="4.1.0"
 	)
 	public int getGeneratedValueAllocationSize() {
 		return generatedValueAllocationSize != null ? generatedValueAllocationSize.intValue() : 0 ;
 	}
+
+	@VelocityMethod(
+		text={	
+			"Returns true if the attribute has a generated value allocation size"
+			},
+		example= {
+			"#if ( $attribute.hasGeneratedValueAllocationSize() )"
+			},
+		since="4.1.0"
+	)
 	public boolean hasGeneratedValueAllocationSize() {
 		return generatedValueAllocationSize != null ;
 	}
@@ -1405,13 +1421,29 @@ public class AttributeInContext {
 	 */
 	@VelocityMethod(
 		text={	
-			"Returns the generated value initial value usable in ORM like JPA or Doctrine",
+			"Returns the generated value initial value usable in ORM like JPA or Doctrine (or 0 if not defined)",
 			"Typically for JPA '@SequenceGenerator initialValue' or '@TableGenerator initialValue' "
-			}
+			},
+		example= {
+			"#if ( $attribute.hasGeneratedValueInitialValue() )",
+			"Generated value initial value is $attribute.generatedValueInitialValue",
+			"#end"
+			},
+		since="4.1.0"
 	)
 	public int getGeneratedValueInitialValue() {
 		return generatedValueInitialValue != null ? generatedValueInitialValue.intValue() : 0 ;
 	}
+
+	@VelocityMethod(
+		text={	
+			"Returns true if the attribute has an initial value for the generated value"
+			},
+		example= {
+			"#if ( $attribute.hasGeneratedValueInitialValue() )"
+			},
+		since="4.1.0"
+	)
 	public boolean hasGeneratedValueInitialValue() {
 		return generatedValueInitialValue != null ;
 	}
@@ -1474,13 +1506,29 @@ public class AttributeInContext {
 	 */
 	@VelocityMethod(
 		text={	
-			"Returns the 'sequence name' used for a generated value (or a void string if none)",
+			"Returns the 'sequence name' to use for a generated value (or a void string if none)",
 			"Typically for JPA '@SequenceGenerator/sequenceName'  "
-			}
+			},
+		example= {
+			"#if ( $attribute.hasGeneratedValueSequenceName() )",
+			"Generated value sequence name is $attribute.generatedValueSequenceName",
+			"#end"
+		},
+		since="4.1.0"
 	)
 	public String getGeneratedValueSequenceName() {
 		return generatedValueSequenceName;
 	}
+	
+	@VelocityMethod(
+		text={	
+			"Returns true if the attribute has a sequence name for the generated value"
+			},
+		example= {
+			"#if ( $attribute.hasGeneratedValueSequenceName() )"
+			},
+		since="4.1.0"
+	)
 	public boolean hasGeneratedValueSequenceName() {
 		return ! StrUtil.nullOrVoid(generatedValueSequenceName);
 	}
@@ -1560,15 +1608,31 @@ public class AttributeInContext {
 //
 	//-----------------------------------------------------------------------------------------
 	@VelocityMethod(
-	text={
-		"Returns the primary key (string value) that identifies the generated value in the table ",
-		"useful for ORM like JPA or Doctrine ",
-		"Returns a void string if none"
-		}
+		text={
+			"Returns the primary key (string value) that identifies the generated value in the table ",
+			"useful for ORM like JPA or Doctrine ",
+			"Returns a void string if none"
+			},
+		example= {
+				"#if ( $attribute.hasGeneratedValueTablePkValue() )",
+				"Generated value : PK value in table is $attribute.generatedValueTablePkValue",
+				"#end"
+			},
+		since="4.1.0"	
 	)
 	public String getGeneratedValueTablePkValue() {
 		return generatedValueTablePkValue;
 	}
+	
+	@VelocityMethod(
+		text={	
+			"Returns true if the attribute has a primary key that identifies the generated value in the table "
+			},
+		example= {
+			"#if ( $attribute.hasGeneratedValueTablePkValue() )"
+			},
+		since="4.1.0"
+	)
 	public boolean hasGeneratedValueTablePkValue() {
 		return ! StrUtil.nullOrVoid(generatedValueTablePkValue);
 	}
