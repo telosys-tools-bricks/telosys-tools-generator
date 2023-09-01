@@ -297,6 +297,9 @@ public class EntityInContext
 	@VelocityMethod ( text= { 
 			"Returns TRUE if the entity has an attribute with the given name"
 		},
+		parameters = {
+			"attributeName : the attribute name in the entity"
+		},
 		example= {
 			"#if ( $entity.hasAttribute('foo') )",
 			"...",
