@@ -53,20 +53,15 @@ import org.telosys.tools.generic.model.ForeignKeyAttribute;
 public class ForeignKeyInContext {
 	
 	private final String  fkName ;
-//	private final String  tableName ; // removed in v 3.4.0
 	private final String  originEntityName ; // v 3.4.0
-//	private final String  targetTableName  ; // removed in v 3.4.0
 	private final String  referencedEntityName ; // v 3.4.0
-//	private final List<ForeignKeyColumnInContext> fkColumns ; // removed in v 3.4.0
 	private final List<ForeignKeyAttributeInContext> fkAttributes ; // new  in v 3.4.0
-	
-//	private int updateRuleCode = 0 ; // removed in v 3.4.0
-//	private int deleteRuleCode = 0 ; // removed in v 3.4.0
-//	private int deferrableCode = 0 ; // removed in v 3.4.0
 	
 	private final ModelInContext modelInContext ;  // v 3.4.0
 
 	private final EnvInContext env ; // ver 3.4.0
+	
+    private final boolean explicitFK;  // ver 4.1.0
 	
 	//-------------------------------------------------------------------------------------
 	public ForeignKeyInContext(ForeignKey foreignKey, ModelInContext modelInContext, EnvInContext env ) {
@@ -80,31 +75,16 @@ public class ForeignKeyInContext {
 		this.env = env ;
 		
 		this.fkName = foreignKey.getName() ;
-//		this.tableName = foreignKey.getTableName() ; // removed in v 3.4.0
-//		this.targetTableName = foreignKey.getReferencedTableName(); // removed in v 3.4.0
 		
 		this.originEntityName = foreignKey.getOriginEntityName();
 		this.referencedEntityName = foreignKey.getReferencedEntityName();
 		
-//		this.updateRuleCode = 0 ; // removed in v 3.4.0
-//		this.deleteRuleCode = 0 ; // removed in v 3.4.0
-//		this.deferrableCode = 0 ; // removed in v 3.4.0
-//		this.fkColumns = new LinkedList<>() ;
-
-		//--- V 3.0.0 
-//		//--- ON UPDATE, ON DELETE and DEFERRABLE (stored in each column in meta-data, keep the last one)
-//		this.updateRuleCode = foreignKey.getUpdateRuleCode() ;
-//		this.deleteRuleCode = foreignKey.getDeleteRuleCode() ;
-//		this.deferrableCode = foreignKey.getDeferrableCode() ;
-		
-//		for ( ForeignKeyColumn metadataFKColumn : foreignKey.getColumns() ) { 
-//			fkColumns.add( new ForeignKeyColumnInContext(metadataFKColumn) );
-//		}
-		// v 3.4.0
 		this.fkAttributes = new LinkedList<>() ;
 		for ( ForeignKeyAttribute fkAttribute : foreignKey.getAttributes() ) {
 			fkAttributes.add( new ForeignKeyAttributeInContext(foreignKey, fkAttribute, modelInContext) );
 		}
+		
+		this.explicitFK = foreignKey.isExplicit();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -128,14 +108,26 @@ public class ForeignKeyInContext {
     }
 	
 	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//	text={	
-//		"Returns the name of the table holding the foreign key"
-//		})
-//	public String getTableName() { // removed in v 3.4.0
-//		return this.tableName ;
-//	}
-
+	@VelocityMethod(
+	text={ "Returns true if the Foreign Key is explicit (defined with name).",
+			"Returns false for an implicit Foreign Key."},
+	example= "#if ( $fk.isExplicit() )",
+	since=   "4.1.0"
+	)
+    public boolean isExplicit() {
+		return this.explicitFK ;
+	}
+    
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={ "Returns true if the Foreign Key is composite (has more than 1 attribute)" },
+	example= "#if ( $fk.isComposite() )",
+	since=   "4.1.0"
+	)
+	public boolean isComposite() {
+		return fkAttributes.size() > 1 ;
+	}
+    
 	//-------------------------------------------------------------------------------------
 	// ORIGIN ENTITY 
 	//-------------------------------------------------------------------------------------
@@ -200,31 +192,6 @@ public class ForeignKeyInContext {
     }
 
 	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//	text={	
-//		"Returns the name of the referenced table (the table referenced by the foreign key)"
-//		})
-//	public String getReferencedTableName() { // removed in v 3.4.0
-//		return this.targetTableName ;
-//	}
-	
-	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//	text={	
-//		"Returns all the columns composing the Foreign Key",
-//		"(sorted in the original database order)"
-//		},
-//	example= {
-//		"#foreach( $fkcol in $fk.columns ) ",
-//		"...",
-//		"#end"
-//		})
-//	@VelocityReturnType("List of 'Foreign Key Column' objects ( List of '$fkcol' )")
-//	public List<ForeignKeyColumnInContext> getColumns() { // removed in v 3.4.0
-//		return this.fkColumns ;
-//	}
-	
-	//-------------------------------------------------------------------------------------
 	// ATTRIBUTES ( COLUMNS ) 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -243,13 +210,6 @@ public class ForeignKeyInContext {
 	}
 	
 	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//	text={	
-//		"Returns the number of columns composing the foreign key"
-//		})
-//	public int getColumnsCount() {
-//		return this.fkColumns.size() ;
-//	}
 	@VelocityMethod(
 	text={	
 		"Returns the number of attributes composing the foreign key"
@@ -274,12 +234,6 @@ public class ForeignKeyInContext {
 	@VelocityReturnType("List<String>")
 	public List<String> getSqlOriginColumns() throws GeneratorException {
 		List<String> list = new LinkedList<>();
-//		SqlInContext sql = this.env.getSql();
-//		if ( fkColumns != null ) {
-//			for ( ForeignKeyColumnInContext col : fkColumns ) {
-//				list.add(sql.convertToColumnName(col.getColumnName()));
-//			}
-//		}
 		for ( ForeignKeyAttributeInContext fkAttrib : fkAttributes ) {
 			String sqlColumnName = fkAttrib.getOriginAttribute().getSqlColumnName();
 			list.add(sqlColumnName);
@@ -314,12 +268,6 @@ public class ForeignKeyInContext {
 	@VelocityReturnType("List<String>")
 	public List<String> getSqlReferencedColumns() throws GeneratorException {
 		List<String> list = new LinkedList<>();
-//		SqlInContext sql = this.env.getSql();
-//		if ( fkColumns != null ) {
-//			for ( ForeignKeyColumnInContext col : fkColumns ) {
-//				list.add( sql.convertToColumnName(col.getReferencedColumnName()) );
-//			}
-//		}
 		for ( ForeignKeyAttributeInContext fkAttrib : fkAttributes ) {
 			String sqlColumnName = fkAttrib.getReferencedAttribute().getSqlColumnName();
 			list.add(sqlColumnName);
@@ -336,58 +284,4 @@ public class ForeignKeyInContext {
 		return ListUtil.join(getSqlReferencedColumns(), ",");
     }
 	
-
-	
-	
-	//-------------------------------------------------------------------------------------
-	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//	text={	
-//		"Returns the 'DEFERRABILITY' status ( 'NOT DEFERRABLE', 'INITIALLY IMMEDIATE', 'INITIALLY DEFERRED'  ) "
-//		})
-//	public String getDeferrable() {
-//		return MetadataUtil.getForeignKeyDeferrability(deferrableCode).toUpperCase();
-//	}
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//	text={	
-//		"Returns the 'DEFERRABILITY' status code ( MetaData Code : 5,6,7 ) "
-//		})
-//	public int getDeferrableCode() {
-//		return deferrableCode;
-//	}
-//
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//	text={	
-//		"Returns the 'ON DELETE' rule ( 'NO ACTION', 'RESTRICT', 'SET NULL', 'SET DEFAULT', 'CASCADE'  ) "
-//		})
-//	public String getDeleteRule() {
-//		return MetadataUtil.getForeignKeyDeleteRule(deleteRuleCode).toUpperCase();
-//	}
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//	text={	
-//		"Returns the 'ON DELETE' rule code ( MetaData Code : 0,1,2,3,4 ) "
-//		})
-//	public int getDeleteRuleCode() {
-//		return deleteRuleCode;
-//	}
-//
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//	text={	
-//		"Returns the 'ON UPDATE' rule ( 'NO ACTION', 'RESTRICT', 'SET NULL', 'SET DEFAULT', 'CASCADE' ) "
-//		})
-//	public String getUpdateRule() {
-//		return MetadataUtil.getForeignKeyUpdateRule(updateRuleCode).toUpperCase();
-//	}
-//	//-------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//	text={	
-//		"Returns the 'ON UPDATE' rule code ( MetaData Code : 0,1,2,3,4 ) "
-//		})
-//	public int getUpdateRuleCode() {
-//		return updateRuleCode;
-//	}
 }
