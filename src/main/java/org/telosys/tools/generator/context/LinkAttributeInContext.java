@@ -22,24 +22,24 @@ import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.Link;
 
 /**
- * Foreign Key pair of attributes ( origin attribute with referenced attribute ) 
+ * Link attribute ( origin attribute with referenced attribute ) 
  * 
  * @author Laurent Guerin
  *
  */
 //-------------------------------------------------------------------------------------
 @VelocityObject(
-//	contextName = ContextName.FK_ATTRIBUTE ,
-	contextName = ContextName.LINK_ATTRIBUTE ,  // error fixed in v 4.0.1
+	contextName = ContextName.LINK_ATTRIBUTE , 
 	text = {
-			"Foreign Key attribute",
-			""
+			"A link uses one or more attributes to reference another entity. ",
+			"A 'link attribute' is one of these attributes, ",
+			"it defines the 'origin-->referenced' association at attribute level. "
 	},
 	since = "3.4.0",
 	example= {
 			"",
-			"#foreach( $fkAttribute in $fk.attributes )",
-			"    $fkAttribute.xxx - $fkAttribute.xxx ",
+			"#foreach( $linkAttribute in $link.attributes )",
+			"    $linkAttribute.originAttributeName references $linkAttribute.referencedAttributeName ",
 			"#end"
 	}
 )
@@ -58,6 +58,11 @@ public class LinkAttributeInContext {
 	//-------------------------------------------------------------------------------------
 	/**
 	 * Constructor
+	 * @param modelInContext
+	 * @param entity
+	 * @param link
+	 * @param originAttributeName
+	 * @param referencedAttributeName
 	 */
 	public LinkAttributeInContext( ModelInContext modelInContext, EntityInContext entity, Link link,
 			String originAttributeName, String referencedAttributeName) { 
@@ -65,7 +70,6 @@ public class LinkAttributeInContext {
 		
 		this.linkName = link.getFieldName();
 		this.originEntityName = entity.getName();
-//		this.referencedEntityName = link.getTargetEntityClassName();
 		this.referencedEntityName = link.getReferencedEntityName();
 		
 		this.originAttributeName = originAttributeName;
@@ -74,6 +78,12 @@ public class LinkAttributeInContext {
 		this.modelInContext = modelInContext;
 	}
 	 
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns the link name using the attribute (field name in the entity)"
+			}
+	)
 	public String getLinkName() {
 		return this.linkName;
 	}
