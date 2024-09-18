@@ -33,7 +33,7 @@ public class TestFileProvider {
 		String destFileName = TARGET_TESTS_TMP_DIR + fileName ;
 		
 		try {
-			FileUtil.copy(srcFileName, destFileName, true);
+			FileUtil.copyFileToFile(srcFileName, destFileName, true);
 		} catch (Exception e) {
 			throw new RuntimeException("TEST ENV : Cannot copy file '" + fileName + "' in target", e);
 		}

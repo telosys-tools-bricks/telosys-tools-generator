@@ -51,7 +51,7 @@ public class TestsProject {
 		
 		System.out.println(" copy " + dbrepInputFile ); 
 		System.out.println("   to " + destDir ); 
-		FileUtil.copyToDirectory(dbrepInputFile, destDir, true);
+		FileUtil.copyFileInDirectory(dbrepInputFile, destDir, true);
 	}
 
 	public static void initBundle(TelosysProject telosysProject, String bundleName) throws TelosysToolsException, Exception {
@@ -67,7 +67,7 @@ public class TestsProject {
 		//--- Copy 
 		System.out.println(" from " + sourceFolder ); 
 		System.out.println("   to " + destFolder ); 
-		FileUtil.copyFolder(sourceFolder, destFolder, true);
+		FileUtil.copyFolderToFolder(sourceFolder, destFolder, true);
 	}
 
 }
