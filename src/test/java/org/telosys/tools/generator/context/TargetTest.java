@@ -1,10 +1,13 @@
 package org.telosys.tools.generator.context;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 import org.telosys.tools.commons.bundles.TargetDefinition;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
+import org.telosys.tools.commons.variables.VariablesManager;
 import org.telosys.tools.dsl.model.DslModelEntity;
 import org.telosys.tools.generic.model.Entity;
 
@@ -23,33 +26,26 @@ public class TargetTest {
 		TelosysToolsCfg telosysToolsCfg = TestsEnv.loadTelosysToolsCfg(projectFolder);
 		println( "TelosysToolsCfg loaded from : " + telosysToolsCfg.getCfgFileAbsolutePath() );
 		assertEquals("/src", telosysToolsCfg.getSRC() );
+		Map<String,String> variables = telosysToolsCfg.getAllVariablesMap();
+		assertEquals("org.demo.foo.bar", variables.get("ROOT_PKG"));
 		return telosysToolsCfg;
 	}
+	private Entity buildEntity(String className) { 
+		return new DslModelEntity(className ) ;
+	}
 
-//	private Variable[] getVariables() {
-//		Variable[] variables = new Variable[5] ;
-//		int i = 0 ;
-//		variables[i++] = new Variable("ROOT_PKG",   "org.demo.foo.bar");
-//		variables[i++] = new Variable("ENTITY_PKG", "org.demo.foo.bar.bean");
-//		variables[i++] = new Variable("VAR1",       "VALUE1");
-//		variables[i++] = new Variable("VAR2",       "VALUE2");
-//		variables[i++] = new Variable("SRC",        "/src");
-//		return variables ;
-//	}
+	private Target createTargetForEntity(String name, String file, String folder, String template, String type) {
+		TargetDefinition targetDef = new TargetDefinition(name, file, folder, template, type);
+		return new Target( getTelosysToolsCfg(), targetDef, buildEntity("Author") ); 
+	}
+	private Target createTargetWithoutEntity(String name, String file, String folder, String template, String type) {
+		TargetDefinition targetDef = new TargetDefinition(name, file, folder, template, type);
+		return new Target( getTelosysToolsCfg(), targetDef ); 
+	}
 	
 	@Test
-	public void testTargetCreation1() {
-		
-		TargetDefinition targetDef = new TargetDefinition(
-				"Target 1", 
-				"${BEANNAME}.java", 
-				"${SRC}/${ROOT_PKG}/persistence/services", 
-				"bean.vm", 
-				"*");
-		TelosysToolsCfg telosysToolsCfg = getTelosysToolsCfg();
-//		Target target = new Target( telosysToolsCfg, targetDef, buildEntity("AUTHOR", "Author") ); 
-		Target target = new Target( telosysToolsCfg, targetDef, buildEntity("Author") ); 
-		print(target);
+	public void testTargetForEntity1() {
+		Target target = createTargetForEntity("Target 1", "${BEANNAME}.java", "${SRC}/${ROOT_PKG}/persistence/services", "bean.vm", "*");
 		
 		assertEquals("Target 1",         target.getTargetName());
 		assertEquals("${BEANNAME}.java", target.getOriginalFileDefinition());
@@ -72,46 +68,56 @@ public class TargetTest {
 		target.forceEntityName("AuthorFoo");
 		assertEquals("AuthorFoo", target.getForcedEntityName());
 		
-		print(target);		
 		assertEquals("${BEANNAME}.java", target.getOriginalFileDefinition());
 		assertEquals("AuthorFoo.java", target.getFile()); // File name based on 'forced entity name'
-		assertEquals("/src/org/demo/foo/bar/persistence/services", target.getFolder());
 	}
 
 	@Test
-	public void testTargetCreation2() {
-		
-		TargetDefinition targetDef = new TargetDefinition(
-				"Target 2", 
-				"${BEANNAME}.java", 
-				"${SRC}/${ENTITY_PKG}", 
-				"bean.vm", 
-				"*");
-//		Target target = new Target( getTelosysToolsCfg(), targetDef, buildEntity("BOOK", "Book") ); // v 3.3.0
-		Target target = new Target( getTelosysToolsCfg(), targetDef, buildEntity("Book") ); // v 3.3.0
-		print(target);
-		
-		assertEquals("Book.java", target.getFile());
+	public void testTargetForEntity2() {
+		Target target = createTargetForEntity("Target 2", "${ENT}.java", "${SRC}/${ENTITY_PKG}", "bean.vm",	"*");
+		assertEquals("Author.java", target.getFile());
 		assertEquals("/src/org/demo/foo/bar/bean", target.getFolder());
+		
+		target = createTargetForEntity("Target 2", "${ENT_LC}.txt", "${SRC}/${ENTITY_PKG}/${ENT_LC}", "bean.vm",	"*");
+		assertEquals("author.txt", target.getFile());
+		assertEquals("/src/org/demo/foo/bar/bean/author", target.getFolder());
+
+		target = createTargetForEntity("Target 2", "${ENT_UC}.txt", "${SRC}/${ENTITY_PKG}/${ENT_UC}", "bean.vm",	"*");
+		assertEquals("AUTHOR.txt", target.getFile());
+		assertEquals("/src/org/demo/foo/bar/bean/AUTHOR", target.getFolder());
 	}
 
 	@Test
 	public void testTargetCreation3() {
 		
-		TargetDefinition targetDef = new TargetDefinition(
-				"Target 3", 
-				"config.xml", 
-				"${RES}/foo", 
-				"config_xml.vm", 
-				"1");
-		Target target = new Target( getTelosysToolsCfg(), targetDef ); // v 3.3.0
-		print(target);
+		Target target = createTargetWithoutEntity("Target XML", "config.xml", "${RES}/foo", "config_xml.vm", "1");
 		
 		assertEquals("config.xml", target.getFile());
 		assertEquals("src/main/resources/foo", target.getFolder());
 		assertEquals("1", target.getType());
 		assertEquals("C:\\FOO\\BAR/src/main/resources/foo/config.xml", target.getOutputFileFullPath());
 	}
+	
+	@Test
+	public void testTransformPackageVariablesToDirPath() {
+		Target target = createTargetWithoutEntity("Target XML", "config.xml", "${RES}/foo", "config_xml.vm", "1");
+		HashMap<String,String> hm = new HashMap<>();
+		hm.put("ROOT_PKG",   "org.demo.foo.bar");
+		hm.put("ENTITY_PKG", "org.demo.foo.bar.bean");
+		hm.put("VAR1",       "VALUE1");
+		hm.put("VAR2",       "VALUE2");
+		hm.put("VAR3",       "VALUE3");
+		VariablesManager vm1 = new VariablesManager(hm);
+		VariablesManager vm2 = target.transformPackageVariablesToDirPath(vm1);
+		
+		assertEquals("org.demo.foo.bar", vm1.getVariableValue("ROOT_PKG"));
+		assertEquals("org/demo/foo/bar", vm2.getVariableValue("ROOT_PKG"));
+		
+		assertEquals("org.demo.foo.bar.bean", vm1.getVariableValue("ENTITY_PKG"));
+		assertEquals("org/demo/foo/bar/bean", vm2.getVariableValue("ENTITY_PKG"));
+
+		assertEquals("VALUE1", vm2.getVariableValue("VAR1"));
+	}	
 
 	private void print(Target target) {
 		println("Target : " );
@@ -124,14 +130,6 @@ public class TargetTest {
 		println(" . file      = " + target.getFile() );
 		println(" . full path = " + target.getOutputFileFullPath() ); // v 3.3.0
 		println(" . exists ?  = " + target.outputFileExists() ); // v 3.3.0
-
 	}
 	
-//	private Entity buildEntity(String tableName, String className) { 
-	private Entity buildEntity(String className) { 
-		DslModelEntity entity = new DslModelEntity(className );
-//		entity.setDatabaseTable(tableName);
-//		entity.setClassName(className);
-		return entity ;
-	}
 }

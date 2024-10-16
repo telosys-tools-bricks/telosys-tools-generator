@@ -16,9 +16,10 @@
 package org.telosys.tools.generator.context;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.List;
 
 import org.telosys.tools.commons.FileUtil;
+import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.bundles.TargetDefinition;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.variables.VariablesManager;
@@ -29,7 +30,7 @@ import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.Entity;
 
 /**
- * The generation target file <br>  
+ * The current target during generation 
  * 
  * @author L. Guerin
  *
@@ -59,15 +60,18 @@ public class Target {
 	private final String    type ; // Col 5
 	
 	private final String    entityName ;
-	private String forcedEntityName = null ;
+	private String forcedEntityName = null ; // can be changed dynamically in the template file
 
-	private final String    folder ; // folder after variable substitution
-
-	
+	/**
+	 * Constructor
+	 * @param telosysToolsCfg
+	 * @param targetDefinition
+	 * @param entityName
+	 */
 	private Target(TelosysToolsCfg telosysToolsCfg, TargetDefinition targetDefinition, String entityName ) {
 		super();
 		this.telosysToolsCfg = telosysToolsCfg ;
-		this.variablesManager = new VariablesManager( telosysToolsCfg.getAllVariables() ); 
+		this.variablesManager = new VariablesManager( telosysToolsCfg.getAllVariablesMap() ); 
 		
 		//--- Keep target definition
 		this.targetName = targetDefinition.getName();
@@ -85,11 +89,6 @@ public class Target {
 		//--- Specialization for the given entity
 		this.entityName = entityName ;
 		this.forcedEntityName = null ;
-
-		//--- Replace the "$" variables in folder
-		
-		this.variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
-		this.folder = replaceVariables( targetDefinition.getFolder(), variablesManager );
 	}
 	
 	/**
@@ -111,52 +110,6 @@ public class Target {
 		this(telosysToolsCfg, targetDefinition, "");
 	}
 	
-//	/**
-//	 * Constructor for a generation with an entity and a template
-//	 * @param targetDefinition
-//	 * @param entity
-//	 * @param variables
-//	 */
-//	public Target( TargetDefinition targetDefinition, Entity entity, Variable[] variables ) {
-//		super();
-//		//--- Generic target informations
-//		this.targetName = targetDefinition.getName();
-//		this.template = targetDefinition.getTemplate();
-//		
-//		//--- Specialization for the given entity
-//		this.entityName = entity.getClassName() ;
-//		this.forcedEntityName = null ;
-//
-//		//--- Replace the "$" variables in _sFile and _sFolder
-//		this.variablesManager = new VariablesManager( variables ); 
-//		this.originalFileDefinition = targetDefinition.getFile() ;
-//		
-//		this.variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
-//		this.folder = replaceVariables( targetDefinition.getFolder(), variablesManager );
-//	}
-
-//	/**
-//	 * Constructor for a 'ONCE' target or a 'RESOURCE' target ( resource copy )
-//	 * @param targetDefinition
-//	 * @param variables
-//	 */
-//	public Target( TargetDefinition targetDefinition, Variable[] variables ) {
-//		super();
-//		//--- Generic target informations
-//		this.targetName = targetDefinition.getName();
-//		this.template = targetDefinition.getTemplate();
-//		
-//		//--- No current entity 
-//		this.entityName = "" ;
-//
-//		//--- Replace the "$" variables in _sFile and _sFolder
-//		this.variablesManager = new VariablesManager( variables ); 
-//		this.originalFileDefinition = targetDefinition.getFile() ;
-//		
-//		this.variablesManager.transformPackageVariablesToDirPath(); // for each variable ${XXXX_PKG} : replace '.' by '/' 
-//		this.folder = replaceVariables( targetDefinition.getFolder(), variablesManager );
-//	}
-
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -198,7 +151,8 @@ public class Target {
 	)
 	public String getFile() {
 		// Keep variable substitution here to use 'forcedEntityName' if defined
-		return replaceVariables( originalFileDefinition, variablesManager );
+		updateEntityNameInVariablesManager(); // to be sure to be up-to-date for ENTITY NAME
+		return variablesManager.replaceVariables(this.originalFileDefinition);
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -208,7 +162,11 @@ public class Target {
 			}
 	)
 	public String getFolder() {
-		return folder;
+		// Keep variable substitution here to use 'forcedEntityName' if defined
+		updateEntityNameInVariablesManager(); // to be sure to be up-to-date for ENTITY NAME
+		// New VariablesManager with '/' instead of '.' in each '*_PKG' variable
+		VariablesManager vmWithDirPath = transformPackageVariablesToDirPath(this.variablesManager);
+		return vmWithDirPath.replaceVariables(this.originalFolderDefinition);
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -244,9 +202,18 @@ public class Target {
 	)
 	public String forceEntityName(String forcedName) {
 		this.forcedEntityName = forcedName ;
+		updateEntityNameInVariablesManager(); 
 		return "" ;
 	}
-
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns TRUE if there's a 'forced entity name'"
+			}
+	)
+    public boolean hasForcedEntityName() {
+		return ! StrUtil.nullOrVoid(forcedEntityName);
+    }
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -254,7 +221,7 @@ public class Target {
 			}
 	)
 	public String getForcedEntityName() {
-		return forcedEntityName != null ? forcedEntityName : "" ;
+		return hasForcedEntityName() ? forcedEntityName : "" ;
 	}
 		
 	//-------------------------------------------------------------------------------------
@@ -270,18 +237,18 @@ public class Target {
 		}
 	)
 	public String javaPackageFromFolder(String srcFolder) {
-		
+		String folder = getFolder();
 		if ( null == srcFolder ) {
 			// Use the folder as is
-			return folderToPackage(this.folder) ;
+			return folderToPackage(folder) ;
 		}
 		String trimmedSrcFolder = srcFolder.trim() ;
 		if ( trimmedSrcFolder.length() == 0 ) {
 			// Use the folder as is
-			return folderToPackage(this.folder) ;
+			return folderToPackage(folder) ;
 		}
 		
-		String folder2 = removeFirstSlashIfAny(this.folder);
+		String folder2 = removeFirstSlashIfAny(folder);
 		String srcFolder2 = removeFirstSlashIfAny(trimmedSrcFolder);
 		
 		if ( folder2.startsWith(srcFolder2) ) {
@@ -371,43 +338,6 @@ public class Target {
 		return s2 ;
 	}
 	
-	private String replaceVariables( String originalString, VariablesManager varmanager ) {
-		
-		String s1 = originalString;
-		if ( this.entityName != null && this.entityName.length() > 0 ) {
-			//--- Replace the generic name "${BEANNAME}" if any
-			s1 = replaceBEANNAME(originalString);
-		}
-
-		//--- Replace the global project variables if any
-		if ( varmanager != null ) {
-			return varmanager.replaceVariables(s1);
-		}
-		else {
-			return s1 ;
-		}
-	}
-    private String replaceBEANNAME(String originalString) {
-    	
-    	// Set the BEANNAME value (using entityName or forcedEntityName if any)
-    	String beannameValue = this.entityName ;
-    	if ( this.forcedEntityName != null ) {
-    		beannameValue = this.forcedEntityName ;
-    	}
-    	
-    	// beannameValue is not defined => nothing to do
-    	if ( beannameValue == null ) return originalString ;
-    	if ( beannameValue.length() == 0 ) return originalString ;
-    	// beannameValue is defined => replace "${BEANNAME}" 
-    	HashMap<String,String> hm = new HashMap<>();
-    	hm.put("${BEANNAME}",    beannameValue );		
-    	hm.put("${BEANNAME_LC}", beannameValue.toLowerCase() );
-    	hm.put("${BEANNAME_UC}", beannameValue.toUpperCase() );
-
-    	VariablesManager varManager = new VariablesManager(hm) ;
-    	return varManager.replaceVariables(originalString);
-    }
-
 	/**
 	 * Returns the full path of the of the generated file in the project<br>
 	 * by combining the folder and the basic file name
@@ -415,8 +345,8 @@ public class Target {
 	 * @return
 	 */
 	@VelocityNoDoc
-	public String getOutputFileNameInProject()
-	{
+	public String getOutputFileNameInProject() {
+		String folder = getFolder();
 		String s = null ;
 		if ( folder.endsWith("/") || folder.endsWith("\\") ) {
 			s = folder + getFile() ;
@@ -448,9 +378,40 @@ public class Target {
 	@Override
 	public String toString() {
 		return "Target [targetName=" + targetName + ", file=" + getFile()
-				+ ", folder=" + folder + ", template=" + template
+				+ ", folder=" + getFolder() + ", template=" + template
 				+ ", entityName=" + entityName + "]";
 	}
 	
+	/**
+	 * Update entity name values in variables "ENT[_LC|_UC]" and "BEANNAME[_LC|_UC]" <br>
+	 * Supposed to be called each time 'forcedEntityName' is changed
+	 */
+	private void updateEntityNameInVariablesManager() {
+		String currentEntityName = this.entityName;
+		if ( hasForcedEntityName() ) {
+			currentEntityName = this.forcedEntityName;
+		}
+		updateVariablesManager("ENT", currentEntityName); // new in v 4.2.0
+		updateVariablesManager("BEANNAME", currentEntityName); // keep "BEANNAME" for backward compatibility
+	}
+	private void updateVariablesManager(String varName, String varValue) {
+		variablesManager.setVariable(varName,       varValue);
+		variablesManager.setVariable(varName+"_LC", varValue.toLowerCase());
+		variablesManager.setVariable(varName+"_UC", varValue.toUpperCase());
+	}
 	
+	protected VariablesManager transformPackageVariablesToDirPath(VariablesManager originalVariablesManager ) {
+		VariablesManager vmCopy = originalVariablesManager.copy();
+		List<String> names = originalVariablesManager.getVariablesNames();
+		for ( String name : names ) {
+			String value = vmCopy.getVariableValue(name) ;
+			if ( name.endsWith("_PKG" ) ) {
+				vmCopy.setVariable(name, value.replace('.', '/') );
+			}
+			else {
+				vmCopy.setVariable(name, value); 
+			}
+		}
+		return vmCopy;
+	}
 }
