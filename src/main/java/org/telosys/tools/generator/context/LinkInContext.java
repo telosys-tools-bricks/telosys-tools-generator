@@ -385,7 +385,6 @@ public class LinkInContext {
 	)
 	public boolean isOwningSide() {
 		// changed in v 4.1.0
-		// return isOwningSide ;
 		switch ( this.cardinality ) {
 		case ONE_TO_ONE:
 			// @MappedBy(xxx) => inverse side, no @MappedBy(xxx) => supposed to be owning side

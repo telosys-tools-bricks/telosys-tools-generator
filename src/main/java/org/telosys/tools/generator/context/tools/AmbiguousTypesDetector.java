@@ -89,7 +89,6 @@ public class AmbiguousTypesDetector {
 		LinkedList<String> ambiguousTypes = new LinkedList<>() ;
 
 		for ( String fullType : fullTypes ) {
-			//String shortName = JavaClassUtil.shortName(fullType);
 			String shortName = JavaTypeUtil.shortType(fullType); // v 3.3.0
 			
 			// if more than one occurrence of this short name in the list 

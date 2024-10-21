@@ -187,8 +187,7 @@ public class AttributeInContext {
 		this.envInContext = env ; 
 		this.modelInContext = modelInContext ; 
 		this.entityInContext = entity ;
-		this.env = env ; // Added in v 3.4.0
-//		this.selected        = attribute.isSelected(); // removed in v 4.1.0
+		this.env = env ;
 		
 		this.name   = attribute.getName(); 		
 		this.neutralType     = attribute.getNeutralType() ; 
@@ -222,9 +221,6 @@ public class AttributeInContext {
 		//--- Database info
 		this.databaseName     = StrUtil.notNull( attribute.getDatabaseName() ) ;
         this.databaseType     = StrUtil.notNull( attribute.getDatabaseType() ) ;
-// removed in v 4.1
-//        this.jdbcTypeCode     = attribute.getJdbcTypeCode() != null ? attribute.getJdbcTypeCode() : 0 ;
-//        this.jdbcTypeName     = StrUtil.notNull( attribute.getJdbcTypeName() );
         this.isKeyElement     = attribute.isKeyElement();
 
 		//--- Foreign Keys / references
@@ -232,57 +228,47 @@ public class AttributeInContext {
         this.isForeignKeySimple    = attribute.isFKSimple() ;
         this.isForeignKeyComposite = attribute.isFKComposite() ;
         this.referencedEntityClassName = attribute.getReferencedEntityClassName() ;
-        // Build "Foreign Key Parts" if any ( v 3.3.0 )
+        // Build "Foreign Key Parts" if any
         for ( ForeignKeyPart fkPart : attribute.getFKParts() ) {
         	this.fkParts.add(new ForeignKeyPartInContext(fkPart, modelInContext));
         }
 
-        this.size     = attribute.getSize(); // v 3.4.0
+        this.size     = attribute.getSize(); 
 
-//        this.isAutoIncremented  = attribute.isAutoIncremented(); // removed in v 4.1.0
         this.databaseComment  = StrUtil.notNull( attribute.getDatabaseComment() ) ; 
         this.databaseDefaultValue = StrUtil.notNull( attribute.getDatabaseDefaultValue() ) ; 
-        // this.isDatabaseNotNull  = attribute.isDatabaseNotNull(); // removed in v 4.1
         
 		//--- Further info for BOOLEAN 
         this.booleanTrueValue   = Util.trim(attribute.getBooleanTrueValue(), VOID_STRING) ; 
         this.booleanFalseValue  = Util.trim(attribute.getBooleanFalseValue(), VOID_STRING) ;
 		
-        //--- Generated Value  v 3.4.0
-//        this.isGeneratedValue = attribute.getGeneratedValueStrategy() != GeneratedValueStrategy.UNDEFINED ;
+        //--- Generated Value  
 		this.generatedValueStrategy = attribute.getGeneratedValueStrategy() ;
-//		this.generatedValueGenerator = notNull(attribute.getGeneratedValueGeneratorName());// removed in v 4.1
-		this.generatedValueAllocationSize = attribute.getGeneratedValueAllocationSize() ; // v 4.1
-		this.generatedValueInitialValue   = attribute.getGeneratedValueInitialValue() ; // v 4.1
+		this.generatedValueAllocationSize = attribute.getGeneratedValueAllocationSize() ; 
+		this.generatedValueInitialValue   = attribute.getGeneratedValueInitialValue() ;
 				
-		// Generated Value / SEQUENCE  v 3.4.0
-//        this.hasSequenceGenerator = attribute.getGeneratedValueStrategy() == GeneratedValueStrategy.SEQUENCE ;
-//		this.sequenceGeneratorName = this.generatedValueGenerator; // removed in v 4.1.0
+		// Generated Value / SEQUENCE 
 		this.generatedValueSequenceName = StrUtil.notNull(attribute.getGeneratedValueSequenceName());
-//		this.sequenceGeneratorAllocationSize = notNull(attribute.getGeneratedValueAllocationSize()); // removed in v 4.1.0
 		
-		// Generated Value / TABLE  v 3.4.0
+		// Generated Value / TABLE  
 		this.generatedValueTablePkValue = StrUtil.notNull(attribute.getGeneratedValueTablePkColumnValue());
 
-		// this.hasTableGenerator    = attribute.getGeneratedValueStrategy() == GeneratedValueStrategy.TABLE ;
-		// this.tableGeneratorName = this.generatedValueGenerator; // removed in v 4.1.0
-		
 		// TODO 
-		this.tableGeneratorTable = ""; // notNull(attribute.getGeneratedValueTableName());
-		this.tableGeneratorPkColumnName = ""; //notNull(attribute.getGeneratedValueTablePkColumnName()); 
-		this.tableGeneratorValueColumnName = ""; //notNull(attribute.getGeneratedValueTableValueColumnName());
+		this.tableGeneratorTable = ""; 
+		this.tableGeneratorPkColumnName = ""; 
+		this.tableGeneratorValueColumnName = ""; 
 		
 		this.isUsedInLinks         = attribute.isUsedInLinks(); 
 		this.isUsedInSelectedLinks = attribute.isUsedInSelectedLinks();
 		
-		this.tagContainer = attribute.getTagContainer(); // v 3.4.0
+		this.tagContainer = attribute.getTagContainer();
 		
-		this.insertable = attribute.getInsertable(); // v 3.3.0
-		this.updatable  = attribute.getUpdatable();  // v 3.3.0
+		this.insertable = attribute.getInsertable();
+		this.updatable  = attribute.getUpdatable();
 
-		this.isTransient  = attribute.isTransient();  // v 3.3.0
+		this.isTransient  = attribute.isTransient();
 		
-		this.isUnique = attribute.isUnique() ;  // v 3.4.0
+		this.isUnique = attribute.isUnique() ;
 
 	}
 
@@ -502,13 +488,6 @@ public class AttributeInContext {
 		else {
 			// No specific initial value => use default for target language
 			LiteralValuesProvider literalValuesProvider = envInContext.getLiteralValuesProvider();
-//			if (this.isNotNull()) {
-//				// not null attribute
-//				return literalValuesProvider.getDefaultValueNotNull(getLanguageType());
-//			} else {
-//				// nullable attribute
-//				return literalValuesProvider.getLiteralNull();
-//			}
 			return literalValuesProvider.getInitValue(this, getLanguageType());
 		}
 	}
@@ -714,8 +693,6 @@ public class AttributeInContext {
 		}
 	)
     public boolean hasDatabaseDefaultValue() {
-    	//if ( isAutoIncremented ) return false ; // No default value for auto-incremented fields
-		// v 4.1.0
     	if ( isGeneratedValue() ) return false ; // No default value for auto-incremented fields
 		return ! StrUtil.nullOrVoid(databaseDefaultValue);
     }
@@ -739,48 +716,9 @@ public class AttributeInContext {
 		}
 	)
     public boolean isDatabaseNotNull() {
-        // return isDatabaseNotNull;
         return isNotNull;
     }
     
-	//----------------------------------------------------------------------
-// removed in v 4.1	
-//	@VelocityMethod(
-//		text={	
-//			"Returns the JDBC type of the attribute (the type code)"
-//			}
-//		)
-//    public int getJdbcTypeCode() {
-//        return jdbcTypeCode ;
-//    }
-//
-//	//----------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns the JDBC type name ('CHAR', 'VARCHAR', 'NUMERIC', ... )<br>",
-//			"The 'java.sql.Types' constant name for the current JDBC type code"
-//			}
-//		)
-//    public String getJdbcTypeName() {
-//        return jdbcTypeName ;
-//    }
-//
-//	//----------------------------------------------------------------------
-//    /**
-//     * Returns the recommended Java type for the JDBC type 
-//     * @return
-//     */
-//	@VelocityMethod(
-//			text={	
-//				"Returns the recommended Java type for the JDBC type of the attribute"
-//				}
-//		)
-//    public String getJdbcRecommendedJavaType()
-//    {
-//    	JdbcTypes types = JdbcTypesManager.getJdbcTypes();
-//    	return types.getJavaTypeForCode(jdbcTypeCode, isDatabaseNotNull );
-//    }
-
 	//----------------------------------------------------------------------
     /**
      * Returns TRUE if the attribute is a Database Primary Key element
@@ -876,7 +814,6 @@ public class AttributeInContext {
 		}
 	)
     public boolean isAutoIncremented() {
-//        return isAutoIncremented;
         return generatedValueStrategy == GeneratedValueStrategy.IDENTITY ;
     }
 
@@ -1135,17 +1072,6 @@ public class AttributeInContext {
 		return s != null ? s : "" ;
 	}
 	
-//	//-------------------------------------------------------------------------------------
-// removed in v 4.1.0	
-//	@VelocityMethod(
-//		text={	
-//			"Returns TRUE if the attribute is selected (ckeckbox ckecked in the GUI)"
-//			}
-//	)
-//	public boolean isSelected() {
-//		return selected;
-//	}
-
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
@@ -1340,7 +1266,6 @@ public class AttributeInContext {
 		}
 	)
 	public boolean isGeneratedValue() {
-		// return isGeneratedValue;
 		return this.generatedValueStrategy != GeneratedValueStrategy.UNDEFINED ;
 	}
 	
@@ -1448,57 +1373,6 @@ public class AttributeInContext {
 		return generatedValueInitialValue != null ;
 	}
 
-
-	//-------------------------------------------------------------------------------------
-// removed in v 4.1
-//	/**
-//	 * Returns the GeneratedValue generator : the name of the primary key generator to use <br>
-//	 * The generator name referenced a "SequenceGenerator" or a "TableGenerator"
-//	 * @return
-//	 */
-//	@VelocityMethod(
-//		text={	
-//			"Returns the generator for a 'generated value' ",
-//			"Typically for JPA : 'SequenceGenerator' or 'TableGenerator' "
-//			}
-//	)
-//	public String getGeneratedValueGenerator() {
-//		return generatedValueGenerator;
-//	}
-
-//	//-----------------------------------------------------------------------------------------
-//	// JPA "@SequenceGenerator"
-//	//-----------------------------------------------------------------------------------------
-//	/**
-//	 * Returns true if this attribute is a "GeneratedValue" using a "SequenceGenerator"
-//	 * @return
-//	 */
-//	@VelocityMethod(
-//		text={	
-//			"Returns TRUE if the attribute is a 'generated value' using a 'sequence generator' ",
-//			"Typically for JPA '@SequenceGenerator'  "
-//			}
-//	)
-//	public boolean hasSequenceGenerator() {
-//		return hasSequenceGenerator;
-//	}
-
-	//-----------------------------------------------------------------------------------------
-// removed in v 4.1
-//	/**
-//	 * Returns the "@SequenceGenerator" name
-//	 * @return
-//	 */
-//	@VelocityMethod(
-//		text={	
-//			"Returns the name of the 'sequence generator' ",
-//			"Typically for JPA '@SequenceGenerator/name'  "
-//			}
-//	)
-//	public String getSequenceGeneratorName() {
-//		return sequenceGeneratorName;
-//	}
-
 	//-----------------------------------------------------------------------------------------
 	/**
 	 * Returns the generated value sequence name
@@ -1533,79 +1407,6 @@ public class AttributeInContext {
 		return ! StrUtil.nullOrVoid(generatedValueSequenceName);
 	}
 
-
-	//-----------------------------------------------------------------------------------------
-//	/**
-//	 * Returns the "@SequenceGenerator" sequence allocation size
-//	 * @return
-//	 */
-//	@VelocityMethod(
-//		text={	
-//			"Returns the 'sequence allocation size' to be used in the 'sequence generator' definition",
-//			"Typically for JPA '@SequenceGenerator/allocationSize'  "
-//			}
-//	)
-//	public int getSequenceGeneratorAllocationSize() {
-//		return sequenceGeneratorAllocationSize;
-//	}
-
-//	//-----------------------------------------------------------------------------------------
-//	// JPA "@TableGenerator"
-//	//-----------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns TRUE if the attribute is a 'generated value' using a 'table generator' ",
-//			"Typically for JPA '@TableGenerator'  "
-//			}
-//	)
-//	public boolean hasTableGenerator() {
-//		return hasTableGenerator;
-//	}
-
-	//-----------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns the name of the 'table generator' ",
-//			"Typically for JPA '@TableGenerator/name'  "
-//			}
-//	)
-//	public String getTableGeneratorName() {
-//		return tableGeneratorName;
-//	}
-
-//	//-----------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns the name of the table used in the 'table generator' ",
-//			"Typically for JPA '@TableGenerator/table'  "
-//			}
-//	)
-//	public String getTableGeneratorTable() {
-//		return tableGeneratorTable;
-//	}
-//
-//	//-----------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns the name of the Primary Key column used in the 'table generator' ",
-//			"Typically for JPA '@TableGenerator/pkColumnName'  "
-//			}
-//	)
-//	public String getTableGeneratorPkColumnName() {
-//		return tableGeneratorPkColumnName;
-//	}
-//
-//	//-----------------------------------------------------------------------------------------
-//	@VelocityMethod(
-//		text={	
-//			"Returns the name of the column that stores the last value generated by the 'table generator' ",
-//			"Typically for JPA '@TableGenerator/valueColumnName'  "
-//			}
-//	)
-//	public String getTableGeneratorValueColumnName() {
-//		return tableGeneratorValueColumnName;
-//	}
-//
 	//-----------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={

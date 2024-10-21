@@ -130,9 +130,6 @@ public class JpaAnnotations
 		else if ( TABLE.equalsIgnoreCase( strategy ) ) {
 			String generatorName = buildGeneratorName();
 			annotationGeneratedValue( annotations, GENERATION_TYPE_TABLE, generatorName);
-//			if (attribute.hasTableGenerator()) {
-//				annotationTableGenerator(annotations);
-//			}
 			annotationTableGenerator(annotations, generatorName);
 		}
 		else{
@@ -174,18 +171,10 @@ public class JpaAnnotations
 		// name - String : (Required) 
 		//    A unique generator name that can be referenced by one or more classes 
 		//    to be the generator for primary key values.
-//		String name = attribute.getSequenceGeneratorName() ;
-//		if ( StrUtil.nullOrVoid(name) ) {
-//			return; // name is required : if no name => no annotation
-//		}
-//		
 		sb.append("@SequenceGenerator(name=\"").append(generatorName).append("\"");
 		
 		// sequenceName - String : (Optional)
 		//    The name of the database sequence object from which to obtain primary key values.
-//		if ( ! StrUtil.nullOrVoid( attribute.getSequenceGeneratorSequenceName() ) ) {
-//			sb.append(", sequenceName=\"").append(attribute.getSequenceGeneratorSequenceName()).append("\"");
-//		}
 		if ( attribute.hasGeneratedValueSequenceName() ) {
 			sb.append(", sequenceName=\"").append(attribute.getGeneratedValueSequenceName()).append("\"");
 		}
@@ -195,9 +184,6 @@ public class JpaAnnotations
 		//  If the sequence object already exists in the database, then you must specify the allocationSize 
 		//  to match the INCREMENT value of the database sequence object. For example, if you have a sequence object
 		//  in the database that you defined to INCREMENT BY 5, set the allocationSize to 5 in the sequence generator definition
-//		if ( attribute.getSequenceGeneratorAllocationSize() > 0 ) {
-//			sb.append(", allocationSize=").append(attribute.getSequenceGeneratorAllocationSize());
-//		}
 		if ( attribute.hasGeneratedValueAllocationSize() ) {
 			sb.append(", allocationSize=").append(attribute.getGeneratedValueAllocationSize() );
 		}
@@ -218,31 +204,6 @@ public class JpaAnnotations
 	/**
 	 * Adds a "@TableGenerator" annotation
 	 */
-//	private void annotationTableGenerator(AnnotationsBuilder annotations) 
-//	{
-//		// Other JPA attribute in @TableGenerator (not supported yet)
-//		// . allocationSize
-//		// . catalog
-//		// . initialValue
-//		// . schema
-//		// . uniqueConstraints
-//
-//		String s = "@TableGenerator(name=\"" + attribute.getTableGeneratorName() + "\"" ; // Required
-//		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorTable() ) ) {
-//			s = s + ", table=\"" + attribute.getTableGeneratorTable() + "\"" ;
-//		}
-//		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorPkColumnName() ) ) {
-//			s = s + ", pkColumnName=\"" + attribute.getTableGeneratorPkColumnName() + "\"" ;
-//		}
-//		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorValueColumnName() ) ) {
-//			s = s + ", valueColumnName=\"" + attribute.getTableGeneratorValueColumnName() + "\"" ;
-//		}
-//		if ( ! StrUtil.nullOrVoid( attribute.getTableGeneratorPkColumnValue() ) ) {
-//			s = s + ", pkColumnValue=\"" + attribute.getTableGeneratorPkColumnValue() + "\"" ;
-//		}
-//		s = s + ")" ;
-//		annotations.addLine ( s );				
-//	}
 	private void annotationTableGenerator(AnnotationsBuilder annotations, String generatorName) 
 	{
 		StringBuilder sb = new StringBuilder();
@@ -286,7 +247,6 @@ public class JpaAnnotations
 		sb.append("@Column(");
 		//--- name
 		sb.append("name=\"");
-		// sb.append(_attribute.getDatabaseName());
 		sb.append(attribute.getSqlColumnName()); // v 3.4.0 : apply naming conventions if any
 		sb.append("\"");
 		

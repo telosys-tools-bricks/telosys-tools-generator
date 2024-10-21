@@ -59,7 +59,6 @@ public class H2InContext {
 	public List<String> ddlCreateTable(final EntityInContext entity) {
 		List<String> lines1 = buildTableDefinition (entity);
 		List<String> resultingLines = new LinkedList<>();
-//		lines2.add( "CREATE TABLE " + SqlTableNameProvider.getTableName(entity) + " (") ; 
 		resultingLines.add( "CREATE TABLE " + entity.getSqlTableName() + " (") ; // v 4.1.0
 		
 		int c = 0 ;
@@ -100,7 +99,6 @@ public class H2InContext {
 	 */
 	private String buildColumnDefinition (final AttributeInContext attribute ) {
 		StringBuilder sb = new StringBuilder();
-//		sb.append( attribute.getDatabaseName() ) ;
 		sb.append( attribute.getSqlColumnName() ); // v 4.1.0
 		sb.append( " ") ;
 		sb.append( getColumnType(attribute) ) ;
@@ -129,7 +127,6 @@ public class H2InContext {
 			if ( c > 1 ) {
 				sb.append(",");
 			}
-//			sb.append(attribute.getDatabaseName());
 			sb.append( attribute.getSqlColumnName() ); // v 4.1.0
 		}
 		sb.append(")");

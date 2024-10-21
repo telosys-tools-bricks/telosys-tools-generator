@@ -170,9 +170,6 @@ public class ErrorReport {
 		else if ( exception instanceof GeneratorException ) { // Telosys Generator Exception (without cause)
 			// nothing special
 		}
-//		else if ( exception instanceof GeneratorEngineException ) { // Telosys GeneratorEngineException
-//			// nothing special
-//		}
 		else if ( exception instanceof InvalidReferenceException ) {
 			// no more information (message is explicit enough)
 		}

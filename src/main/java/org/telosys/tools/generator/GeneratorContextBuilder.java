@@ -56,7 +56,6 @@ public class GeneratorContextBuilder {
 
 	private final TelosysToolsCfg     telosysToolsCfg ;
 	private final TelosysToolsLogger  logger ;
-//	private final GeneratorContext    generatorContext ;
 	
 	private Model                     model = null ;
 	private ModelInContext            modelInContext = null ;
@@ -79,14 +78,8 @@ public class GeneratorContextBuilder {
 			throw new IllegalArgumentException("TelosysToolsCfg parameter is null");
 		}
 		this.telosysToolsCfg = telosysToolsCfg;
-
-//		generatorContext = new GeneratorContext(); 		
 	}
 	
-//	public GeneratorContext getGeneratorContext() {
-//		return generatorContext ;		
-//	}
-
 	private void initProjectVariables(GeneratorContext generatorContext) {
 		//--- Get all the project variables and put them in the context	
 		Variable[] projectVariables = telosysToolsCfg.getAllVariables();
@@ -121,17 +114,6 @@ public class GeneratorContextBuilder {
 		
 		generatorContext.put(ContextName.NEWLINE, "\n"  ); // #LGU 2017-08-16
 		generatorContext.put(ContextName.TAB,     "\t"  ); // #LGU 2017-08-16
-		
-//		//--- Get all the project variables and put them in the context	
-//		Variable[] projectVariables = telosysToolsCfg.getAllVariables();
-//		log("initContext() : Project variables count = " + ( projectVariables != null ? projectVariables.length : 0 ) );
-//		//--- Set the project variables in the context ( if any )
-//		if ( projectVariables != null ) {
-//			for ( int i = 0 ; i < projectVariables.length ; i++ ) {
-//				Variable var = projectVariables[i];
-//				generatorContext.put( var.getName(), var.getValue() );
-//			}
-//		}
 		
 		//--- Set "$env" object ( environment configuration )
 		EnvInContext env = new EnvInContext() ;
@@ -172,8 +154,6 @@ public class GeneratorContextBuilder {
 		
 		//--- Set "$factory" object (version 3.4.0) 
 		generatorContext.put(ContextName.FACTORY, new FactoryInContext());  // v 3.4.0
-
-		// return generatorContext ;
 	}
 	
 	/**

@@ -20,12 +20,12 @@ import java.util.List;
 
 public class MethodInfo implements Comparable<MethodInfo> {
 
-	private final static String[] VOID_STRING_ARRAY = new String[0] ;
+	private static final String[] VOID_STRING_ARRAY = new String[0] ;
 	
 	private String   javaName     = "" ;
 	private String   velocityName = "" ;
 	private String   returnType   = "" ;
-	private List<MethodParameter> parameters = new LinkedList<MethodParameter>() ;
+	private List<MethodParameter> parameters = new LinkedList<>() ;
 	
 	private String[] docText     = VOID_STRING_ARRAY ;
 	private String[] exampleText = VOID_STRING_ARRAY ;
@@ -174,8 +174,6 @@ public class MethodInfo implements Comparable<MethodInfo> {
 	}
 	
 	public int compareTo(MethodInfo methodInfo) {
-//		//--- Compare the Velocity name
-//		return this.getVelocityName().compareTo( methodInfo.getVelocityName() );
 		//--- Compare the signature name
 		return this.getSignature().compareTo( methodInfo.getSignature() );
 	}

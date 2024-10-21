@@ -36,15 +36,15 @@ import org.telosys.tools.generator.context.names.ContextName;
 //-------------------------------------------------------------------------------------
 public class ProjectInContext
 {
-	private final TelosysToolsCfg _telosysToolsCfg ; // v 3.0.0
+	private final TelosysToolsCfg telosysToolsCfg ;
 	
 	/**
 	 * Constructor
 	 * @param telosysToolsCfg
 	 */
-	public ProjectInContext(TelosysToolsCfg telosysToolsCfg) { // v 3.0.0
+	public ProjectInContext(TelosysToolsCfg telosysToolsCfg) {
 		super();
-		_telosysToolsCfg = telosysToolsCfg ;
+		this.telosysToolsCfg = telosysToolsCfg ;
 	}
 
 	//---------------------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ public class ProjectInContext
 	)
     public String getLocationFullPath()
     {
-        return _telosysToolsCfg.getProjectAbsolutePath() ; // v 3.0.0
+        return telosysToolsCfg.getProjectAbsolutePath(); 
     }
 	
 	//-------------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ public class ProjectInContext
 	)
     public String getTemplatesFolderFullPath()
     {
-        return _telosysToolsCfg.getTemplatesFolderAbsolutePath() ; 
+        return telosysToolsCfg.getTemplatesFolderAbsolutePath() ; 
     }
 
 	//-------------------------------------------------------------------------------------------------
@@ -87,9 +87,9 @@ public class ProjectInContext
 			},
 		since = "3.3.0"
 	)
-    public String getModelsFolderFullPath() // v 3.3.0
+    public String getModelsFolderFullPath()
     {
-        return _telosysToolsCfg.getModelsFolderAbsolutePath();
+        return telosysToolsCfg.getModelsFolderAbsolutePath();
     }
 
 	//---------------------------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ public class ProjectInContext
 	)
     public Variable[] getSpecificVariables()
     {
-		return _telosysToolsCfg.getSpecificVariables(); // v 3.0.0
+		return telosysToolsCfg.getSpecificVariables();
     }
 
 	//---------------------------------------------------------------------------------------------------
@@ -123,6 +123,6 @@ public class ProjectInContext
 	)
     public Variable[] getAllVariables()
     {
-		return _telosysToolsCfg.getAllVariables(); // v 3.0.0
+		return telosysToolsCfg.getAllVariables();
     }
 }

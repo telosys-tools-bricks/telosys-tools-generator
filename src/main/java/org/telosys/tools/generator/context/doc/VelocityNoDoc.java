@@ -20,5 +20,4 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface VelocityNoDoc {
-	//String[] value() default { "" } ;
 }

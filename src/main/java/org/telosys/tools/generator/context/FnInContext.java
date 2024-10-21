@@ -286,17 +286,6 @@ public class FnInContext {
 			)
 	public String argumentsListWithGetter( String objectName, List<AttributeInContext> attributes )  {
 		if ( attributes != null ) {
-//			StringBuilder sb = new StringBuilder();
-//			int n = 0 ;
-//			for ( AttributeInContext attribute : attributes ) {
-//				if ( n > 0 ) sb.append(", ");
-//				sb.append( objectName ) ;
-//				sb.append( "." ) ;
-//				sb.append( attribute.getGetter() ) ;
-//				sb.append( "()" ) ;
-//				n++;
-//			}
-//			return sb.toString();
 			// since v 4.1.0 all the job is done in TargetLanguage
 			return env.getTargetLanguage().argumentsListFromObjectWithGetter(objectName, attributes);
 		} 

@@ -105,11 +105,6 @@ public class StandardGenerationTask extends AbstractGenerationTask implements Ge
 			// All the exceptions are wrapped in a 'InvocationTargetException'
 			log("End of generation task."  );
 			title = "END OF GENERATION" ;
-		// throws InvocationTargetException : removed in v 3.3.0 
-//		} catch (InvocationTargetException invocationTargetException) {
-//			ErrorReport errorReport = buildErrorReport(invocationTargetException);
-//			onError( errorReport ) ;
-			
 		} catch (InterruptedException interruptedException) {
 			title = "GENERATION CANCELED" ;
 		} finally {

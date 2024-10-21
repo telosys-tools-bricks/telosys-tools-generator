@@ -40,11 +40,6 @@ public final class TypeUtil
     }
 
     //----------------------------------------------------------------------------------------------
-	private static void log(String s) {
-		// Log here if necessary
-	}
-	
-    //----------------------------------------------------------------------------------------------
 	/**
 	 * Returns the upper or lower bound for the given type
 	 * @param wildcardType
@@ -87,7 +82,6 @@ public final class TypeUtil
 		if ( type instanceof ParameterizedType ) {
 			// eg : List<String>, Set<Object>, ...
 			ParameterizedType parameterizedType = (ParameterizedType) type ;
-			log(" . ParameterizedType : " + parameterizedType );
 			
 			//--- Owner type if any ( eg : if this type is O<T>.I<S>, return a representation of O<T> )
 			Type ownerType = parameterizedType.getOwnerType() ;
@@ -98,8 +92,6 @@ public final class TypeUtil
 			
 			//--- Basic type ( eg "List" for "List<String>" )
 			Type rawType = parameterizedType.getRawType();
-//			Class<?> rawClass = (Class<?>) rawType ; // it's always an instance of Class<?> (only implementation of Type)
-//			sb.append ( rawClass.getSimpleName() ) ;
 			sb.append( typeToString(rawType) ) ;
 			
 			//--- Param types
@@ -118,17 +110,7 @@ public final class TypeUtil
 		else if ( type instanceof WildcardType ) {
 			// eg : List<?>, Set<? extends Number>, ...			
 			WildcardType wildcardType = (WildcardType) type;
-			log(" . WildcardType : " + wildcardType );
 			sb.append("?");
-//			Type boundType;
-//			// Only ONE bound ( super bound or lower bound )
-//			if (wildcardType.getLowerBounds().length != 0) {
-//				sb.append(" super ");
-//				boundType = wildcardType.getLowerBounds()[0];
-//			} else {
-//				sb.append(" extends ");
-//				boundType = wildcardType.getUpperBounds()[0];
-//			}
 			sb.append( getBound(wildcardType) ) ;
 		}
 
@@ -147,7 +129,6 @@ public final class TypeUtil
 		//----- CASE 5 : Simple standard Class 
 		else if ( type instanceof Class ) {
 			Class<?> clazz = (Class<?>)type  ;
-			log(" . Class : " + clazz );
 			sb.append ( clazz.getSimpleName() ) ;
 		}
 		

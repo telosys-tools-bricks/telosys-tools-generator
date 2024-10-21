@@ -440,7 +440,6 @@ public class SqlInContext {
 				if ( sb.length() > 0 ) {
 					sb.append(", ");
 				}
-//				sb.append( convertToColumnName(attribute.getName()) );
 				sb.append( attribute.getSqlColumnName() );
 			}
 			return sb.toString();
@@ -488,7 +487,6 @@ public class SqlInContext {
 		since = "3.4.0"
 	)
 	public String fkOriginTable(ForeignKeyInContext fk) {
-		// return convertToTableName(fk.getTableName());
 		return fk.getOriginEntity().getSqlTableName();
 	}
 	
@@ -509,7 +507,6 @@ public class SqlInContext {
 		since = "3.4.0"
 	)
 	public String fkReferencedTable(ForeignKeyInContext fk) {
-		//return convertToTableName(fk.getReferencedTableName());
 		return fk.getReferencedEntity().getSqlTableName();
 	}
 		
@@ -706,21 +703,6 @@ public class SqlInContext {
 		}
 	}
 	
-//	private String buildColumns(ForeignKeyInContext fk, int colType) {
-//		StringBuilder sb = new StringBuilder();
-//		for ( ForeignKeyColumnInContext fkCol : fk.getColumns() ) {
-//			if ( sb.length() > 0 ) {
-//				sb.append(", ");
-//			}
-//			if ( colType == FK_COL ) {
-//				sb.append( convertToColumnName(fkCol.getColumnName()) );
-//			}
-//			else {
-//				sb.append( convertToColumnName(fkCol.getReferencedColumnName()) );
-//			}
-//		}
-//		return sb.toString();
-//    }
 	private String buildColumns(ForeignKeyInContext fk, int colType) throws GeneratorException {
 		StringBuilder sb = new StringBuilder();
 		for ( ForeignKeyAttributeInContext fkAttribute : fk.getAttributes() ) {
@@ -728,17 +710,13 @@ public class SqlInContext {
 				sb.append(", ");
 			}
 			if ( colType == FK_ORIGIN_SIDE ) {
-				// sb.append( convertToColumnName(fkAttribute.getOriginAttribute() ) );
 				sb.append(fkAttribute.getOriginAttribute().getSqlColumnName() ); 
 			}
 			else {
-				// sb.append( convertToColumnName(fkAttribute.getReferencedColumnName()) );
 				sb.append(fkAttribute.getReferencedAttribute().getSqlColumnName() ); 
 			}
 		}
 		return sb.toString();
     }
 
-	//-------------------------------------------------------------------------------------
-	//-------------------------------------------------------------------------------------
 }

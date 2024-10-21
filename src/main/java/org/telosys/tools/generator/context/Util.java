@@ -16,9 +16,6 @@
 package org.telosys.tools.generator.context ;
 
 import java.math.BigDecimal;
-import java.util.LinkedList;
-
-import org.telosys.tools.commons.JavaTypeUtil;
 
 public class Util {
 

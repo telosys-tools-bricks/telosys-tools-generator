@@ -32,7 +32,7 @@ public class GenerationTaskResult {
 	private int numberOfFilesGenerated ;
 	private int numberOfGenerationErrors ;
 
-	private List<ErrorReport> errors = new ArrayList<ErrorReport>();
+	private List<ErrorReport> errors = new ArrayList<>();
 
 	//--------------------------------------------------------------------------------------
 	/**

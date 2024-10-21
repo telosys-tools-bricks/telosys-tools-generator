@@ -108,7 +108,6 @@ public class ModelInContext
 		this.entitiesByTableName = new HashMap<>();
 		for ( EntityInContext entity : this.allEntities ) {
 			// The table name is unique 
-//			this.entitiesByTableName.put(SqlTableNameProvider.getTableName(entity), entity); 
 			this.entitiesByTableName.put(getTableNameUpperCase(entity), entity); // v 4.1.0
 		}
 		
@@ -357,7 +356,6 @@ public class ModelInContext
 		}
 	)
     public EntityInContext getEntityByTableName( String tableName ) { 
-//		EntityInContext entity = entitiesByTableName.get(tableName);
 		EntityInContext entity = searchEntityByTableName(tableName); // v 4.1.0
 		if ( entity != null ) {
 			return entity;
@@ -387,7 +385,6 @@ public class ModelInContext
 		}
 	)
     public boolean hasEntityWithTableName( String tableName ) {
-//		return ( entitiesByTableName.get(tableName) != null ) ;
 		return ( searchEntityByTableName(tableName) != null ) ; // v 4.1.0
     }
 
