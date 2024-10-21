@@ -17,11 +17,11 @@ package org.telosys.tools.generator.context;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import org.telosys.tools.commons.FileUtil;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.bundles.TargetDefinition;
-import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.variables.VariablesManager;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityNoDoc;
@@ -48,9 +48,14 @@ import org.telosys.tools.generic.model.Entity;
  )
 //-------------------------------------------------------------------------------------
 public class Target {
-
-	private final TelosysToolsCfg  telosysToolsCfg ;
-	private final VariablesManager variablesManager ;
+	
+	public static final String VAR_BUN = "BUN" ;
+	public static final String VAR_MOD = "MOD" ;
+	public static final String VAR_ENT = "ENT" ;
+	public static final String VAR_BEANNAME = "BEANNAME" ; // keep "BEANNAME" only for backward compatibility
+	
+	private final String destinationDirAbsolutePath ; // v 4.2.0 (instead of TelosysToolsCfg)
+	private final VariablesManager variablesManager ; // v 4.2.0 (instead of TelosysToolsCfg)
 	
 	// Target definition in templates bundle :
 	private final String    targetName ; // Col 1
@@ -64,14 +69,17 @@ public class Target {
 
 	/**
 	 * Constructor
-	 * @param telosysToolsCfg
+	 * @param destinationDirAbsolutePath
 	 * @param targetDefinition
-	 * @param entityName
+	 * @param variables
+	 * @param entityName (or "" if no entity for this target)
 	 */
-	private Target(TelosysToolsCfg telosysToolsCfg, TargetDefinition targetDefinition, String entityName ) {
+	private Target(String destinationDirAbsolutePath, TargetDefinition targetDefinition, Map<String,String> variables, String entityName ) {
 		super();
-		this.telosysToolsCfg = telosysToolsCfg ;
-		this.variablesManager = new VariablesManager( telosysToolsCfg.getAllVariablesMap() ); 
+		this.destinationDirAbsolutePath = destinationDirAbsolutePath; // v 4.2.0 (instead of TelosysToolsCfg)
+		this.variablesManager = new VariablesManager(variables);  // v 4.2.0 (instead of TelosysToolsCfg)
+		applyLowerCaseAndUpperCase(VAR_BUN); // BUN, BUN_UC, BUN_LC
+		applyLowerCaseAndUpperCase(VAR_MOD); // MOD, MOD_UC, MOD_LC
 		
 		//--- Keep target definition
 		this.targetName = targetDefinition.getName();
@@ -93,21 +101,23 @@ public class Target {
 	
 	/**
 	 * Constructor for a generation with an entity and a template
-	 * @param telosysToolsCfg
+	 * @param destinationDirAbsolutePath
 	 * @param targetDefinition
+	 * @param variables
 	 * @param entity
 	 */
-	public Target(TelosysToolsCfg telosysToolsCfg, TargetDefinition targetDefinition, Entity entity) {
-		this(telosysToolsCfg, targetDefinition, entity.getClassName());
+	public Target(String destinationDirAbsolutePath, TargetDefinition targetDefinition, Map<String,String> variables, Entity entity) {
+		this(destinationDirAbsolutePath, targetDefinition, variables, entity.getClassName());
 	}
 	
 	/**
 	 * Constructor for a 'ONCE' target or a 'RESOURCE' target ( resource copy )
-	 * @param telosysToolsCfg
+	 * @param destinationDirAbsolutePath
 	 * @param targetDefinition
+	 * @param variables
 	 */
-	public Target(TelosysToolsCfg telosysToolsCfg, TargetDefinition targetDefinition) {
-		this(telosysToolsCfg, targetDefinition, "");
+	public Target(String destinationDirAbsolutePath, TargetDefinition targetDefinition, Map<String,String> variables) {
+		this(destinationDirAbsolutePath, targetDefinition, variables, "");
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -270,9 +280,7 @@ public class Target {
 		since = "3.3.0"
 		)
 	public String getOutputFileFullPath() {
-		return FileUtil.buildFilePath(
-				telosysToolsCfg.getDestinationFolderAbsolutePath(),
-				getOutputFileNameInProject()) ;
+		return FileUtil.buildFilePath(this.destinationDirAbsolutePath, getOutputFileNameInProject()) ;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -391,13 +399,19 @@ public class Target {
 		if ( hasForcedEntityName() ) {
 			currentEntityName = this.forcedEntityName;
 		}
-		updateVariablesManager("ENT", currentEntityName); // new in v 4.2.0
-		updateVariablesManager("BEANNAME", currentEntityName); // keep "BEANNAME" for backward compatibility
+		updateVariablesManager(VAR_ENT, currentEntityName); // new in v 4.2.0
+		updateVariablesManager(VAR_BEANNAME, currentEntityName); // keep "BEANNAME" for backward compatibility
 	}
 	private void updateVariablesManager(String varName, String varValue) {
 		variablesManager.setVariable(varName,       varValue);
-		variablesManager.setVariable(varName+"_LC", varValue.toLowerCase());
-		variablesManager.setVariable(varName+"_UC", varValue.toUpperCase());
+		applyLowerCaseAndUpperCase(varName);
+	}
+	private void applyLowerCaseAndUpperCase(String varName) {
+		String varValue = variablesManager.getVariableValue(varName);
+		if ( varValue != null) {
+			variablesManager.setVariable(varName+"_LC", varValue.toLowerCase());
+			variablesManager.setVariable(varName+"_UC", varValue.toUpperCase());
+		}
 	}
 	
 	protected VariablesManager transformPackageVariablesToDirPath(VariablesManager originalVariablesManager ) {

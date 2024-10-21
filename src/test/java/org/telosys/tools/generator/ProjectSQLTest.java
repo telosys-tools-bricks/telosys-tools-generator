@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.telosys.tools.commons.bundles.TargetDefinition;
+import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.Model;
@@ -20,13 +21,14 @@ public class ProjectSQLTest {
 	private FakeProject fakeProject = new FakeProject("proj-sql");
 	
 	private Target getTargetOnce(String templateFile, String generatedFile, Entity entity) {
+		TelosysToolsCfg telosysToolsCfg = fakeProject.getTelosysToolsCfg();
 		TargetDefinition targetDefinition = new TargetDefinition(
 				"Fake target", 
 				generatedFile, 
 				"generated-files", 
 				templateFile, 
 				"1");
-		return new Target( fakeProject.getTelosysToolsCfg(), targetDefinition, entity );  // v 3.3.0
+		return new Target( telosysToolsCfg.getDestinationFolderAbsolutePath(), targetDefinition, telosysToolsCfg.getAllVariablesMap(), entity );  // v 4.2.0
 	}
 	
 	private List<String> getSelectedEntities() {

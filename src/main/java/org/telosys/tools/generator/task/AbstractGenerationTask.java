@@ -25,10 +25,10 @@ import org.telosys.tools.commons.bundles.TargetDefinition;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.io.CopyHandler;
 import org.telosys.tools.commons.io.OverwriteChooser;
-import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generator.BundleResourcesManager;
 import org.telosys.tools.generator.Generator;
 import org.telosys.tools.generator.GeneratorException;
+import org.telosys.tools.generator.TargetBuilder;
 import org.telosys.tools.generator.context.Target;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.Model;
@@ -126,10 +126,6 @@ public abstract class AbstractGenerationTask
 		}
 	}
 	
-	private Variable[] getAllProjectVariables() {
-		return telosysToolsCfg.getAllVariables() ;
-	}
-	
 	/**
 	 * Run the task : <br>
 	 *  1) copy the resources if any<br>
@@ -146,7 +142,7 @@ public abstract class AbstractGenerationTask
 		copyResourcesIfAny(overwriteChooser, copyHandler);
 		
 		//--- 2) Launch the generation (if cancelled : 'InterruptedException' is thrown )
-		generateSelectedTargets(taskMonitor, getAllProjectVariables());
+		generateSelectedTargets(taskMonitor);
 	}
 	
 	//--------------------------------------------------------------------------------------------------
@@ -186,11 +182,9 @@ public abstract class AbstractGenerationTask
 	/**
 	 * Generates all the "selected targets" ( once or for each entity depending on the target's type ) 
 	 * @param progressMonitor
-	 * @param variables
-	 * @return true to continue, false to interrupt the task
 	 * @throws InterruptedException
 	 */
-	private void generateSelectedTargets( ITaskMonitor progressMonitor, Variable[] variables ) throws InterruptedException
+	private void generateSelectedTargets( ITaskMonitor progressMonitor ) throws InterruptedException
 	{
 		//--- Separate targets in 2 list : "ONCE" and "ENTITY"
 		List<TargetDefinition> onceTargets   = new LinkedList<>() ; 
@@ -219,8 +213,8 @@ public abstract class AbstractGenerationTask
 				for ( TargetDefinition targetDefinition : entityTargets ) {
 					
 					//--- Get a specialized target for the current entity
-					//Target target = new Target( targetDefinition, entity, variables ); // v 3.0.0
-					Target target = new Target( telosysToolsCfg, targetDefinition, entity ); // v 3.3.0
+					//Target target = new Target( telosysToolsCfg, targetDefinition, entity ); // v 3.3.0
+					Target target = TargetBuilder.buildTarget(telosysToolsCfg, targetDefinition, bundleName, model, entity); // v 4.2.0
 					
 					generateTarget(progressMonitor, target, selectedEntities); // throws InterruptedException if error + 'cancel'
 				}
@@ -239,8 +233,8 @@ public abstract class AbstractGenerationTask
 		logger.info("----- Generation without entity" );
 		for ( TargetDefinition targetDefinition : onceTargets ) {
 			//--- Target without current entity
-			//Target target = new Target( targetDefinition, variables ); // v 3.0.0
-			Target target = new Target( telosysToolsCfg, targetDefinition ); // v 3.3.0
+			//Target target = new Target( telosysToolsCfg, targetDefinition ); // v 3.3.0
+			Target target = TargetBuilder.buildTarget(telosysToolsCfg, targetDefinition, bundleName, model); // v 4.2.0
 			generateTarget(progressMonitor, target, selectedEntities);  // throws InterruptedException if error + 'cancel'
 		}
 		
@@ -250,8 +244,8 @@ public abstract class AbstractGenerationTask
 		if ( progressMonitor.isCanceled() ) { // Cancellation of current operation has been requested
 			throw new InterruptedException("The generation task was cancelled");
 		}
-		
 	}
+	
 	//--------------------------------------------------------------------------------------------------
 	/**
 	 * Generates the given target. <br>

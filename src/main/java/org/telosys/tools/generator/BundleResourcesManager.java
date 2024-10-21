@@ -26,7 +26,6 @@ import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.commons.io.CopyHandler;
 import org.telosys.tools.commons.io.OverwriteChooser;
 import org.telosys.tools.commons.io.ResourcesCopier;
-import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generator.context.Target;
 
 
@@ -65,13 +64,11 @@ public class BundleResourcesManager {
 	 */
 	private List<Target> getResourcesTargets(List<TargetDefinition> targetsDefinitions ) {
 		log("getResourcesTargets()... " );
-		
-//		Variable[] projectVariables = telosysToolsCfg.getAllVariables(); // v 3.3.0
 		LinkedList<Target> targets = new LinkedList<>();
 		if ( targetsDefinitions != null ) {
 			for ( TargetDefinition targetDefinition : targetsDefinitions ) {
-//				Target target = new Target ( targetDefinition, projectVariables ); // v 3.0.0
-				Target target = new Target (telosysToolsCfg, targetDefinition); // v 3.3.0
+//				Target target = new Target (telosysToolsCfg, targetDefinition); // v 3.3.0
+				Target target = TargetBuilder.buildTarget(telosysToolsCfg, targetDefinition, bundleName); // v 4.2.0
 				targets.add(target);
 			}
 		}

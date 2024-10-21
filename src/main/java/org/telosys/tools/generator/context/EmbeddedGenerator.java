@@ -23,6 +23,7 @@ import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.generator.Generator;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.GeneratorVersion;
+import org.telosys.tools.generator.TargetBuilder;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
@@ -173,14 +174,12 @@ public class EmbeddedGenerator {
 			throw new GeneratorException( err + "(entity '" + entityClassName + "' not found in repository)");
 		}
 		
-		// Variable[] allVariables = this._telosysToolsCfg.getAllVariables(); // v 3.3.0
+		TargetDefinition targetDefinition = new TargetDefinition("Dynamic target", outputFile, outputFolder, templateFile, "");
 		
-		TargetDefinition genericTarget = new TargetDefinition("Dynamic target", outputFile, outputFolder, templateFile, "");
+		//Target target = new Target( telosysToolsCfg, targetDefinition, entity ); // v 3.3.0
+		Target target = TargetBuilder.buildTarget(telosysToolsCfg, targetDefinition, bundleName, model, entity); // v 4.2.0
 		
-		//Target target = new Target( genericTarget, entity, allVariables ); // v 3.0.0
-		Target target = new Target( telosysToolsCfg, genericTarget, entity ); // v 3.3.0
-		
-		Generator generator = new Generator(this.telosysToolsCfg, this.bundleName, logger); // v 3.0.0
+		Generator generator = new Generator(this.telosysToolsCfg, this.bundleName, logger);
 		
 		generator.generateTarget(target, model, selectedEntitiesNames, this.generatedTargets);
 	}
