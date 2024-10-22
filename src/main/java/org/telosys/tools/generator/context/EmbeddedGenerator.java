@@ -128,7 +128,7 @@ public class EmbeddedGenerator {
 	)
 	public String getVersion()
     {
-        return GeneratorVersion.GENERATOR_VERSION ;
+        return GeneratorVersion.getVersion();
     }
 	
 	//-------------------------------------------------------------------------------------

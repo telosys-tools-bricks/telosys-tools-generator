@@ -15,15 +15,55 @@
  */
 package org.telosys.tools.generator;
 
+import org.telosys.tools.commons.VersionProvider;
+
 /**
- * Generator version
+ * Generator version 
  * 
  * @author Laurent Guerin
  *  
  */
 public class GeneratorVersion {
 
-	public static final String GENERATOR_VERSION = "4.1.0" ;
+	/**
+	 * Property name to get the VERSION from properties file
+	 */
+	private static final VersionProvider versionProvider = new VersionProvider("/telosys-generator-build.properties") ;
 	
+	/**
+	 * Private constructor
+	 */
 	private GeneratorVersion() {}
+	
+	/**
+	 * Returns the module name 
+	 * @return
+	 */
+	public static final String getName() {
+		return versionProvider.getName();
+	}
+
+	/**
+	 * Returns the module version 
+	 * @return
+	 */
+	public static final String getVersion() {
+		return versionProvider.getVersion();
+	}
+
+	/**
+	 * Returns the module build-id 
+	 * @return
+	 */
+	public static final String getBuildId() {
+		return versionProvider.getBuildId();
+	}
+
+	/**
+	 * Returns the module version with build-id
+	 * @return
+	 */
+	public static final String getVersionWithBuilId() {
+		return versionProvider.getVersionWithBuilId();
+	}
 }

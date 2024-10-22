@@ -13,9 +13,14 @@
 
 	<name>telosys-tools-generator</name>
 	<artifactId>telosys-tools-generator</artifactId>
-	<version>4.1.0</version> <!-- also update version in GeneratorVersion.java  -->
+	<version>4.2.0</version>
 	<packaging>jar</packaging>
 
+	<properties>
+		<maven.build.timestamp.format>yyMMdd.HHmmss.S</maven.build.timestamp.format>	<!-- day in the year . min . milliseconds -->	
+		<build.id>${maven.build.timestamp}</build.id> <!-- for resource filtering -->
+	</properties>
+	
 	<dependencies>
 		<!-- DEPENDENCIES / COMPILE -->
 		<dependency>
@@ -40,4 +45,23 @@
 
 	</dependencies>
 
+	<build>
+	    <resources>
+	    	<!-- Filtering file with build.id  -->
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>telosys-generator-build.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>telosys-generator-build.properties</exclude>
+				</excludes>
+			</resource>
+	    </resources>
+	</build>
 </project>
