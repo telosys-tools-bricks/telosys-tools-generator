@@ -1,8 +1,6 @@
 package org.telosys.tools.generator.context;
 
 import org.junit.Test;
-import org.telosys.tools.commons.cfg.TelosysToolsCfg;
-import org.telosys.tools.commons.cfg.TelosysToolsCfgManager;
 import org.telosys.tools.dsl.model.DslModel;
 import org.telosys.tools.dsl.model.DslModelAttribute;
 import org.telosys.tools.dsl.model.DslModelEntity;
@@ -18,7 +16,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class JpaInContextTest {
-	
+	private static final String DEFAULT_ENTITY_PACKAGE = "org.demo.bean"; 
+
 	private String[] jpaFieldAnnotations(AttributeInContext attribute) {
 		return jpaFieldAnnotations(attribute, false);
 	}
@@ -382,10 +381,10 @@ public class JpaInContextTest {
 		fakeModel.addEntity(fakeOriginEntity);
 		fakeModel.addEntity(fakeTargetEntity);
 
-		TelosysToolsCfgManager cfgManager = new TelosysToolsCfgManager("/tmp/foo");
-		TelosysToolsCfg cfg = cfgManager.createDefaultTelosysToolsCfg();
+//		TelosysToolsCfgManager cfgManager = new TelosysToolsCfgManager("/tmp/foo");
+//		TelosysToolsCfg cfg = cfgManager.createDefaultTelosysToolsCfg();
 		EnvInContext env = new EnvInContext();
-		ModelInContext model = new ModelInContext(fakeModel, cfg, env);
+		ModelInContext model = new ModelInContext(fakeModel, DEFAULT_ENTITY_PACKAGE, env);
 		EntityInContext entity = new EntityInContext(fakeOriginEntity, "org.demo", model, env);
 		return new LinkInContext(entity, fakeLink, model, env );
 	}
@@ -395,6 +394,7 @@ public class JpaInContextTest {
 	private void print(String s) {
 		System.out.println(s);
 	}
+	
 
 	private EntityInContext buildEntityInContext(String entityName) {
 		return buildEntityInContext(entityName, "NO_TABLE");
@@ -404,11 +404,11 @@ public class JpaInContextTest {
 		DslModelEntity fakeEntity = new DslModelEntity(entityName);
 		fakeModel.addEntity(fakeEntity);
 
-		TelosysToolsCfgManager cfgManager = new TelosysToolsCfgManager("projectAbsolutePath");
-		TelosysToolsCfg telosysToolsCfg = cfgManager.createDefaultTelosysToolsCfg();
+//		TelosysToolsCfgManager cfgManager = new TelosysToolsCfgManager("projectAbsolutePath");
+//		TelosysToolsCfg telosysToolsCfg = cfgManager.createDefaultTelosysToolsCfg();
 		EnvInContext envInContext = new EnvInContext() ; 
 		
-		ModelInContext modelInContext = new ModelInContext(fakeModel, telosysToolsCfg, envInContext);
+		ModelInContext modelInContext = new ModelInContext(fakeModel, DEFAULT_ENTITY_PACKAGE, envInContext);
 		return new EntityInContext(fakeEntity, "org.foo.pkg", modelInContext, envInContext);
 	}
 	

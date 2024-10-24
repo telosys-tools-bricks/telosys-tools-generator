@@ -145,7 +145,8 @@ public class GeneratorContextBuilder {
 
 		//--- Set "$model" object : full model with  all the entities 
 		this.model = model ;
-		this.modelInContext = new ModelInContext(model, telosysToolsCfg, env ); 
+//		this.modelInContext = new ModelInContext(model, telosysToolsCfg, env ); 
+		this.modelInContext = new ModelInContext(model, telosysToolsCfg.getEntityPackage(), env ); // v 4.2.0 
 		generatorContext.put(ContextName.MODEL, modelInContext); 
 		
 		//--- Set "$bundle" object ( new in v 3.3.0 ) 

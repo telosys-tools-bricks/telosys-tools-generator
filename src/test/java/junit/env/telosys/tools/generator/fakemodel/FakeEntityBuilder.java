@@ -26,10 +26,10 @@ public class FakeEntityBuilder {
 		fakeModel.addEntity(fakeEntity);
 
 		TelosysToolsCfgManager cfgManager = new TelosysToolsCfgManager("projectAbsolutePath");
-		TelosysToolsCfg telosysToolsCfg = cfgManager.createDefaultTelosysToolsCfg();
+//		TelosysToolsCfg telosysToolsCfg = cfgManager.createDefaultTelosysToolsCfg();
 		EnvInContext envInContext = new EnvInContext() ; 
 		
-		ModelInContext modelInContext = new ModelInContext(fakeModel, telosysToolsCfg, envInContext);
+		ModelInContext modelInContext = new ModelInContext(fakeModel, "org.demo.bean", envInContext);
 		return new EntityInContext(fakeEntity, "org.foo.pkg", modelInContext, envInContext);
 	}
 

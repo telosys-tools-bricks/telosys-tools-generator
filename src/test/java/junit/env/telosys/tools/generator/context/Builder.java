@@ -26,32 +26,23 @@ public class Builder {
 	}
 	
 	private static final EnvInContext envInContext = new EnvInContext() ; 
+	private static final String DEFAULT_ENTITY_PACKAGE = "org.demo.bean"; 
 			
 	private Builder() {
 	}
 
-//	public static Model buildVoidModel() {
-//		return new DslModel(FAKE_MODEL);
-//	}
-	
 	public static ModelInContext buildVoidModelInContext() {
-//		Model model = buildVoidModel();
 		DslModel model = new DslModel(FAKE_MODEL_NAME);
-		return new ModelInContext(model, telosysToolsCfg, envInContext);
+//		return new ModelInContext(model, telosysToolsCfg, envInContext);
+		return new ModelInContext(model, DEFAULT_ENTITY_PACKAGE, envInContext); // v 4.2.0
 	}
 
 	public static ModelInContext buildModelInContext(Model model) {
-		return new ModelInContext(model, telosysToolsCfg, envInContext);
+//		return new ModelInContext(model, telosysToolsCfg, envInContext); 
+		return new ModelInContext(model, DEFAULT_ENTITY_PACKAGE, envInContext); // v 4.2.0
 	}
 	
-	
 	public static EntityInContext buildEntityInContext(String entityName, String tableName) {
-//		DslModel fakeModel = new DslModel(FAKE_MODEL);
-//		DslModelEntity entity = new DslModelEntity(entityName);
-//		entity.setDatabaseTable(tableName);
-//		fakeModel.addEntity(entity);
-//		ModelInContext modelInContext = buildModelInContext(fakeModel);
-//		return modelInContext.getEntityByClassName(entityName);
 		DslModelEntity entity = new DslModelEntity(entityName);
 		entity.setDatabaseTable(tableName);
 		return buildEntityInContext(entity);

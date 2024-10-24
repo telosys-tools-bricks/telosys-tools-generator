@@ -69,16 +69,17 @@ public class ModelInContext
 	}
 
 	//-------------------------------------------------------------------------------------
-	/**
-	 * Constructor
-	 * @param model
-	 * @param telosysToolsCfg
-	 * @param env
-	 */
-	public ModelInContext( Model model, TelosysToolsCfg telosysToolsCfg, EnvInContext env ) { // v 3.3.0
+//	/**
+//	 * Constructor
+//	 * @param model
+//	 * @param telosysToolsCfg
+//	 * @param env
+//	 */
+//	public ModelInContext( Model model, TelosysToolsCfg telosysToolsCfg, EnvInContext env ) { // v 3.3.0
+	public ModelInContext( Model model, String defaultEntityPackage, EnvInContext env ) { // v 4.2.0
 		super();
 		if ( model == null ) throw new IllegalArgumentException("Model is null");
-		if ( telosysToolsCfg == null ) throw new IllegalArgumentException("TelosysToolsCfg is null");
+		if ( defaultEntityPackage == null ) throw new IllegalArgumentException("defaultEntityPackage is null");
 		if ( env == null ) throw new IllegalArgumentException("EnvInContext is null");
 		
 		this.modelName = model.getName();  // MANDATORY
@@ -100,7 +101,8 @@ public class ModelInContext
 			//_allEntities.add( new EntityInContext(entity, entitiesPackage, this, env) );// v 3.0.0
 			this.allEntities.add( 
 					new EntityInContext(entity, 
-							telosysToolsCfg.getEntityPackage(),  // v 3.3.0
+//							telosysToolsCfg.getEntityPackage(),  // v 3.3.0
+							defaultEntityPackage,  // v 4.2.0
 							this, env) );
 		}
 		

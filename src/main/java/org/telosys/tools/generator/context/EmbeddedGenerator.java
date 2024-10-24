@@ -114,7 +114,7 @@ public class EmbeddedGenerator {
 	)
 	public String getName()
 	{
-		return "Telosys Tools Generator";
+		return "Telosys embedded generator";
 	}
 	
 	//-------------------------------------------------------------------------------------
