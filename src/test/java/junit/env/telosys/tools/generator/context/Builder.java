@@ -1,7 +1,5 @@
 package junit.env.telosys.tools.generator.context;
 
-import org.telosys.tools.commons.cfg.TelosysToolsCfg;
-import org.telosys.tools.commons.cfg.TelosysToolsCfgManager;
 import org.telosys.tools.dsl.model.DslModel;
 import org.telosys.tools.dsl.model.DslModelEntity;
 import org.telosys.tools.generator.context.EntityInContext;
@@ -14,17 +12,6 @@ public class Builder {
 	
 	private static final String FAKE_MODEL_NAME = "FakeModel";
 
-	/**
-	 * Build TelosysToolsCfg instance with default values
-	 * @return
-	 */
-	private static final TelosysToolsCfg telosysToolsCfg = buildTelosysToolsCfg();
-
-	public static TelosysToolsCfg buildTelosysToolsCfg() {
-		TelosysToolsCfgManager cfgManager = new TelosysToolsCfgManager("projectAbsolutePath");
-		return cfgManager.createDefaultTelosysToolsCfg();
-	}
-	
 	private static final EnvInContext envInContext = new EnvInContext() ; 
 	private static final String DEFAULT_ENTITY_PACKAGE = "org.demo.bean"; 
 			
@@ -33,12 +20,10 @@ public class Builder {
 
 	public static ModelInContext buildVoidModelInContext() {
 		DslModel model = new DslModel(FAKE_MODEL_NAME);
-//		return new ModelInContext(model, telosysToolsCfg, envInContext);
 		return new ModelInContext(model, DEFAULT_ENTITY_PACKAGE, envInContext); // v 4.2.0
 	}
 
 	public static ModelInContext buildModelInContext(Model model) {
-//		return new ModelInContext(model, telosysToolsCfg, envInContext); 
 		return new ModelInContext(model, DEFAULT_ENTITY_PACKAGE, envInContext); // v 4.2.0
 	}
 	
