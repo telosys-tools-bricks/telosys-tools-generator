@@ -102,16 +102,8 @@ public class LiteralValuesProviderForGo extends LiteralValuesProvider {
 	
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
-		if (attribute.isNotNull()) {
-			// not null attribute
-// TODO
-//			String defaultValue = defaultValues.get(languageType.getNeutralType());
-//			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
-			return NULL_LITERAL;
-		} else {
-			// nullable attribute
-			return NULL_LITERAL;
-		}
+		// In the future: if the attribute is "Not Null" get a default value for the attribute neutral type  
+		return NULL_LITERAL;
 	}
 
 
