@@ -256,14 +256,25 @@ public class JpaAnnotations
 		}
 		
 		//--- length : (Optional) The column length. 
-		if ( attribute.isStringType() ) { // v 3.3.0
-			if ( ! StrUtil.nullOrVoid(attribute.getDatabaseSize()) ) {
+		if ( attribute.isStringType() || attribute.isNumberType() ) { // v 3.3.0
+			if ( ! StrUtil.nullOrVoid(attribute.getSize()) ) {
 				sb.append(", length=");
-				sb.append(attribute.getDatabaseSize());
+				sb.append(attribute.getSize());
 			}
 			else if ( ! StrUtil.nullOrVoid(attribute.getMaxLength()) ) {
 				sb.append(", length=");
 				sb.append(attribute.getMaxLength());
+			}
+		}
+
+		if (attribute.isDecimalType()) {
+			if ( ! StrUtil.nullOrVoid(attribute.getPrecision()) ) {
+				sb.append(", precision=");
+				sb.append(attribute.getPrecision());
+			}
+			if ( ! StrUtil.nullOrVoid(attribute.getScale()) ) {
+				sb.append(", scale=");
+				sb.append(attribute.getScale());
 			}
 		}
 

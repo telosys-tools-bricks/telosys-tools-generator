@@ -85,7 +85,7 @@ public class JpaInContextTest {
 		// check result
 		assertEquals(2, a.length);
 		assertEquals("@Id", a[0]);
-		assertEquals("@Column(name=\"id\", columnDefinition=\"INT\")", a[1]); // "int" type => no length=20 
+		assertEquals("@Column(name=\"id\", length=20, columnDefinition=\"INT\")", a[1]); 
 	}
 
 	@Test 
