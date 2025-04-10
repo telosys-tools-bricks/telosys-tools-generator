@@ -62,16 +62,30 @@ public class TargetLanguageForTypeScript extends TargetLanguage {
 	public String argumentsList(List<AttributeInContext> attributes) {
 		return commonArgumentsListWithoutType(attributes);
 	}
-	
+
+
+	@Override
+	public String argumentsListDbName(List<AttributeInContext> attributes) {
+		return commonArgumentsListWithoutType(attributes, true);
+	}
+
 	@Override
 	public String argumentsListWithType(List<AttributeInContext> attributes) {
+		return argumentsListWithType(attributes, false);
+	}
+
+	public String argumentsListWithType(List<AttributeInContext> attributes, boolean useDbName) {
 		if ( attributes == null ) return "";
 		StringBuilder sb = new StringBuilder();
 		int n = 0 ;
 		for ( AttributeInContext attribute : attributes ) {
 			// example : "name: string, age: number"
 			if ( n > 0 ) sb.append(", ");
-			sb.append( attribute.getName() ) ; // arg name first
+			if (useDbName) {
+				sb.append(attribute.getDatabaseName()); // arg name first
+			} else {
+				sb.append(attribute.getName()); // arg name first
+			}
 			sb.append( ": " ) ;
 			sb.append( attribute.getType() ) ; // arg type after 
 			n++;
@@ -84,6 +98,13 @@ public class TargetLanguageForTypeScript extends TargetLanguage {
 		// NB: recomandation "do not use wrappers" 
 		// return args with basic types
 		return this.argumentsListWithType(attributes);
+	}
+
+	@Override
+	public String argumentsListDbNameWithWrapperType(List<AttributeInContext> attributes) {
+		// NB: recomandation "do not use wrappers"
+		// return args with basic types
+		return this.argumentsListWithType(attributes, true);
 	}
 
 	@Override
