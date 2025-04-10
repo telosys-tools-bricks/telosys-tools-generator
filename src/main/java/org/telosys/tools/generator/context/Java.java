@@ -44,7 +44,26 @@ public class Java {
 		}
 		return spaces.toString();
 	}
-	
+
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={
+			"Returns a string containing all the code for a Java 'equals' method",
+			"Tabulations are used for code indentation"
+		},
+		example={
+			"$java.equalsMethodDbName( $entity.name, $entity.attributes )" },
+		parameters = {
+			"className : the Java class name (simple name or full name)",
+			"attributes : list of attributes to be used in the equals method"},
+		since="2025-04-10"
+	)
+	public String equalsMethodDbName( String className, List<AttributeInContext> attributes ) {
+
+		return equalsMethod( className , attributes, new LinesBuilder(), true );
+	}
+
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -60,7 +79,7 @@ public class Java {
 			)
 	public String equalsMethod( String className, List<AttributeInContext> attributes ) {
 		
-		return equalsMethod( className , attributes, new LinesBuilder() ); 
+		return equalsMethod( className , attributes, new LinesBuilder() ,false );
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -79,11 +98,11 @@ public class Java {
 			)
 	public String equalsMethod( String className, List<AttributeInContext> attributes, int indentSpaces ) {
 		
-		return equalsMethod( className , attributes, new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) ); 
+		return equalsMethod( className , attributes, new LinesBuilder(buildIndentationWithSpaces(indentSpaces)), false );
 	}
 	
 	//-------------------------------------------------------------------------------------
-	private String equalsMethod( String className, List<AttributeInContext> fieldsList, LinesBuilder lb ) {
+	private String equalsMethod( String className, List<AttributeInContext> fieldsList, LinesBuilder lb, boolean useDbName ) {
 
 		int indent = 1 ;
 		lb.append(indent, "public boolean equals(Object obj) { ");
@@ -100,6 +119,9 @@ public class Java {
 			for ( AttributeInContext attribute : fieldsList ) {
 				
 				String attributeName = attribute.getName() ;
+				if (useDbName) {
+					attributeName = attribute.getDatabaseName();
+				}
 				lb.append(indent, "//--- Attribute " + attributeName );
 				if ( attribute.isPrimitiveType() ) {
 					if ( attribute.isFloatType() ) {
@@ -141,6 +163,24 @@ public class Java {
 		return lb.toString();
 	}
 
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={
+			"Returns a string containing all the code for a Java 'hashCode' method",
+			"Tabulations are used for code indentation"
+		},
+		example={
+			"$java.hashCodeDbName( $entity.name, $entity.attributes )" },
+		parameters = {
+			"className  : the Java class name (simple name or full name)",
+			"attributes : list of attributes to be used in the equals method"},
+		since = "2.0.7"
+	)
+	public String hashCodeMethodDbName( String className, List<AttributeInContext> attributes ) {
+		return hashCodeMethod(attributes, new LinesBuilder() , true );
+	}
+
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 			text={	
@@ -155,7 +195,7 @@ public class Java {
 			since = "2.0.7"
 				)
 	public String hashCodeMethod( String className, List<AttributeInContext> attributes ) {
-		return hashCodeMethod(attributes, new LinesBuilder() ); 
+		return hashCodeMethod(attributes, new LinesBuilder() , false );
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -173,11 +213,11 @@ public class Java {
 			since = "2.0.7"
 				)
 	public String hashCodeMethod( String className, List<AttributeInContext> attributes, int indentSpaces ) {
-		return hashCodeMethod(attributes, new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) ); 
+		return hashCodeMethod(attributes, new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) , false);
 	}
 	
 	//-------------------------------------------------------------------------------------
-	private String hashCodeMethod(List<AttributeInContext> fieldsList, LinesBuilder lb ) {
+	private String hashCodeMethod(List<AttributeInContext> fieldsList, LinesBuilder lb, boolean useDbName ) {
 
 		int indent = 1 ;
 		lb.append(indent, "public int hashCode() { ");
@@ -192,6 +232,9 @@ public class Java {
 				for ( AttributeInContext attribute : fieldsList ) {
 					
 					String attributeName = attribute.getName() ;
+					if (useDbName) {
+						attributeName = attribute.getDatabaseName();
+					}
 					lb.append(indent, "//--- Attribute " + attributeName );
 					if ( attribute.isPrimitiveType() ) {
 						//--- Primitive types

@@ -57,7 +57,12 @@ public class TargetLanguageForCPlusPlus extends TargetLanguage {
 	public String argumentsList(List<AttributeInContext> attributes) {
 		return commonArgumentsListWithoutType(attributes);
 	}
-	
+
+	@Override
+	public String argumentsListDbName(List<AttributeInContext> attributes) {
+		return commonArgumentsListWithoutType(attributes, true);
+	}
+
 	@Override
 	public String argumentsListWithType(List<AttributeInContext> attributes) {
 		return commonArgumentsListWithType(attributes);
@@ -67,6 +72,12 @@ public class TargetLanguageForCPlusPlus extends TargetLanguage {
 	public String argumentsListWithWrapperType(List<AttributeInContext> attributes) {
 		// no wrapper type in C++ => basic types
 		return commonArgumentsListWithType(attributes);
+	}
+
+	@Override
+	public String argumentsListDbNameWithWrapperType(List<AttributeInContext> attributes) {
+		// no wrapper type in C++ => basic types
+		return commonArgumentsListWithType(attributes, true);
 	}
 
 	@Override

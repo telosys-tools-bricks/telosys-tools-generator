@@ -72,7 +72,23 @@ public class TargetLanguageForPHP extends TargetLanguage {
 		}
 		return sb.toString();
 	}
-	
+
+	@Override
+	public String argumentsListDbName(List<AttributeInContext> attributes) {
+		if ( attributes == null ) return "";
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			// example : "function add($a, $b, $x)"
+			if ( n > 0 ) sb.append(", ");
+			// AFTER : the name "$xx"
+			sb.append( "$" ).append( attribute.getDatabaseName() ) ;
+			n++;
+		}
+		return sb.toString();
+	}
+
+
 	@Override
 	public String argumentsListWithType(List<AttributeInContext> attributes) {
 		if ( attributes == null ) return "";
@@ -93,12 +109,34 @@ public class TargetLanguageForPHP extends TargetLanguage {
 		}
 		return sb.toString();
 	}
-	
+
 	@Override
 	public String argumentsListWithWrapperType(List<AttributeInContext> attributes) {
 		// No wrapper type => same behavior as with basic types
 		return argumentsListWithType(attributes); 
 	}
+
+	@Override
+	public String argumentsListDbNameWithWrapperType(List<AttributeInContext> attributes) {
+		if ( attributes == null ) return "";
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			// example : "function add(int $a, int $b, ?string $s)"
+			if ( n > 0 ) sb.append(", ");
+			// argument type
+			String type = attribute.getType();
+			if ( type.trim().length() > 0 ) {
+				sb.append( type ) ;
+				sb.append( " " ) ;
+			}
+			// argument name "$xx"
+			sb.append( "$" ).append( attribute.getDatabaseName() ) ;
+			n++;
+		}
+		return sb.toString();
+	}
+
 
 	@Override
 	public String argumentsListFromObjectWithGetter(String objectName, List<AttributeInContext> attributes) {

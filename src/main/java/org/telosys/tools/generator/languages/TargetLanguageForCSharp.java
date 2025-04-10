@@ -63,7 +63,12 @@ public class TargetLanguageForCSharp extends TargetLanguage {
 	public String argumentsList(List<AttributeInContext> attributes) {
 		return commonArgumentsListWithoutType(attributes);
 	}
-	
+
+	@Override
+	public String argumentsListDbName(List<AttributeInContext> attributes) {
+		return commonArgumentsListWithoutType(attributes, true);
+	}
+
 	@Override
 	public String argumentsListWithType(List<AttributeInContext> attributes) {
 		if ( attributes == null ) return "";
@@ -102,6 +107,25 @@ public class TargetLanguageForCSharp extends TargetLanguage {
 			n++;
 		}
 		return sb.toString();		
+	}
+
+	@Override
+	public String argumentsListDbNameWithWrapperType(List<AttributeInContext> attributes) {
+		if ( attributes == null ) return "";
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			if ( n > 0 ) sb.append(", ");
+			sb.append( attribute.getWrapperType() ) ; //  arg type first : WRAPPER type
+// moved in attribute.getType()
+//			if ( ! attribute.isNotNull() ) {
+//				sb.append( "?" ) ;  // nullable => add '?' at the end of the type, eg "String?"
+//			}
+			sb.append( " " ) ;
+			sb.append( attribute.getDatabaseName() ) ; // arg name after
+			n++;
+		}
+		return sb.toString();
 	}
 
 	@Override

@@ -216,7 +216,34 @@ public class FnInContext {
 			return "" ;
 		}
 	}
-	
+
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={
+			"Returns a string containing a list of field names separated by a comma",
+			"The resulting string depends on the current target language (eg: args are different for Java and PHP) ",
+			"NB: do not forget to define the current language : ",
+			"#set ( $env.language = '..' ) "
+		},
+		example={
+			"$fn.argumentsListDbName( $entity.attributes )",
+			"Result example : 'id, firstName, lastName, age' (for most languages) ",
+			"Result example : '$id, $firstName, $lastName, $age' (for languages with '$' prefix) "},
+		parameters = {
+			"attributes : list of attributes to be added in the arguments list" },
+		since = "2.0.5"
+	)
+	public String argumentsListDbName( List<AttributeInContext> attributes ) {
+		// since v 4.1.0 all the job is done in TargetLanguage
+		if ( attributes != null ) {
+			return env.getTargetLanguage().argumentsListDbName(attributes);
+		}
+		else {
+			return "" ;
+		}
+	}
+
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -267,7 +294,32 @@ public class FnInContext {
 			return "" ;
 		}
 	}
-	
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={
+			"Returns a string containing a list of fields (wrapper type and name) separated by a comma",
+			"The resulting string depends on the current target language (some languages don't have wrappers) ",
+			"NB: do not forget to define the current language : ",
+			"#set ( $env.language = '..' ) "
+		},
+		example={
+			"$fn.argumentsListDbNameWithWrapperType( $entity.attributes )",
+			"Returns : 'Integer id, String firstName, String lastName, Integer age' "},
+		parameters = {
+			"attributes : list of attributes to be added in the arguments list" },
+		since = "2025-04-10"
+	)
+	public String argumentsListDbNameWithWrapperType( List<AttributeInContext> attributes )  {
+		if ( attributes != null ) {
+			// since v 4.1.0 all the job is done in TargetLanguage
+			return env.getTargetLanguage().argumentsListDbNameWithWrapperType(attributes);
+		}
+		else {
+			return "" ;
+		}
+	}
+
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	

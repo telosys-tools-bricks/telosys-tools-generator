@@ -62,9 +62,19 @@ public class TargetLanguageForScala extends TargetLanguage {
 	public String argumentsList(List<AttributeInContext> attributes) {
 		return commonArgumentsListWithoutType(attributes);
 	}
-	
+
+
+	@Override
+	public String argumentsListDbName(List<AttributeInContext> attributes) {
+		return commonArgumentsListWithoutType(attributes, true);
+	}
+
 	@Override
 	public String argumentsListWithType(List<AttributeInContext> attributes) {
+		return argumentsListWithType(attributes, false);
+	}
+
+	public String argumentsListWithType(List<AttributeInContext> attributes, boolean useDbName) {
 		if ( attributes == null ) return "";
 		// example : "id: Int, name: String"
 		StringBuilder sb = new StringBuilder();
@@ -72,7 +82,11 @@ public class TargetLanguageForScala extends TargetLanguage {
 		for ( AttributeInContext attribute : attributes ) {
 			// example : id: Int, name: String"
 			if ( n > 0 ) sb.append(", ");
-			sb.append( attribute.getName() ) ; // arg name first
+			if (useDbName) {
+				sb.append( attribute.getDatabaseName() ) ; // arg name first
+			} else {
+				sb.append( attribute.getName() ) ; // arg name first
+			}
 			sb.append( ": " ) ;
 			sb.append( attribute.getType() ) ; // arg type after 
 			n++;
@@ -85,6 +99,13 @@ public class TargetLanguageForScala extends TargetLanguage {
 		// No wrapper type in Scala => same behavior as with basic types
 		return argumentsListWithType(attributes);
 	}
+
+	@Override
+	public String argumentsListDbNameWithWrapperType( List<AttributeInContext> attributes ) {
+		// No wrapper type in Scala => same behavior as with basic types
+		return argumentsListWithType(attributes, true);
+	}
+
 
 	@Override
 	public String argumentsListFromObjectWithGetter(String objectName, List<AttributeInContext> attributes) {

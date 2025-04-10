@@ -62,7 +62,12 @@ public class TargetLanguageForJavaScript extends TargetLanguage {
 	public String argumentsList(List<AttributeInContext> attributes) {
 		return commonArgumentsListWithoutType(attributes);
 	}
-	
+
+	@Override
+	public String argumentsListDbName(List<AttributeInContext> attributes) {
+		return commonArgumentsListWithoutType(attributes, true);
+	}
+
 	@Override
 	public String argumentsListWithType(List<AttributeInContext> attributes) {
 		// No type => just arg names
@@ -73,7 +78,13 @@ public class TargetLanguageForJavaScript extends TargetLanguage {
 	public String argumentsListWithWrapperType(List<AttributeInContext> attributes) {
 		// No type => just arg names
 		return commonArgumentsListWithoutType(attributes);
-	}	
+	}
+
+	@Override
+	public String argumentsListDbNameWithWrapperType(List<AttributeInContext> attributes) {
+		// No type => just arg names
+		return commonArgumentsListWithoutType(attributes, true);
+	}
 
 	@Override
 	public String argumentsListFromObjectWithGetter(String objectName, List<AttributeInContext> attributes) {

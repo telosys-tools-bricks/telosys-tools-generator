@@ -65,7 +65,15 @@ public class TargetLanguageForGo extends TargetLanguage {
 	}
 
 	@Override
+	public String argumentsListDbName(List<AttributeInContext> attributes) {
+		return commonArgumentsListWithoutType(attributes, true);
+	}
+
+	@Override
 	public String argumentsListWithType(List<AttributeInContext> attributes) {
+		return argumentsListWithType(attributes, false);
+	}
+	public String argumentsListWithType(List<AttributeInContext> attributes, boolean useDbName) {
 		if ( attributes == null ) return "";
 		// example : "name string, age int"
 		StringBuilder sb = new StringBuilder();
@@ -86,6 +94,13 @@ public class TargetLanguageForGo extends TargetLanguage {
 		// No wrapper type in GO => use basic method
 		return argumentsListWithType(attributes);
 	}
+
+	@Override
+	public String argumentsListDbNameWithWrapperType(List<AttributeInContext> attributes) {
+		// No wrapper type in GO => use basic method
+		return argumentsListWithType(attributes, true);
+	}
+
 
 	@Override
 	public String argumentsListFromObjectWithGetter(String objectName, List<AttributeInContext> attributes) {

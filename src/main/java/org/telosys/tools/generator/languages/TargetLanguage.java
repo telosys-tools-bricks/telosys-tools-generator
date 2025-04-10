@@ -87,6 +87,15 @@ public abstract class TargetLanguage {
 	 */
 	public abstract String argumentsList( List<AttributeInContext> attributes ) ;
 
+
+	/**
+	 * Build simple arguments list (only argument names, no type) <br>
+	 * Returns a list of arguments in the expected form for the current language<br>
+	 * @param attributes
+	 * @return
+	 */
+	public abstract String argumentsListDbName( List<AttributeInContext> attributes ) ;
+
 	/**
 	 * Build arguments list with associated basic type <br>
 	 * Returns a list of arguments with argument type and argument name in the expected form for the current language<br>
@@ -103,6 +112,16 @@ public abstract class TargetLanguage {
 	 */
 	public abstract String argumentsListWithWrapperType( List<AttributeInContext> attributes ) ;
 
+
+	/**
+	 * Build arguments list with associated wrapper type <br>
+	 * Returns a list of arguments with : argument type and argument name in the expected form for the current language <br>
+	 * @param attributes
+	 * @return
+	 */
+	public abstract String argumentsListDbNameWithWrapperType( List<AttributeInContext> attributes ) ;
+
+
 	/**
 	 * Build arguments list with object name + associated getter if any <br>
 	 * @param objectName
@@ -116,7 +135,7 @@ public abstract class TargetLanguage {
 	 * @param attributes
 	 * @return
 	 */
-	protected final String commonArgumentsListWithoutType(List<AttributeInContext> attributes) {
+	protected final String commonArgumentsListWithoutType(List<AttributeInContext> attributes, boolean useDbName) {
 		if ( attributes == null ) return "";
 		// No type, example : "name, age"
 		StringBuilder sb = new StringBuilder();
@@ -124,18 +143,30 @@ public abstract class TargetLanguage {
 		for ( AttributeInContext field : attributes ) {
 			// example : "name string, age int"
 			if ( n > 0 ) sb.append(", ");
-			sb.append( field.getName() ) ; 
+			if (useDbName) {
+				sb.append(field.getDatabaseName());
+			} else {
+				sb.append(field.getName());
+			}
 			n++;
 		}
 		return sb.toString();
 	}
 
-	/**
-	 * Builds arguments list with the form : "arg1-type arg1-name, arg2-type arg2-name, ..."
-	 * @param attributes
-	 * @return
-	 */
+	protected final String commonArgumentsListWithoutType(List<AttributeInContext> attributes) {
+		return commonArgumentsListWithoutType(attributes, false);
+	}
+
+		/**
+         * Builds arguments list with the form : "arg1-type arg1-name, arg2-type arg2-name, ..."
+         * @param attributes
+         * @return
+         */
 	protected final String commonArgumentsListWithType( List<AttributeInContext> attributes ) {
+		return commonArgumentsListWithType(attributes, false);
+	}
+
+	protected final String commonArgumentsListWithType( List<AttributeInContext> attributes, boolean useDbName ) {
 		if ( attributes == null ) return "";
 		StringBuilder sb = new StringBuilder();
 		int n = 0 ;
@@ -143,7 +174,11 @@ public abstract class TargetLanguage {
 			if ( n > 0 ) sb.append(", ");
 			sb.append( attribute.getType() ) ; // arg type first
 			sb.append( " " ) ;
-			sb.append( attribute.getName() ) ; // arg name after type
+			if (useDbName) {
+				sb.append(attribute.getDatabaseName()); // arg name after type
+			} else {
+				sb.append(attribute.getName()); // arg name after type
+			}
 			n++;
 		}
 		return sb.toString();
