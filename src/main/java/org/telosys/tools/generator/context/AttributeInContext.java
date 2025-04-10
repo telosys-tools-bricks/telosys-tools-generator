@@ -171,6 +171,10 @@ public class AttributeInContext {
 	
     private final boolean isUnique ;  // v 3.4.0
 
+	private final String scale;
+
+	private final String precision;
+
     //-----------------------------------------------------------------------------------------------
 	/**
 	 * Constructor to create an ATTRIBUTE in the generator context
@@ -270,6 +274,9 @@ public class AttributeInContext {
 		
 		this.isUnique = attribute.isUnique() ;
 
+
+		this.scale = Util.integerToString(attribute.getScale(), VOID_STRING);
+		this.precision = Util.integerToString(attribute.getPrecision(), VOID_STRING);
 	}
 
 	protected final LanguageType getLanguageType() {
@@ -601,6 +608,11 @@ public class AttributeInContext {
 	public boolean hasDatabaseType() {
 		return ! StrUtil.nullOrVoid(databaseType);
 	}
+
+
+
+
+
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -1704,7 +1716,34 @@ public class AttributeInContext {
 	public String getSqlColumnConstraints() {
 		return this.env.getSql().columnConstraints(this);
 	}
-	
+
+
+	@VelocityMethod(
+		text={
+			"Decimal/Numeric scale"
+		},
+		since="2025-04-02"
+	)
+	public String getScale() {
+		if ( ! StrUtil.nullOrVoid(this.scale) ) {
+			return this.scale ;
+		}
+		return "";
+	}
+
+	@VelocityMethod(
+		text={
+			"Decimal/Numeric precision"
+		},
+		since="2025-04-02"
+	)
+	public String getPrecision() {
+		if ( ! StrUtil.nullOrVoid(this.precision) ) {
+			return this.precision ;
+		}
+		return "";
+	}
+
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
