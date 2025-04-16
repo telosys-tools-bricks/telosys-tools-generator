@@ -32,8 +32,9 @@ public class TypeConverterForJava extends TypeConverter {
 
 	public static final String LOCAL_DATE_CLASS      = "java.time.LocalDate" ;
 	public static final String LOCAL_TIME_CLASS      = "java.time.LocalTime" ;
-	public static final String LOCAL_DATE_TIME_CLASS = "java.time.LocalDateTime" ;	
-	
+	public static final String LOCAL_DATE_TIME_CLASS = "java.time.LocalDateTime" ;
+	public static final String OFFSET_DATE_TIME_CLASS = "java.time.OffsetDateTime" ;
+
 	public TypeConverterForJava() {
 		super("Java");
 		
@@ -55,6 +56,7 @@ public class TypeConverterForJava extends TypeConverter {
 		declareObjectType( buildJavaType(NeutralType.DATE,      LOCAL_DATE_CLASS) );
 		declareObjectType( buildJavaType(NeutralType.TIME,      LOCAL_TIME_CLASS) );
 		declareObjectType( buildJavaType(NeutralType.TIMESTAMP, LOCAL_DATE_TIME_CLASS) );
+		declareObjectType( buildJavaType(NeutralType.TIMESTAMPZ, OFFSET_DATE_TIME_CLASS) );
 		//Nothing for BINARY
 
 		//--- Primitive types 
