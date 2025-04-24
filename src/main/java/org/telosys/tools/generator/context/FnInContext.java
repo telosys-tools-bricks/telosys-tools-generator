@@ -606,7 +606,34 @@ public class FnInContext {
 			return str.toLowerCase();
 		}
 		return str.substring(0, 1).toLowerCase() + str.substring(1);
-	}	
+	}
+
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(text={
+		"Replaces a trailing hash (#) with Num"
+	},
+		parameters = {
+			"s : the string to trimmed"
+		},
+		example = {
+			"$fn.replaceHash($var) "
+		},
+		since = "2025-04-23"
+	)
+	public String replaceHash(String str) {
+		if(str == null || str.length() == 0) {
+			return str;
+		}
+		if (str.endsWith("#")) {
+			if(str.length() == 1 && str.charAt(0) == '#') {
+				return "Num";
+			}
+			return str.substring(0, str.length()-1) + "Num";
+		}
+		return str;
+	}
+
 
 	//==============================================================================================
 	// Version 2.1.1

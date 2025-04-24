@@ -120,7 +120,7 @@ public class Java {
 				
 				String attributeName = attribute.getName() ;
 				if (useDbName) {
-					attributeName = attribute.getDatabaseName();
+					attributeName = replaceHash(attribute.getDatabaseName());
 				}
 				lb.append(indent, "//--- Attribute " + attributeName );
 				if ( attribute.isPrimitiveType() ) {
@@ -233,7 +233,7 @@ public class Java {
 					
 					String attributeName = attribute.getName() ;
 					if (useDbName) {
-						attributeName = attribute.getDatabaseName();
+						attributeName = replaceHash(attribute.getDatabaseName());
 					}
 					lb.append(indent, "//--- Attribute " + attributeName );
 					if ( attribute.isPrimitiveType() ) {
@@ -541,5 +541,18 @@ public class Java {
     	if ( s.endsWith("Blob") || s.endsWith("Clob") ) return false ; 
     	return true ;
     }
-    
+
+	private String replaceHash(String str) {
+		if(str == null || str.length() == 0) {
+			return str;
+		}
+		if (str.endsWith("#")) {
+			if(str.length() == 1 && str.charAt(0) == '#') {
+				return "Num";
+			}
+			return str.substring(0, str.length()-1) + "Num";
+		}
+		return str;
+	}
+
 }
