@@ -16,8 +16,10 @@
 package org.telosys.tools.generator.context;
 
 import java.io.File;
+import java.util.Map;
 
 import org.telosys.tools.commons.StrUtil;
+import org.telosys.tools.commons.variables.VariablesNames;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityNoDoc;
@@ -44,21 +46,41 @@ public class EnvInContext {
 	private String entityClassNamePrefix = "" ;
 	private String entityClassNameSuffix = "" ;
 	
-	private String language = "Java" ; // v 3.0.0
+	private String language = "Java" ; // Java is the default target language
 	
-	private String specificCollectionType = null ; // v 3.3.0
+	private String specificCollectionType = null ;
 
-	private String database = "" ; // v 3.4.0
-	private File   databaseConvFile = null ;  // v 3.4.0
-	private SqlInContext sqlInContext = null;   // v 3.4.0
+	private String database = "" ;
+	private File   databaseConvFile = null ;
+	private SqlInContext sqlInContext = null;
 	
-	private boolean typeWithNullableMark = true ; // v 4.1.0 
+	private boolean typeWithNullableMark = true ;
 	
-	//-------------------------------------------------------------------------------------
-	// CONSTRUCTOR
-	//-------------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 */
 	public EnvInContext() {
 		super();
+	}
+
+	/**
+	 * Constructor
+	 * @param projectVariables
+	 */
+	public EnvInContext(Map<String, String> projectVariables) {
+		super();
+		if ( projectVariables != null ) {
+			// use default tartget language defined in project configuration 
+			String targetLanguage = projectVariables.get(VariablesNames.TARGET_LANGUAGE);
+			if ( ! StrUtil.nullOrVoid(targetLanguage) ) {
+				this.language = targetLanguage.trim();
+			}
+			// use default tartget database defined in project configuration 
+			String targetDatabase = projectVariables.get(VariablesNames.TARGET_DATABASE);
+			if ( ! StrUtil.nullOrVoid(targetDatabase) ) {
+				this.database = targetDatabase.trim();
+			}
+		}
 	}
 
 	//-------------------------------------------------------------------------------------

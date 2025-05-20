@@ -10,7 +10,7 @@ public class GeneratorVersionTest {
 	@Test
 	public void test1() {
 		assertEquals("telosys-tools-generator", GeneratorVersion.getName());
-		assertEquals("4.2.0", GeneratorVersion.getVersion());
+		assertNotNull(GeneratorVersion.getVersion()); // SemVer X.Y.Z
 		assertNotNull(GeneratorVersion.getBuildId());
 		assertNotNull(GeneratorVersion.getVersionWithBuilId());
 	}

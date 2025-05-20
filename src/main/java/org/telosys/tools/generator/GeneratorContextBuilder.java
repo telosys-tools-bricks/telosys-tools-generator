@@ -16,11 +16,11 @@
 package org.telosys.tools.generator;
 
 import java.util.List;
+import java.util.Map;
 
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.commons.TelosysToolsLogger;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
-import org.telosys.tools.commons.variables.Variable;
 import org.telosys.tools.generator.context.BeanValidation;
 import org.telosys.tools.generator.context.BundleInContext;
 import org.telosys.tools.generator.context.Const;
@@ -60,12 +60,6 @@ public class GeneratorContextBuilder {
 	private Model                     model = null ;
 	private ModelInContext            modelInContext = null ;
 	
-	private void log(String s) {
-		if (logger != null) {
-			logger.log(s);
-		}
-	}
-
 	/**
 	 * Constructor <br>
 	 * @param telosysToolsCfg
@@ -80,28 +74,28 @@ public class GeneratorContextBuilder {
 		this.telosysToolsCfg = telosysToolsCfg;
 	}
 	
-	private void initProjectVariables(GeneratorContext generatorContext) {
-		//--- Get all the project variables and put them in the context	
-		Variable[] projectVariables = telosysToolsCfg.getAllVariables();
-		log("initProjectVariables() : Project variables count = " + ( projectVariables != null ? projectVariables.length : 0 ) );
-		//--- Set the project variables in the context ( if any )
+	/**
+	 * Initializes all the project variables (variables defined at "project level")
+	 * @param generatorContext
+	 * @param projectVariables
+	 */
+	private void initProjectVariables(GeneratorContext generatorContext, Map<String, String> projectVariables) { // v 4.2.1
 		if ( projectVariables != null ) {
-			for ( int i = 0 ; i < projectVariables.length ; i++ ) {
-				Variable var = projectVariables[i];
-				generatorContext.put( var.getName(), var.getValue() );
-			}
+	    	for ( Map.Entry<String, String> entry : projectVariables.entrySet() ) {
+	    		generatorContext.put( entry.getKey(), entry.getValue() );
+	    	}
+		}
+		else {
+			throw new IllegalArgumentException("projectVariables parameter is null");
 		}
 	}
 
 	/**
-	 * Initializes the context with basic objects
+	 * Initializes all the constants 
 	 * @param generatorContext
-	 * @param model
-	 * @param bundleName
 	 * @return
 	 */
-	private void initBasicObjects(GeneratorContext generatorContext, Model model, String bundleName ) {
-		
+	private void initConstants(GeneratorContext generatorContext) {
 		//--- Special Characters
 		generatorContext.put(ContextName.DOLLAR , "$"  );
 		generatorContext.put(ContextName.SHARP,   "#"  );
@@ -112,11 +106,20 @@ public class GeneratorContextBuilder {
 		generatorContext.put(ContextName.LBRACE,  "{"  ); // left brace
 		generatorContext.put(ContextName.RBRACE,  "}"  ); // right brace
 		
-		generatorContext.put(ContextName.NEWLINE, "\n"  ); // #LGU 2017-08-16
-		generatorContext.put(ContextName.TAB,     "\t"  ); // #LGU 2017-08-16
-		
+		generatorContext.put(ContextName.NEWLINE, "\n"  ); 
+		generatorContext.put(ContextName.TAB,     "\t"  ); 
+	}
+	
+	/**
+	 * Init the context with basic objects
+	 * @param generatorContext
+	 * @param model
+	 * @param bundleName
+	 * @param projectVariables
+	 */
+	private void initBasicObjects(GeneratorContext generatorContext, Model model, String bundleName, Map<String, String> projectVariables ) {		
 		//--- Set "$env" object ( environment configuration )
-		EnvInContext env = new EnvInContext() ;
+		EnvInContext env = new EnvInContext(projectVariables) ;
 		generatorContext.put(ContextName.ENV, env);  
 
 		//--- Set the standard Velocity variables in the context
@@ -145,16 +148,15 @@ public class GeneratorContextBuilder {
 
 		//--- Set "$model" object : full model with  all the entities 
 		this.model = model ;
-//		this.modelInContext = new ModelInContext(model, telosysToolsCfg, env ); 
-		this.modelInContext = new ModelInContext(model, telosysToolsCfg.getEntityPackage(), env ); // v 4.2.0 
+		this.modelInContext = new ModelInContext(model, telosysToolsCfg.getEntityPackage(), env ); 
 		generatorContext.put(ContextName.MODEL, modelInContext); 
 		
 		//--- Set "$bundle" object ( new in v 3.3.0 ) 
-		BundleInContext bundle = new BundleInContext(bundleName); // v 3.3.0
-		generatorContext.put(ContextName.BUNDLE, bundle); // v 3.0.0
+		BundleInContext bundle = new BundleInContext(bundleName);
+		generatorContext.put(ContextName.BUNDLE, bundle); 
 		
 		//--- Set "$factory" object (version 3.4.0) 
-		generatorContext.put(ContextName.FACTORY, new FactoryInContext());  // v 3.4.0
+		generatorContext.put(ContextName.FACTORY, new FactoryInContext()); 
 	}
 	
 	/**
@@ -172,14 +174,23 @@ public class GeneratorContextBuilder {
 
 		//--- New context 
 		GeneratorContext generatorContext = new GeneratorContext();
-		//--- Init with specific variables
-		initProjectVariables(generatorContext);
-		//--- Initialize with basic objects
-		initBasicObjects(generatorContext, model, bundleName);		
+		
+		//--- Init all the project variables
+		// initProjectVariables(generatorContext); // removed in v 4.2.1
+		Map<String, String> projectVariables = telosysToolsCfg.getAllVariablesMap(); // v 4.2.1
+		initProjectVariables(generatorContext, projectVariables); // v 4.2.1
+		
+		//--- Init all the constants
+		initConstants(generatorContext);
+		
+		//--- Init the standard basic objects
+		initBasicObjects(generatorContext, model, bundleName, projectVariables);	
+		
 		//--- Init with further elements
 		setEmbeddedGenerator(generatorContext, selectedEntitiesNames, bundleName, generatedTargets);
 		setSelectedEntities(generatorContext, selectedEntitiesNames);
 		setTargetAndCurrentEntity(generatorContext, target);
+		
 		//--- Keep context in 'holder'
 		return generatorContext ;
 	}
