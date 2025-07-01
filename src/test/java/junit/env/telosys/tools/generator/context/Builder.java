@@ -27,6 +27,11 @@ public class Builder {
 		return new ModelInContext(model, DEFAULT_ENTITY_PACKAGE, envInContext); // v 4.2.0
 	}
 	
+	public static EntityInContext buildEntityInContext(String entityName) {
+		DslModelEntity entity = new DslModelEntity(entityName);
+		return buildEntityInContext(entity);
+	}
+
 	public static EntityInContext buildEntityInContext(String entityName, String tableName) {
 		DslModelEntity entity = new DslModelEntity(entityName);
 		entity.setDatabaseTable(tableName);

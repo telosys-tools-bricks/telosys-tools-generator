@@ -1,0 +1,97 @@
+
+ 'LocalDateTime' mapping 
+  
+| Feature            | `DATE` (Oracle)                 | `TIMESTAMP` (Oracle)              |
+| ------------------ | ------------------------------- | ----------------------------------|
+| Stores Time        | Yes (hours, minutes, seconds)   | Yes (plus fractional seconds)     |
+| Stores Nanoseconds | No                              | Yes (up to 9 digits)              |
+| Java Compatibility | Limited precision               | Better match for `LocalDateTime`  |
+| JDBC Mapping       | Maps to `java.sql.Timestamp`    | Maps directly to `LocalDateTime`  |
+  
+----------------------------------------------------------------------------------------------
+
+ 'LocalDate' mapping 
+  
+  For a Java LocalDate, the best matching Oracle column type is: `DATE`
+  Don't use TIMESTAMP for LocalDate
+    TIMESTAMP adds unnecessary fractional seconds and precision you don't need for LocalDate.
+    DATE is more space-efficient and semantically clearer.
+    
+----------------------------------------------------------------------------------------------
+
+ 'LocalTime' mapping --> Timestamp --> TIMESTAMP WITH TIME ZONE
+ 
+ Oracle does not have a native "time-only" type, but you can still store it effectively using one of these two options:
+ 
+ Option 1: TIMESTAMP or DATE (store time with dummy date)
+    Store the LocalTime in an Oracle TIMESTAMP or DATE column.
+    Use a fixed dummy date (e.g., 1970-01-01) with the actual time part.
+    
+ Option 2: INTERVAL DAY TO SECOND
+    Oracle’s INTERVAL DAY TO SECOND can store durations like “0 14:30:15”.
+    This can represent a time of day, though it’s meant for durations.
+
+ With JPA a Converter is required 
+ Example:
+ 
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+@Converter(autoApply = false)
+public class LocalTimeToTimestampConverter implements AttributeConverter<LocalTime, Timestamp> {
+
+    private static final LocalDate EPOCH = LocalDate.of(1970, 1, 1);
+
+    @Override
+    public Timestamp convertToDatabaseColumn(LocalTime localTime) {
+        return (localTime == null) ? null : Timestamp.valueOf(localTime.atDate(EPOCH));
+    }
+
+    @Override
+    public LocalTime convertToEntityAttribute(Timestamp timestamp) {
+        return (timestamp == null) ? null : timestamp.toLocalDateTime().toLocalTime();
+    }
+}
+
+----------------------------------------------------------------------------------------------
+
+ 'OffsetTime' mapping --> OffsetDateTime --> TIMESTAMP WITH TIME ZONE
+
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+import java.sql.Timestamp;
+import java.time.*;
+
+@Converter(autoApply = false)
+public class OffsetTimeToTimestampTZConverter implements AttributeConverter<OffsetTime, OffsetDateTime> {
+
+    private static final LocalDate EPOCH = LocalDate.of(1970, 1, 1);
+
+    @Override
+    public OffsetDateTime convertToDatabaseColumn(OffsetTime offsetTime) {
+        return (offsetTime == null)
+            ? null
+            : offsetTime.atDate(EPOCH);  // Converts OffsetTime → OffsetDateTime
+    }
+
+    @Override
+    public OffsetTime convertToEntityAttribute(OffsetDateTime dbData) {
+        return (dbData == null)
+            ? null
+            : dbData.toOffsetTime();
+    }
+}
+
+----------------------------------------------------------------------------------------------
+
+ 'UUID' mapping 
+
+| Oracle Type    | Recommended  | Description                                                                        |
+| -------------- | -------------| ---------------------------------------------------------------------------------- |
+| `RAW(16)`      | Best         | Stores UUID as compact 16-byte binary data. Most efficient for space and indexing. |
+| `CHAR(36)`     | Good         | Stores UUID as a 36-character string (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`)      |
+| `VARCHAR2(36)` | Acceptable   | Similar to `CHAR(36)`, but less strict on fixed length                             |

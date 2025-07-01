@@ -109,7 +109,7 @@ public class SqlInContext {
 	}
 	
 	/**
-	 * Constructor for default database configuration file
+	 * Constructor for specific database definition file
 	 * @param targetDbName
 	 * @param targetDbConfigFile
 	 */

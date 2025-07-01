@@ -1,0 +1,130 @@
+SQLite core data types :
+
+  see https://www.sqlite.org/datatype3.html
+
+  Storage Classes and Datatypes
+   Each value stored in an SQLite database (or manipulated by the database engine) has one of the following storage classes:
+   - NULL    The value is a NULL value.
+   - INTEGER The value is a signed integer, stored in 0, 1, 2, 3, 4, 6, or 8 bytes depending on the magnitude of the value.
+   - REAL    The value is a floating point value, stored as an 8-byte IEEE floating point number.
+   - TEXT    The value is a text string, stored using the database encoding (UTF-8, UTF-16BE or UTF-16LE).
+   - BLOB    The value is a blob of data, stored exactly as it was input.
+
+   A storage class is more general than a datatype. The INTEGER storage class, for example, includes 7 different integer datatypes of different lengths. 
+   This makes a difference on disk. But as soon as INTEGER values are read off of disk and into memory for processing, they are converted to the most general datatype (8-byte signed integer). 
+   And so for the most part, "storage class" is indistinguishable from "datatype" and the two terms can be used interchangeably.
+   Any column in an SQLite version 3 database, except an INTEGER PRIMARY KEY column, may be used to store a value of any storage class.
+  
+  
+--------------------------------------------------------------------------------------------------------------  
+SQLite "create table" example 
+
+CREATE TABLE example_types (
+  id                 INTEGER PRIMARY KEY,           -- INTEGER affinity, stores integers
+  username           VARCHAR(50),                   -- TEXT affinity (because of VARCHAR)
+  email              TEXT,                          -- TEXT affinity
+  signup_date        DATE,                          -- NUMERIC affinity (date stored as TEXT usually)
+  last_login         DATETIME,                      -- NUMERIC affinity (datetime as TEXT or NUMERIC)
+  active             BOOLEAN,                       -- NUMERIC affinity (BOOLEAN treated as integer 0/1)
+  profile_picture    BLOB,                          -- NONE affinity (raw binary)
+  score              REAL,                          -- REAL affinity (floating point)
+  points             FLOAT,                         -- REAL affinity
+  comments           CLOB,                          -- TEXT affinity (Character Large Object)
+  price              NUMERIC(10,2),                 -- NUMERIC affinity (precision not enforced)
+  rank               SMALLINT,                      -- INTEGER affinity
+  level              MEDIUMINT,                     -- INTEGER affinity (MySQL-specific, but SQLite treats as INTEGER affinity)
+  flags              TINYINT UNSIGNED,              -- INTEGER affinity (SQLite ignores UNSIGNED)
+  data               NONE,                          -- NONE affinity (store as-is)
+  description        CHARACTER VARYING(255),        -- TEXT affinity
+  uuid               CHAR(36)                       -- TEXT affinity (UUID stored as text)
+);
+
+PRAGMA table_info(example_types);
+
+INSERT INTO example_types (
+  id, username, email, signup_date, last_login, active,
+  profile_picture, score, points, comments, price,
+  rank, level, flags, data, description, uuid
+ ) VALUES (
+  1,
+  'alice',
+  'alice@example.com',
+  '2025-07-01',                    -- DATE as text
+  '2025-07-01 14:30:00',           -- DATETIME as text
+  1,                               -- BOOLEAN as integer (true)
+  X'89504E470D0A1A0A0000000D4948',-- BLOB (some binary data)
+  95.7,                            -- REAL
+  100.25,                          -- FLOAT
+  'This is a comment.',            -- CLOB (text)
+  19.99,                           -- NUMERIC(10,2)
+  5,                              -- SMALLINT (INTEGER affinity)
+  10,                             -- MEDIUMINT (INTEGER affinity)
+  255,                            -- TINYINT UNSIGNED (INTEGER affinity, unsigned ignored)
+  'raw binary data',               -- NONE affinity, stored as-is (will be text here)
+  'Sample description text.',      -- CHARACTER VARYING
+  '550e8400-e29b-41d4-a716-446655440000' -- UUID stored as text
+);
+
+SELECT typeof(id), typeof(username), typeof(active)  FROM example_types LIMIT 10;
+
+typeof(id)|typeof(username)|typeof(active)|
+----------+----------------+--------------+
+integer   |text            |integer       |
+
+--------------------------------------------------------------------------------------------------------------  
+
+Test with DBeaver :
+  
+  Database > New Database Connection
+   Choose "SQLite" 
+     Specify a file path for your new SQLite database file 
+       ( eg "D:\Z\DB-DATA\SQLite-data\sqlite-db-example.db" )
+     Download driver if not yet present in DBeaver
+       ( eg "org.xerial:sqlite-jdbc:RELEASE 3.50.2.0" )
+     
+--------------------------------------------------------------------------------------------------------------  
+SQLite with Java JPA 
+
+| Java Type        | SQLite Storage Type | Conversion                     |
+| ---------------- | ------------------- | ------------------------------ |
+| `LocalDate`      | TEXT                | `yyyy-MM-dd` string            |
+| `LocalDateTime`  | TEXT                | `yyyy-MM-dd'T'HH:mm:ss` string |
+| `OffsetDateTime` | TEXT                | ISO8601 string with offset     |
+
+Create AttributeConverters for each type
+
+Example:
+
+@Converter(autoApply = true)
+public class LocalDateConverter implements AttributeConverter<LocalDate, String> {
+    @Override
+    public String convertToDatabaseColumn(LocalDate locDate) {
+        return locDate == null ? null : locDate.toString();  // ISO-8601 format (yyyy-MM-dd)
+    }
+
+    @Override
+    public LocalDate convertToEntityAttribute(String sqlDate) {
+        return sqlDate == null ? null : LocalDate.parse(sqlDate);
+    }
+}
+
+@Entity
+public class Event {
+    @Id
+    private Long id;
+
+    @Convert(converter = LocalDateConverter.class)
+    private LocalDate date;
+
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime dateTime;
+
+    @Convert(converter = OffsetDateTimeConverter.class)
+    private OffsetDateTime offsetDateTime;
+}
+
+How SQLite compares TEXT dates (ISO8601)
+
+    If stored as ISO8601 strings (YYYY-MM-DD or YYYY-MM-DD HH:MM:SS), lexicographic (string) comparison corresponds exactly to chronological order.
+
+    So queries like "SELECT * FROM events WHERE event_date >= '2025-07-01';" work perfectly for filtering or sorting.

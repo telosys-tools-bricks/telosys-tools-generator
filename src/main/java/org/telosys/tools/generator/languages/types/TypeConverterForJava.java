@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.telosys.tools.commons.JavaTypeUtil;
-import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 /**
@@ -30,9 +29,10 @@ import org.telosys.tools.generic.model.types.NeutralType;
  */
 public class TypeConverterForJava extends TypeConverter {
 
-	public static final String LOCAL_DATE_CLASS      = "java.time.LocalDate" ;
-	public static final String LOCAL_TIME_CLASS      = "java.time.LocalTime" ;
-	public static final String LOCAL_DATE_TIME_CLASS = "java.time.LocalDateTime" ;	
+	public static final String LOCAL_DATE_CLASS       = "java.time.LocalDate" ;
+	public static final String LOCAL_TIME_CLASS       = "java.time.LocalTime" ;
+	public static final String LOCAL_DATE_TIME_CLASS  = "java.time.LocalDateTime" ;	
+	public static final String OFFSET_DATE_TIME_CLASS = "java.time.OffsetDateTime"; // ver 4.30
 	
 	public TypeConverterForJava() {
 		super("Java");
@@ -48,13 +48,14 @@ public class TypeConverterForJava extends TypeConverter {
 		declareObjectType( buildJavaType(NeutralType.DOUBLE,    java.lang.Double.class) );
 		declareObjectType( buildJavaType(NeutralType.DECIMAL,   java.math.BigDecimal.class) );
 		
-// New temporal types since ver 3.4.0
-//		declareObjectType( buildJavaType(NeutralType.DATE,      java.util.Date.class) );
-//		declareObjectType( buildJavaType(NeutralType.TIME,      java.util.Date.class) );
-//		declareObjectType( buildJavaType(NeutralType.TIMESTAMP, java.util.Date.class) );
+		//--- Temporal types since ver 3.4.0
 		declareObjectType( buildJavaType(NeutralType.DATE,      LOCAL_DATE_CLASS) );
 		declareObjectType( buildJavaType(NeutralType.TIME,      LOCAL_TIME_CLASS) );
 		declareObjectType( buildJavaType(NeutralType.TIMESTAMP, LOCAL_DATE_TIME_CLASS) );
+		//--- New temporal types since ver 4.3.0
+		declareObjectType( buildJavaType(NeutralType.DATETIMETZ, OFFSET_DATE_TIME_CLASS) ); // ver 4.30
+		
+
 		//Nothing for BINARY
 
 		//--- Primitive types 
