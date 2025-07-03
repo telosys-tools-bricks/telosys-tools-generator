@@ -1,7 +1,6 @@
 package org.telosys.tools.generator.languages.literals;
 
 import org.junit.Test;
-import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 

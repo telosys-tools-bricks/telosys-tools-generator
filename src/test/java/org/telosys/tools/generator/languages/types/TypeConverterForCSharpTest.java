@@ -43,11 +43,11 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 	}
 	
 	@Test
-	public void testString() throws GeneratorException {
+	public void testString() {
 		println("--- ");
 		
 		checkPrimitiveType( getType(NeutralType.STRING, NONE ),            "string?", "String?");
-		checkPrimitiveType( getType(NeutralType.STRING, NOT_NULL ),        "string", "String");
+		checkPrimitiveType( getType(NeutralType.STRING, NOT_NULL ),        "string",  "String");
 		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE ),  "string?", "String?");
 		checkPrimitiveType( getType(NeutralType.STRING, UNSIGNED_TYPE ),   "string?", "String?");
 		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "string?", "String?");
@@ -58,9 +58,10 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 		
 		EnvInContext env = getEnv();
 		env.setTypeWithNullableMark(false); // No "?" at the end of type
-		checkObjectType( getType(env, NeutralType.STRING, OBJECT_TYPE),                 "String", "System.String" );
-		checkObjectType( getType(env, NeutralType.STRING, OBJECT_TYPE + UNSIGNED_TYPE), "String", "System.String" );
-		checkObjectType( getType(env, NeutralType.STRING, OBJECT_TYPE + NOT_NULL),      "String", "System.String" );
+		checkPrimitiveType( getType(env, NeutralType.STRING, NONE ),                       "string", "String" );
+		checkObjectType(    getType(env, NeutralType.STRING, OBJECT_TYPE),                 "String", "System.String" );
+		checkObjectType(    getType(env, NeutralType.STRING, OBJECT_TYPE + UNSIGNED_TYPE), "String", "System.String" );
+		checkObjectType(    getType(env, NeutralType.STRING, OBJECT_TYPE + NOT_NULL),      "String", "System.String" );
 	}
 
 	@Test
@@ -78,7 +79,8 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 
 		EnvInContext env = getEnv();
 		env.setTypeWithNullableMark(false); // No "?" at the end of type
-		checkObjectType( getType(env, NeutralType.BOOLEAN, OBJECT_TYPE),            "Boolean", "System.Boolean" );
+		checkPrimitiveType( getType(env, NeutralType.BOOLEAN, NONE ),                  "bool", "Boolean" );
+		checkObjectType(    getType(env, NeutralType.BOOLEAN, OBJECT_TYPE),            "Boolean", "System.Boolean" );
 	}
 
 	@Test
@@ -187,6 +189,15 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 		checkObjectType( getType( NeutralType.TIME, OBJECT_TYPE ),    "TimeOnly?",  "System.TimeOnly?" );
 		checkObjectType( getType( NeutralType.TIME, NOT_NULL ),       "TimeOnly",  "System.TimeOnly" );
 	}
+	@Test
+	public void testTimetz() { // ver 4.3.0
+		println("--- ");
+		// No TimeOnly with TZ Offset in C# => same as "time"
+		checkObjectType( getType( NeutralType.TIMETZ, NONE ),           "TimeOnly?",  "System.TimeOnly?" );
+		checkObjectType( getType( NeutralType.TIMETZ, UNSIGNED_TYPE ),  "TimeOnly?",  "System.TimeOnly?" );
+		checkObjectType( getType( NeutralType.TIMETZ, OBJECT_TYPE ),    "TimeOnly?",  "System.TimeOnly?" );
+		checkObjectType( getType( NeutralType.TIMETZ, NOT_NULL ),       "TimeOnly",  "System.TimeOnly" );
+	}
 
 	@Test
 	public void testTimestamp() {
@@ -196,6 +207,31 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 		checkObjectType( getType( NeutralType.TIMESTAMP, OBJECT_TYPE ),    "DateTime?",  "System.DateTime?" );
 		checkObjectType( getType( NeutralType.TIMESTAMP, NOT_NULL ),       "DateTime",  "System.DateTime" );
 	}
+	@Test 
+	public void testDatetime() { // ver 4.3.0
+		println("--- "); 
+		checkObjectType( getType( NeutralType.DATETIME, NONE ),           "DateTime?",  "System.DateTime?" );
+		checkObjectType( getType( NeutralType.DATETIME, UNSIGNED_TYPE ),  "DateTime?",  "System.DateTime?" );
+		checkObjectType( getType( NeutralType.DATETIME, OBJECT_TYPE ),    "DateTime?",  "System.DateTime?" );
+		checkObjectType( getType( NeutralType.DATETIME, NOT_NULL ),       "DateTime",  "System.DateTime" );
+	}
+	@Test
+	public void testDatetimetz() { // ver 4.3.0
+		println("--- ");
+		checkObjectType( getType( NeutralType.DATETIMETZ, NONE ),           "DateTimeOffset?",  "System.DateTimeOffset?" );
+		checkObjectType( getType( NeutralType.DATETIMETZ, UNSIGNED_TYPE ),  "DateTimeOffset?",  "System.DateTimeOffset?" );
+		checkObjectType( getType( NeutralType.DATETIMETZ, OBJECT_TYPE ),    "DateTimeOffset?",  "System.DateTimeOffset?" );
+		checkObjectType( getType( NeutralType.DATETIMETZ, NOT_NULL ),       "DateTimeOffset",   "System.DateTimeOffset" );
+	}
+	
+	@Test
+	public void testUUID() { // ver 4.3.0
+		println("--- ");
+		checkObjectType( getType( NeutralType.UUID, NONE ),           "Guid?",  "System.Guid?" );
+		checkObjectType( getType( NeutralType.UUID, UNSIGNED_TYPE ),  "Guid?",  "System.Guid?" );
+		checkObjectType( getType( NeutralType.UUID, OBJECT_TYPE ),    "Guid?",  "System.Guid?" );
+		checkObjectType( getType( NeutralType.UUID, NOT_NULL ),       "Guid",   "System.Guid" );
+	}
 	
 	@Test
 	public void testBinary() {
@@ -203,7 +239,7 @@ public class TypeConverterForCSharpTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( NeutralType.BINARY, NONE ),           "byte[]?",  "byte[]?" );
 		checkPrimitiveType( getType( NeutralType.BINARY, UNSIGNED_TYPE ),  "byte[]?",  "byte[]?" );
 		checkPrimitiveType( getType( NeutralType.BINARY, OBJECT_TYPE ),    "byte[]?",  "byte[]?" );
-		checkPrimitiveType( getType( NeutralType.BINARY, NOT_NULL ),       "byte[]",  "byte[]" );
+		checkPrimitiveType( getType( NeutralType.BINARY, NOT_NULL ),       "byte[]",   "byte[]" );
 	}
 
 	@Test

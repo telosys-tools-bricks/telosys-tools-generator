@@ -37,39 +37,45 @@ public class TypeConverterForCSharp extends TypeConverter {
 
 	private final HashMap<String, LanguageType> unsignedTypes = new HashMap<>(); 
 
+	private static final String CSHARP_SBYTE_OBJECT = "SByte" ;
+	private static final String CSHARP_INT16_OBJECT = "Int16" ;
+	private static final String CSHARP_INT32_OBJECT = "Int32" ;
+	private static final String CSHARP_INT64_OBJECT = "Int64" ;
+	
 	public TypeConverterForCSharp() {
 		super("C#");
 		
 		//--- Object types 
-		declareObjectType( buildObjectType(NeutralType.STRING,    "String",   "System.String"  ) );
-		declareObjectType( buildObjectType(NeutralType.BOOLEAN,   "Boolean",  "System.Boolean" ) );
-		declareObjectType( buildObjectType(NeutralType.BYTE,      "SByte",    "System.SByte"   ) );
-		declareObjectType( buildObjectType(NeutralType.SHORT,     "Int16",    "System.Int16"   ) );
-		declareObjectType( buildObjectType(NeutralType.INTEGER,   "Int32",    "System.Int32"   ) );
-		declareObjectType( buildObjectType(NeutralType.LONG,      "Int64",    "System.Int64"   ) );
-		declareObjectType( buildObjectType(NeutralType.FLOAT,     "Single",   "System.Single"  ) );
-		declareObjectType( buildObjectType(NeutralType.DOUBLE,    "Double",   "System.Double"  ) );
-		declareObjectType( buildObjectType(NeutralType.DECIMAL,   "Decimal",  "System.Decimal" ) );
-		declareObjectType( buildObjectType(NeutralType.DATE,      "DateOnly", "System.DateOnly" ) ); // DateOnly : v 4.1.0 ( since .Net 6 )
-		declareObjectType( buildObjectType(NeutralType.TIME,      "TimeOnly", "System.TimeOnly" ) ); // TimeOnly : v 4.1.0 ( since .Net 6 )
-		declareObjectType( buildObjectType(NeutralType.TIMESTAMP, "DateTime", "System.DateTime" ) );  
-		// DateTimeOffset : comming soon..
+		declareObjectType( buildObjectType(NeutralType.STRING,     "String",            "System.String"   ) );
+		declareObjectType( buildObjectType(NeutralType.BOOLEAN,    "Boolean",           "System.Boolean"  ) );
+		declareObjectType( buildObjectType(NeutralType.BYTE,       CSHARP_SBYTE_OBJECT, "System.SByte"    ) );
+		declareObjectType( buildObjectType(NeutralType.SHORT,      CSHARP_INT16_OBJECT, "System.Int16"    ) );
+		declareObjectType( buildObjectType(NeutralType.INTEGER,    CSHARP_INT32_OBJECT, "System.Int32"    ) );
+		declareObjectType( buildObjectType(NeutralType.LONG,       CSHARP_INT64_OBJECT, "System.Int64"    ) );
+		declareObjectType( buildObjectType(NeutralType.FLOAT,      "Single",            "System.Single"   ) );
+		declareObjectType( buildObjectType(NeutralType.DOUBLE,     "Double",            "System.Double"   ) );
+		declareObjectType( buildObjectType(NeutralType.DECIMAL,    "Decimal",           "System.Decimal"  ) );
+		declareObjectType( buildObjectType(NeutralType.DATE,       "DateOnly",          "System.DateOnly" ) ); // DateOnly : v 4.1.0 ( since .Net 6 )
+		declareObjectType( buildObjectType(NeutralType.TIME,       "TimeOnly",          "System.TimeOnly" ) ); // TimeOnly : v 4.1.0 ( since .Net 6 )
+		declareObjectType( buildObjectType(NeutralType.TIMESTAMP,  "DateTime",          "System.DateTime" ) );  
+		declareObjectType( buildObjectType(NeutralType.DATETIME,   "DateTime",          "System.DateTime"       ) );  // v 4.3.0
+		declareObjectType( buildObjectType(NeutralType.DATETIMETZ, "DateTimeOffset",    "System.DateTimeOffset" ) );  // v 4.3.0
+		declareObjectType( buildObjectType(NeutralType.TIMETZ,     "TimeOnly",          "System.TimeOnly" ) );        // v 4.3.0 No TimeOnly with TZ offset in C#
+		declareObjectType( buildObjectType(NeutralType.UUID,       "Guid",              "System.Guid" ) );            // v 4.3.0
 		// no ObjectType for NeutralType.BINARY
 
 		//--- Primitive types :
 		declarePrimitiveType( buildPrimitiveType(NeutralType.STRING,   "string",  "String"  ) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.BOOLEAN,  "bool",    "Boolean" ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.BYTE,     "sbyte",   "SByte"   ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.SHORT,    "short",   "Int16"   ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.INTEGER,  "int",     "Int32"   ) );
-		declarePrimitiveType( buildPrimitiveType(NeutralType.LONG,     "long",    "Int64"   ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.BYTE,     "sbyte",   CSHARP_SBYTE_OBJECT   ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.SHORT,    "short",   CSHARP_INT16_OBJECT   ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.INTEGER,  "int",     CSHARP_INT32_OBJECT   ) );
+		declarePrimitiveType( buildPrimitiveType(NeutralType.LONG,     "long",    CSHARP_INT64_OBJECT   ) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.FLOAT,    "float",   "Single"  ) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.DOUBLE,   "double",  "Double"  ) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.DECIMAL,  "decimal", "Decimal" ) );
-		// DATE => No primitive type
-		// TIME => No primitive type
-		// TIMESTAMP => No primitive type
-		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY, "byte[]", "byte[]" )  ); // No Wrapper type for binary / byte[] ?
+		// DATE, TIME, DATETIME => No primitive type
+		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY,  "byte[]",  "byte[]" )  ); // No Wrapper type for binary / byte[] ?
 		
 		//--- Unsigned primitive types : 
 		unsignedTypes.put( "sbyte", buildPrimitiveType(NeutralType.BYTE,    "byte",   "Byte"   ) );
@@ -78,10 +84,10 @@ public class TypeConverterForCSharp extends TypeConverter {
 		unsignedTypes.put( "long",  buildPrimitiveType(NeutralType.LONG,    "ulong",  "UInt64" ) );
 
 		//--- Unsigned object types : 
-		unsignedTypes.put( "SByte", buildObjectType(NeutralType.BYTE,    "Byte",    "System.Byte"   ) );
-		unsignedTypes.put( "Int16", buildObjectType(NeutralType.SHORT,   "UInt16",  "System.UInt16" ) );
-		unsignedTypes.put( "Int32", buildObjectType(NeutralType.INTEGER, "UInt32",  "System.UInt32" ) );
-		unsignedTypes.put( "Int64", buildObjectType(NeutralType.LONG,    "UInt64",  "System.UInt64" ) );
+		unsignedTypes.put( CSHARP_SBYTE_OBJECT, buildObjectType(NeutralType.BYTE,    "Byte",    "System.Byte"   ) );
+		unsignedTypes.put( CSHARP_INT16_OBJECT, buildObjectType(NeutralType.SHORT,   "UInt16",  "System.UInt16" ) );
+		unsignedTypes.put( CSHARP_INT32_OBJECT, buildObjectType(NeutralType.INTEGER, "UInt32",  "System.UInt32" ) );
+		unsignedTypes.put( CSHARP_INT64_OBJECT, buildObjectType(NeutralType.LONG,    "UInt64",  "System.UInt64" ) );
 	}
 
 	private LanguageType buildPrimitiveType(String neutralType, String primitiveType, String wrapperType) {

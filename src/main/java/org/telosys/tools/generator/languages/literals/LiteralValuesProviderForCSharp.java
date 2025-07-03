@@ -96,7 +96,7 @@ public class LiteralValuesProviderForCSharp extends LiteralValuesProvider {
 			return new LiteralValue(value ? TRUE_LITERAL : FALSE_LITERAL, Boolean.valueOf(value)) ;
 		}
 
-		//--- Noting for DATE, TIME and TIMESTAMP, BINARY
+		//--- Noting for DATE, TIME and TIMESTAMP, UUID, BINARY
 		
 		return new LiteralValue(NULL_LITERAL, null);
 	}
@@ -125,17 +125,19 @@ public class LiteralValuesProviderForCSharp extends LiteralValuesProvider {
 		defaultValues.put(NeutralType.DOUBLE,  "0");  // double, Double
 		defaultValues.put(NeutralType.DECIMAL, "0");  // decimal, Decimal
 
-		defaultValues.put(NeutralType.DATE,      "new DateOnly()"); // 01/01/0001
-		defaultValues.put(NeutralType.TIME,      "new TimeOnly()"); // 00:00
-		defaultValues.put(NeutralType.TIMESTAMP, "new DateTime()"); // 01/01/0001 00:00:00
+		// for temporal types 3 options : "ClassName.MinValue" or "new ClassName" (for all) and "ClassName.Now" (only for DateTime and DateTimeOffset)
+		defaultValues.put(NeutralType.DATE,       "DateOnly.MinValue" ); // 01/01/0001
+		defaultValues.put(NeutralType.TIME,       "TimeOnly.MinValue" ); // 00:00:00.0000000 
+		defaultValues.put(NeutralType.TIMETZ,     "TimeOnly.MinValue" ); // 00:00:00.0000000 
+		defaultValues.put(NeutralType.TIMESTAMP,  "DateTime.MinValue" ); // 01/01/0001 00:00:00
+		defaultValues.put(NeutralType.DATETIME,   "DateTime.MinValue" ); // 01/01/0001 00:00:00
+		defaultValues.put(NeutralType.DATETIMETZ, "DateTimeOffset.MinValue"); // current local time with the local timezone offset
+		
 		defaultValues.put(NeutralType.BINARY,    "new byte[0]"); // void array
+
+		defaultValues.put(NeutralType.UUID,      "Guid.Empty"); // "new Guid" or "Guid.Empty" (kind of "zero-value")
 	}
-//	@Override
-//	public String getDefaultValueNotNull(LanguageType languageType) {
-//		String type = languageType.getNeutralType();
-//		String defaultValue = defaultValues.get(type);
-//		return defaultValue != null ? defaultValue : NULL_LITERAL ; 
-//	}
+
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
 		if (attribute.isNotNull()) {
