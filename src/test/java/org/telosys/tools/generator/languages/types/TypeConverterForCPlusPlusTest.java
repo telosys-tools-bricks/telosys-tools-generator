@@ -12,7 +12,6 @@ import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -34,27 +33,20 @@ public class TypeConverterForCPlusPlusTest extends AbstractTypeTest {
 		assertEquals(primitiveType, lt.getWrapperType() );
 	}
 
-//	private void checkObjectType( LanguageType lt, String simpleType, String fullType) {
-//		assertNotNull(lt);
-//		assertFalse ( lt.isPrimitiveType() ) ;
-//		assertEquals(simpleType, lt.getSimpleType() );
-//		assertEquals(fullType,   lt.getFullType() );
-//		assertEquals(simpleType, lt.getWrapperType() );
-//	}
-	
+	private static final String STD_STRING = "std::string";
 	@Test
 	public void testString() {
 		println("--- ");
 		
-		checkPrimitiveType( getType(NeutralType.STRING, NONE ),            "string");
-		checkPrimitiveType( getType(NeutralType.STRING, NOT_NULL ),        "string");
-		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE ),  "string");
-		checkPrimitiveType( getType(NeutralType.STRING, UNSIGNED_TYPE ),   "string");
-		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE + UNSIGNED_TYPE ), "string");
+		checkPrimitiveType( getType(NeutralType.STRING, NONE ),            STD_STRING);
+		checkPrimitiveType( getType(NeutralType.STRING, NOT_NULL ),        STD_STRING);
+		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE ),  STD_STRING);
+		checkPrimitiveType( getType(NeutralType.STRING, UNSIGNED_TYPE ),   STD_STRING);
+		checkPrimitiveType( getType(NeutralType.STRING, PRIMITIVE_TYPE + UNSIGNED_TYPE ), STD_STRING);
 		
-		checkPrimitiveType( getType(NeutralType.STRING, OBJECT_TYPE),                 "string" );
-		checkPrimitiveType( getType(NeutralType.STRING, OBJECT_TYPE + UNSIGNED_TYPE), "string" );
-		checkPrimitiveType( getType(NeutralType.STRING, OBJECT_TYPE + NOT_NULL),      "string" );
+		checkPrimitiveType( getType(NeutralType.STRING, OBJECT_TYPE),                 STD_STRING);
+		checkPrimitiveType( getType(NeutralType.STRING, OBJECT_TYPE + UNSIGNED_TYPE), STD_STRING );
+		checkPrimitiveType( getType(NeutralType.STRING, OBJECT_TYPE + NOT_NULL),      STD_STRING );
 	}
 
 	private static final String BOOL = "bool";
@@ -166,31 +158,62 @@ public class TypeConverterForCPlusPlusTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( NeutralType.DOUBLE, OBJECT_TYPE ),             DOUBLE);
 	}
 
-	private static final String STD_TM = "std::tm";
+	private static final String EXPECTED_TYPE_FOR_DATE = "std::chrono::year_month_day";
 	@Test
 	public void testDate() {
 		println("--- ");
-		checkPrimitiveType( getType( NeutralType.DATE, NONE ),                    STD_TM);
+		checkPrimitiveType( getType( NeutralType.DATE, NONE ),                    EXPECTED_TYPE_FOR_DATE);
 	}
 
-	private static final String STD_TIME_T = "std::time_t";
+	private static final String EXPECTED_TYPE_FOR_TIME = "std::chrono::hh_mm_ss";
 	@Test
 	public void testTime() {
 		println("--- ");
-		checkPrimitiveType( getType( NeutralType.TIME, NONE ),                    STD_TIME_T);
+		checkPrimitiveType( getType( NeutralType.TIME, NONE ),                    EXPECTED_TYPE_FOR_TIME);
 	}
 
+	private static final String EXPECTED_TYPE_FOR_DATETIME = "std::chrono::local_time";
 	@Test
 	public void testTimestamp() {
 		println("--- ");
-		checkPrimitiveType( getType( NeutralType.TIMESTAMP, NONE ),                    STD_TM);
+		checkPrimitiveType( getType( NeutralType.TIMESTAMP, NONE ),               EXPECTED_TYPE_FOR_DATETIME);
+	}
+	@Test
+	public void testDateTime() {
+		println("--- ");
+		checkPrimitiveType( getType( NeutralType.DATETIME, NONE ),                   EXPECTED_TYPE_FOR_DATETIME);
+		checkPrimitiveType( getType( NeutralType.DATETIME, OBJECT_TYPE ),            EXPECTED_TYPE_FOR_DATETIME);
+		checkPrimitiveType( getType( NeutralType.DATETIME, NOT_NULL ),               EXPECTED_TYPE_FOR_DATETIME);
+		checkPrimitiveType( getType( NeutralType.DATETIME, NOT_NULL + OBJECT_TYPE ), EXPECTED_TYPE_FOR_DATETIME);
+		checkPrimitiveType( getType( NeutralType.DATETIME, UNSIGNED_TYPE ),          EXPECTED_TYPE_FOR_DATETIME);
+	}
+	@Test
+	public void testDateTimeTZ() {
+		println("--- ");
+		checkPrimitiveType( getType( NeutralType.DATETIMETZ, NONE ),            "std::chrono::zoned_time");
+	}
+	@Test
+	public void testTimeTZ() {
+		println("--- ");
+		checkPrimitiveType( getType( NeutralType.TIMETZ, NONE ), EXPECTED_TYPE_FOR_TIME); // No Time with TZ in CPP => like Time
 	}
 	
-	private static final String STD_VECTOR_UC = "std::vector<unsigned char>";
+	private static final String  EXPECTED_TYPE_FOR_UUID = "std::array<std::uint8_t, 16>";
+	@Test
+	public void testUUID() {
+		println("--- ");
+		checkPrimitiveType( getType( NeutralType.UUID, NONE ),                    EXPECTED_TYPE_FOR_UUID);
+		checkPrimitiveType( getType( NeutralType.UUID, OBJECT_TYPE ),             EXPECTED_TYPE_FOR_UUID);
+		checkPrimitiveType( getType( NeutralType.UUID, NOT_NULL ),                EXPECTED_TYPE_FOR_UUID);
+		checkPrimitiveType( getType( NeutralType.UUID, NOT_NULL + OBJECT_TYPE ),  EXPECTED_TYPE_FOR_UUID);
+		checkPrimitiveType( getType( NeutralType.UUID, UNSIGNED_TYPE ),           EXPECTED_TYPE_FOR_UUID);
+	}
+
+	private static final String  EXPECTED_TYPE_FOR_BYNARY = "std::vector<std::byte>";
 	@Test
 	public void testBinary() {
 		println("--- ");
-		checkPrimitiveType( getType( NeutralType.BINARY, NONE ),    STD_VECTOR_UC );
+		checkPrimitiveType( getType( NeutralType.BINARY, NONE ),    EXPECTED_TYPE_FOR_BYNARY );
 	}
 
 	@Test
@@ -202,18 +225,19 @@ public class TypeConverterForCPlusPlusTest extends AbstractTypeTest {
 		assertEquals("std::list<int>", typeConverter.getCollectionType("int"));
 	}
 
+	private static final String STD_VECTOR = "std::vector";
 	@Test
 	public void testSpecificCollectionType() throws GeneratorException {
 		println("--- ");
 		EnvInContext env = new EnvInContext();
 		env.setLanguage(getLanguageName());
-		env.setCollectionType("vector");
+		env.setCollectionType(STD_VECTOR);
 		TypeConverter typeConverter = env.getTypeConverter();
 		
 		assertNotNull(typeConverter.getSpecificCollectionType());
-		assertEquals("vector", typeConverter.getSpecificCollectionType());
-		assertEquals("vector", typeConverter.getCollectionType());
-		assertEquals("vector<int>", typeConverter.getCollectionType("int"));
+		assertEquals(STD_VECTOR, typeConverter.getSpecificCollectionType());
+		assertEquals(STD_VECTOR, typeConverter.getCollectionType());
+		assertEquals("std::vector<int>", typeConverter.getCollectionType("int"));
 	}
 	
 }

@@ -31,9 +31,9 @@ import org.telosys.tools.generic.model.types.NeutralType;
  */
 public class LiteralValuesProviderForCPlusPlus extends LiteralValuesProvider {
 	
-	private static final String NULL_LITERAL  = "NULL" ;  // e.g. : char* a = NULL;
-	private static final String TRUE_LITERAL  = "true" ;  // e.g. : bool flag = true;
-	private static final String FALSE_LITERAL = "false" ; // e.g. : bool flag = false;
+	private static final String NULL_LITERAL  = "NULL" ;  
+	private static final String TRUE_LITERAL  = "true" ;  
+	private static final String FALSE_LITERAL = "false" ; 
 
 	@Override
 	public String getLiteralNull() {
@@ -84,22 +84,8 @@ public class LiteralValuesProviderForCPlusPlus extends LiteralValuesProvider {
 			return new LiteralValue(value ? TRUE_LITERAL : FALSE_LITERAL, Boolean.valueOf(value)) ;
 		}
 
-//		//--- DATE, TIME and TIMESTAMP :  ????
-//		else if ( NeutralType.DATE.equals(neutralType)  ) {
-//			return NULL_LITERAL ;
-//		}
-//		else if ( NeutralType.TIME.equals(neutralType)  ) {
-//			return NULL_LITERAL ;
-//		}
-//		else if ( NeutralType.TIMESTAMP.equals(neutralType)  ) {
-//			return NULL_LITERAL ;
-//		}		
-//		//--- BINARY
-//		else if ( NeutralType.BINARY.equals(neutralType)  ) {
-//			return NULL_LITERAL ;
-//		}
-		
-//		return NULL_LITERAL ; 
+		// Other literal values are not provided
+		// for neutral types DATE, TIME, DATETIME, TIMESTAMP, DATETIMETZ, TIMETZ, UUID, ...
 		return new LiteralValue(NULL_LITERAL, null);
 	}
 	
@@ -126,18 +112,9 @@ public class LiteralValuesProviderForCPlusPlus extends LiteralValuesProvider {
 		defaultValues.put(NeutralType.FLOAT,   "0");  
 		defaultValues.put(NeutralType.DOUBLE,  "0");  
 		defaultValues.put(NeutralType.DECIMAL, "0");  
-
-//		defaultValues.put(NeutralType.DATE,      "?");  
-//		defaultValues.put(NeutralType.TIME,      "?"); 
-//		defaultValues.put(NeutralType.TIMESTAMP, "?"); 
-		defaultValues.put(NeutralType.BINARY,    "{}"); // void array, example : char x[10] = {};
+		// nothing for "array", in C++ a size is required when declaring an array => cannot use "void array" for all init
+		// nothing for "vector", in C++ a vector is empty by default
 	}
-//	@Override
-//	public String getDefaultValueNotNull(LanguageType languageType) {
-//		String type = languageType.getNeutralType();
-//		String defaultValue = defaultValues.get(type);
-//		return defaultValue != null ? defaultValue : NULL_LITERAL ; 
-//	}
 	
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
