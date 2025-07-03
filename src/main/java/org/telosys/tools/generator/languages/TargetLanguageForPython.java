@@ -18,9 +18,7 @@ package org.telosys.tools.generator.languages;
 import java.util.List;
 
 import org.telosys.tools.generator.context.AttributeInContext;
-import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProviderForPython;
-import org.telosys.tools.generator.languages.types.TypeConverter;
 import org.telosys.tools.generator.languages.types.TypeConverterForPython;
 
 /**
@@ -30,33 +28,12 @@ import org.telosys.tools.generator.languages.types.TypeConverterForPython;
  */
 public class TargetLanguageForPython extends TargetLanguage {
 	
-//	private final LiteralValuesProvider literalValuesProvider ;
-//
-//	/**
-//	 * Constructor
-//	 */
-//	protected TargetLanguageForPython() {
-//		super();
-//		this.literalValuesProvider = new LiteralValuesProviderForPython();
-//	}
 	/**
 	 * Constructor
 	 */
 	protected TargetLanguageForPython() {
 		super(new TypeConverterForPython(), new LiteralValuesProviderForPython());
 	}
-
-//	@Override
-//	public TypeConverter getTypeConverter() {
-//		// NB create a new instance for each "get" 
-//		// because it can be changed at run-time with setSpecificCollectionType(..)
-//		return new TypeConverterForPython();
-//	}
-//
-//	@Override
-//	public LiteralValuesProvider getLiteralValuesProvider() {
-//		return literalValuesProvider;
-//	}
 
 	@Override
 	public String argumentsList(List<AttributeInContext> attributes) {

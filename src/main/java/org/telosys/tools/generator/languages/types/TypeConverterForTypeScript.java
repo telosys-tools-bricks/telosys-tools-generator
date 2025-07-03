@@ -75,8 +75,6 @@ public class TypeConverterForTypeScript extends TypeConverter {
 		
 		//--- Unsigned primitive types : 
 		// No unsigned types
-//		declarePrimitiveUnsignedType(NeutralType.SHORT,   buildPrimitiveType("ushort", "System.UInt16" ) );
-		
 	}
 
 	private LanguageType buildPrimitiveType(String neutralType, String primitiveType, String wrapperType) {
@@ -88,40 +86,6 @@ public class TypeConverterForTypeScript extends TypeConverter {
 		return new LanguageType( neutralType, objectType, objectType, false, objectType );
 	}
 
-//	@Override
-//	public LanguageType getType(AttributeTypeInfo attributeTypeInfo) {
-//		log("type info : " + attributeTypeInfo );
-//		
-//		// @UnsignedType, @SqlType, @NotNull are not supported in TypeScript
-//
-//		//--- 1) Process explicit requirements first (if any)
-//		if ( attributeTypeInfo.isPrimitiveTypeExpected() ) {
-//			// A primitive type is explicitly required ( @PrimitiveType )
-//			LanguageType lt = getPrimitiveType(attributeTypeInfo.getNeutralType() ) ;
-//			if ( lt != null ) {
-//				// FOUND
-//				log("1) primitive type found" );
-//				return lt ;
-//			}
-//		}
-//		else if ( attributeTypeInfo.isObjectTypeExpected() ) {
-//			// An object type is explicitly required ( @ObjectType )
-//			LanguageType lt = getObjectType(attributeTypeInfo.getNeutralType() ) ;
-//			if ( lt != null ) {
-//				// FOUND
-//				log("1) object type found" );
-//				return lt ;
-//			}
-//		}
-//
-//		// By default return the primitive type or object type if no primitive type
-//		LanguageType lt = getPrimitiveType(attributeTypeInfo.getNeutralType() ) ;
-//		if ( lt == null ) {
-//			lt = getObjectType(attributeTypeInfo.getNeutralType() ) ;
-//		}
-//		return lt ;
-//	}
-	
 	@Override
 	public List<String> getComments() {
 		List<String> l = new LinkedList<>();
@@ -192,28 +156,4 @@ public class TypeConverterForTypeScript extends TypeConverter {
 		}
 	}
 	
-//	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "Array" ; // or "Set" ?
-//	private static final String STANDARD_COLLECTION_FULL_TYPE   = "Array" ; // or "Set" ?
-//	
-////	@Override
-////	public void setSpecificCollectionType(String specificCollectionType) {
-////		this.setSpecificCollectionFullType(specificCollectionType) ;
-////		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
-////	}
-//
-//	@Override
-//	public String getCollectionType(String elementType) {
-//		return getCollectionSimpleType() + "<" + elementType + ">" ; 
-//	}
-//	
-//	@Override
-//	public String getCollectionSimpleType() {
-//		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
-//	}
-//
-//	@Override
-//	public String getCollectionFullType() {
-//		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
-//	}
-//
 }

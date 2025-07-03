@@ -122,22 +122,4 @@ public final class TargetLanguageProvider {
 			throw new TelosysRuntimeException("Cannot get default target language (JAVA)") ;
 		}
 	}
-//	/**
-//	 * Returns the TypeConverter for the given language name (Java by default)
-//	 * @param languageName
-//	 * @return
-//	 */
-//	public static TypeConverter getTypeConverter(String languageName) {
-//		return getTargetLanguage(languageName).getTypeConverter();
-//	}
-//	
-//	/**
-//	 * Returns the LiteralValuesProvider for the given language name (Java by default)
-//	 * @param languageName
-//	 * @return
-//	 */
-//	public static LiteralValuesProvider getLiteralValuesProvider(String languageName) {
-//		return getTargetLanguage(languageName).getLiteralValuesProvider();
-//	}
-
 }

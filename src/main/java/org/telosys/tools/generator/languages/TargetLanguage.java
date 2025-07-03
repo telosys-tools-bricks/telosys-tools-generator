@@ -21,7 +21,6 @@ import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.types.TypeConverter;
-import org.telosys.tools.generator.languages.types.TypeConverterForCPlusPlus;
 
 /**
  *  
@@ -64,7 +63,6 @@ public abstract class TargetLanguage {
 	 * Returns the TypeConverter 
 	 * @return
 	 */
-//	public abstract TypeConverter getTypeConverter();
 	public final TypeConverter getTypeConverter() {
 		return typeConverter;
 	}
@@ -73,11 +71,9 @@ public abstract class TargetLanguage {
 	 * Returns the LiteralValuesProvider 
 	 * @return
 	 */
-//	public abstract LiteralValuesProvider getLiteralValuesProvider();
 	public final LiteralValuesProvider getLiteralValuesProvider() {
 		return literalValuesProvider;
 	}
-	
 	
 	/**
 	 * Build simple arguments list (only argument names, no type) <br>

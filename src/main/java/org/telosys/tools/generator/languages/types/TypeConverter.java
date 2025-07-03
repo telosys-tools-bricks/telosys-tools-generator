@@ -48,9 +48,6 @@ public abstract class TypeConverter {
 	
 	private final HashMap<String, LanguageType> objectTypes         = new HashMap<>();
 	
-//	private String specificCollectionFullType   = null ;
-//	private String specificCollectionSimpleType = null ;
-	
 	/**
 	 * Constructor
 	 * @param languageName
@@ -66,32 +63,6 @@ public abstract class TypeConverter {
 	protected EnvInContext getEnv() {
 		return env;
 	}
-
-//	//--- Standard/Specific COLLECTION SIMPLE TYPE
-//	protected void setSpecificCollectionSimpleType(String type) {
-//		specificCollectionSimpleType = type;
-//	}
-//	protected String getCollectionSimpleType(String standardCollectionSimpleType) {
-//		String specificCollectionType = getEnv().getCollectionType(); 
-//		if ( StrUtil.nullOrVoid(specificCollectionType) ) {
-//			return specificCollectionType ; 
-//		}
-//		else {
-//			return standardCollectionSimpleType ; 
-//		}
-//	}
-//	//--- Standard/Specific COLLECTION FULL TYPE
-//	protected void setSpecificCollectionFullType(String type) {
-//		specificCollectionFullType = type;
-//	}
-//	protected String getCollectionFullType(String standardCollectionFullType) {
-//		if ( specificCollectionFullType != null ) {
-//			return specificCollectionFullType ; 
-//		}
-//		else {
-//			return standardType ; 
-//		}
-//	}
 
 	/**
 	 * Returns the language associated with this type converter
@@ -207,12 +178,6 @@ public abstract class TypeConverter {
 	// Collection type ( since v 3.3.0 )
 	//--------------------------------------------------------------------------------------------
 	
-//	/**
-//	 * Force a specific collection type (instead of standard type used by default)
-//	 * @param specificCollectionType
-//	 */
-//	public abstract void setSpecificCollectionType(String specificCollectionType);
-
 	/**
 	 * Returns the active collection type (standard or specific) <br>
 	 * Example for Java : returns "List" or any other specific type like "Set", "Collection", etc
@@ -274,19 +239,5 @@ public abstract class TypeConverter {
 			return false;
 		}
 	}
-	
-//	/**
-//	 * Returns the 'simple type' used by default for a collection <br>
-//	 * For example : returns "List" in Java
-//	 * @return
-//	 */
-//	public abstract String getCollectionSimpleType() ;
-//
-//	/**
-//	 * Returns the 'full type' used by default for a collection <br>
-//	 * For example : returns "java.util.List" in Java
-//	 * @return
-//	 */
-//	public abstract String getCollectionFullType() ;
 	
 }

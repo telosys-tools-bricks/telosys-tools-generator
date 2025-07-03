@@ -18,9 +18,7 @@ package org.telosys.tools.generator.languages;
 import java.util.List;
 
 import org.telosys.tools.generator.context.AttributeInContext;
-import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProviderForPHP;
-import org.telosys.tools.generator.languages.types.TypeConverter;
 import org.telosys.tools.generator.languages.types.TypeConverterForPHP;
 
 /**
@@ -30,33 +28,12 @@ import org.telosys.tools.generator.languages.types.TypeConverterForPHP;
  */
 public class TargetLanguageForPHP extends TargetLanguage {
 	
-//	private final LiteralValuesProvider literalValuesProvider ;
-//
-//	/**
-//	 * Constructor
-//	 */
-//	protected TargetLanguageForPHP() {
-//		super();
-//		this.literalValuesProvider = new LiteralValuesProviderForPHP();
-//	}
 	/**
 	 * Constructor
 	 */
 	protected TargetLanguageForPHP() {
 		super(new TypeConverterForPHP(), new LiteralValuesProviderForPHP());
 	}
-
-//	@Override
-//	public TypeConverter getTypeConverter() {
-//		// NB create a new instance for each "get" 
-//		// because it can be changed at run-time with setSpecificCollectionType(..)
-//		return new TypeConverterForPHP();
-//	}
-//
-//	@Override
-//	public LiteralValuesProvider getLiteralValuesProvider() {
-//		return literalValuesProvider;
-//	}
 
 	@Override
 	public String argumentsList(List<AttributeInContext> attributes) {

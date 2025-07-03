@@ -100,28 +100,4 @@ public class TypeConverterForJavaScript extends TypeConverter {
 		return "Set";  // "Set" or "[]" ( no type )
 	}
 	
-//	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "Set" ; // or "[]"
-//	private static final String STANDARD_COLLECTION_FULL_TYPE   = "Set" ; // or "[]"
-//	
-////	@Override
-////	public void setSpecificCollectionType(String specificCollectionType) {
-////		this.setSpecificCollectionFullType(specificCollectionType) ;
-////		this.setSpecificCollectionSimpleType(specificCollectionType);
-////	}
-//
-//	@Override
-//	public String getCollectionType(String elementType) {
-//		return getCollectionSimpleType() ;  // "Set" or "[]" ( no type )
-//	}
-//	
-//	@Override
-//	public String getCollectionSimpleType() {
-//		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
-//	}
-//
-//	@Override
-//	public String getCollectionFullType() {
-//		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
-//	}
-	
 }

@@ -19,9 +19,7 @@ import java.util.List;
 
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.AttributeInContext;
-import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProviderForGo;
-import org.telosys.tools.generator.languages.types.TypeConverter;
 import org.telosys.tools.generator.languages.types.TypeConverterForGo;
 
 /**
@@ -31,33 +29,12 @@ import org.telosys.tools.generator.languages.types.TypeConverterForGo;
  */
 public class TargetLanguageForGo extends TargetLanguage {
 	
-//	private final LiteralValuesProvider literalValuesProvider ;
-//
-//	/**
-//	 * Constructor
-//	 */
-//	protected TargetLanguageForGo() {
-//		super();
-//		this.literalValuesProvider = new LiteralValuesProviderForGo();
-//	}
 	/**
 	 * Constructor
 	 */
 	protected TargetLanguageForGo() {
 		super(new TypeConverterForGo(), new LiteralValuesProviderForGo());
 	}
-
-//	@Override
-//	public TypeConverter getTypeConverter() {
-//		// NB create a new instance for each "get" 
-//		// because it can be changed at run-time with setSpecificCollectionType(..)
-//		return new TypeConverterForGo();
-//	}
-//
-//	@Override
-//	public LiteralValuesProvider getLiteralValuesProvider() {
-//		return literalValuesProvider;
-//	}
 
 	@Override
 	public String argumentsList(List<AttributeInContext> attributes) {

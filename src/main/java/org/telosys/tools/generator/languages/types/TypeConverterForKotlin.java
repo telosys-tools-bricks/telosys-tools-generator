@@ -67,12 +67,6 @@ public class TypeConverterForKotlin extends TypeConverter {
 		declarePrimitiveType( buildPrimitiveType(NeutralType.DOUBLE,  KOTLIN_DOUBLE) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY,  KOTLIN_BYTEARRAY) );
 
-//		//--- Primitive types for "UNSIGNED" option 
-//		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.BYTE,    KOTLIN_UBYTE  ) );
-//		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.SHORT,   KOTLIN_USHORT ) );
-//		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.INTEGER, KOTLIN_UINT   ) );
-//		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.LONG,    KOTLIN_ULONG  ) );
-		
 		//--- Object types : Java types used in Kotlin are considered as "object types"		
 		declareObjectType( buildObjectType(NeutralType.DECIMAL,   JAVA_BIGDECIMAL) );
 		declareObjectType( buildObjectType(NeutralType.DATE,      JAVA_LOCALDATE) );
@@ -115,42 +109,21 @@ public class TypeConverterForKotlin extends TypeConverter {
 
 	@Override
 	public LanguageType getType(AttributeTypeInfo attributeTypeInfo) {
-		
-//		// Search first in primitive types (with optionally "unsigned option" )
-//		LanguageType lt = getPrimitiveType(attributeTypeInfo.getNeutralType(), attributeTypeInfo.isUnsignedTypeExpected() ) ; 
-//		if ( lt != null ) { // FOUND
-//			return lt ;
-//		}
-//		else { // NOT FOUND in primitive types
-//			// Search in object types
-//			lt = getObjectType(attributeTypeInfo.getNeutralType() ) ;
-//			if ( lt != null ) { // FOUND
-//				return lt ;
-//			}
-//			else {
-//				// Still not found !!!
-//				throw new TelosysTypeNotFoundException(getLanguageName(), attributeTypeInfo);
-//			}		
-//		}
 		// Get the standard type 
 		LanguageType languageType = getStandardType(attributeTypeInfo);
-		
 		// An object type is explicitly required ( @ObjectType )
 		if ( attributeTypeInfo.isObjectTypeExpected() ) {
 			languageType = getObjectType(languageType );
 		}
-		
 		// An unsigned type is explicitly required ( @UnsignedType )
 		if ( attributeTypeInfo.isUnsignedTypeExpected() ) {
 			languageType = getUnsignedType(languageType);
 		}
-
 		// If attribute is 'nullable' and '$env.typeWithNullableMark' is TRUE
 		if ( ( nullableMarkCanBeUsed(attributeTypeInfo) ) ) {
 			// Nullable => nullable type with '?' at the end
 			languageType = getNullableType(languageType);
 		}
-
 		// Return resulting type
 		return languageType;
 	}
@@ -221,25 +194,4 @@ public class TypeConverterForKotlin extends TypeConverter {
 		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE) + "<" + elementType + ">" ; 
 	}
 	
-////	@Override
-////	public void setSpecificCollectionType(String specificCollectionType) {
-////		this.setSpecificCollectionFullType(specificCollectionType) ;
-////		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
-////	}
-//
-//	@Override
-//	public String getCollectionType(String elementType) {
-//		return getCollectionSimpleType() + "<" + elementType + ">" ; 
-//	}
-//	
-//	@Override
-//	public String getCollectionSimpleType() {
-//		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
-//	}
-//
-//	@Override
-//	public String getCollectionFullType() {
-//		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
-//	}
-//
 }

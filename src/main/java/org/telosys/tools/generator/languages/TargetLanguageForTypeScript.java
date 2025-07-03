@@ -18,9 +18,7 @@ package org.telosys.tools.generator.languages;
 import java.util.List;
 
 import org.telosys.tools.generator.context.AttributeInContext;
-import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProviderForTypeScript;
-import org.telosys.tools.generator.languages.types.TypeConverter;
 import org.telosys.tools.generator.languages.types.TypeConverterForTypeScript;
 
 /**
@@ -30,33 +28,12 @@ import org.telosys.tools.generator.languages.types.TypeConverterForTypeScript;
  */
 public class TargetLanguageForTypeScript extends TargetLanguage {
 	
-//	private final LiteralValuesProvider literalValuesProvider ;
-//
-//	/**
-//	 * Constructor
-//	 */
-//	protected TargetLanguageForTypeScript() {
-//		super();
-//		this.literalValuesProvider = new LiteralValuesProviderForTypeScript();
-//	}
 	/**
 	 * Constructor
 	 */
 	protected TargetLanguageForTypeScript() {
 		super(new TypeConverterForTypeScript(), new LiteralValuesProviderForTypeScript());
 	}
-
-//	@Override
-//	public TypeConverter getTypeConverter() {
-//		// NB create a new instance for each "get" 
-//		// because it can be changed at run-time with setSpecificCollectionType(..)
-//		return new TypeConverterForTypeScript();
-//	}
-//
-//	@Override
-//	public LiteralValuesProvider getLiteralValuesProvider() {
-//		return literalValuesProvider;
-//	}
 
 	@Override
 	public String argumentsList(List<AttributeInContext> attributes) {

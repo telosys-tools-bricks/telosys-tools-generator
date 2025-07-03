@@ -75,8 +75,6 @@ public class AttributeInContext {
 
 	private boolean       mustUseFullType = false ; 
 
-//	private final boolean selected ; // removed in v 4.1.0
-    
 	//--- Basic minimal attribute info ---------------------------------
 	private final String  name ;  // attribute name 
 	private final String  neutralType ;  // attribute neutral type
@@ -113,16 +111,9 @@ public class AttributeInContext {
     
     private final String  databaseName     ;  // Column name in the DB table
     private final String  databaseType      ;  // Column type in the DB table
-    //private final String  databaseSize   ;   // removed in v 3.4.0
     private final String  databaseComment ;     // Comment of this column 
     private final String  databaseDefaultValue ;   
-//    private final boolean isDatabaseNotNull ;  // True if "not null" in the database (REMOVED in v 4.1.0)
-//    private final boolean isAutoIncremented  ;  // True if auto-incremented by the database (REMOVED in v 4.1.0)
 
-// removed in ver 4.1
-//    private final int     jdbcTypeCode    ;  // JDBC type code for this column
-//    private final String  jdbcTypeName    ;  // JDBC type name 
-    
 	//--- FOREIGN KEYS  -------------------------------------------------
     private final boolean isForeignKey          ; 
     private final boolean isForeignKeySimple    ; 
@@ -135,21 +126,13 @@ public class AttributeInContext {
     private final String  booleanFalseValue ; // eg "0", ""No"",  ""false""
     
 	//--- JPA KEY Generation infos -------------------------------------------------
-//    private final boolean isGeneratedValue ;  // True if GeneratedValue ( annotation "@GeneratedValue" )
 	private final GeneratedValueStrategy generatedValueStrategy ; // "AUTO", "IDENTITY", "SEQUENCE", "TABLE" 
-	
-	// private final String  generatedValueGenerator ; // removed in v 4.1.0 
 	
 	private final Integer generatedValueAllocationSize ; // v 4.1.0 not dedicated to SEQUENCE
 	private final Integer generatedValueInitialValue ; // v 4.1.0
 	
-//    private final boolean hasSequenceGenerator  ;  // True if SequenceGenerator ( annotation "@SequenceGenerator" )
-	// private final String  sequenceGeneratorName     ; // removed in v 4.1.0 
 	private final String  generatedValueSequenceName   ;
-	// private final int     sequenceGeneratorAllocationSize ;  // removed in v 4.1.0 
 
-//    private final boolean hasTableGenerator;  // True if TableGenerator ( annotation "@TableGenerator" )
-	// private final String  tableGeneratorName; // removed in v 4.1.0 
 	private final String  generatedValueTablePkValue;
 
 	private final String  tableGeneratorTable;

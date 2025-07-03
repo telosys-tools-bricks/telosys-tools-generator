@@ -66,11 +66,6 @@ public class TypeConverterForPython extends TypeConverter {
 	public LanguageType getType(AttributeTypeInfo attributeTypeInfo) {
 		log("type info : " + attributeTypeInfo );		
 		// Return always the same "void" type
-//		return new LanguageType(attributeTypeInfo.getNeutralType(),
-//				"", // String simpleType, 
-//				"", // String fullType, 
-//				true, // boolean isPrimitiveType, 
-//				"") ; // String wrapperType
 		return getPrimitiveType( attributeTypeInfo.getNeutralType() );
 	}
 	
@@ -87,28 +82,4 @@ public class TypeConverterForPython extends TypeConverter {
 		return "" ;
 	}
 	
-//	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "" ; 
-//	private static final String STANDARD_COLLECTION_FULL_TYPE   = "" ; 
-
-//	@Override
-//	public void setSpecificCollectionType(String specificCollectionType) {
-//		this.setSpecificCollectionFullType(specificCollectionType) ;
-//		this.setSpecificCollectionSimpleType(specificCollectionType);
-//	}
-
-//	@Override
-//	public String getCollectionType(String elementType) {
-//		return getCollectionSimpleType() ;
-//	}
-//	
-//	@Override
-//	public String getCollectionSimpleType() {
-//		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
-//	}
-//
-//	@Override
-//	public String getCollectionFullType() {
-//		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
-//	}
-
 }

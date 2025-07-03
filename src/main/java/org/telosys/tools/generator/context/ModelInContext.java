@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.telosys.tools.commons.NamingStyleConverter;
-import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityNoDoc;

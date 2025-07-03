@@ -111,29 +111,4 @@ public class TypeConverterForScala extends TypeConverter {
 		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE) + "<" + elementType + ">" ; 
 	}
 	
-//	private static final String STANDARD_COLLECTION_SIMPLE_TYPE = "List" ;
-//	private static final String STANDARD_COLLECTION_FULL_TYPE   = "scala.List" ;
-//	
-////	@Override
-////	public void setSpecificCollectionType(String specificCollectionType) {
-////		this.setSpecificCollectionFullType(specificCollectionType) ;
-////		this.setSpecificCollectionSimpleType(JavaTypeUtil.shortType(specificCollectionType));
-////	}
-//
-//	@Override
-//	public String getCollectionType(String elementType) {
-//		// Examples : 
-//		// val nums: List[Int] = List(1, 2, 3, 4)
-//		return getCollectionSimpleType() + "[" + elementType + "]" ; 
-//	}
-//	
-//	@Override
-//	public String getCollectionSimpleType() {
-//		return getCollectionSimpleType(STANDARD_COLLECTION_SIMPLE_TYPE);
-//	}
-//
-//	@Override
-//	public String getCollectionFullType() {
-//		return getCollectionFullType(STANDARD_COLLECTION_FULL_TYPE);
-//	}
 }

@@ -18,9 +18,7 @@ package org.telosys.tools.generator.languages;
 import java.util.List;
 
 import org.telosys.tools.generator.context.AttributeInContext;
-import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProviderForCSharp;
-import org.telosys.tools.generator.languages.types.TypeConverter;
 import org.telosys.tools.generator.languages.types.TypeConverterForCSharp;
 
 /**
@@ -30,34 +28,12 @@ import org.telosys.tools.generator.languages.types.TypeConverterForCSharp;
  */
 public class TargetLanguageForCSharp extends TargetLanguage {
 	
-//	private final LiteralValuesProvider literalValuesProvider ;
-//
-//	/**
-//	 * Constructor
-//	 */
-//	protected TargetLanguageForCSharp() {
-//		super();
-//		this.literalValuesProvider = new LiteralValuesProviderForCSharp();
-//	}
-
 	/**
 	 * Constructor
 	 */
 	protected TargetLanguageForCSharp() {
 		super(new TypeConverterForCSharp(), new LiteralValuesProviderForCSharp());
 	}
-
-//	@Override
-//	public TypeConverter getTypeConverter() {
-//		// NB create a new instance for each "get" 
-//		// because it can be changed at run-time with setSpecificCollectionType(..)
-//		return new TypeConverterForCSharp();
-//	}
-//
-//	@Override
-//	public LiteralValuesProvider getLiteralValuesProvider() {
-//		return literalValuesProvider;
-//	}
 
 	@Override
 	public String argumentsList(List<AttributeInContext> attributes) {
@@ -74,10 +50,6 @@ public class TargetLanguageForCSharp extends TargetLanguage {
 			// example : "name string, age int"
 			if ( n > 0 ) sb.append(", ");
 			sb.append( attribute.getType() ) ; // arg type FIRST 
-// moved in attribute.getType()
-//			if ( ! attribute.isNotNull() ) {
-//				sb.append( "?" ) ;  // nullable => add '?' at the end of the type, eg "int?"
-//			}
 			sb.append( " " ) ;
 			sb.append( attribute.getName() ) ; // arg name AFTER
 			n++;
@@ -93,10 +65,6 @@ public class TargetLanguageForCSharp extends TargetLanguage {
 		for ( AttributeInContext attribute : attributes ) {
 			if ( n > 0 ) sb.append(", ");
 			sb.append( attribute.getWrapperType() ) ; //  arg type first : WRAPPER type 
-// moved in attribute.getType()
-//			if ( ! attribute.isNotNull() ) {
-//				sb.append( "?" ) ;  // nullable => add '?' at the end of the type, eg "String?"
-//			}
 			sb.append( " " ) ;
 			sb.append( attribute.getName() ) ; // arg name after
 			n++;

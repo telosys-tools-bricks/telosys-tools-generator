@@ -18,9 +18,7 @@ package org.telosys.tools.generator.languages;
 import java.util.List;
 
 import org.telosys.tools.generator.context.AttributeInContext;
-import org.telosys.tools.generator.languages.literals.LiteralValuesProvider;
 import org.telosys.tools.generator.languages.literals.LiteralValuesProviderForJavaScript;
-import org.telosys.tools.generator.languages.types.TypeConverter;
 import org.telosys.tools.generator.languages.types.TypeConverterForJavaScript;
 
 /**
@@ -30,15 +28,6 @@ import org.telosys.tools.generator.languages.types.TypeConverterForJavaScript;
  */
 public class TargetLanguageForJavaScript extends TargetLanguage {
 	
-//	private final LiteralValuesProvider literalValuesProvider ;
-//
-//	/**
-//	 * Constructor
-//	 */
-//	protected TargetLanguageForJavaScript() {
-//		super();
-//		this.literalValuesProvider = new LiteralValuesProviderForJavaScript();
-//	}
 	/**
 	 * Constructor
 	 */
@@ -46,18 +35,6 @@ public class TargetLanguageForJavaScript extends TargetLanguage {
 		super(new TypeConverterForJavaScript(), new LiteralValuesProviderForJavaScript());
 	}
 
-//	@Override
-//	public TypeConverter getTypeConverter() {
-//		// NB create a new instance for each "get" 
-//		// because it can be changed at run-time with setSpecificCollectionType(..)
-//		return new TypeConverterForJavaScript();
-//	}
-//
-//	@Override
-//	public LiteralValuesProvider getLiteralValuesProvider() {
-//		return literalValuesProvider;
-//	}
-	
 	@Override
 	public String argumentsList(List<AttributeInContext> attributes) {
 		return commonArgumentsListWithoutType(attributes);

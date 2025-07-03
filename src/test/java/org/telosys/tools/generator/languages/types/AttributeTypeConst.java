@@ -23,6 +23,12 @@ package org.telosys.tools.generator.languages.types;
  */
 public class AttributeTypeConst {
 
+	/**
+	 * Private constructor
+	 */
+	private AttributeTypeConst() {
+	}
+	
 	public static final int     NONE           =  0 ;
 	public static final int     NOT_NULL       =  1 ;
 	public static final int     PRIMITIVE_TYPE =  2 ;

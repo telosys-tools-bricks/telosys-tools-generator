@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 /**
@@ -38,27 +37,6 @@ public class TypeConverterForCSharp extends TypeConverter {
 
 	private final HashMap<String, LanguageType> unsignedTypes = new HashMap<>(); 
 
-//	protected EnvInContext getEnv() {
-//		GeneratorContext generatorContext = GeneratorContextHolder.getGeneratorContext();
-//		if ( generatorContext != null ) {
-//			Object o = generatorContext.get(ContextName.ENV);
-//			if ( o != null ) {
-//				if ( o instanceof EnvInContext ) {
-//					return (EnvInContext)o;
-//				}
-//				else {
-//					throw new TelosysRuntimeException("Object 'env' from GeneratorContext is not an instance of EnvInContext");
-//				}
-//			}
-//			else {
-//				throw new TelosysRuntimeException("Cannot get 'env' from GeneratorContext");
-//			}
-//		}
-//		else {
-//			throw new TelosysRuntimeException("Cannot get GeneratorContext from GeneratorContextHolder");
-//		}
-//	}
-	
 	public TypeConverterForCSharp() {
 		super("C#");
 		
@@ -211,13 +189,6 @@ public class TypeConverterForCSharp extends TypeConverter {
 	//  - List<T>
 	//  - Collection<T>
 	private static final String STANDARD_COLLECTION_TYPE = "List" ; // or "Collection" ?
-//	private static final String STANDARD_COLLECTION_FULL_TYPE   = "System.Collections.Generic.List" ; // or "Collection" ?
-	
-//	@Override
-//	public void setSpecificCollectionType(String specificCollectionType) {
-//		this.setSpecificCollectionFullType(specificCollectionType) ;
-//		this.setSpecificCollectionSimpleType(specificCollectionType);
-//	}
 	
 	@Override
 	public String getCollectionType() {
@@ -228,25 +199,5 @@ public class TypeConverterForCSharp extends TypeConverter {
 	public String getCollectionType(String elementType) {
 		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE)  + "<" + elementType + ">" ; 
 	}
-	
-//	@Override
-//	public String getCollectionSimpleType() {
-//		return chooseCollectionType(STANDARD_COLLECTION_SIMPLE_TYPE);
-//	}
-//
-//	@Override
-//	public String getCollectionFullType() {
-//		return chooseCollectionType(STANDARD_COLLECTION_FULL_TYPE);
-//	}
-
-//	private String chooseCollectionType(String standardCollectionType) {
-//		String specificCollectionType = getEnv().getCollectionType();
-//		if ( ! StrUtil.nullOrVoid( specificCollectionType ) ) {
-//			return specificCollectionType;
-//		}
-//		else {
-//			return standardCollectionType ;
-//		}
-//	}
 	
 }
