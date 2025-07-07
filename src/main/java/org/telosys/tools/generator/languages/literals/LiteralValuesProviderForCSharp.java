@@ -18,6 +18,7 @@ package org.telosys.tools.generator.languages.literals;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
@@ -95,8 +96,15 @@ public class LiteralValuesProviderForCSharp extends LiteralValuesProvider {
 			boolean value = buildBooleanValue(step);
 			return new LiteralValue(value ? TRUE_LITERAL : FALSE_LITERAL, Boolean.valueOf(value)) ;
 		}
+		
+		//--- UUID
+		else if ( NeutralType.UUID.equals(neutralType)  ) {
+			String uuidString = UUID.randomUUID().toString();
+			return new LiteralValue("Guid.Parse(\""+uuidString+"\")", uuidString) ; // v 4.3
+		}
+		
 
-		//--- Noting for DATE, TIME and TIMESTAMP, UUID, BINARY
+		//--- Noting for DATE, TIME and TIMESTAMP, BINARY
 		
 		return new LiteralValue(NULL_LITERAL, null);
 	}
@@ -117,13 +125,13 @@ public class LiteralValuesProviderForCSharp extends LiteralValuesProvider {
 	static {
 		defaultValues.put(NeutralType.STRING,  "\"\"");  // string, String
 		defaultValues.put(NeutralType.BOOLEAN, FALSE_LITERAL); // bool, Boolean
-		defaultValues.put(NeutralType.BYTE,    "0");  // sbyte, SByte, byte, Byte
-		defaultValues.put(NeutralType.SHORT,   "0");  // short, Int16, ushort, UInt16
-		defaultValues.put(NeutralType.INTEGER, "0");  // int, Int32, uint, UInt32
-		defaultValues.put(NeutralType.LONG,    "0");  // long, Int64, ulong, UInt64
-		defaultValues.put(NeutralType.FLOAT,   "0");  // float, Single
-		defaultValues.put(NeutralType.DOUBLE,  "0");  // double, Double
-		defaultValues.put(NeutralType.DECIMAL, "0");  // decimal, Decimal
+		defaultValues.put(NeutralType.BYTE,    "0");   // sbyte, SByte, byte, Byte
+		defaultValues.put(NeutralType.SHORT,   "0");   // short, Int16, ushort, UInt16
+		defaultValues.put(NeutralType.INTEGER, "0");   // int, Int32, uint, UInt32
+		defaultValues.put(NeutralType.LONG,    "0L");  // long, Int64, ulong, UInt64 (long requires 'L' suffix (optional but recommended for clarity)
+		defaultValues.put(NeutralType.FLOAT,   "0.0f");  // float, Single (float requires 'f' suffix)
+		defaultValues.put(NeutralType.DOUBLE,  "0.0" );   // double, Double (double is default for floating-point literals)
+		defaultValues.put(NeutralType.DECIMAL, "0.0m");  // decimal, Decimal (decimal requires 'm' suffix)
 
 		// for temporal types 3 options : "ClassName.MinValue" or "new ClassName" (for all) and "ClassName.Now" (only for DateTime and DateTimeOffset)
 		defaultValues.put(NeutralType.DATE,       "DateOnly.MinValue" ); // 01/01/0001

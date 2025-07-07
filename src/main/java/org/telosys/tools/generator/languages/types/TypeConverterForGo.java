@@ -28,6 +28,8 @@ import org.telosys.tools.generic.model.types.NeutralType;
  */
 public class TypeConverterForGo extends TypeConverter {
 
+	private static final String GO_TIME_TIME = "time.Time" ;
+
 	public TypeConverterForGo() {
 		super("Go");
 		
@@ -53,9 +55,21 @@ public class TypeConverterForGo extends TypeConverter {
 		declarePrimitiveUnsignedType( buildPrimitiveType(NeutralType.LONG,    "uint64" ) );
 
 		//--- Object types : for GO "object types" are used for "structures" define in a "package" ( when "import" is required )
-		declareObjectType( buildObjectType(NeutralType.DATE,      "time.Time" ) );
-		declareObjectType( buildObjectType(NeutralType.TIME,      "time.Time" ) );
-		declareObjectType( buildObjectType(NeutralType.TIMESTAMP, "time.Time" ) );
+		// Go’s "time.Time" type includes support for time zones and UTC offsets
+		declareObjectType( buildObjectType(NeutralType.DATE,       GO_TIME_TIME ) );
+		declareObjectType( buildObjectType(NeutralType.TIME,       GO_TIME_TIME ) );
+		declareObjectType( buildObjectType(NeutralType.TIMESTAMP,  GO_TIME_TIME ) );
+		declareObjectType( buildObjectType(NeutralType.DATETIME,   GO_TIME_TIME ) ); // v 4.3
+		declareObjectType( buildObjectType(NeutralType.DATETIMETZ, GO_TIME_TIME ) ); // v 4.3
+		declareObjectType( buildObjectType(NeutralType.TIMETZ,     GO_TIME_TIME ) ); // v 4.3
+		
+		//--- UUID
+		// In Go, to store a UUID, there is no built-in type in the standard library 
+		// but the most common and idiomatic way is to use a third-party package like github.com/google/uuid
+		// import "github.com/google/uuid"
+		// var id uuid.UUID
+		declareObjectType( buildObjectType(NeutralType.UUID,     "uuid.UUID" ) ); // v 4.3
+		
 	}
 
 	private LanguageType buildPrimitiveType(String neutralType, String type) {

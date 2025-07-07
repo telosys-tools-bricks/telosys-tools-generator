@@ -16,6 +16,7 @@
 package org.telosys.tools.generator.languages.literals;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
@@ -80,6 +81,11 @@ public class LiteralValuesProviderForGo extends LiteralValuesProvider {
 		else if ( NeutralType.BOOLEAN.equals(neutralType)  ) {
 			boolean value = buildBooleanValue(step);
 			return new LiteralValue(value ? TRUE_LITERAL : FALSE_LITERAL, Boolean.valueOf(value)) ;
+		}
+		//--- UUID
+		else if ( NeutralType.UUID.equals(neutralType)  ) {
+			String uuidString = UUID.randomUUID().toString();
+			return new LiteralValue("uuid.Parse(\""+uuidString+"\")", uuidString) ; // v 4.3 (Parse: with "github.com/google/uuid")
 		}
 
 		//--- Noting for DATE, TIME and TIMESTAMP, BINARY
