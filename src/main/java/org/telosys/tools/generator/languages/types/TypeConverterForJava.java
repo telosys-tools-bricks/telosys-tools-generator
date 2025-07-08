@@ -18,7 +18,6 @@ package org.telosys.tools.generator.languages.types;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.telosys.tools.commons.JavaTypeUtil;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 /**
@@ -29,11 +28,6 @@ import org.telosys.tools.generic.model.types.NeutralType;
  */
 public class TypeConverterForJava extends TypeConverter {
 
-	public static final String LOCAL_DATE_CLASS       = "java.time.LocalDate" ;
-	public static final String LOCAL_TIME_CLASS       = "java.time.LocalTime" ;
-	public static final String LOCAL_DATE_TIME_CLASS  = "java.time.LocalDateTime" ;	
-	public static final String OFFSET_DATE_TIME_CLASS = "java.time.OffsetDateTime"; // ver 4.30
-	
 	public TypeConverterForJava() {
 		super("Java");
 		
@@ -47,16 +41,17 @@ public class TypeConverterForJava extends TypeConverter {
 		declareObjectType( buildJavaType(NeutralType.FLOAT,     java.lang.Float.class) );
 		declareObjectType( buildJavaType(NeutralType.DOUBLE,    java.lang.Double.class) );
 		declareObjectType( buildJavaType(NeutralType.DECIMAL,   java.math.BigDecimal.class) );
-		
 		//--- Temporal types since ver 3.4.0
-		declareObjectType( buildJavaType(NeutralType.DATE,      LOCAL_DATE_CLASS) );
-		declareObjectType( buildJavaType(NeutralType.TIME,      LOCAL_TIME_CLASS) );
-		declareObjectType( buildJavaType(NeutralType.TIMESTAMP, LOCAL_DATE_TIME_CLASS) );
+		declareObjectType( buildJavaType(NeutralType.DATE,       java.time.LocalDate.class) );
+		declareObjectType( buildJavaType(NeutralType.TIME,       java.time.LocalTime.class) );
+		declareObjectType( buildJavaType(NeutralType.TIMESTAMP,  java.time.LocalDateTime.class) );
 		//--- New temporal types since ver 4.3.0
-		declareObjectType( buildJavaType(NeutralType.DATETIMETZ, OFFSET_DATE_TIME_CLASS) ); // ver 4.30
-		
-
-		//Nothing for BINARY
+		declareObjectType( buildJavaType(NeutralType.DATETIME,   java.time.LocalDateTime.class) ); // ver 4.30
+		declareObjectType( buildJavaType(NeutralType.DATETIMETZ, java.time.OffsetDateTime.class) ); // ver 4.30
+		declareObjectType( buildJavaType(NeutralType.TIMETZ,     java.time.OffsetTime.class) ); // ver 4.30
+		//--- UUID 
+		declareObjectType( buildJavaType(NeutralType.UUID,       java.util.UUID.class) ); // ver 4.30
+		//No object type for BINARY
 
 		//--- Primitive types 
 		// STRING => No primitive type
@@ -72,8 +67,7 @@ public class TypeConverterForJava extends TypeConverter {
 		// TIME => No primitive type
 		// TIMESTAMP => No primitive type
 		declarePrimitiveType( buildJavaType(NeutralType.BINARY,  byte[].class) );
-		
-		//--- Unsigned primitive types : No unsigned primitive types in Java
+		//--- No unsigned primitive types in Java
 	}
 
 	private LanguageType buildJavaType(String neutralType, Class<?> clazz) {
@@ -86,10 +80,10 @@ public class TypeConverterForJava extends TypeConverter {
 			return new LanguageType( neutralType, clazz.getSimpleName(), clazz.getCanonicalName(), false, clazz.getSimpleName() );
 		}
 	}
-	private LanguageType buildJavaType(String neutralType, String javaClassCanonicalName) {
-		String javaClassSimpleName = JavaTypeUtil.shortType(javaClassCanonicalName);
-		return new LanguageType( neutralType, javaClassSimpleName, javaClassCanonicalName, false, javaClassSimpleName );
-	}
+//	private LanguageType buildJavaType(String neutralType, String javaClassCanonicalName) {
+//		String javaClassSimpleName = JavaTypeUtil.shortType(javaClassCanonicalName);
+//		return new LanguageType( neutralType, javaClassSimpleName, javaClassCanonicalName, false, javaClassSimpleName );
+//	}
 	
 	/**
 	 * Returns the Java wrapper type for the given primitive type

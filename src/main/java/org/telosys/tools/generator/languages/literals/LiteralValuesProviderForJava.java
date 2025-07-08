@@ -18,10 +18,10 @@ package org.telosys.tools.generator.languages.literals;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
-import org.telosys.tools.generator.languages.types.TypeConverterForJava;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 /**
@@ -141,6 +141,41 @@ public class LiteralValuesProviderForJava extends LiteralValuesProvider {
 			return new LiteralValue("Boolean.valueOf("+s+")", Boolean.valueOf(value)) ; // eg : Boolean.valueOf(true)
 		}
 		
+		// DATE & TIME : "java.time.*"  (NEW since v 3.4.0 )
+		else if ( java.time.LocalDate.class.getCanonicalName().equals(javaFullType) ) {
+			return generateLocalDateValue(step);
+		}
+		else if ( java.time.LocalTime.class.getCanonicalName().equals(javaFullType) ) {
+			return generateLocalTimeValue(step);
+		}
+		else if ( java.time.LocalDateTime.class.getCanonicalName().equals(javaFullType) ) {
+			return generateLocalDateTimeValue(step);
+		}
+		else if ( java.time.OffsetDateTime.class.getCanonicalName().equals(javaFullType) ) { // ver 4.3.0
+			return generateOffsetDateTimeValue(step);
+		}
+		else if ( java.time.OffsetTime.class.getCanonicalName().equals(javaFullType) ) { // ver 4.3.0
+			return generateOffsetTimeValue(step);
+		}
+		
+		// UUID
+		else if ( java.util.UUID.class.getCanonicalName().equals(javaFullType) ) { // ver 4.3.0
+			String uuidString = UUID.randomUUID().toString();
+			return new LiteralValue("java.util.UUID.fromString(\""+uuidString+"\")", uuidString) ; // v 4.3
+		}
+
+		//-------------------------------------------------------------------------------
+		// DATE & TIME : "java.sql.*" ( OLD not supposed to be used ) 
+		else if ( java.sql.Date.class.getCanonicalName().equals(javaFullType) ) {
+			return generateSqlDateValue(step);
+		}
+		else if ( java.sql.Time.class.getCanonicalName().equals(javaFullType) ) {
+			return generateSqlTimeValue(step);
+		}
+		else if ( java.sql.Timestamp.class.getCanonicalName().equals(javaFullType) ) {
+			return generateSqlTimestampValue(step);
+		}
+		//-------------------------------------------------------------------------------
 		// DATE & TIME : OLD "java.util.Date" ( not supposed to be used since v 3.4.0 ) 
 		else if ( java.util.Date.class.getCanonicalName().equals(javaFullType) ) {
 			String neutralType = languageType.getNeutralType();
@@ -159,27 +194,6 @@ public class LiteralValuesProviderForJava extends LiteralValuesProvider {
 				return generateSqlDateValue(step);
 			}
 		}
-		// DATE & TIME : "java.time.*"  (NEW since v 3.4.0 )
-		else if ( TypeConverterForJava.LOCAL_DATE_CLASS.equals(javaFullType) ) {
-			return generateLocalDateValue(step);
-		}
-		else if ( TypeConverterForJava.LOCAL_TIME_CLASS.equals(javaFullType) ) {
-			return generateLocalTimeValue(step);
-		}
-		else if ( TypeConverterForJava.LOCAL_DATE_TIME_CLASS.equals(javaFullType) ) {
-			return generateLocalDateTimeValue(step);
-		}
-		// DATE & TIME : "java.sql.*"
-		else if ( java.sql.Date.class.getCanonicalName().equals(javaFullType) ) {
-			return generateSqlDateValue(step);
-		}
-		else if ( java.sql.Time.class.getCanonicalName().equals(javaFullType) ) {
-			return generateSqlTimeValue(step);
-		}
-		else if ( java.sql.Timestamp.class.getCanonicalName().equals(javaFullType) ) {
-			return generateSqlTimestampValue(step);
-		}
-		
 		return new LiteralValue(NULL_LITERAL, null);
 	}
 	
@@ -191,6 +205,11 @@ public class LiteralValuesProviderForJava extends LiteralValuesProvider {
 		int hour = step % 24 ;
 		return String.format("%02d", hour) ; // between 0 and 23		
 	}
+	private String generateOffset(int step) { // v 4.3.0
+		int offset = step % 5; // 0 to 4
+		return String.format("%+03d:00", offset); // from "+00.00" to "+04.00"
+	}	
+
 	//--- SQL date/time/timestamp
 	private LiteralValue generateSqlDateValue(int step) {
 		String dateISO = generateYearValue(step) + "-06-22" ; // "2001-06-22" 
@@ -217,11 +236,20 @@ public class LiteralValuesProviderForJava extends LiteralValuesProvider {
 	}
 	private LiteralValue generateLocalDateTimeValue(int step) { // v 3.4.0
 		// expected : LocalDateTime.parse("2017-11-15T08:22:12")
-		String timestampISO = 
-				generateYearValue(step) + "-05-21" 
-				+ "T" 
-				+ generateHourValue(step) + ":46:52" ; // "2001-05-21T15:46:52" 
+		String timestampISO = generateYearValue(step) + "-05-21" 
+				+ "T" + generateHourValue(step) + ":46:52" ; // "2001-05-21T15:46:52" 
 		return new LiteralValue("java.time.LocalDateTime.parse(\"" + timestampISO + "\")", timestampISO );
+	}
+	private LiteralValue generateOffsetDateTimeValue(int step) { // v 4.3.0
+		// expected : OffsetDateTime.parse("2025-07-08T12:30:45+02:00")
+		String formatedValue = generateYearValue(step) + "-07-21" 
+				+ "T" + generateHourValue(step) + ":47:57" + generateOffset(step); 
+		return new LiteralValue("java.time.OffsetDateTime.parse(\"" + formatedValue + "\")", formatedValue );
+	}
+	private LiteralValue generateOffsetTimeValue(int step) { // v 4.3.0
+		// expected : OffsetTime.parse("12:30:45+02:00")
+		String formatedValue = generateHourValue(step) + ":48:58" + generateOffset(step); 
+		return new LiteralValue("java.time.OffsetTime.parse(\"" + formatedValue + "\")", formatedValue );
 	}
 
 	/* 

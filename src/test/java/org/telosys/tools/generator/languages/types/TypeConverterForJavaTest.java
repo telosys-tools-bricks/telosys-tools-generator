@@ -61,6 +61,15 @@ public class TypeConverterForJavaTest extends AbstractTypeTest {
 
 	private static final String LOCALDATETIME = "LocalDateTime" ;
 	private static final String JAVA_TIME_LOCALDATETIME = "java.time.LocalDateTime";
+	
+	private static final String OFFSETDATETIME = "OffsetDateTime" ;
+	private static final String JAVA_TIME_OFFSETDATETIME = "java.time.OffsetDateTime";
+
+	private static final String OFFSETTIME = "OffsetTime" ;
+	private static final String JAVA_TIME_OFFSETTIME = "java.time.OffsetTime";
+
+	private static final String UUID = "UUID" ;
+	private static final String JAVA_UTIL_UUID = "java.util.UUID";
 
 	private static final String BYTE_ARRAY = "byte[]" ;
 	
@@ -244,7 +253,7 @@ public class TypeConverterForJavaTest extends AbstractTypeTest {
 	}
 
 	@Test
-	public void testTimestamp() {
+	public void testTimestamp() { // deprecated (= "datetime")
 		println("--- ");
 		checkObjectType( getType(NeutralType.TIMESTAMP, NONE ),                           LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
 		checkObjectType( getType(NeutralType.TIMESTAMP, NOT_NULL ),                       LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
@@ -255,6 +264,59 @@ public class TypeConverterForJavaTest extends AbstractTypeTest {
 		checkObjectType( getType(NeutralType.TIMESTAMP, OBJECT_TYPE),                     LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
 		checkObjectType( getType(NeutralType.TIMESTAMP, OBJECT_TYPE + UNSIGNED_TYPE ),    LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
 		checkObjectType( getType(NeutralType.TIMESTAMP, OBJECT_TYPE + NOT_NULL ),         LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+	}
+	@Test
+	public void testDatetime() {  // ver 4.3.0
+		println("--- ");
+		checkObjectType( getType(NeutralType.DATETIME, NONE ),                           LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.DATETIME, NOT_NULL ),                       LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.DATETIME, UNSIGNED_TYPE ),                  LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.DATETIME, PRIMITIVE_TYPE ),                 LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.DATETIME, PRIMITIVE_TYPE + UNSIGNED_TYPE ), LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.DATETIME, PRIMITIVE_TYPE + NOT_NULL ),      LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.DATETIME, OBJECT_TYPE),                     LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.DATETIME, OBJECT_TYPE + UNSIGNED_TYPE ),    LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+		checkObjectType( getType(NeutralType.DATETIME, OBJECT_TYPE + NOT_NULL ),         LOCALDATETIME, JAVA_TIME_LOCALDATETIME);
+	}
+	@Test
+	public void testDatetimetz() {  // ver 4.3.0
+		println("--- ");
+		checkObjectType( getType(NeutralType.DATETIMETZ, NONE ),                           OFFSETDATETIME, JAVA_TIME_OFFSETDATETIME);
+		checkObjectType( getType(NeutralType.DATETIMETZ, NOT_NULL ),                       OFFSETDATETIME, JAVA_TIME_OFFSETDATETIME);
+		checkObjectType( getType(NeutralType.DATETIMETZ, UNSIGNED_TYPE ),                  OFFSETDATETIME, JAVA_TIME_OFFSETDATETIME);
+		checkObjectType( getType(NeutralType.DATETIMETZ, PRIMITIVE_TYPE ),                 OFFSETDATETIME, JAVA_TIME_OFFSETDATETIME);
+		checkObjectType( getType(NeutralType.DATETIMETZ, PRIMITIVE_TYPE + UNSIGNED_TYPE ), OFFSETDATETIME, JAVA_TIME_OFFSETDATETIME);
+		checkObjectType( getType(NeutralType.DATETIMETZ, PRIMITIVE_TYPE + NOT_NULL ),      OFFSETDATETIME, JAVA_TIME_OFFSETDATETIME);
+		checkObjectType( getType(NeutralType.DATETIMETZ, OBJECT_TYPE),                     OFFSETDATETIME, JAVA_TIME_OFFSETDATETIME);
+		checkObjectType( getType(NeutralType.DATETIMETZ, OBJECT_TYPE + UNSIGNED_TYPE ),    OFFSETDATETIME, JAVA_TIME_OFFSETDATETIME);
+		checkObjectType( getType(NeutralType.DATETIMETZ, OBJECT_TYPE + NOT_NULL ),         OFFSETDATETIME, JAVA_TIME_OFFSETDATETIME);
+	}
+	@Test
+	public void testTimetz() {  // ver 4.3.0
+		println("--- ");
+		checkObjectType( getType(NeutralType.TIMETZ, NONE ),                           OFFSETTIME, JAVA_TIME_OFFSETTIME);
+		checkObjectType( getType(NeutralType.TIMETZ, NOT_NULL ),                       OFFSETTIME, JAVA_TIME_OFFSETTIME);
+		checkObjectType( getType(NeutralType.TIMETZ, UNSIGNED_TYPE ),                  OFFSETTIME, JAVA_TIME_OFFSETTIME);
+		checkObjectType( getType(NeutralType.TIMETZ, PRIMITIVE_TYPE ),                 OFFSETTIME, JAVA_TIME_OFFSETTIME);
+		checkObjectType( getType(NeutralType.TIMETZ, PRIMITIVE_TYPE + UNSIGNED_TYPE ), OFFSETTIME, JAVA_TIME_OFFSETTIME);
+		checkObjectType( getType(NeutralType.TIMETZ, PRIMITIVE_TYPE + NOT_NULL ),      OFFSETTIME, JAVA_TIME_OFFSETTIME);
+		checkObjectType( getType(NeutralType.TIMETZ, OBJECT_TYPE),                     OFFSETTIME, JAVA_TIME_OFFSETTIME);
+		checkObjectType( getType(NeutralType.TIMETZ, OBJECT_TYPE + UNSIGNED_TYPE ),    OFFSETTIME, JAVA_TIME_OFFSETTIME);
+		checkObjectType( getType(NeutralType.TIMETZ, OBJECT_TYPE + NOT_NULL ),         OFFSETTIME, JAVA_TIME_OFFSETTIME);
+	}
+
+	@Test
+	public void testUUID() {  // ver 4.3.0
+		println("--- ");
+		checkObjectType( getType(NeutralType.UUID, NONE ),                           UUID, JAVA_UTIL_UUID);
+		checkObjectType( getType(NeutralType.UUID, NOT_NULL ),                       UUID, JAVA_UTIL_UUID);
+		checkObjectType( getType(NeutralType.UUID, UNSIGNED_TYPE ),                  UUID, JAVA_UTIL_UUID);
+		checkObjectType( getType(NeutralType.UUID, PRIMITIVE_TYPE ),                 UUID, JAVA_UTIL_UUID);
+		checkObjectType( getType(NeutralType.UUID, PRIMITIVE_TYPE + UNSIGNED_TYPE ), UUID, JAVA_UTIL_UUID);
+		checkObjectType( getType(NeutralType.UUID, PRIMITIVE_TYPE + NOT_NULL ),      UUID, JAVA_UTIL_UUID);
+		checkObjectType( getType(NeutralType.UUID, OBJECT_TYPE),                     UUID, JAVA_UTIL_UUID);
+		checkObjectType( getType(NeutralType.UUID, OBJECT_TYPE + UNSIGNED_TYPE ),    UUID, JAVA_UTIL_UUID);
+		checkObjectType( getType(NeutralType.UUID, OBJECT_TYPE + NOT_NULL ),         UUID, JAVA_UTIL_UUID);
 	}
 
 	@Test

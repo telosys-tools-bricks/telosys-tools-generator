@@ -22,7 +22,7 @@ public abstract class AbstractLiteralsTest {
 	 * @param s
 	 */
 	protected void println(String s) {
-		System.out.println(s);
+		// System.out.println(s);
 	}	
 
 	/**
