@@ -80,10 +80,6 @@ public class TypeConverterForJava extends TypeConverter {
 			return new LanguageType( neutralType, clazz.getSimpleName(), clazz.getCanonicalName(), false, clazz.getSimpleName() );
 		}
 	}
-//	private LanguageType buildJavaType(String neutralType, String javaClassCanonicalName) {
-//		String javaClassSimpleName = JavaTypeUtil.shortType(javaClassCanonicalName);
-//		return new LanguageType( neutralType, javaClassSimpleName, javaClassCanonicalName, false, javaClassSimpleName );
-//	}
 	
 	/**
 	 * Returns the Java wrapper type for the given primitive type
