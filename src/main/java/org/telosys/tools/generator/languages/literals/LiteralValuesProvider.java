@@ -16,6 +16,7 @@
 package org.telosys.tools.generator.languages.literals;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
@@ -186,6 +187,13 @@ public abstract class LiteralValuesProvider {
 		return String.format("%+03d:00", offset); // from "+00.00" to "+04.00"
 	}
 	
+	/**
+	 * Builds a UUID string (like "550e8400-e29b-41d4-a716-446655440000")
+	 * @return
+	 */
+	protected String buildUUID() { // ver 4.3.0
+		return UUID.randomUUID().toString();
+	}
 	
 	//------------------------------------------------------------------------------------
 	// ABSTRACT METHODS
@@ -230,10 +238,6 @@ public abstract class LiteralValuesProvider {
 	 */
 	public abstract String getEqualsStatement(String value, LanguageType languageType) ;
 	
-	
-	//public abstract String getDefaultValueNotNull(LanguageType languageType) ;
-	
 	public abstract String getInitValue(AttributeInContext attribute, LanguageType languageType);
-
 
 }

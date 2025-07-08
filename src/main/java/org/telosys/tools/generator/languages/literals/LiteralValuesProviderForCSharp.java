@@ -18,7 +18,6 @@ package org.telosys.tools.generator.languages.literals;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.languages.types.LanguageType;
@@ -99,7 +98,7 @@ public class LiteralValuesProviderForCSharp extends LiteralValuesProvider {
 		
 		//--- UUID
 		else if ( NeutralType.UUID.equals(neutralType)  ) {
-			String uuidString = UUID.randomUUID().toString();
+			String uuidString = buildUUID();
 			return new LiteralValue("Guid.Parse(\""+uuidString+"\")", uuidString) ; // v 4.3
 		}
 		
