@@ -86,9 +86,34 @@ public class LiteralValuesProviderForJavaScript extends LiteralValuesProvider {
 			return new LiteralValue(value ? TRUE_LITERAL : FALSE_LITERAL, Boolean.valueOf(value)) ;
 		}
 
-		//--- Noting for DATE, TIME and TIMESTAMP, BINARY 
-		//    there is no Date literal in JavaScript !
+		//--- Temporal types: DATE, TIME, DATETIME, etc  ( "Temporal.xxx" supported by Node.js 20+ )
+		else if ( NeutralType.DATETIME.equals(neutralType) || NeutralType.TIMESTAMP.equals(neutralType) ) {
+			String value = buildDateTimeISO(step) ; // "2001-06-22" 
+			return new LiteralValue("Temporal.PlainDateTime.from('" + value + "')", value );
+		}
+		else if ( NeutralType.DATETIMETZ.equals(neutralType) ) {
+			// OK with :
+			// Offset          '2025-07-08T14:30:00+01:00' 
+			// or Offset+zone  '2025-07-08T14:30:00+01:00[Europe/London]'
+			String value = buildDateTimeWithOffsetISO(step);
+			return new LiteralValue("Temporal.ZonedDateTime.from('" + value + "')", value );
+		}
+		else if ( NeutralType.DATE.equals(neutralType)  ) {
+			String value = buildDateISO(step) ; // "2001-06-22" 
+			return new LiteralValue("Temporal.PlainDate.from('" + value + "')", value );
+		}
+		else if ( NeutralType.TIME.equals(neutralType) || NeutralType.TIMETZ.equals(neutralType) ) { // no Time with Offset/TZ
+			String value = buildTimeISO(step) ; // "14:30:00" 
+			return new LiteralValue("Temporal.PlainTime.from('" + value + "')", value );
+		}
 		
+		//--- UUID - In JavaScript, there is no built-in primitive UUID type => use string 
+		else if ( NeutralType.UUID.equals(neutralType)  ) {
+			String value = buildUUID() ; // "2001-06-22" 
+			return new LiteralValue("'" + value + "'", value );
+		}
+		
+		//--- Noting for BINARY 
 		return new LiteralValue(NULL_LITERAL, null);
 	}
 	
@@ -116,10 +141,16 @@ public class LiteralValuesProviderForJavaScript extends LiteralValuesProvider {
 		notNullInitValues.put(NeutralType.DOUBLE,  "0.0" );  
 		notNullInitValues.put(NeutralType.DECIMAL, "0.0" );  
 
-//		notNullInitValues.put(NeutralType.DATE,      "??"); 
-//		notNullInitValues.put(NeutralType.TIME,      "??"); 
-//		notNullInitValues.put(NeutralType.TIMESTAMP, "??"); 
-//		notNullInitValues.put(NeutralType.BINARY,    "??"); 
+		notNullInitValues.put(NeutralType.DATE,       "Temporal.PlainDate.from('0000-01-01')" ); // Year 0, Jan 1
+		notNullInitValues.put(NeutralType.TIME,       "Temporal.PlainTime.from('00:00:00')"   ); // 00:00:00.000000000
+		notNullInitValues.put(NeutralType.TIMETZ,     "Temporal.PlainTime.from('00:00:00')"   ); // 00:00:00.000000000
+		notNullInitValues.put(NeutralType.TIMESTAMP,  "Temporal.PlainDateTime.from('0000-01-01T00:00:00')" ); 
+		notNullInitValues.put(NeutralType.DATETIME,   "Temporal.PlainDateTime.from('0000-01-01T00:00:00')" ); 
+		notNullInitValues.put(NeutralType.DATETIMETZ, "Temporal.ZonedDateTime.from('0000-01-01T00:00:00+00:00[UTC]')" ); 
+		
+		notNullInitValues.put(NeutralType.UUID,  EMPTY_STRING_LITERAL);
+		
+		// nothing for NeutralType BINARY 
 	}
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
