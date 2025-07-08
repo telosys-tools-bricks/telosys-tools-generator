@@ -99,7 +99,6 @@ public class JavaTemporalTypesTest  {
 		
 		assertTrue(LocalTime.of(18, 12, 4).isAfter( LocalTime.of(18, 12,  3)) );
 		assertTrue(LocalTime.of(18, 12, 4).isBefore(LocalTime.of(18, 16, 12)) );
-		//assertTrue(LocalTime.of(18, 12, 4).isEqual( LocalTime.of(18, 12,  4)) ); // no method
 	}
 	
 	@Test(expected=java.time.DateTimeException.class)

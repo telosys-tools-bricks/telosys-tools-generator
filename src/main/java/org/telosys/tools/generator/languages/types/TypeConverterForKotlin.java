@@ -46,10 +46,13 @@ public class TypeConverterForKotlin extends TypeConverter {
 	public static final String KOTLIN_BYTEARRAY = "ByteArray" ;
 
 	// Object types ( Java objects => import required )	
-	public static final String JAVA_BIGDECIMAL    = "java.math.BigDecimal" ; // import java.math.BigDecimal
-	public static final String JAVA_LOCALDATE     = "java.time.LocalDate" ;  // import java.time.LocalDateTime
-	public static final String JAVA_LOCALTIME     = "java.time.LocalTime" ;
-	public static final String JAVA_LOCALDATETIME = "java.time.LocalDateTime" ;	
+	public static final String JAVA_BIGDECIMAL     = "java.math.BigDecimal" ; // import java.math.BigDecimal
+	public static final String JAVA_LOCALDATE      = "java.time.LocalDate" ;  // import java.time.LocalDateTime
+	public static final String JAVA_LOCALTIME      = "java.time.LocalTime" ;
+	public static final String JAVA_LOCALDATETIME  = "java.time.LocalDateTime" ;	
+	public static final String JAVA_OFFSETDATETIME = "java.time.OffsetDateTime" ;
+	public static final String JAVA_OFFSETTIME     = "java.time.OffsetTime" ;
+	public static final String JAVA_UUID           = "java.util.UUID" ;
 	
 	private final HashMap<String, LanguageType> unsignedTypes = new HashMap<>();
 	
@@ -68,10 +71,15 @@ public class TypeConverterForKotlin extends TypeConverter {
 		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY,  KOTLIN_BYTEARRAY) );
 
 		//--- Object types : Java types used in Kotlin are considered as "object types"		
-		declareObjectType( buildObjectType(NeutralType.DECIMAL,   JAVA_BIGDECIMAL) );
-		declareObjectType( buildObjectType(NeutralType.DATE,      JAVA_LOCALDATE) );
-		declareObjectType( buildObjectType(NeutralType.TIME,      JAVA_LOCALTIME) );
-		declareObjectType( buildObjectType(NeutralType.TIMESTAMP, JAVA_LOCALDATETIME) );
+		declareObjectType( buildObjectType(NeutralType.DECIMAL,    JAVA_BIGDECIMAL) );
+		declareObjectType( buildObjectType(NeutralType.DATE,       JAVA_LOCALDATE) );
+		declareObjectType( buildObjectType(NeutralType.TIME,       JAVA_LOCALTIME) );
+		declareObjectType( buildObjectType(NeutralType.TIMESTAMP,  JAVA_LOCALDATETIME) );
+		declareObjectType( buildObjectType(NeutralType.DATETIME,   JAVA_LOCALDATETIME) );  // ver 4.3.0
+		declareObjectType( buildObjectType(NeutralType.DATETIMETZ, JAVA_OFFSETDATETIME) ); // ver 4.3.0
+		declareObjectType( buildObjectType(NeutralType.TIMETZ,     JAVA_OFFSETTIME) );     // ver 4.3.0
+
+		declareObjectType( buildObjectType(NeutralType.UUID,       JAVA_UUID) );  // ver 4.3.0
 		
 		//--- Unsigned primitive types : 
 		unsignedTypes.put( KOTLIN_BYTE,  buildPrimitiveType(NeutralType.BYTE,    KOTLIN_UBYTE  ) );

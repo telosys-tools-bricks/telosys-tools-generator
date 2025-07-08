@@ -171,8 +171,8 @@ public class TypeConverterForKotlinTest extends AbstractTypeTest {
 		checkObjectType( getType( NeutralType.TIME, NOT_NULL ),       KOTLIN_LOCALTIME,           KOTLIN_LOCALTIME_FULLTYPE );
 	}
 
-	private static final String KOTLIN_LOCALDATETIME           = "LocalDateTime";
-	private static final String KOTLIN_LOCALDATETIME_NULLABLE  = "LocalDateTime?";
+	private static final String KOTLIN_LOCALDATETIME                    = "LocalDateTime";
+	private static final String KOTLIN_LOCALDATETIME_NULLABLE           = "LocalDateTime?";
 	private static final String KOTLIN_LOCALDATETIME_FULLTYPE           = "java.time.LocalDateTime";
 	private static final String KOTLIN_LOCALDATETIME_FULLTYPE_NULLABLE  = "java.time.LocalDateTime?";
 	@Test
@@ -182,7 +182,51 @@ public class TypeConverterForKotlinTest extends AbstractTypeTest {
 		checkObjectType( getType( NeutralType.TIMESTAMP, OBJECT_TYPE ),    KOTLIN_LOCALDATETIME_NULLABLE,  KOTLIN_LOCALDATETIME_FULLTYPE_NULLABLE );
 		checkObjectType( getType( NeutralType.TIMESTAMP, NOT_NULL ),       KOTLIN_LOCALDATETIME,           KOTLIN_LOCALDATETIME_FULLTYPE );
 	}
+	@Test
+	public void testDateTime() { // v 4.3.0
+		checkObjectType( getType( NeutralType.DATETIME, NONE ),           KOTLIN_LOCALDATETIME_NULLABLE,  KOTLIN_LOCALDATETIME_FULLTYPE_NULLABLE );
+		checkObjectType( getType( NeutralType.DATETIME, UNSIGNED_TYPE ),  KOTLIN_LOCALDATETIME_NULLABLE,  KOTLIN_LOCALDATETIME_FULLTYPE_NULLABLE );
+		checkObjectType( getType( NeutralType.DATETIME, OBJECT_TYPE ),    KOTLIN_LOCALDATETIME_NULLABLE,  KOTLIN_LOCALDATETIME_FULLTYPE_NULLABLE );
+		checkObjectType( getType( NeutralType.DATETIME, NOT_NULL ),       KOTLIN_LOCALDATETIME,           KOTLIN_LOCALDATETIME_FULLTYPE );
+	}
+	
+	private static final String KOTLIN_OFFSETDATETIME                   = "OffsetDateTime";
+	private static final String KOTLIN_OFFSETDATETIME_NULLABLE          = "OffsetDateTime?";
+	private static final String KOTLIN_OFFSETDATETIME_FULLTYPE          = "java.time.OffsetDateTime";
+	private static final String KOTLIN_OFFSETDATETIME_FULLTYPE_NULLABLE = "java.time.OffsetDateTime?";	
+	@Test
+	public void testDateTimeTZ() {  // v 4.3.0
+		checkObjectType( getType( NeutralType.DATETIMETZ, NONE ),           KOTLIN_OFFSETDATETIME_NULLABLE,  KOTLIN_OFFSETDATETIME_FULLTYPE_NULLABLE );
+		checkObjectType( getType( NeutralType.DATETIMETZ, UNSIGNED_TYPE ),  KOTLIN_OFFSETDATETIME_NULLABLE,  KOTLIN_OFFSETDATETIME_FULLTYPE_NULLABLE );
+		checkObjectType( getType( NeutralType.DATETIMETZ, OBJECT_TYPE ),    KOTLIN_OFFSETDATETIME_NULLABLE,  KOTLIN_OFFSETDATETIME_FULLTYPE_NULLABLE );
+		checkObjectType( getType( NeutralType.DATETIMETZ, NOT_NULL ),       KOTLIN_OFFSETDATETIME,           KOTLIN_OFFSETDATETIME_FULLTYPE );
+	}
 
+	private static final String KOTLIN_OFFSETTIME                   = "OffsetTime";
+	private static final String KOTLIN_OFFSETTIME_NULLABLE          = "OffsetTime?";
+	private static final String KOTLIN_OFFSETTIME_FULLTYPE          = "java.time.OffsetTime";
+	private static final String KOTLIN_OFFSETTIME_FULLTYPE_NULLABLE = "java.time.OffsetTime?";	
+	@Test
+	public void testTimeTZ() {  // v 4.3.0
+		checkObjectType( getType( NeutralType.TIMETZ, NONE ),           KOTLIN_OFFSETTIME_NULLABLE,  KOTLIN_OFFSETTIME_FULLTYPE_NULLABLE );
+		checkObjectType( getType( NeutralType.TIMETZ, UNSIGNED_TYPE ),  KOTLIN_OFFSETTIME_NULLABLE,  KOTLIN_OFFSETTIME_FULLTYPE_NULLABLE );
+		checkObjectType( getType( NeutralType.TIMETZ, OBJECT_TYPE ),    KOTLIN_OFFSETTIME_NULLABLE,  KOTLIN_OFFSETTIME_FULLTYPE_NULLABLE );
+		checkObjectType( getType( NeutralType.TIMETZ, NOT_NULL ),       KOTLIN_OFFSETTIME,           KOTLIN_OFFSETTIME_FULLTYPE );
+	}
+
+	private static final String KOTLIN_UUID                   = "UUID";
+	private static final String KOTLIN_UUID_NULLABLE          = "UUID?";	
+	private static final String KOTLIN_UUID_FULLTYPE          = "java.util.UUID";
+	private static final String KOTLIN_UUID_FULLTYPE_NULLABLE = "java.util.UUID?";	
+	@Test
+	public void testUUID() {  // v 4.3.0
+		checkObjectType( getType( NeutralType.UUID, NONE ),           KOTLIN_UUID_NULLABLE,  KOTLIN_UUID_FULLTYPE_NULLABLE );
+		checkObjectType( getType( NeutralType.UUID, UNSIGNED_TYPE ),  KOTLIN_UUID_NULLABLE,  KOTLIN_UUID_FULLTYPE_NULLABLE );
+		checkObjectType( getType( NeutralType.UUID, OBJECT_TYPE ),    KOTLIN_UUID_NULLABLE,  KOTLIN_UUID_FULLTYPE_NULLABLE );
+		checkObjectType( getType( NeutralType.UUID, NOT_NULL ),       KOTLIN_UUID,           KOTLIN_UUID_FULLTYPE );
+	}
+
+	
 	private static final String KOTLIN_BYTEARRAY          = "ByteArray";
 	private static final String KOTLIN_BYTEARRAY_NULLABLE = "ByteArray?";
 	@Test

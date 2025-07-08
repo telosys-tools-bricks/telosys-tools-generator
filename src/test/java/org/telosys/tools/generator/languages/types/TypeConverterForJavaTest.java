@@ -7,7 +7,6 @@ import static org.telosys.tools.generator.languages.types.AttributeTypeConst.PRI
 import static org.telosys.tools.generator.languages.types.AttributeTypeConst.UNSIGNED_TYPE;
 
 import org.junit.Test;
-import org.telosys.tools.commons.exception.TelosysRuntimeException;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generic.model.types.NeutralType;
