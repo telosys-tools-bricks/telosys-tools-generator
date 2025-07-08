@@ -155,6 +155,24 @@ public abstract class LiteralValuesProvider {
 				+ buildHourValue(step) + ":47:53" ;  
 	}
 	
+	/**
+	 * Builds a date+time+offset in ISO format, eg "2025-07-08T12:30:45+02:00"
+	 * @param step
+	 * @return
+	 */
+	protected String buildDateTimeWithOffsetISO(int step) { // ver 4.3.0
+		return buildDateTimeISO(step) + buildOffsetValue(step);
+	}
+
+	/**
+	 * Builds a time+offset in ISO format, eg "12:30:45+02:00"
+	 * @param step
+	 * @return
+	 */
+	protected String buildTimeWithOffsetISO(int step) { // ver 4.3.0
+		return buildTimeISO(step) + buildOffsetValue(step);
+	}
+	
 	private String buildYearValue(int step) {
 		int year = 2000 + ( step % 1000 ) ;  // between 2000 and 2999 
 		return "" + year ;
@@ -162,6 +180,10 @@ public abstract class LiteralValuesProvider {
 	private String buildHourValue(int step) {
 		int hour = step % 24 ;
 		return String.format("%02d", hour) ; // between 0 and 23		
+	}
+	private String buildOffsetValue(int step) { // ver 4.3.0
+		int offset = step % 5; // 0 to 4
+		return String.format("%+03d:00", offset); // from "+00.00" to "+04.00"
 	}
 	
 	
