@@ -315,6 +315,17 @@ public class LiteralValuesProviderForJavaTest extends AbstractLiteralsTest {
 		assertEquals("java.time.LocalTime.parse(\"00:46:52\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  0).getCurrentLanguageValue() );
 		assertEquals("java.time.LocalTime.parse(\"01:46:52\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  1).getCurrentLanguageValue() );
 	}
+	@Test
+	public void testLiteralValuesForTIMETZ() {
+		// Check literal expression 
+		assertNotNull( java.time.OffsetTime.parse("01:46:52+02:00") );
+		// Check expected 
+		LanguageType lt = getLanguageType(NeutralType.TIMETZ );
+		int maxlen = 999; // not used
+		assertEquals("java.time.OffsetTime.parse(\"00:46:52+00:00\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  0).getCurrentLanguageValue() );
+		assertEquals("java.time.OffsetTime.parse(\"01:46:52+01:00\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  1).getCurrentLanguageValue() );
+		assertEquals("java.time.OffsetTime.parse(\"02:46:52+02:00\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  2).getCurrentLanguageValue() );
+	}
 	
 	@Test
 	public void testLiteralValuesForTIMESTAMP() {
@@ -323,8 +334,8 @@ public class LiteralValuesProviderForJavaTest extends AbstractLiteralsTest {
 		// Check expected 
 		LanguageType lt = getLanguageType(NeutralType.TIMESTAMP );
 		int maxlen = 999; // not used
-		assertEquals("java.time.LocalDateTime.parse(\"2000-05-21T00:46:52\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  0).getCurrentLanguageValue() );
-		assertEquals("java.time.LocalDateTime.parse(\"2001-05-21T01:46:52\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  1).getCurrentLanguageValue() );
+		assertEquals("java.time.LocalDateTime.parse(\"2000-05-21T00:47:53\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  0).getCurrentLanguageValue() );
+		assertEquals("java.time.LocalDateTime.parse(\"2001-05-21T01:47:53\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  1).getCurrentLanguageValue() );
 	}
 
 	@Test
@@ -334,9 +345,9 @@ public class LiteralValuesProviderForJavaTest extends AbstractLiteralsTest {
 		// Check expected 
 		LanguageType lt = getLanguageType(NeutralType.DATETIME );
 		int maxlen = 999; // not used
-		assertEquals("java.time.LocalDateTime.parse(\"2000-05-21T00:46:52\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  0).getCurrentLanguageValue() );
-		assertEquals("java.time.LocalDateTime.parse(\"2001-05-21T01:46:52\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  1).getCurrentLanguageValue() );
-		assertEquals("java.time.LocalDateTime.parse(\"2002-05-21T02:46:52\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  2).getCurrentLanguageValue() );
+		assertEquals("java.time.LocalDateTime.parse(\"2000-05-21T00:47:53\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  0).getCurrentLanguageValue() );
+		assertEquals("java.time.LocalDateTime.parse(\"2001-05-21T01:47:53\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  1).getCurrentLanguageValue() );
+		assertEquals("java.time.LocalDateTime.parse(\"2002-05-21T02:47:53\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  2).getCurrentLanguageValue() );
 	}
 	@Test
 	public void testLiteralValuesForDATETIMETZ() {
@@ -345,9 +356,9 @@ public class LiteralValuesProviderForJavaTest extends AbstractLiteralsTest {
 		// Check expected 
 		LanguageType lt = getLanguageType(NeutralType.DATETIMETZ );
 		int maxlen = 999; // not used
-		assertEquals("java.time.OffsetDateTime.parse(\"2000-07-21T00:47:57+00:00\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  0).getCurrentLanguageValue() );
-		assertEquals("java.time.OffsetDateTime.parse(\"2001-07-21T01:47:57+01:00\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  1).getCurrentLanguageValue() );
-		assertEquals("java.time.OffsetDateTime.parse(\"2002-07-21T02:47:57+02:00\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  2).getCurrentLanguageValue() );
+		assertEquals("java.time.OffsetDateTime.parse(\"2000-05-21T00:47:53+00:00\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  0).getCurrentLanguageValue() );
+		assertEquals("java.time.OffsetDateTime.parse(\"2001-05-21T01:47:53+01:00\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  1).getCurrentLanguageValue() );
+		assertEquals("java.time.OffsetDateTime.parse(\"2002-05-21T02:47:53+02:00\")", getLiteralValuesProvider().generateLiteralValue(lt, maxlen,  2).getCurrentLanguageValue() );
 	}
 	
 	@Test

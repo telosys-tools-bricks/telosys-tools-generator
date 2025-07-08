@@ -197,22 +197,23 @@ public class LiteralValuesProviderForJava extends LiteralValuesProvider {
 		return new LiteralValue(NULL_LITERAL, null);
 	}
 	
-	private String generateYearValue(int step) {
-		int year = 2000 + ( step % 1000 ) ;  // between 2000 and 2999 
-		return "" + year ;
-	}
-	private String generateHourValue(int step) {
-		int hour = step % 24 ;
-		return String.format("%02d", hour) ; // between 0 and 23		
-	}
-	private String generateOffset(int step) { // v 4.3.0
-		int offset = step % 5; // 0 to 4
-		return String.format("%+03d:00", offset); // from "+00.00" to "+04.00"
-	}	
+//	private String generateYearValue(int step) {
+//		int year = 2000 + ( step % 1000 ) ;  // between 2000 and 2999 
+//		return "" + year ;
+//	}
+//	private String generateHourValue(int step) {
+//		int hour = step % 24 ;
+//		return String.format("%02d", hour) ; // between 0 and 23		
+//	}
+//	private String generateOffset(int step) { // v 4.3.0
+//		int offset = step % 5; // 0 to 4
+//		return String.format("%+03d:00", offset); // from "+00.00" to "+04.00"
+//	}	
 
 	//--- SQL date/time/timestamp
 	private LiteralValue generateSqlDateValue(int step) {
-		String dateISO = generateYearValue(step) + "-06-22" ; // "2001-06-22" 
+		//String dateISO = generateYearValue(step) + "-06-22" ; // "2001-06-22" 
+		String dateISO = buildDateISO(step);
 		java.sql.Date value = java.sql.Date.valueOf(dateISO);
 		return new LiteralValue("java.sql.Date.valueOf(\"" + dateISO + "\")", value) ; 
 	}
@@ -222,33 +223,38 @@ public class LiteralValuesProviderForJava extends LiteralValuesProvider {
 		return new LiteralValue("java.sql.Time.valueOf(\"" + timeISO + "\")", value) ; 
 	}
 	private LiteralValue generateSqlTimestampValue(int step) {
-		String timestampISO = generateYearValue(step) + "-05-21" + " " + String.format("%02d", (step%24) ) + ":46:53" ; // "2001-05-21 15:46:53" 
+		String timestampISO = buildDateISO(step) + " " + String.format("%02d", (step%24) ) + ":46:53" ; // "2001-05-21 15:46:53" 
 		java.sql.Timestamp value = java.sql.Timestamp.valueOf(timestampISO);
 		return new LiteralValue("java.sql.Timestamp.valueOf(\"" + timestampISO + "\")", value) ; 
 	}
 	private LiteralValue generateLocalDateValue(int step) { // v 3.4.0
-		String dateISO = generateYearValue(step) + "-06-22" ; // "2001-06-22" 
+		//String dateISO = generateYearValue(step) + "-06-22" ; // "2001-06-22" 
+		String dateISO = buildDateISO(step) ; // "2001-06-22" 
 		return new LiteralValue("java.time.LocalDate.parse(\"" + dateISO + "\")", dateISO );
 	}
 	private LiteralValue generateLocalTimeValue(int step) { // v 3.4.0
-		String timeISO = generateHourValue(step) + ":46:52" ; // "15:46:52"
+		//String timeISO = generateHourValue(step) + ":46:52" ; // "15:46:52"
+		String timeISO = buildTimeISO(step) ; // "15:46:52"
 		return new LiteralValue("java.time.LocalTime.parse(\"" + timeISO + "\")", timeISO );
 	}
 	private LiteralValue generateLocalDateTimeValue(int step) { // v 3.4.0
 		// expected : LocalDateTime.parse("2017-11-15T08:22:12")
-		String timestampISO = generateYearValue(step) + "-05-21" 
-				+ "T" + generateHourValue(step) + ":46:52" ; // "2001-05-21T15:46:52" 
-		return new LiteralValue("java.time.LocalDateTime.parse(\"" + timestampISO + "\")", timestampISO );
+//		String timestampISO = generateYearValue(step) + "-05-21" 
+//				+ "T" + generateHourValue(step) + ":46:52" ; // "2001-05-21T15:46:52" 
+		String dateTimeISO = buildDateTimeISO(step); // "2017-11-15T08:22:12"
+		return new LiteralValue("java.time.LocalDateTime.parse(\"" + dateTimeISO + "\")", dateTimeISO );
 	}
 	private LiteralValue generateOffsetDateTimeValue(int step) { // v 4.3.0
 		// expected : OffsetDateTime.parse("2025-07-08T12:30:45+02:00")
-		String formatedValue = generateYearValue(step) + "-07-21" 
-				+ "T" + generateHourValue(step) + ":47:57" + generateOffset(step); 
+//		String formatedValue = generateYearValue(step) + "-07-21" 
+//				+ "T" + generateHourValue(step) + ":47:57" + generateOffset(step); 
+		String formatedValue = buildDateTimeWithOffsetISO(step);
 		return new LiteralValue("java.time.OffsetDateTime.parse(\"" + formatedValue + "\")", formatedValue );
 	}
 	private LiteralValue generateOffsetTimeValue(int step) { // v 4.3.0
 		// expected : OffsetTime.parse("12:30:45+02:00")
-		String formatedValue = generateHourValue(step) + ":48:58" + generateOffset(step); 
+		// String formatedValue = generateHourValue(step) + ":48:58" + generateOffset(step); 
+		String formatedValue = buildTimeWithOffsetISO(step);
 		return new LiteralValue("java.time.OffsetTime.parse(\"" + formatedValue + "\")", formatedValue );
 	}
 
