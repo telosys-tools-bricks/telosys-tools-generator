@@ -18,7 +18,6 @@ package org.telosys.tools.generator.languages.types;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.telosys.tools.commons.JavaTypeUtil;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 /**
