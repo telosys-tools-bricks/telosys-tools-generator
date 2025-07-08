@@ -153,10 +153,16 @@ public class LiteralValuesProviderForKotlin extends LiteralValuesProvider {
 		notNullInitValues.put(NeutralType.DOUBLE,  "0.0"  );  // no suffix 
 		notNullInitValues.put(NeutralType.DECIMAL, "BigDecimal.ZERO" );  // BigDecimal (java.math.BigDecimal)
 
-		notNullInitValues.put(NeutralType.DATE,      "LocalDate.now()"); 
-		notNullInitValues.put(NeutralType.TIME,      "LocalTime.now()"); 
-		notNullInitValues.put(NeutralType.TIMESTAMP, "LocalDateTime.now()"); 
-		notNullInitValues.put(NeutralType.BINARY,    "ByteArray(0)"); // ByteArray
+		notNullInitValues.put(NeutralType.DATE,       "LocalDate.now()"); 
+		notNullInitValues.put(NeutralType.TIME,       "LocalTime.now()"); 
+		notNullInitValues.put(NeutralType.TIMESTAMP,  "LocalDateTime.now()"); 
+		notNullInitValues.put(NeutralType.DATETIME,   "LocalDateTime.now()");  // v 4.3.0
+		notNullInitValues.put(NeutralType.DATETIMETZ, "OffsetDateTime.now()"); // v 4.3.0
+		notNullInitValues.put(NeutralType.TIMETZ,     "OffsetTime.now()");     // v 4.3.0
+
+		notNullInitValues.put(NeutralType.UUID, 	 "UUID(0L,0L)"); // v 4.3.0  (Kotlin syntax != Java syntax, no "new" keyword)
+		
+		notNullInitValues.put(NeutralType.BINARY,    "ByteArray(0)"); // ByteArray (Kotlin syntax != Java syntax)
 	}
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {

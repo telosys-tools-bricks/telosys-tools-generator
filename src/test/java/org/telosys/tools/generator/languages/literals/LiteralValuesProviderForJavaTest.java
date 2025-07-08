@@ -364,6 +364,7 @@ public class LiteralValuesProviderForJavaTest extends AbstractLiteralsTest {
 	@Test
 	public void testLiteralValuesForUUID() {
 		// Check literal expression 
+		assertEquals( new java.util.UUID(0L, 0L), java.util.UUID.fromString("00000000-0000-0000-0000-000000000000") );
 		assertNotNull( java.util.UUID.fromString("123e4567-e89b-12d3-a456-426614174000") );
 		// Check expected 
 		LanguageType lt = getLanguageType(NeutralType.UUID );

@@ -274,9 +274,15 @@ public class LiteralValuesProviderForJava extends LiteralValuesProvider {
 		notNullInitValues.put(NeutralType.DOUBLE,  "0D");  // double, Double
 		notNullInitValues.put(NeutralType.DECIMAL, "BigDecimal.ZERO" );  // BigDecimal (java.math.BigDecimal)
 
-		notNullInitValues.put(NeutralType.DATE,      "LocalDate.now()"); 
-		notNullInitValues.put(NeutralType.TIME,      "LocalTime.now()"); 
-		notNullInitValues.put(NeutralType.TIMESTAMP, "LocalDateTime.now()"); 
+		notNullInitValues.put(NeutralType.DATE,       "LocalDate.now()"); 
+		notNullInitValues.put(NeutralType.TIME,       "LocalTime.now()"); 
+		notNullInitValues.put(NeutralType.TIMESTAMP,  "LocalDateTime.now()"); 
+		notNullInitValues.put(NeutralType.DATETIME,   "LocalDateTime.now()");  // v 4.3.0
+		notNullInitValues.put(NeutralType.DATETIMETZ, "OffsetDateTime.now()"); // v 4.3.0
+		notNullInitValues.put(NeutralType.TIMETZ,     "OffsetTime.now()");     // v 4.3.0
+
+		notNullInitValues.put(NeutralType.UUID, 	"new UUID(0L,0L)"); // v 4.3.0
+		
 		notNullInitValues.put(NeutralType.BINARY,    "new byte[0]"); // void array
 	}
 	@Override
