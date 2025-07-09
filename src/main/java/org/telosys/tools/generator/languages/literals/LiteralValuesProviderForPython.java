@@ -98,9 +98,42 @@ public class LiteralValuesProviderForPython extends LiteralValuesProvider {
 			boolean value = buildBooleanValue(step);
 			return new LiteralValue(value ? TRUE_LITERAL : FALSE_LITERAL, Boolean.valueOf(value)) ;
 		}
-
-		//--- Noting for DATE, TIME and TIMESTAMP, BINARY 
 		
+		//--- TEMPORAL TYPES
+		// import requirements:
+		//   "from datetime import datetime"
+		//   "from datetime import date"
+		//   "from datetime import time"
+		// or "from datetime import datetime, date, time"
+		else if ( NeutralType.DATE.equals(neutralType)  ) {
+			String dateISO = buildDateISO(step) ; // "2001-06-22" 
+			return new LiteralValue("date.fromisoformat(\"" + dateISO + "\")", dateISO );
+		}
+		else if ( NeutralType.TIME.equals(neutralType)  ) {
+			String timeISO = buildTimeISO(step) ; // "15:46:52"
+			return new LiteralValue("time.fromisoformat(\"" + timeISO + "\")", timeISO );
+		}
+		else if ( NeutralType.DATETIME.equals(neutralType) || NeutralType.TIMESTAMP.equals(neutralType) ) { // ver 4.3.0
+			String dateTimeISO = buildDateTimeISO(step); // "2017-11-15T08:22:12"
+			return new LiteralValue("datetime.fromisoformat(\"" + dateTimeISO + "\")", dateTimeISO );
+		}
+		else if ( NeutralType.DATETIMETZ.equals(neutralType) ) { // ver 4.3.0
+			String value = buildDateTimeWithOffsetISO(step); 
+			return new LiteralValue("datetime.fromisoformat(\"" + value + "\")", value ); // A timezone-aware 'datetime' has its 'tzinfo' field set
+		}
+		else if ( NeutralType.TIMETZ.equals(neutralType) ) { // ver 4.3.0
+			String value = buildTimeWithOffsetISO(step);
+			return new LiteralValue("time.fromisoformat(\"" + value + "\")", value );
+		}
+		
+		//--- UUID
+		// import required:   "from uuid import UUID"
+		else if ( NeutralType.UUID.equals(neutralType) ) { // ver 4.3.0
+			String uuidString = buildUUID(); 
+			return new LiteralValue("UUID(\""+uuidString+"\")", uuidString);
+		}
+		
+		//--- Noting for BINARY		
 		return new LiteralValue(NULL_LITERAL, null);
 	}
 	
@@ -129,9 +162,16 @@ public class LiteralValuesProviderForPython extends LiteralValuesProvider {
 		notNullInitValues.put(NeutralType.DOUBLE,  "0.0");  // float
 		notNullInitValues.put(NeutralType.DECIMAL, "0.0");  // float
 
-//		notNullInitValues.put(NeutralType.DATE,      "?");  
-//		notNullInitValues.put(NeutralType.TIME,      "?"); 
-//		notNullInitValues.put(NeutralType.TIMESTAMP, "?"); 
+		// temporal types,  import required: "from datetime import date, time, datetime"
+		notNullInitValues.put(NeutralType.DATE,       "date(1,1,1)");   // 0001-01-01
+		notNullInitValues.put(NeutralType.TIME,       "time(0,0,0,0)"); // 00:00:00
+		notNullInitValues.put(NeutralType.TIMESTAMP,  "datetime(1,1,1,0,0,0)"); // 0001-01-01 00:00:00
+		notNullInitValues.put(NeutralType.DATETIME,   "datetime(1,1,1,0,0,0)"); // 0001-01-01 00:00:00 - v 4.3.0
+		notNullInitValues.put(NeutralType.DATETIMETZ, "datetime(1,1,1,0,0,0)"); // 0001-01-01 00:00:00 - v 4.3.0
+		notNullInitValues.put(NeutralType.TIMETZ,     "time(0,0,0,0)");         // 00:00:00 - v 4.3.0
+
+		notNullInitValues.put(NeutralType.UUID, 	 "UUID(int=0)"); // v 4.3.0  ( import required: "from uuid import UUID" )
+
 //		defaultValues.put(NeutralType.BINARY,    "?"); 
 	}
 	@Override
