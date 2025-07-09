@@ -43,7 +43,6 @@ public class LiteralValuesProviderForPHP extends LiteralValuesProvider {
 	private static final String NULL_LITERAL  = "null" ;   // "NULL"  or "null"
 	private static final String TRUE_LITERAL  = "true" ;   // "TRUE"  or "true"
 	private static final String FALSE_LITERAL = "false" ;  // "FALSE" or "false" 
-	private static final String EMPTY_STRING_LITERAL = "\"\"" ; 
 	
 	@Override
 	public String getLiteralNull() {
@@ -95,12 +94,36 @@ public class LiteralValuesProviderForPHP extends LiteralValuesProvider {
 			return new LiteralValue(value ? TRUE_LITERAL : FALSE_LITERAL, Boolean.valueOf(value)) ;
 		}
 
-		//--- Noting for DATE, TIME and TIMESTAMP :  there is no Date literal in TypeScript !
+		//--- TEMPORAL TYPES 
+		else if ( NeutralType.DATE.equals(neutralType)  ) {
+			return buildLiteralValueWithNewDateTime( buildDateISO(step) ); // "2001-06-22" 
+		}
+		else if ( NeutralType.TIME.equals(neutralType)  ) {
+			return buildLiteralValueWithNewDateTime( buildTimeISO(step) ); // "15:46:52"
+		}
+		else if ( NeutralType.DATETIME.equals(neutralType) || NeutralType.TIMESTAMP.equals(neutralType) ) { // ver 4.3.0
+			return buildLiteralValueWithNewDateTime( buildDateTimeISO(step) ); // "2017-11-15T08:22:12"
+		}
+		else if ( NeutralType.DATETIMETZ.equals(neutralType) ) { // ver 4.3.0
+			return buildLiteralValueWithNewDateTime( buildDateTimeWithOffsetISO(step) );
+		}
+		else if ( NeutralType.TIMETZ.equals(neutralType) ) { // ver 4.3.0
+			return buildLiteralValueWithNewDateTime( buildTimeWithOffsetISO(step) );
+		}
+		
+		//--- UUID
+		else if ( NeutralType.UUID.equals(neutralType) ) { // ver 4.3.0
+			String uuidString = buildUUID(); 
+			return new LiteralValue("'"+uuidString+"'", uuidString);
+		}
+
 		//--- Noting for BINARY
 		
 		return new LiteralValue(NULL_LITERAL, null);
 	}
-	
+	private LiteralValue buildLiteralValueWithNewDateTime(String isoValue) {
+		return new LiteralValue( "new DateTime('" + isoValue + "')",  isoValue );
+	}
 	/* 
 	 * Returns something like that : 
 	 *   ' == 100' 
@@ -116,23 +139,34 @@ public class LiteralValuesProviderForPHP extends LiteralValuesProvider {
 		//  1 == "1": true // "1" gets casted to an integer, which is 1
 		return " == " + value ; // Value comparison 
 	}
+
+	private static final String EMPTY_STRING_LITERAL = "''" ; // Single quotes (no variable interpolation) or double quotes (parses variables)
+	private static final String INT_ZERO_VALUE       = "0" ; 
+	private static final String FLOAT_ZERO_VALUE     = "0.0" ; 
+	private static final String NEW_DATETIME         = "new DateTime()" ; // current date and time (in the default timezone)
 	
 	private static final Map<String,String> notNullInitValues = new HashMap<>();
 	static {
 		notNullInitValues.put(NeutralType.STRING,  EMPTY_STRING_LITERAL);  // string 
 		notNullInitValues.put(NeutralType.BOOLEAN, FALSE_LITERAL);  
-		notNullInitValues.put(NeutralType.BYTE,    "0"); // int
-		notNullInitValues.put(NeutralType.SHORT,   "0"); // int 
-		notNullInitValues.put(NeutralType.INTEGER, "0"); // int 
-		notNullInitValues.put(NeutralType.LONG,    "0"); // int 
-		notNullInitValues.put(NeutralType.FLOAT,   "0.0");  // float
-		notNullInitValues.put(NeutralType.DOUBLE,  "0.0");  // float
-		notNullInitValues.put(NeutralType.DECIMAL, "0.0");  // float
+		notNullInitValues.put(NeutralType.BYTE,    INT_ZERO_VALUE ); // int
+		notNullInitValues.put(NeutralType.SHORT,   INT_ZERO_VALUE ); // int 
+		notNullInitValues.put(NeutralType.INTEGER, INT_ZERO_VALUE ); // int 
+		notNullInitValues.put(NeutralType.LONG,    INT_ZERO_VALUE ); // int 
+		notNullInitValues.put(NeutralType.FLOAT,   FLOAT_ZERO_VALUE); // float
+		notNullInitValues.put(NeutralType.DOUBLE,  FLOAT_ZERO_VALUE); // float
+		notNullInitValues.put(NeutralType.DECIMAL, FLOAT_ZERO_VALUE); // float
 
-		notNullInitValues.put(NeutralType.DATE,      "new DateTime()");  
-		notNullInitValues.put(NeutralType.TIME,      "new DateTime()"); 
-		notNullInitValues.put(NeutralType.TIMESTAMP, "new DateTime()"); 
-//		defaultValues.put(NeutralType.BINARY,    "?"); 
+		notNullInitValues.put(NeutralType.DATE,       NEW_DATETIME);  
+		notNullInitValues.put(NeutralType.TIME,       NEW_DATETIME); 
+		notNullInitValues.put(NeutralType.TIMESTAMP,  NEW_DATETIME); 
+		notNullInitValues.put(NeutralType.DATETIME,   NEW_DATETIME); // v 4.3.0  
+		notNullInitValues.put(NeutralType.DATETIMETZ, NEW_DATETIME); // v 4.3.0  
+		notNullInitValues.put(NeutralType.TIMETZ,     NEW_DATETIME); // v 4.3.0  
+		
+		notNullInitValues.put(NeutralType.UUID,       "'00000000-0000-0000-0000-000000000000'"); // v 4.3.0  
+
+		notNullInitValues.put(NeutralType.BINARY,     EMPTY_STRING_LITERAL ); // v 4.3.0  
 	}
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {

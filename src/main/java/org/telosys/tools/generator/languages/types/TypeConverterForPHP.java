@@ -32,6 +32,7 @@ public class TypeConverterForPHP extends TypeConverter {
 	private static final String PHP_BOOL   = "bool" ;
 	private static final String PHP_INT    = "int" ;
 	private static final String PHP_FLOAT  = "float" ;
+	private static final String PHP_DATETIME  = "DateTime" ;
 
 	public TypeConverterForPHP() {
 		super("PHP");
@@ -46,11 +47,17 @@ public class TypeConverterForPHP extends TypeConverter {
 		declarePrimitiveType( buildPrimitiveType(NeutralType.DOUBLE,  PHP_FLOAT ) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.DECIMAL, PHP_FLOAT ) );
 		
-		declareObjectType( buildObjectType(NeutralType.DATE,      "DateTime", "DateTime" ) ); 
-		declareObjectType( buildObjectType(NeutralType.TIME,      "DateTime", "DateTime" ) );
-		declareObjectType( buildObjectType(NeutralType.TIMESTAMP, "DateTime", "DateTime" ) );  
+		declareObjectType( buildObjectType(NeutralType.DATE,      PHP_DATETIME, PHP_DATETIME ) ); // PHP doesn’t have a built-in “Date-only” type => use 'DateTime'
+		declareObjectType( buildObjectType(NeutralType.TIME,      PHP_DATETIME, PHP_DATETIME ) ); // PHP doesn’t have a built-in “Time-only” type => use 'DateTime'
+		declareObjectType( buildObjectType(NeutralType.TIMESTAMP, PHP_DATETIME, PHP_DATETIME ) ); 
 		
-		declareObjectType( buildObjectType(NeutralType.BINARY,    "", "" ) ); 		
+		declareObjectType( buildObjectType(NeutralType.DATETIME,   PHP_DATETIME, PHP_DATETIME ) );  
+		declareObjectType( buildObjectType(NeutralType.DATETIMETZ, PHP_DATETIME, PHP_DATETIME ) );  // 'DateTime' and 'DateTimeImmutable' instances internally store timezone info.
+		declareObjectType( buildObjectType(NeutralType.TIMETZ,     PHP_DATETIME, PHP_DATETIME ) );  // PHP does not have a built-in time-only with timezone => use 'DateTime'
+
+		declarePrimitiveType( buildPrimitiveType(NeutralType.UUID,   PHP_STRING) ); // Most commonly, a UUID is just stored as a string in PHP
+
+		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY, PHP_STRING) ); // No 'byte array' => use 'string', it can store binary (PHP strings are binary-safe)
 	}
 	
 	private LanguageType buildPrimitiveType(String neutralType, String primitiveType)  {

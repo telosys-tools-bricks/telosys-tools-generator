@@ -154,22 +154,39 @@ public class TypeConverterForPHPTest extends AbstractTypeTest {
 	public void testTimestamp() {
 		checkDateTimeExpected(NeutralType.TIMESTAMP);
 	}
-
-	//----------------------------------------------------------------------------------
-	private void checkVoidExpected(String neutralType) {
-		checkObjectType( getType( neutralType, NONE ),                  "", "" );
-		checkObjectType( getType( neutralType, PRIMITIVE_TYPE ),        "", "" );
-		checkObjectType( getType( neutralType, OBJECT_TYPE),            "", "" );
-		checkObjectType( getType( neutralType, UNSIGNED_TYPE),          "", "" );
-
-		checkObjectType( getType( neutralType, NOT_NULL ),                  "", "");
-		checkObjectType( getType( neutralType, NOT_NULL + PRIMITIVE_TYPE ), "", "");
-		checkObjectType( getType( neutralType, NOT_NULL + OBJECT_TYPE ),    "", "");
-		checkObjectType( getType( neutralType, NOT_NULL + UNSIGNED_TYPE),   "", "");
+	@Test
+	public void testDatetime() {
+		checkDateTimeExpected(NeutralType.DATETIME);
 	}
 	@Test
+	public void testDatetimeTZ() {
+		checkDateTimeExpected(NeutralType.DATETIMETZ);
+	}
+	@Test
+	public void testTimeTZ() {
+		checkDateTimeExpected(NeutralType.TIMETZ);
+	}
+
+	//----------------------------------------------------------------------------------
+//	private void checkVoidExpected(String neutralType) {
+//		checkObjectType( getType( neutralType, NONE ),                  "", "" );
+//		checkObjectType( getType( neutralType, PRIMITIVE_TYPE ),        "", "" );
+//		checkObjectType( getType( neutralType, OBJECT_TYPE),            "", "" );
+//		checkObjectType( getType( neutralType, UNSIGNED_TYPE),          "", "" );
+//
+//		checkObjectType( getType( neutralType, NOT_NULL ),                  "", "");
+//		checkObjectType( getType( neutralType, NOT_NULL + PRIMITIVE_TYPE ), "", "");
+//		checkObjectType( getType( neutralType, NOT_NULL + OBJECT_TYPE ),    "", "");
+//		checkObjectType( getType( neutralType, NOT_NULL + UNSIGNED_TYPE),   "", "");
+//	}
+	@Test
 	public void testBinary() {
-		checkVoidExpected(NeutralType.BINARY);
+		checkPrimitiveType( getType(NeutralType.BINARY, NONE ),                           PHP_STRING_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.BINARY, PRIMITIVE_TYPE ),                 PHP_STRING_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.BINARY, UNSIGNED_TYPE ),                  PHP_STRING_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.BINARY, PRIMITIVE_TYPE + UNSIGNED_TYPE ), PHP_STRING_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.BINARY, OBJECT_TYPE),                     PHP_STRING_NULLABLE );
+		checkPrimitiveType( getType(NeutralType.BINARY, NOT_NULL ),                       PHP_STRING );
 	}
 	
 	//----------------------------------------------------------------------------------

@@ -71,7 +71,6 @@ public class LiteralValuesProviderForKotlin extends LiteralValuesProvider {
 		
 		String neutralType = languageType.getNeutralType(); 
 		String simpleType = languageType.getSimpleType(); 
-		String fullType = languageType.getFullType();
 		
 		//--- STRING
 		if ( NeutralType.STRING.equals(neutralType) ) {
@@ -120,12 +119,24 @@ public class LiteralValuesProviderForKotlin extends LiteralValuesProvider {
 			String timeISO = buildTimeISO(step) ; // "15:46:52"
 			return new LiteralValue("java.time.LocalTime.parse(\"" + timeISO + "\")", timeISO );
 		}
-		else if ( NeutralType.TIMESTAMP.equals(neutralType) ) {
+		else if ( NeutralType.DATETIME.equals(neutralType) || NeutralType.TIMESTAMP.equals(neutralType) ) { // ver 4.3.0
 			String dateTimeISO = buildDateTimeISO(step); // "2017-11-15T08:22:12"
 			return new LiteralValue("java.time.LocalDateTime.parse(\"" + dateTimeISO + "\")", dateTimeISO );
 		}
-
-		//--- Noting for the rest (BINARY)		
+		else if ( NeutralType.DATETIMETZ.equals(neutralType) ) { // ver 4.3.0
+			String value = buildDateTimeWithOffsetISO(step); 
+			return new LiteralValue("java.time.OffsetDateTime.parse(\"" + value + "\")", value );
+		}
+		else if ( NeutralType.TIMETZ.equals(neutralType) ) { // ver 4.3.0
+			String value = buildTimeWithOffsetISO(step);
+			return new LiteralValue("java.time.OffsetTime.parse(\"" + value + "\")", value );
+		}
+		//--- UUID
+		else if ( NeutralType.UUID.equals(neutralType) ) { // ver 4.3.0
+			String uuidString = buildUUID(); 
+			return new LiteralValue("java.util.UUID.fromString(\""+uuidString+"\")", uuidString);
+		}
+		//--- Noting for BINARY		
 		return new LiteralValue(NULL_LITERAL, null);
 	}
 	
