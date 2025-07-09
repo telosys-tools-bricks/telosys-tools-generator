@@ -150,7 +150,7 @@ public class LiteralValuesProviderForJavaScript extends LiteralValuesProvider {
 		
 		notNullInitValues.put(NeutralType.UUID,  EMPTY_STRING_LITERAL);
 		
-		// nothing for NeutralType BINARY 
+		notNullInitValues.put(NeutralType.BINARY,  "new Uint8Array(0)"); // Uint8Array is a typed array with a fixed length.
 	}
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {

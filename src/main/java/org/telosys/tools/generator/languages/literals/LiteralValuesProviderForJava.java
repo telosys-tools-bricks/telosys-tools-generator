@@ -140,102 +140,115 @@ public class LiteralValuesProviderForJava extends LiteralValuesProvider {
 			return new LiteralValue("Boolean.valueOf("+s+")", Boolean.valueOf(value)) ; // eg : Boolean.valueOf(true)
 		}
 		
-		// DATE & TIME : "java.time.*"  (NEW since v 3.4.0 )
+		//--- DATE & TIME : "java.time.*"  (NEW since v 3.4.0 )
 		else if ( java.time.LocalDate.class.getCanonicalName().equals(javaFullType) ) {
-			return generateLocalDateValue(step);
+//			return generateLocalDateValue(step);
+			String dateISO = buildDateISO(step) ; // "2001-06-22" 
+			return new LiteralValue("java.time.LocalDate.parse(\"" + dateISO + "\")", dateISO );
 		}
 		else if ( java.time.LocalTime.class.getCanonicalName().equals(javaFullType) ) {
-			return generateLocalTimeValue(step);
+//			return generateLocalTimeValue(step);
+			String timeISO = buildTimeISO(step) ; // "15:46:52"
+			return new LiteralValue("java.time.LocalTime.parse(\"" + timeISO + "\")", timeISO );
 		}
 		else if ( java.time.LocalDateTime.class.getCanonicalName().equals(javaFullType) ) {
-			return generateLocalDateTimeValue(step);
+//			return generateLocalDateTimeValue(step);
+			// expected : LocalDateTime.parse("2017-11-15T08:22:12")
+			String dateTimeISO = buildDateTimeISO(step); // "2017-11-15T08:22:12"
+			return new LiteralValue("java.time.LocalDateTime.parse(\"" + dateTimeISO + "\")", dateTimeISO );
 		}
 		else if ( java.time.OffsetDateTime.class.getCanonicalName().equals(javaFullType) ) { // ver 4.3.0
-			return generateOffsetDateTimeValue(step);
+//			return generateOffsetDateTimeValue(step);
+			// v 4.3.0 - expected : OffsetDateTime.parse("2025-07-08T12:30:45+02:00")
+			String value = buildDateTimeWithOffsetISO(step);
+			return new LiteralValue("java.time.OffsetDateTime.parse(\"" + value + "\")", value );
 		}
 		else if ( java.time.OffsetTime.class.getCanonicalName().equals(javaFullType) ) { // ver 4.3.0
-			return generateOffsetTimeValue(step);
+//			return generateOffsetTimeValue(step);
+			// expected : OffsetTime.parse("12:30:45+02:00")
+			String value = buildTimeWithOffsetISO(step);
+			return new LiteralValue("java.time.OffsetTime.parse(\"" + value + "\")", value );
 		}
 		
-		// UUID
+		//--- UUID
 		else if ( java.util.UUID.class.getCanonicalName().equals(javaFullType) ) { // ver 4.3.0
 			String uuidString = buildUUID(); 
 			return new LiteralValue("java.util.UUID.fromString(\""+uuidString+"\")", uuidString) ; // v 4.3
 		}
 
-		//-------------------------------------------------------------------------------
-		// DATE & TIME : "java.sql.*" ( OLD not supposed to be used ) 
-		else if ( java.sql.Date.class.getCanonicalName().equals(javaFullType) ) {
-			return generateSqlDateValue(step);
-		}
-		else if ( java.sql.Time.class.getCanonicalName().equals(javaFullType) ) {
-			return generateSqlTimeValue(step);
-		}
-		else if ( java.sql.Timestamp.class.getCanonicalName().equals(javaFullType) ) {
-			return generateSqlTimestampValue(step);
-		}
-		//-------------------------------------------------------------------------------
-		// DATE & TIME : OLD "java.util.Date" ( not supposed to be used since v 3.4.0 ) 
-		else if ( java.util.Date.class.getCanonicalName().equals(javaFullType) ) {
-			String neutralType = languageType.getNeutralType();
-			// A standard "java.util.Date" can be used to store Date/Time/Timestamp
-			if ( NeutralType.DATE.equals(neutralType) ) {
-				return generateSqlDateValue(step);
-			}
-			else if ( NeutralType.TIME.equals(neutralType) ) {
-				return generateSqlTimeValue(step);
-			}
-			else if ( NeutralType.TIMESTAMP.equals(neutralType) ) {
-				return generateSqlTimestampValue(step);
-			}
-			else {
-				// by default generate a DATE
-				return generateSqlDateValue(step);
-			}
-		}
+//		//-------------------------------------------------------------------------------
+//		// DATE & TIME : "java.sql.*" ( OLD not supposed to be used ) 
+//		else if ( java.sql.Date.class.getCanonicalName().equals(javaFullType) ) {
+//			return generateSqlDateValue(step);
+//		}
+//		else if ( java.sql.Time.class.getCanonicalName().equals(javaFullType) ) {
+//			return generateSqlTimeValue(step);
+//		}
+//		else if ( java.sql.Timestamp.class.getCanonicalName().equals(javaFullType) ) {
+//			return generateSqlTimestampValue(step);
+//		}
+//		//-------------------------------------------------------------------------------
+//		// DATE & TIME : OLD "java.util.Date" ( not supposed to be used since v 3.4.0 ) 
+//		else if ( java.util.Date.class.getCanonicalName().equals(javaFullType) ) {
+//			String neutralType = languageType.getNeutralType();
+//			// A standard "java.util.Date" can be used to store Date/Time/Timestamp
+//			if ( NeutralType.DATE.equals(neutralType) ) {
+//				return generateSqlDateValue(step);
+//			}
+//			else if ( NeutralType.TIME.equals(neutralType) ) {
+//				return generateSqlTimeValue(step);
+//			}
+//			else if ( NeutralType.TIMESTAMP.equals(neutralType) ) {
+//				return generateSqlTimestampValue(step);
+//			}
+//			else {
+//				// by default generate a DATE
+//				return generateSqlDateValue(step);
+//			}
+//		}
 		return new LiteralValue(NULL_LITERAL, null);
 	}
 	
-	//--- SQL date/time/timestamp
-	private LiteralValue generateSqlDateValue(int step) {
-		//String dateISO = generateYearValue(step) + "-06-22" ; // "2001-06-22" 
-		String dateISO = buildDateISO(step);
-		java.sql.Date value = java.sql.Date.valueOf(dateISO);
-		return new LiteralValue("java.sql.Date.valueOf(\"" + dateISO + "\")", value) ; 
-	}
-	private LiteralValue generateSqlTimeValue(int step) {
-		String timeISO =  String.format("%02d", (step%24) ) + ":46:52" ; // "15:46:52"
-		java.sql.Time value = java.sql.Time.valueOf(timeISO);
-		return new LiteralValue("java.sql.Time.valueOf(\"" + timeISO + "\")", value) ; 
-	}
-	private LiteralValue generateSqlTimestampValue(int step) {
-		String timestampISO = buildDateISO(step) + " " + String.format("%02d", (step%24) ) + ":46:53" ; // "2001-05-21 15:46:53" 
-		java.sql.Timestamp value = java.sql.Timestamp.valueOf(timestampISO);
-		return new LiteralValue("java.sql.Timestamp.valueOf(\"" + timestampISO + "\")", value) ; 
-	}
-	private LiteralValue generateLocalDateValue(int step) { // v 3.4.0
-		String dateISO = buildDateISO(step) ; // "2001-06-22" 
-		return new LiteralValue("java.time.LocalDate.parse(\"" + dateISO + "\")", dateISO );
-	}
-	private LiteralValue generateLocalTimeValue(int step) { // v 3.4.0
-		String timeISO = buildTimeISO(step) ; // "15:46:52"
-		return new LiteralValue("java.time.LocalTime.parse(\"" + timeISO + "\")", timeISO );
-	}
-	private LiteralValue generateLocalDateTimeValue(int step) { // v 3.4.0
-		// expected : LocalDateTime.parse("2017-11-15T08:22:12")
-		String dateTimeISO = buildDateTimeISO(step); // "2017-11-15T08:22:12"
-		return new LiteralValue("java.time.LocalDateTime.parse(\"" + dateTimeISO + "\")", dateTimeISO );
-	}
-	private LiteralValue generateOffsetDateTimeValue(int step) { // v 4.3.0
-		// expected : OffsetDateTime.parse("2025-07-08T12:30:45+02:00")
-		String formatedValue = buildDateTimeWithOffsetISO(step);
-		return new LiteralValue("java.time.OffsetDateTime.parse(\"" + formatedValue + "\")", formatedValue );
-	}
-	private LiteralValue generateOffsetTimeValue(int step) { // v 4.3.0
-		// expected : OffsetTime.parse("12:30:45+02:00")
-		String formatedValue = buildTimeWithOffsetISO(step);
-		return new LiteralValue("java.time.OffsetTime.parse(\"" + formatedValue + "\")", formatedValue );
-	}
+//	//--- SQL date/time/timestamp
+//	private LiteralValue generateSqlDateValue(int step) {
+//		//String dateISO = generateYearValue(step) + "-06-22" ; // "2001-06-22" 
+//		String dateISO = buildDateISO(step);
+//		java.sql.Date value = java.sql.Date.valueOf(dateISO);
+//		return new LiteralValue("java.sql.Date.valueOf(\"" + dateISO + "\")", value) ; 
+//	}
+//	private LiteralValue generateSqlTimeValue(int step) {
+//		String timeISO =  String.format("%02d", (step%24) ) + ":46:52" ; // "15:46:52"
+//		java.sql.Time value = java.sql.Time.valueOf(timeISO);
+//		return new LiteralValue("java.sql.Time.valueOf(\"" + timeISO + "\")", value) ; 
+//	}
+//	private LiteralValue generateSqlTimestampValue(int step) {
+//		String timestampISO = buildDateISO(step) + " " + String.format("%02d", (step%24) ) + ":46:53" ; // "2001-05-21 15:46:53" 
+//		java.sql.Timestamp value = java.sql.Timestamp.valueOf(timestampISO);
+//		return new LiteralValue("java.sql.Timestamp.valueOf(\"" + timestampISO + "\")", value) ; 
+//	}
+//	private LiteralValue generateLocalDateValue(int step) { // v 3.4.0
+//		String dateISO = buildDateISO(step) ; // "2001-06-22" 
+//		return new LiteralValue("java.time.LocalDate.parse(\"" + dateISO + "\")", dateISO );
+//	}
+//	private LiteralValue generateLocalTimeValue(int step) { // v 3.4.0
+//		String timeISO = buildTimeISO(step) ; // "15:46:52"
+//		return new LiteralValue("java.time.LocalTime.parse(\"" + timeISO + "\")", timeISO );
+//	}
+//	private LiteralValue generateLocalDateTimeValue(int step) { // v 3.4.0
+//		// expected : LocalDateTime.parse("2017-11-15T08:22:12")
+//		String dateTimeISO = buildDateTimeISO(step); // "2017-11-15T08:22:12"
+//		return new LiteralValue("java.time.LocalDateTime.parse(\"" + dateTimeISO + "\")", dateTimeISO );
+//	}
+//	private LiteralValue generateOffsetDateTimeValue(int step) { // 
+//		// v 4.3.0 - expected : OffsetDateTime.parse("2025-07-08T12:30:45+02:00")
+//		String formatedValue = buildDateTimeWithOffsetISO(step);
+//		return new LiteralValue("java.time.OffsetDateTime.parse(\"" + formatedValue + "\")", formatedValue );
+//	}
+//	private LiteralValue generateOffsetTimeValue(int step) { // v 4.3.0
+//		// expected : OffsetTime.parse("12:30:45+02:00")
+//		String formatedValue = buildTimeWithOffsetISO(step);
+//		return new LiteralValue("java.time.OffsetTime.parse(\"" + formatedValue + "\")", formatedValue );
+//	}
 
 	/* 
 	 * Returns something like that : 

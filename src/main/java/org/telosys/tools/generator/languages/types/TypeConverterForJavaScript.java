@@ -50,9 +50,9 @@ public class TypeConverterForJavaScript extends TypeConverter {
 		
 		declarePrimitiveType( buildType(NeutralType.UUID ) ); // ver 4.3.0
 		
-		declarePrimitiveType( buildType(NeutralType.BINARY ) ); 				
+		declarePrimitiveType( buildType(NeutralType.BINARY ) );
 	}
-	private LanguageType buildType(String neutralType) {
+	private LanguageType buildType(String neutralType) { // build a "void type"
 		return new LanguageType(neutralType, 
 				"",   // String simpleType, 
 				"",   // String fullType, 
