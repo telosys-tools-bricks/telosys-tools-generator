@@ -166,13 +166,27 @@ public class LiteralValuesProviderForKotlin extends LiteralValuesProvider {
 	}
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
-		if ( attribute.isNotNull() ) {
-			// not null attribute 
-			String initValue = notNullInitValues.get(languageType.getNeutralType());
-			return initValue != null ? initValue : NULL_LITERAL ; 
+//		if ( attribute.isNotNull() ) {
+//			// not null attribute 
+//			String initValue = notNullInitValues.get(languageType.getNeutralType());
+//			return initValue != null ? initValue : NULL_LITERAL ; 
+//		} else {
+//			// nullable attribute
+//			return NULL_LITERAL;
+//		}
+		// In Kotlin, primitive types cannot be null by default
+		return getInitValue(languageType.getNeutralType(), attribute.isNotNull() || languageType.isPrimitiveType() );
+	}
+	@Override
+	public String getInitValue(String neutralType, boolean notNull) {
+		if (notNull) {
+			// not null attribute
+			String defaultValue = notNullInitValues.get(neutralType);
+			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
 		} else {
 			// nullable attribute
 			return NULL_LITERAL;
 		}
 	}
+
 }

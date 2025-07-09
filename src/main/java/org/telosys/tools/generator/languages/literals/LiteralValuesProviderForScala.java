@@ -179,19 +179,6 @@ public class LiteralValuesProviderForScala extends LiteralValuesProvider {
 		notNullInitValues.put(NeutralType.TIMESTAMP, "LocalDateTime.now()");  // java.time.LocalDateTime : NULLABLE
 		notNullInitValues.put(NeutralType.BINARY,    "Array[Byte]");          // Array[Byte]             : NULLABLE
 	}
-	private static final String SCALA_DEFAULT_VALUE = "_"; 
-	// in Scala "_" initialises means "default value" when used in variable initialization
-	@Override
-	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
-		if ( attribute.isNotNull() || isNotNullable(languageType) ) {
-			// not null attribute 
-			String initValue = notNullInitValues.get(languageType.getNeutralType());
-			return initValue != null ? initValue : SCALA_DEFAULT_VALUE ; 
-		} else {
-			// nullable attribute
-			return NULL_LITERAL ;
-		}
-	}
 	private static final Set<String> notNullableScalaTypes = new HashSet<>();
 	static {
 		// Scala types derived from “AnyVal” are NOT NULLABLE
@@ -205,5 +192,31 @@ public class LiteralValuesProviderForScala extends LiteralValuesProvider {
 	}
 	private boolean isNotNullable(LanguageType languageType) {
 		return notNullableScalaTypes.contains(languageType.getNeutralType());
+	}
+	
+	// in Scala "_" initialises means "default value" when used in variable initialization
+	@Override
+	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
+//		if ( attribute.isNotNull() || isNotNullable(languageType) ) {
+//			// not null attribute 
+//			String initValue = notNullInitValues.get(languageType.getNeutralType());
+//			return initValue != null ? initValue : SCALA_DEFAULT_VALUE ; 
+//		} else {
+//			// nullable attribute
+//			return NULL_LITERAL ;
+//		}
+		return getInitValue(languageType.getNeutralType(), attribute.isNotNull() || isNotNullable(languageType) );
+	}
+	private static final String SCALA_DEFAULT_VALUE = "_"; 
+	@Override
+	public String getInitValue(String neutralType, boolean notNull) {
+		if (notNull) {
+			// not null attribute
+			String defaultValue = notNullInitValues.get(neutralType);
+			return defaultValue != null ? defaultValue : SCALA_DEFAULT_VALUE ; 
+		} else {
+			// nullable attribute
+			return NULL_LITERAL;
+		}
 	}
 }

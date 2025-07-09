@@ -136,14 +136,17 @@ public class LiteralValuesProviderForPHP extends LiteralValuesProvider {
 	}
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
-		if ( attribute.isNotNull() ) {
-			// not null attribute 
-			String initValue = notNullInitValues.get(languageType.getNeutralType());
-			return initValue != null ? initValue : NULL_LITERAL ; 
+		return getInitValue(languageType.getNeutralType(), attribute.isNotNull() );
+	}
+	@Override
+	public String getInitValue(String neutralType, boolean notNull) {
+		if (notNull) {
+			// not null attribute
+			String defaultValue = notNullInitValues.get(neutralType);
+			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
 		} else {
 			// nullable attribute
 			return NULL_LITERAL;
 		}
 	}
-
 }

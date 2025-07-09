@@ -101,26 +101,39 @@ public class LiteralValuesProviderForCPlusPlus extends LiteralValuesProvider {
 		return " == " + value ;
 	}
 	
-	private static final Map<String,String> defaultValues = new HashMap<>();
+	private static final Map<String,String> notNullInitValues = new HashMap<>();
 	static {
-		defaultValues.put(NeutralType.STRING,  "\"\"");  // string 
-		defaultValues.put(NeutralType.BOOLEAN, FALSE_LITERAL);  
-		defaultValues.put(NeutralType.BYTE,    "'\0'");  // char or unsigned char
-		defaultValues.put(NeutralType.SHORT,   "0");  
-		defaultValues.put(NeutralType.INTEGER, "0");  
-		defaultValues.put(NeutralType.LONG,    "0");  
-		defaultValues.put(NeutralType.FLOAT,   "0");  
-		defaultValues.put(NeutralType.DOUBLE,  "0");  
-		defaultValues.put(NeutralType.DECIMAL, "0");  
+		notNullInitValues.put(NeutralType.STRING,  "\"\"");  // string 
+		notNullInitValues.put(NeutralType.BOOLEAN, FALSE_LITERAL);  
+		notNullInitValues.put(NeutralType.BYTE,    "'\0'");  // char or unsigned char
+		notNullInitValues.put(NeutralType.SHORT,   "0");  
+		notNullInitValues.put(NeutralType.INTEGER, "0");  
+		notNullInitValues.put(NeutralType.LONG,    "0");  
+		notNullInitValues.put(NeutralType.FLOAT,   "0");  
+		notNullInitValues.put(NeutralType.DOUBLE,  "0");  
+		notNullInitValues.put(NeutralType.DECIMAL, "0");  
 		// nothing for "array", in C++ a size is required when declaring an array => cannot use "void array" for all init
 		// nothing for "vector", in C++ a vector is empty by default
 	}
 	
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
-		if (attribute.isNotNull()) {
+//		if (attribute.isNotNull()) {
+//			// not null attribute
+//			String defaultValue = notNullInitValues.get(languageType.getNeutralType());
+//			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
+//		} else {
+//			// nullable attribute
+//			return NULL_LITERAL;
+//		}
+		return getInitValue(languageType.getNeutralType(), attribute.isNotNull());
+	}
+
+	@Override
+	public String getInitValue(String neutralType, boolean notNull) {
+		if (notNull) {
 			// not null attribute
-			String defaultValue = defaultValues.get(languageType.getNeutralType());
+			String defaultValue = notNullInitValues.get(neutralType);
 			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
 		} else {
 			// nullable attribute

@@ -238,6 +238,20 @@ public abstract class LiteralValuesProvider {
 	 */
 	public abstract String getEqualsStatement(String value, LanguageType languageType) ;
 	
+	/**
+	 * Returns the default init value for the given attribute 
+	 * @param attribute
+	 * @param languageType
+	 * @return
+	 */
 	public abstract String getInitValue(AttributeInContext attribute, LanguageType languageType);
+	
+	/**
+	 * Returns the default init value for the given neutral type  
+	 * @param neutralType
+	 * @param notNull 
+	 * @return
+	 */
+	public abstract String getInitValue(String neutralType, boolean notNull) ;
 
 }

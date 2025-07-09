@@ -287,10 +287,21 @@ public class LiteralValuesProviderForJava extends LiteralValuesProvider {
 	}
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
-		if ( attribute.isNotNull() || languageType.isPrimitiveType() ) {
-			// not null attribute (in Java primitive type => not null value)
-			String initValue = notNullInitValues.get(languageType.getNeutralType());
-			return initValue != null ? initValue : NULL_LITERAL ; 
+//		if ( attribute.isNotNull() || languageType.isPrimitiveType() ) {
+//			// not null attribute (in Java primitive type => not null value)
+//			String initValue = notNullInitValues.get(languageType.getNeutralType());
+//			return initValue != null ? initValue : NULL_LITERAL ; 
+//		} else {
+//			// nullable attribute
+//			return NULL_LITERAL;
+//		}
+		return getInitValue(languageType.getNeutralType(), attribute.isNotNull() || languageType.isPrimitiveType() );
+	}
+	public String getInitValue(String neutralType, boolean notNull) {
+		if (notNull) {
+			// not null attribute
+			String defaultValue = notNullInitValues.get(neutralType);
+			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
 		} else {
 			// nullable attribute
 			return NULL_LITERAL;

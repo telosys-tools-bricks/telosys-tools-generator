@@ -120,41 +120,52 @@ public class LiteralValuesProviderForCSharp extends LiteralValuesProvider {
 		return " == " + value ;
 	}
 
-	private static final Map<String,String> defaultValues = new HashMap<>();
+	private static final Map<String,String> notNullInitValues = new HashMap<>();
 	static {
-		defaultValues.put(NeutralType.STRING,  "\"\"");  // string, String
-		defaultValues.put(NeutralType.BOOLEAN, FALSE_LITERAL); // bool, Boolean
-		defaultValues.put(NeutralType.BYTE,    "0");   // sbyte, SByte, byte, Byte
-		defaultValues.put(NeutralType.SHORT,   "0");   // short, Int16, ushort, UInt16
-		defaultValues.put(NeutralType.INTEGER, "0");   // int, Int32, uint, UInt32
-		defaultValues.put(NeutralType.LONG,    "0L");  // long, Int64, ulong, UInt64 (long requires 'L' suffix (optional but recommended for clarity)
-		defaultValues.put(NeutralType.FLOAT,   "0.0f");  // float, Single (float requires 'f' suffix)
-		defaultValues.put(NeutralType.DOUBLE,  "0.0" );   // double, Double (double is default for floating-point literals)
-		defaultValues.put(NeutralType.DECIMAL, "0.0m");  // decimal, Decimal (decimal requires 'm' suffix)
+		notNullInitValues.put(NeutralType.STRING,  "\"\"");  // string, String
+		notNullInitValues.put(NeutralType.BOOLEAN, FALSE_LITERAL); // bool, Boolean
+		notNullInitValues.put(NeutralType.BYTE,    "0");   // sbyte, SByte, byte, Byte
+		notNullInitValues.put(NeutralType.SHORT,   "0");   // short, Int16, ushort, UInt16
+		notNullInitValues.put(NeutralType.INTEGER, "0");   // int, Int32, uint, UInt32
+		notNullInitValues.put(NeutralType.LONG,    "0L");  // long, Int64, ulong, UInt64 (long requires 'L' suffix (optional but recommended for clarity)
+		notNullInitValues.put(NeutralType.FLOAT,   "0.0f");  // float, Single (float requires 'f' suffix)
+		notNullInitValues.put(NeutralType.DOUBLE,  "0.0" );   // double, Double (double is default for floating-point literals)
+		notNullInitValues.put(NeutralType.DECIMAL, "0.0m");  // decimal, Decimal (decimal requires 'm' suffix)
 
 		// for temporal types 3 options : "ClassName.MinValue" or "new ClassName" (for all) and "ClassName.Now" (only for DateTime and DateTimeOffset)
-		defaultValues.put(NeutralType.DATE,       "DateOnly.MinValue" ); // 01/01/0001
-		defaultValues.put(NeutralType.TIME,       "TimeOnly.MinValue" ); // 00:00:00.0000000 
-		defaultValues.put(NeutralType.TIMETZ,     "TimeOnly.MinValue" ); // 00:00:00.0000000 
-		defaultValues.put(NeutralType.TIMESTAMP,  "DateTime.MinValue" ); // 01/01/0001 00:00:00
-		defaultValues.put(NeutralType.DATETIME,   "DateTime.MinValue" ); // 01/01/0001 00:00:00
-		defaultValues.put(NeutralType.DATETIMETZ, "DateTimeOffset.MinValue"); // current local time with the local timezone offset
+		notNullInitValues.put(NeutralType.DATE,       "DateOnly.MinValue" ); // 01/01/0001
+		notNullInitValues.put(NeutralType.TIME,       "TimeOnly.MinValue" ); // 00:00:00.0000000 
+		notNullInitValues.put(NeutralType.TIMETZ,     "TimeOnly.MinValue" ); // 00:00:00.0000000 
+		notNullInitValues.put(NeutralType.TIMESTAMP,  "DateTime.MinValue" ); // 01/01/0001 00:00:00
+		notNullInitValues.put(NeutralType.DATETIME,   "DateTime.MinValue" ); // 01/01/0001 00:00:00
+		notNullInitValues.put(NeutralType.DATETIMETZ, "DateTimeOffset.MinValue"); // current local time with the local timezone offset
 		
-		defaultValues.put(NeutralType.BINARY,    "new byte[0]"); // void array
+		notNullInitValues.put(NeutralType.BINARY,    "new byte[0]"); // void array
 
-		defaultValues.put(NeutralType.UUID,      "Guid.Empty"); // "new Guid" or "Guid.Empty" (kind of "zero-value")
+		notNullInitValues.put(NeutralType.UUID,      "Guid.Empty"); // "new Guid" or "Guid.Empty" (kind of "zero-value")
 	}
 
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
-		if (attribute.isNotNull()) {
+//		if (attribute.isNotNull()) {
+//			// not null attribute
+//			String defaultValue = defaultValues.get(languageType.getNeutralType());
+//			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
+//		} else {
+//			// nullable attribute
+//			return NULL_LITERAL;
+//		}
+		return getInitValue(languageType.getNeutralType(), attribute.isNotNull());
+	}
+	
+	public String getInitValue(String neutralType, boolean notNull) {
+		if (notNull) {
 			// not null attribute
-			String defaultValue = defaultValues.get(languageType.getNeutralType());
+			String defaultValue = notNullInitValues.get(neutralType);
 			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
 		} else {
 			// nullable attribute
 			return NULL_LITERAL;
 		}
 	}
-	
 }
