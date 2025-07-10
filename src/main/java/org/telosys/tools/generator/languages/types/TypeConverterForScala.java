@@ -53,9 +53,13 @@ public class TypeConverterForScala extends TypeConverter {
 		// "scala.math.BigDecimal" is only a wrapper around "java.math.BigDecimal"  
 		declareObjectType( buildObjectType(NeutralType.DECIMAL,   "BigDecimal", "scala.math.BigDecimal" ) );
 		
-		declareObjectType( buildObjectType(NeutralType.DATE,      "LocalDate",     "java.time.LocalDate" ) );
-		declareObjectType( buildObjectType(NeutralType.TIME,      "LocalTime",     "java.time.LocalTime" ) );
-		declareObjectType( buildObjectType(NeutralType.TIMESTAMP, "LocalDateTime", "java.time.LocalDateTime" ) );
+		declareObjectType( buildObjectType(NeutralType.DATE,       "LocalDate",      "java.time.LocalDate" ) );
+		declareObjectType( buildObjectType(NeutralType.TIME,       "LocalTime",      "java.time.LocalTime" ) );
+		declareObjectType( buildObjectType(NeutralType.TIMESTAMP,  "LocalDateTime",  "java.time.LocalDateTime"  ) );
+		declareObjectType( buildObjectType(NeutralType.DATETIME,   "LocalDateTime",  "java.time.LocalDateTime"  ) );  // ver 4.3
+		declareObjectType( buildObjectType(NeutralType.DATETIMETZ, "OffsetDateTime", "java.time.OffsetDateTime" ) );  // ver 4.3
+		declareObjectType( buildObjectType(NeutralType.TIMETZ,     "OffsetTime",     "java.time.OffsetTime"     ) );  // ver 4.3
+		declareObjectType( buildObjectType(NeutralType.UUID,       "UUID",           "java.util.UUID"     ) );  // ver 4.3
 	}
 
 	private LanguageType buildPrimitiveType(String neutralType, String primitiveType) {
@@ -107,7 +111,8 @@ public class TypeConverterForScala extends TypeConverter {
 	}
 	@Override
 	public String getCollectionType(String elementType) {
-		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE) + "<" + elementType + ">" ; 
+		// Scala uses "[xx]" instead of "<xx>" in Java
+		return determineCollectionTypeToUse(STANDARD_COLLECTION_TYPE) + "[" + elementType + "]" ; 
 	}
 	
 }
