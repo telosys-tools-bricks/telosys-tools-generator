@@ -79,11 +79,17 @@ public class LiteralValuesProviderForScala extends LiteralValuesProvider {
 		}
 		
 		//--- NUMBER (NOT INTEGER)
-		else if (  NeutralType.FLOAT.equals(neutralType) 
-				|| NeutralType.DOUBLE.equals(neutralType) 
-				|| NeutralType.DECIMAL.equals(neutralType) ) {
+		else if ( NeutralType.FLOAT.equals(neutralType)  ) {
 			BigDecimal value = buildDecimalValue(neutralType, step);
-			return new LiteralValue(value.toString(), value) ; // eg :  123.77
+			return new LiteralValue(value.toString() + "f", value) ; // + "f"
+		}
+		else if ( NeutralType.DOUBLE.equals(neutralType) ) {
+			BigDecimal value = buildDecimalValue(neutralType, step);
+			return new LiteralValue(value.toString(), value) ; // no suffix
+		} 
+		else if ( NeutralType.DECIMAL.equals(neutralType) ) {
+			BigDecimal value = buildDecimalValue(neutralType, step);
+			return new LiteralValue("java.math.BigDecimal.valueOf(" + value.toString() + ")", value) ; // eg : java.math.BigDecimal.valueOf(15000.77)
 		}
 
 		//--- BOOLEAN
@@ -94,49 +100,64 @@ public class LiteralValuesProviderForScala extends LiteralValuesProvider {
 
 		//--- DATE, TIME and TIMESTAMP : 
 		else if ( NeutralType.DATE.equals(neutralType)  ) {
-			return generateJavaLocalDateLiteralValue(step) ;
+			String dateISO = buildDateISO(step) ; // "2001-06-22" 
+			return new LiteralValue("java.time.LocalDate.parse(\"" + dateISO + "\")", dateISO );
 		}
 		else if ( NeutralType.TIME.equals(neutralType)  ) {
-			return generateJavaLocalTimeValue(step)  ;
+			String timeISO = buildTimeISO(step) ; // "15:46:52"
+			return new LiteralValue("java.time.LocalTime.parse(\"" + timeISO + "\")", timeISO );
 		}
-		else if ( NeutralType.TIMESTAMP.equals(neutralType)  ) {
-			return generateJavaLocalDateTimeValue(step) ;
+		else if ( NeutralType.DATETIME.equals(neutralType) || NeutralType.TIMESTAMP.equals(neutralType)  ) { // DATETIME ver 4.3.0
+			String dateTimeISO = buildDateTimeISO(step); // "2017-11-15T08:22:12"
+			return new LiteralValue("java.time.LocalDateTime.parse(\"" + dateTimeISO + "\")", dateTimeISO );
 		}
-		
+		else if ( NeutralType.DATETIMETZ.equals(neutralType) ) { // ver 4.3.0
+			String value = buildDateTimeWithOffsetISO(step); 
+			return new LiteralValue("java.time.OffsetDateTime.parse(\"" + value + "\")", value );
+		}
+		else if ( NeutralType.TIMETZ.equals(neutralType) ) { // ver 4.3.0
+			String value = buildTimeWithOffsetISO(step);
+			return new LiteralValue("java.time.OffsetTime.parse(\"" + value + "\")", value );
+		}
+		//--- UUID
+		else if ( NeutralType.UUID.equals(neutralType) ) { // ver 4.3.0
+			String uuidString = buildUUID(); 
+			return new LiteralValue("java.util.UUID.fromString(\""+uuidString+"\")", uuidString);
+		}		
 		//--- No literal value for BINARY
 		
 		return new LiteralValue(NULL_LITERAL, null);
 	}
 	
-	private int generateYearValue(int step) {
-		return 2000 + ( step % 1000 ) ;  // between 2000 and 2999 
-	}
-	private LiteralValue generateJavaLocalDateLiteralValue(int step) {
-		int year = generateYearValue(step);
-		int month = 6;
-		int dayOfMonth = 22;
-		String s = "java.time.LocalDate.of(" + year + "," + month + "," + dayOfMonth + ")";
-		
-		return new LiteralValue(s, null) ; // null : no basic value for JSON, URL
-	}
-	private LiteralValue generateJavaLocalTimeValue(int step) {
-		int hour = step % 24 ;
-		int minute = 46 ;
-		int second = 52 ;
-		String s = "java.time.LocalTime.of(" + hour + "," + minute + "," + second + ")";
-		return new LiteralValue(s, null) ;  // null : no basic value for JSON, URL
-	}
-	private LiteralValue generateJavaLocalDateTimeValue(int step) {
-		int year = generateYearValue(step);
-		int month = 5;
-		int dayOfMonth = 21;
-		int hour = step % 24 ;
-		int minute = 46 ;
-		int second = 52 ;
-		String s = "java.time.LocalDateTime.of(" + year + "," + month + "," + dayOfMonth + ","
-				+ hour + "," + minute + "," + second + ")";
-		return new LiteralValue(s, null) ;  // null : no basic value for JSON, URL		
-	}
+//	private int generateYearValue(int step) {
+//		return 2000 + ( step % 1000 ) ;  // between 2000 and 2999 
+//	}
+//	private LiteralValue generateJavaLocalDateLiteralValue(int step) {
+//		int year = generateYearValue(step);
+//		int month = 6;
+//		int dayOfMonth = 22;
+//		String s = "java.time.LocalDate.of(" + year + "," + month + "," + dayOfMonth + ")";
+//		
+//		return new LiteralValue(s, null) ; // null : no basic value for JSON, URL
+//	}
+//	private LiteralValue generateJavaLocalTimeValue(int step) {
+//		int hour = step % 24 ;
+//		int minute = 46 ;
+//		int second = 52 ;
+//		String s = "java.time.LocalTime.of(" + hour + "," + minute + "," + second + ")";
+//		return new LiteralValue(s, null) ;  // null : no basic value for JSON, URL
+//	}
+//	private LiteralValue generateJavaLocalDateTimeValue(int step) {
+//		int year = generateYearValue(step);
+//		int month = 5;
+//		int dayOfMonth = 21;
+//		int hour = step % 24 ;
+//		int minute = 46 ;
+//		int second = 52 ;
+//		String s = "java.time.LocalDateTime.of(" + year + "," + month + "," + dayOfMonth + ","
+//				+ hour + "," + minute + "," + second + ")";
+//		return new LiteralValue(s, null) ;  // null : no basic value for JSON, URL		
+//	}
 
 	/* 
 	 * Returns something like that : 
@@ -172,12 +193,16 @@ public class LiteralValuesProviderForScala extends LiteralValuesProvider {
 		notNullInitValues.put(NeutralType.DOUBLE,  "0.0D" );       // Double  : derived from “AnyVal” => NOT NULLABLE ('D' or 'd' suffix )
 		
 		// Types derived from “AnyRef” => NULLABLE
-		notNullInitValues.put(NeutralType.STRING,    EMPTY_STRING_LITERAL);   //                           NULLABLE
-		notNullInitValues.put(NeutralType.DECIMAL,   "BigDecimal(0.0)" );     // scala.math.BigDecimal   : NULLABLE
-		notNullInitValues.put(NeutralType.DATE,      "LocalDate.now()");      // java.time.LocalDate     : NULLABLE
-		notNullInitValues.put(NeutralType.TIME,      "LocalTime.now()");      // java.time.LocalTime     : NULLABLE
-		notNullInitValues.put(NeutralType.TIMESTAMP, "LocalDateTime.now()");  // java.time.LocalDateTime : NULLABLE
-		notNullInitValues.put(NeutralType.BINARY,    "Array[Byte]");          // Array[Byte]             : NULLABLE
+		notNullInitValues.put(NeutralType.STRING,     EMPTY_STRING_LITERAL);   //                           NULLABLE
+		notNullInitValues.put(NeutralType.DECIMAL,    "BigDecimal(0.0)" );     // scala.math.BigDecimal   : NULLABLE
+		notNullInitValues.put(NeutralType.DATE,       "LocalDate.now()");      // java.time.LocalDate     : NULLABLE
+		notNullInitValues.put(NeutralType.TIME,       "LocalTime.now()");      // java.time.LocalTime     : NULLABLE
+		notNullInitValues.put(NeutralType.TIMESTAMP,  "LocalDateTime.now()");  // java.time.LocalDateTime : NULLABLE
+		notNullInitValues.put(NeutralType.DATETIME,   "LocalDateTime.now()");  // v 4.3.0
+		notNullInitValues.put(NeutralType.DATETIMETZ, "OffsetDateTime.now()"); // v 4.3.0
+		notNullInitValues.put(NeutralType.TIMETZ,     "OffsetTime.now()");     // v 4.3.0
+		notNullInitValues.put(NeutralType.UUID, 	  "new UUID(0L,0L)");      // v 4.3.0  ("new" keyword required in Scala)		
+		notNullInitValues.put(NeutralType.BINARY,     "Array.empty[Byte]");    // empty byte array        : NULLABLE		
 	}
 	private static final Set<String> notNullableScalaTypes = new HashSet<>();
 	static {
@@ -197,16 +222,9 @@ public class LiteralValuesProviderForScala extends LiteralValuesProvider {
 	// in Scala "_" initialises means "default value" when used in variable initialization
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
-//		if ( attribute.isNotNull() || isNotNullable(languageType) ) {
-//			// not null attribute 
-//			String initValue = notNullInitValues.get(languageType.getNeutralType());
-//			return initValue != null ? initValue : SCALA_DEFAULT_VALUE ; 
-//		} else {
-//			// nullable attribute
-//			return NULL_LITERAL ;
-//		}
 		return getInitValue(languageType.getNeutralType(), attribute.isNotNull() || isNotNullable(languageType) );
 	}
+	
 	private static final String SCALA_DEFAULT_VALUE = "_"; 
 	@Override
 	public String getInitValue(String neutralType, boolean notNull) {
