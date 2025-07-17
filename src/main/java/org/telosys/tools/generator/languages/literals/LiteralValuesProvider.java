@@ -30,6 +30,9 @@ import org.telosys.tools.generic.model.types.NeutralType;
  */
 public abstract class LiteralValuesProvider {
 	
+	// UUID (version-neutral), often used to represent a "null" or "empty" UUID in systems like databases or APIs
+	protected static final String UUID_ZERO_VALUE_STRING = "00000000-0000-0000-0000-000000000000";
+	
 	/**
 	 * Ensures the value is always less than or equal at the given threshold 
 	 * @param value
@@ -154,6 +157,16 @@ public abstract class LiteralValuesProvider {
 		return buildYearValue(step) + "-05-21" 
 				+ "T" 
 				+ buildHourValue(step) + ":47:53" ;  
+	}
+	
+	/**
+	 * Builds a date+time in ISO format, eg "2001-05-21T15:47:53" with the given ISO date
+	 * @param step
+	 * @param dateISO
+	 * @return
+	 */
+	protected String buildDateTimeISO(int step, String dateISO) {
+		return dateISO + "T" + buildHourValue(step) + ":47:53" ;  
 	}
 	
 	/**

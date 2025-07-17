@@ -109,7 +109,7 @@ public class LiteralValuesProviderForJavaScript extends LiteralValuesProvider {
 		
 		//--- UUID - In JavaScript, there is no built-in primitive UUID type => use string 
 		else if ( NeutralType.UUID.equals(neutralType)  ) {
-			String value = buildUUID() ; // "2001-06-22" 
+			String value = buildUUID() ;
 			return new LiteralValue("'" + value + "'", value );
 		}
 		

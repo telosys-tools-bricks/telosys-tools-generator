@@ -35,7 +35,7 @@ public class LiteralValuesProviderForTypeScript extends LiteralValuesProvider {
 	private static final String NULL_LITERAL  = "null" ; 
 	private static final String TRUE_LITERAL  = "true" ; 
 	private static final String FALSE_LITERAL = "false" ; 
-	private static final String EMPTY_STRING_LITERAL = "\"\"" ; 
+	private static final String EMPTY_STRING_LITERAL = "''" ; 
 
 	@Override
 	public String getLiteralNull() {
@@ -61,7 +61,9 @@ public class LiteralValuesProviderForTypeScript extends LiteralValuesProvider {
 		//--- STRING
 		if ( NeutralType.STRING.equals(neutralType) ) {
 			String value = buildStringValue(maxLength, step);
-			return new LiteralValue("\"" + value + "\"", value) ;			
+			// In TypeScript (and JavaScript), you can use either single (') or double (") quotes for string literals — both are valid and functionally identical
+			// Many developers and tools (like ESLint + Prettier) prefer 'single quotes' for strings
+			return new LiteralValue("'" + value + "'", value) ;			
 		}
 		
 		//--- NUMBER / INTEGER
@@ -87,22 +89,49 @@ public class LiteralValuesProviderForTypeScript extends LiteralValuesProvider {
 			return new LiteralValue(value ? TRUE_LITERAL : FALSE_LITERAL, Boolean.valueOf(value)) ;
 		}
 		
-//		//--- DATE, TIME and TIMESTAMP :  there is no Date literal in TypeScript !
-//		else if ( NeutralType.DATE.equals(neutralType)  ) {
-//			return NULL_LITERAL ;
-//		}
-//		else if ( NeutralType.TIME.equals(neutralType)  ) {
-//			return NULL_LITERAL ;
-//		}
-//		else if ( NeutralType.TIMESTAMP.equals(neutralType)  ) {
-//			return NULL_LITERAL ;
-//		}		
-//		//--- BINARY
-//		else if ( NeutralType.BINARY.equals(neutralType)  ) {
-//			return NULL_LITERAL ;
-//		}
+		//--- Temporal types 
+		else if ( NeutralType.DATE.equals(neutralType) ) {
+			String dateISO = buildDateISO(step) ; // "2001-06-22"  ( time is "00:00:00" )
+			return new LiteralValue(buildNewDateString(dateISO), dateISO );
+		}
+		else if ( NeutralType.TIME.equals(neutralType) || NeutralType.TIMETZ.equals(neutralType) ) {
+			// NB: cannot initialize a JavaScript/TypeScript Date object using only a time string like "12:34:56" or "12:34:56Z" (it will result in an invalid Date)
+			// JavaScript’s Date constructor requires a full date-time string 
+			// For "time-only" store it in a Date and use getHours(), getMinutes(), getSeconds() and getTime() (rem: getTimezoneOffset() allways return -60 => do not use)
+			String dateTimeISO = buildDateTimeISO(step, "1970-01-01"); // "1970-01-01Txx:xx:xx"
+			return new LiteralValue(buildNewDateString(dateTimeISO), dateTimeISO );
+		}
+		else if ( NeutralType.TIMESTAMP.equals(neutralType) || NeutralType.DATETIME.equals(neutralType) ) {
+			String dateTimeISO = buildDateTimeISO(step); // "2017-11-15T08:22:12"
+			return new LiteralValue(buildNewDateString(dateTimeISO), dateTimeISO );
+		}
+		else if ( NeutralType.DATETIMETZ.equals(neutralType) ) {
+			// NB: the built-in Date object doesn't retain the original time zone offset — it parses it, converts to UTC, and forgets it.
+			// Offset conversion changes the original Hour/Min ! => do not use Offset
+			String value = buildDateTimeISO(step); // Basic date-time ISO  "2017-11-15T08:22:12"
+			return new LiteralValue(buildNewDateString(value), value );
+		}
+
+		//--- UUID - In TypeScript, there is no built-in primitive UUID type => use string 
+		else if ( NeutralType.UUID.equals(neutralType)  ) {
+			String value = buildUUID() ;
+			// In TypeScript (and JavaScript), you can use either single (') or double (") quotes for string literals — both are valid and functionally identical
+			// Many developers and tools (like ESLint + Prettier) prefer 'single quotes' for strings
+			return new LiteralValue("'" + value + "'", value );
+		}
+
+		//--- BINARY
+		else if ( NeutralType.BINARY.equals(neutralType)  ) {
+			// empty Uint8Array
+			return new LiteralValue("new Uint8Array(0)", Integer.valueOf(0) ); 
+		}
 		
 		return new LiteralValue(NULL_LITERAL, null);
+	}
+	private String buildNewDateString(String dateValue) {
+		// In TypeScript (and JavaScript), you can use either single (') or double (") quotes for string literals — both are valid and functionally identical
+		// Many developers and tools (like ESLint + Prettier) prefer 'single quotes' for strings
+		return "new Date('" + dateValue + "')";
 	}
 	
 	/* 
@@ -117,6 +146,7 @@ public class LiteralValuesProviderForTypeScript extends LiteralValuesProvider {
 		return " == " + value ;
 	}
 	
+	private static final String NEW_DATE_ZERO = "new Date(0)" ; // Date with 'zero-value' = "1970-01-01T00:00:00.000Z"
 	private static final Map<String,String> notNullInitValues = new HashMap<>();
 	static {
 		notNullInitValues.put(NeutralType.STRING,  EMPTY_STRING_LITERAL);  // string / String 
@@ -129,24 +159,22 @@ public class LiteralValuesProviderForTypeScript extends LiteralValuesProvider {
 		notNullInitValues.put(NeutralType.DOUBLE,  "0");  // number, Number
 		notNullInitValues.put(NeutralType.DECIMAL, "0");  // number, Number
 
-		notNullInitValues.put(NeutralType.DATE,      "new Date()");  // Date
-		notNullInitValues.put(NeutralType.TIME,      "new Date()");  // Date
-		notNullInitValues.put(NeutralType.TIMESTAMP, "new Date()");  // Date
-//		defaultValues.put(NeutralType.BINARY,    "?"); 
+		notNullInitValues.put(NeutralType.DATE,       NEW_DATE_ZERO);  // Zero-value: "1970-01-01T00:00:00.000Z"
+		notNullInitValues.put(NeutralType.TIME,       NEW_DATE_ZERO); 
+		notNullInitValues.put(NeutralType.TIMETZ,     NEW_DATE_ZERO);  
+		notNullInitValues.put(NeutralType.TIMESTAMP,  NEW_DATE_ZERO);  
+		notNullInitValues.put(NeutralType.DATETIME,   NEW_DATE_ZERO);  
+		notNullInitValues.put(NeutralType.DATETIMETZ, NEW_DATE_ZERO);  
+		
+		notNullInitValues.put(NeutralType.UUID, 	  "'" + UUID_ZERO_VALUE_STRING + "'" );   	
+		notNullInitValues.put(NeutralType.BINARY,     "new Uint8Array(0)" ); // empty Uint8Array   	
 	}
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
-//		if ( attribute.isNotNull() ) {
-//			// not null attribute 
-//			String initValue = notNullInitValues.get(languageType.getNeutralType());
-//			return initValue != null ? initValue : NULL_LITERAL ; 
-//		} else {
-//			// nullable attribute
-//			return NULL_LITERAL;
-//		}
 		return getInitValue(languageType.getNeutralType(), attribute.isNotNull());
 	}
 
+	@Override
 	public String getInitValue(String neutralType, boolean notNull) {
 		if (notNull) {
 			// not null attribute
