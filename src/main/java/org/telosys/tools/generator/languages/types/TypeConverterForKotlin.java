@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.telosys.tools.commons.JavaTypeUtil;
+import org.telosys.tools.generator.context.tools.JavaTypeUtil;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 /**

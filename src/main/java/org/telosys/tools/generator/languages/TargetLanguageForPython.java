@@ -40,16 +40,38 @@ public class TargetLanguageForPython extends TargetLanguage {
 		return commonArgumentsListWithoutType(attributes);
 	}
 	
+	/**
+	 * Returns arguments list with Python "type hints"
+	 * example: "id: int, name: str, flag: bool, birthDate: date"
+	 * @param attributes
+	 * @return
+	 */
+	private String argumentsListWithPythonTypeHints(List<AttributeInContext> attributes) {
+		if ( attributes == null ) return "";
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			if ( n > 0 ) sb.append(", ");
+			sb.append( attribute.getName() ) ; // arg name before type hint
+			sb.append( ": " ) ;
+			sb.append( attribute.getType() ) ; // type hint
+			n++;
+		}
+		return sb.toString();
+	}
+	
 	@Override
 	public String argumentsListWithType(List<AttributeInContext> attributes) {
-		// No type => just arg names
-		return commonArgumentsListWithoutType(attributes);
+		// Python "type hints" supported since ver 4.3.0
+		// example: "id: int, name: str, flag: bool, birthDate: date"
+		return argumentsListWithPythonTypeHints(attributes);
 	}
 	
 	@Override
 	public String argumentsListWithWrapperType(List<AttributeInContext> attributes) {
-		// No type => just arg names
-		return commonArgumentsListWithoutType(attributes);
+		// Python "type hints" supported since ver 4.3.0 => used as "wrapper type"
+		// example: "id: int, name: str, flag: bool, birthDate: date"
+		return argumentsListWithPythonTypeHints(attributes);
 	}
 
 	@Override

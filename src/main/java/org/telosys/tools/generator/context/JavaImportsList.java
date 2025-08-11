@@ -18,7 +18,7 @@ package org.telosys.tools.generator.context;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.telosys.tools.commons.JavaTypeUtil;
+import org.telosys.tools.generator.context.tools.JavaTypeUtil;
 
 /**
  * List of full java class names that need imports<br>

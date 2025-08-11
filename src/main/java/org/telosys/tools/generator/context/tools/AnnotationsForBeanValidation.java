@@ -15,7 +15,6 @@
  */
 package org.telosys.tools.generator.context.tools;
 
-import org.telosys.tools.commons.JavaTypeUtil;
 import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.AttributeInContext;
 
@@ -83,25 +82,20 @@ public class AnnotationsForBeanValidation
 	 * @param sJavaFullType
 	 */
 	private void addOtherAnnotations(AnnotationsBuilder annotations ) {
-		String sJavaFullType = attribute.getFullType() ;
-		
+		String javaFullType = attribute.getFullType(); // primitive or full type ( eg "long" or "java.lang.Long" )		
 		//--- Annotations for each type category 
-		if ( JavaTypeUtil.isCategoryBoolean( sJavaFullType ) )
-		{
-			// Nothing to do !
-		}
-		else if ( JavaTypeUtil.isCategoryString( sJavaFullType ) )
-		{
+		if ( JavaTypeUtil.isStringType( javaFullType ) ) {
+			// String annotations
 			annotationSize(annotations);
 			annotationPattern(annotations);
 		}
-		else if ( JavaTypeUtil.isCategoryNumber( sJavaFullType ) )
-		{
+		else if ( JavaTypeUtil.isNumberType( javaFullType ) ) {
+			// Number annotations
 			annotationMin(annotations);
 			annotationMax(annotations);
 		}
-		else if ( JavaTypeUtil.isCategoryDateOrTime( sJavaFullType ) )
-		{
+		else if ( JavaTypeUtil.isTemporalType(javaFullType ) ) {
+			// Temporal annotations
 			if ( attribute.hasDatePastValidation() ) {
 				annotations.addLine("@Past" );
 			}

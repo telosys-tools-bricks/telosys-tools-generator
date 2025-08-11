@@ -18,7 +18,7 @@ import junit.env.telosys.tools.generator.fakemodel.FakeAttributeBuilder;
 public class TargetLanguageProviderTest  {
 
 	private static final List<AttributeInContext> ATTRIBUTES_VOID_LIST = new LinkedList<>();
-	private static final String LIST_OF_ARG_NAMES = "id, name, flag, birthDate";
+	private static final String LIST_OF_ARG_NAMES = "id, name, flag, birthDate, id2";
 
 
 	private void check(String languageName) {
@@ -59,13 +59,13 @@ public class TargetLanguageProviderTest  {
 		Assert.assertEquals("", tl.argumentsListWithType(null) );
 		Assert.assertEquals("", tl.argumentsListWithWrapperType(null) );
 		// $env.typeWithNullableMark = default value = true => '?' at the end of type if nullable  ( id is not null => no '?' )
-		Assert.assertEquals("int id, string? name, bool? flag, DateOnly? birthDate", tl.argumentsListWithType(attributes) );
-		Assert.assertEquals("Int32 id, String? name, Boolean? flag, DateOnly? birthDate", tl.argumentsListWithWrapperType(attributes) );
+		Assert.assertEquals("int id, string? name, bool? flag, DateOnly? birthDate, Guid? id2", tl.argumentsListWithType(attributes) );
+		Assert.assertEquals("Int32 id, String? name, Boolean? flag, DateOnly? birthDate, Guid? id2", tl.argumentsListWithWrapperType(attributes) );
 
 		// $env.typeWithNullableMark = false =>  no '?' at the end of type
 		env.setTypeWithNullableMark(false); 
-		Assert.assertEquals("int id, string name, bool flag, DateOnly birthDate", tl.argumentsListWithType(attributes) );
-		Assert.assertEquals("Int32 id, String name, Boolean flag, DateOnly birthDate", tl.argumentsListWithWrapperType(attributes) );		
+		Assert.assertEquals("int id, string name, bool flag, DateOnly birthDate, Guid id2", tl.argumentsListWithType(attributes) );
+		Assert.assertEquals("Int32 id, String name, Boolean flag, DateOnly birthDate, Guid id2", tl.argumentsListWithWrapperType(attributes) );		
 	}
 
 	@Test
@@ -79,15 +79,16 @@ public class TargetLanguageProviderTest  {
 		TargetLanguage tl = env.getTargetLanguage();
 		Assert.assertEquals(TargetLanguageForGo.class.getSimpleName(), tl.getClass().getSimpleName());
 		
-		List<AttributeInContext> attributes = FakeAttributeBuilder.buildAttributes(env);		
+		List<AttributeInContext> attributes = FakeAttributeBuilder.buildAttributes(env);
+		String expectedArgList = "id int32, name string, flag bool, birthDate time.Time, id2 uuid.UUID";
 		//
 		Assert.assertEquals("", tl.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
 		Assert.assertEquals("", tl.argumentsListWithType(null) );
-		Assert.assertEquals("id int32, name string, flag bool, birthDate time.Time", tl.argumentsListWithType(attributes) );
+		Assert.assertEquals(expectedArgList, tl.argumentsListWithType(attributes) );
 		//
 		Assert.assertEquals("", tl.argumentsListWithWrapperType(ATTRIBUTES_VOID_LIST) );
 		Assert.assertEquals("", tl.argumentsListWithWrapperType(null) );
-		Assert.assertEquals("id int32, name string, flag bool, birthDate time.Time", tl.argumentsListWithWrapperType(attributes) );
+		Assert.assertEquals(expectedArgList, tl.argumentsListWithWrapperType(attributes) );
 	}
 
 	@Test
@@ -104,11 +105,11 @@ public class TargetLanguageProviderTest  {
 		Assert.assertEquals("", tl.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
 		Assert.assertEquals("", tl.argumentsListWithType(null) );
 		// id is not null => int 
-		Assert.assertEquals("int id, String name, Boolean flag, LocalDate birthDate", tl.argumentsListWithType(attributes) );
+		Assert.assertEquals("int id, String name, Boolean flag, LocalDate birthDate, UUID id2", tl.argumentsListWithType(attributes) );
 		//
 		Assert.assertEquals("", tl.argumentsListWithWrapperType(ATTRIBUTES_VOID_LIST) );
 		Assert.assertEquals("", tl.argumentsListWithWrapperType(null) );
-		Assert.assertEquals("Integer id, String name, Boolean flag, LocalDate birthDate", tl.argumentsListWithWrapperType(attributes) );
+		Assert.assertEquals("Integer id, String name, Boolean flag, LocalDate birthDate, UUID id2", tl.argumentsListWithWrapperType(attributes) );
 	}
 
 	@Test
@@ -147,12 +148,12 @@ public class TargetLanguageProviderTest  {
 		Assert.assertEquals("", tl.argumentsListWithType(null) );
 		
 		// $env.typeWithNullableMark = default value = true => '?' at the end of type if nullable  ( id is not null => no '?' )
-		Assert.assertEquals("id: Int, name: String?, flag: Boolean?, birthDate: LocalDate?", tl.argumentsListWithType(attributes) );
+		Assert.assertEquals("id: Int, name: String?, flag: Boolean?, birthDate: LocalDate?, id2: UUID?", tl.argumentsListWithType(attributes) );
 		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) ); // same result with wrapper type
 
 		// $env.typeWithNullableMark = false =>  no '?' at the end of type
 		env.setTypeWithNullableMark(false); 
-		Assert.assertEquals("id: Int, name: String, flag: Boolean, birthDate: LocalDate", tl.argumentsListWithType(attributes) );
+		Assert.assertEquals("id: Int, name: String, flag: Boolean, birthDate: LocalDate, id2: UUID", tl.argumentsListWithType(attributes) );
 		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) ); // same result with wrapper type
 	}
 
@@ -171,11 +172,11 @@ public class TargetLanguageProviderTest  {
 		Assert.assertEquals("", tl.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
 		Assert.assertEquals("", tl.argumentsListWithType(null) );
 		// $env.typeWithNullableMark = default value = true => '?' at the end of type if nullable  ( id is not null => no '?' )
-		Assert.assertEquals("int $id, ?string $name, ?bool $flag, ?DateTime $birthDate", tl.argumentsListWithType(attributes) );
+		Assert.assertEquals("int $id, ?string $name, ?bool $flag, ?DateTime $birthDate, ?string $id2", tl.argumentsListWithType(attributes) );
 		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) ); // same result with wrapper type
 		// $env.typeWithNullableMark = false =>  no '?' in the type
 		env.setTypeWithNullableMark(false); 
-		Assert.assertEquals("int $id, string $name, bool $flag, DateTime $birthDate", tl.argumentsListWithType(attributes) );
+		Assert.assertEquals("int $id, string $name, bool $flag, DateTime $birthDate, string $id2", tl.argumentsListWithType(attributes) );
 		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) ); // same result with wrapper type
 	}
 
@@ -193,10 +194,11 @@ public class TargetLanguageProviderTest  {
 		//
 		Assert.assertEquals("", tl.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
 		Assert.assertEquals("", tl.argumentsListWithType(null) );
-		// no type => just arg names
-		Assert.assertEquals(LIST_OF_ARG_NAMES, tl.argumentsListWithType(attributes) );
-		// same result with wrapper type
-		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) );
+		String expectedArgWithTypeHints = "id: int, name: str, flag: bool, birthDate: date, id2: UUID";
+		// "with type" => Python type hints (since 4.3.0)
+		Assert.assertEquals(expectedArgWithTypeHints, tl.argumentsListWithType(attributes) );
+		// "with wrapper type" => Python type hints (since 4.3.0)
+		Assert.assertEquals(expectedArgWithTypeHints, tl.argumentsListWithWrapperType(attributes) );
 	}
 
 	@Test
@@ -213,7 +215,7 @@ public class TargetLanguageProviderTest  {
 		// test : argumentsListWithType
 		Assert.assertEquals("", tl.argumentsListWithType(ATTRIBUTES_VOID_LIST) );
 		Assert.assertEquals("", tl.argumentsListWithType(null) );
-		Assert.assertEquals("id: Int, name: String, flag: Boolean, birthDate: LocalDate", tl.argumentsListWithType(attributes) );
+		Assert.assertEquals("id: Int, name: String, flag: Boolean, birthDate: LocalDate, id2: UUID", tl.argumentsListWithType(attributes) );
 		// same result with wrapper type
 		Assert.assertEquals(tl.argumentsListWithType(attributes), tl.argumentsListWithWrapperType(attributes) );
 	}

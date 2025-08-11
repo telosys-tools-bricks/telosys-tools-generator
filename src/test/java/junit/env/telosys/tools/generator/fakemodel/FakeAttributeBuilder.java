@@ -22,9 +22,10 @@ public class FakeAttributeBuilder {
 		EntityInContext entityInContext = FakeEntityBuilder.buildEntityInContext("Foo", "FOO");
 		List<AttributeInContext> attributes = new LinkedList<>();
 		attributes.add( buildAttributeNotNull(entityInContext, "id", "int", envInContext) );
-		attributes.add( buildAttribute(entityInContext, "name", "string", envInContext ) );
-		attributes.add( buildAttribute(entityInContext, "flag", "boolean", envInContext ) );
+		attributes.add( buildAttribute(entityInContext, "name",      "string", envInContext ) );
+		attributes.add( buildAttribute(entityInContext, "flag",      "boolean", envInContext ) );
 		attributes.add( buildAttribute(entityInContext, "birthDate", "date", envInContext ) );
+		attributes.add( buildAttribute(entityInContext, "id2",       "uuid", envInContext ) );
 		return attributes;
 	}
 	
