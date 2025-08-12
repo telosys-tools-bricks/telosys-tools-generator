@@ -21,6 +21,7 @@ import java.util.List;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
+import org.telosys.tools.generator.context.tools.JavaValidationAnnotations;
 import org.telosys.tools.generator.context.tools.LinesBuilder;
 
 //-------------------------------------------------------------------------------------
@@ -499,4 +500,64 @@ public class Java {
     	return true ;
     }
     
+	
+	@VelocityMethod(
+		text={	
+			"Returns the 'Bean Validation (JSR-303)' or 'Jakarta EE' annotations for the given attribute",
+			"All annotations are grouped on a single line",
+			"Annotation from packages 'javax.validation.constraints' or 'jakarta.validation.constraints' ",
+			"For example: @NotNull, @NotBlank, @Size, @Min, @Max, etc",
+			"Do not forget to import the package you want to use: ",
+			"    import jakarta.validation.constraints.*; ",
+			"or  import javax.validation.constraints.*;   "
+			},
+		example={ 
+			"$java.validationAnnotations(4, $attribute)" },
+		parameters = { 
+			"leftMargin : the left margin size (number of blanks) ",
+			"attribute : the attribute to be annotated "
+			},
+		since = "4.3.0"
+	)
+	public String validationAnnotations(int leftMargin, AttributeInContext attribute) {
+		JavaValidationAnnotations annotations = new JavaValidationAnnotations(attribute);
+		return annotations.getValidationAnnotations(leftMargin );
+    }
+
+	@VelocityMethod(
+		text={	
+			"Same as 'validationAnnotations' but with multiline result (one line for each annotation)"
+			},
+		example={ 
+			"$java.validationAnnotationsMultiline(4, $attribute)" },
+		parameters = { 
+			"leftMargin : the left margin size (number of blanks) ",
+			"attribute : the attribute to be annotated "
+			},
+		since = "4.3.0"
+	)
+	public String validationAnnotationsMultiline(int leftMargin, AttributeInContext attribute) {
+		JavaValidationAnnotations annotations = new JavaValidationAnnotations(attribute);
+		return annotations.getValidationAnnotationsMultiline(leftMargin );
+    }
+
+	@VelocityMethod(
+		text={	
+			"Returns TRUE if the attribute has at least one validation annotation ",
+			"Useful to avoid a blank line if no annotation"
+			},
+		example={ 
+			"#if( $java.hasValidationAnnotations($attribute) )",
+			"$java.validationAnnotations(4, $attribute)",
+			"#end" },
+		parameters = { 
+			"leftMargin : the left margin size (number of blanks) ",
+			"attribute : the attribute to be annotated "
+			},
+		since = "4.3.0"
+	)
+	public boolean hasValidationAnnotations(AttributeInContext attribute) {
+		JavaValidationAnnotations annotations = new JavaValidationAnnotations(attribute);
+		return annotations.hasValidationAnnotations();
+    }
 }

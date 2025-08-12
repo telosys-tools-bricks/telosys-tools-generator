@@ -73,7 +73,7 @@ public class JpaAnnotations
 		if ( attribute.isKeyElement() ) {
 			if ( ! embeddedId ) {
 				// do not use "@Id" in an Embedded ID
-				annotations.addLine("@Id");
+				annotations.addAnnotation("@Id");
 			}
 
 			if ( attribute.isGeneratedValue() ) {
@@ -105,13 +105,13 @@ public class JpaAnnotations
 				|| "java.sql.Clob".equals(sAttributeFullType) 
 				|| "byte[]".equals(sAttributeFullType) ) 
 		{
-			annotations.addLine ( "@Lob" );
+			annotations.addAnnotation ( "@Lob" );
 		}
 
 		// @Column
 		annotationColumn(annotations);
 		
-		return annotations.getAnnotations();
+		return annotations.getMultiLineAnnotations();
 	}
 	
 	private void annotationsForGeneratedValue( AnnotationsBuilder annotations ) {
@@ -158,7 +158,7 @@ public class JpaAnnotations
 			s = s + ", generator=\"" + generator + "\"" ;
 		}
 		s = s + ")" ;
-		annotations.addLine ( s );		
+		annotations.addAnnotation ( s );		
 	}
 
 	/**
@@ -198,7 +198,7 @@ public class JpaAnnotations
 		//  . catalog (Optional)
 		
 		sb.append(")") ;
-		annotations.addLine ( sb.toString() );
+		annotations.addAnnotation ( sb.toString() );
 	}
 
 	/**
@@ -235,7 +235,7 @@ public class JpaAnnotations
 		// . uniqueConstraints
 
 		sb.append(")") ;
-		annotations.addLine ( sb.toString() );
+		annotations.addAnnotation ( sb.toString() );
 	}
 
 	/**
@@ -296,7 +296,7 @@ public class JpaAnnotations
 		// scale : (Optional) The scale for a decimal (exact numeric) column.
 		// table : (Optional) The name of the table that contains the column.
 		
-		annotations.addLine ( sb.toString() );
+		annotations.addAnnotation ( sb.toString() );
 	}
 	
 	private String buildColumnDefinition() { // v 3.4.0
@@ -319,7 +319,7 @@ public class JpaAnnotations
 	private void annotationTemporal(AnnotationsBuilder annotations, String sTemporalType) 
 	{
 		String s = "@Temporal(TemporalType." + sTemporalType + ")";
-		annotations.addLine ( s );
+		annotations.addAnnotation ( s );
 	}
 	
 }

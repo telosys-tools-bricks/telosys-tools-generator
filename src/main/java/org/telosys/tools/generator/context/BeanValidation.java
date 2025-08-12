@@ -18,16 +18,20 @@ package org.telosys.tools.generator.context;
 import org.telosys.tools.generator.context.doc.VelocityMethod;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.generator.context.tools.AnnotationsForBeanValidation;
+import org.telosys.tools.generator.context.tools.JavaValidationAnnotations;
 
+//-------------------------------------------------------------------------------------
+// ***   DEPRECATED since ver 4.3.0   ***
 //-------------------------------------------------------------------------------------
 @VelocityObject(
 		contextName=ContextName.BEAN_VALIDATION,
 		text = { 
 				"Object providing a set of utility functions for Java Bean Validation (JSR-303) annotations",
-				""
+				"",
+				"DEPRECATED: use $java object instead"
 		},
-		since = "2.0.7"
+		since = "2.0.7",
+		deprecated = true
  )
 //-------------------------------------------------------------------------------------
 public class BeanValidation {
@@ -46,11 +50,12 @@ public class BeanValidation {
 			"leftMargin : the left margin (number of blanks) ",
 			"attribute : the attribute to be annotated "
 			},
-		since = "2.0.7"
+		since = "2.0.7",
+		deprecated = true
 	)
 	public String annotations(int iLeftMargin, AttributeInContext attribute )
     {
-		AnnotationsForBeanValidation annotations = new AnnotationsForBeanValidation(attribute);
+		JavaValidationAnnotations annotations = new JavaValidationAnnotations(attribute);
 		return annotations.getValidationAnnotations(iLeftMargin );
     }
 
@@ -68,12 +73,15 @@ public class BeanValidation {
 			"leftMargin : the left margin (number of blanks) ",
 			"attribute : the attribute to be annotated "
 			},
-		since = "3.0.0"
+		since = "3.0.0",
+		deprecated = true
 	)
 	public String annotationsForWrapperType(int iLeftMargin, AttributeInContext attribute )
     {
-		AnnotationsForBeanValidation annotations = new AnnotationsForBeanValidation(attribute);
-		return annotations.getValidationAnnotationsForWrapperType(iLeftMargin );
+//		JavaValidationAnnotations annotations = new JavaValidationAnnotations(attribute);
+//		return annotations.getValidationAnnotationsForWrapperType(iLeftMargin );
+		// Deprecated => return the same result as standard 'annotations' method
+		return annotations(iLeftMargin, attribute);
     }
 
 }

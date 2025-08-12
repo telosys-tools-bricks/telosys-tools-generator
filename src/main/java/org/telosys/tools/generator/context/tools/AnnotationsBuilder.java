@@ -15,6 +15,10 @@
  */
 package org.telosys.tools.generator.context.tools;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.telosys.tools.generator.GeneratorUtil;
 
 /**
@@ -25,11 +29,9 @@ import org.telosys.tools.generator.GeneratorUtil;
  */
 public class AnnotationsBuilder {
 
-	private final StringBuilder stringBuilder ;
+	private final List<String> annotations = new LinkedList<>() ;
 
-	private final String        leftMarginString ;
-	
-	private int           annotationsCount = 0 ;
+	private final String       leftMarginString ;
 	
 	
 	/**
@@ -38,33 +40,46 @@ public class AnnotationsBuilder {
 	 */
 	public AnnotationsBuilder(int leftMargin) {
 		super();
-		this.stringBuilder = new StringBuilder();
-		this.annotationsCount = 0 ;
 		this.leftMarginString = GeneratorUtil.blanks(leftMargin);		
 	}
 
 	/**
-	 * Add a new line of annotation  <br>
-	 * Put the left margin before the given string and add a CR-LF at the end
-	 * @param sAnnotation
+	 * Get the current number of annotations
+	 * @return
 	 */
-	public void addLine(String sAnnotation)
-	{
-		if ( annotationsCount > 0 ) {
-			stringBuilder.append( "\n" );
-		}
-		stringBuilder.append( leftMarginString );
-		stringBuilder.append( sAnnotation );
-		annotationsCount++;
+	public int getCount() {
+		return annotations.size();
+	}
+	
+	/**
+	 * Add a new annotation
+	 * @param annotation
+	 */
+	public void addAnnotation(String annotation) {
+		annotations.add(annotation);
 	}
 
 	/**
-	 * Returns a string containing all the annotations built ( one annotation per line )
+	 * Returns a string containing all the annotations with one annotation per line
 	 * @return
 	 */
-	public String getAnnotations()
-	{
-		return stringBuilder.toString() ;
+	public String getMultiLineAnnotations() {
+        return annotations.stream()
+                .map(s -> leftMarginString + s) // add left margin before each 
+                .collect(Collectors.joining("\n")); // join with newline as separator
+	}
+
+	/**
+	 * Returns a string containing all the annotations in a single line (separated by a space)
+	 * @return
+	 */
+	public String getSingleLineAnnotations() {
+		if ( annotations.isEmpty() ) {
+			return "";
+		}
+		else {
+	        return leftMarginString + String.join(" ", annotations); 
+		}
 	}
 
 }

@@ -314,7 +314,7 @@ public class JpaInContext {
     {
 		AnnotationsBuilder b = new AnnotationsBuilder(iLeftMargin);
 		
-		b.addLine("@Entity");
+		b.addAnnotation("@Entity");
 		
 		String s = "@Table(name=\"" + entity.getSqlTableName() + "\"" ;  // v 4.1.0
 		if ( ! StrUtil.nullOrVoid( entity.getDatabaseSchema() ) ) {
@@ -325,9 +325,9 @@ public class JpaInContext {
 		}
 		s = s + " )" ;
 
-		b.addLine(s);
+		b.addAnnotation(s);
 		
-		return b.getAnnotations();
+		return b.getMultiLineAnnotations();
     }
 	
 	//-------------------------------------------------------------------------------------
@@ -352,7 +352,7 @@ public class JpaInContext {
 		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
 		processLinkCardinalityAnnotation(annotations, link) ;
 		processLinkJoinAnnotation(annotations, link, alreadyMappedFields );
-		return annotations.getAnnotations();
+		return annotations.getMultiLineAnnotations();
 	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
@@ -373,7 +373,7 @@ public class JpaInContext {
 		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
 		processLinkCardinalityAnnotation(annotations, link) ;
 		processLinkJoinAnnotation(annotations, link, null );
-		return annotations.getAnnotations();
+		return annotations.getMultiLineAnnotations();
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -391,7 +391,7 @@ public class JpaInContext {
 	public String linkCardinalityAnnotation(int leftMargin, LinkInContext link ) {
 		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
 		processLinkCardinalityAnnotation(annotations, link) ;
-		return annotations.getAnnotations();
+		return annotations.getMultiLineAnnotations();
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -412,7 +412,7 @@ public class JpaInContext {
 	public String linkJoinAnnotation(int leftMargin, LinkInContext link, List<AttributeInContext> alreadyMappedFields ) throws GeneratorException {
 		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
 		processLinkJoinAnnotation(annotations, link, alreadyMappedFields );
-		return annotations.getAnnotations();
+		return annotations.getMultiLineAnnotations();
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -429,7 +429,7 @@ public class JpaInContext {
 	public String linkJoinAnnotation(int leftMargin, LinkInContext link ) throws GeneratorException {
 		AnnotationsBuilder annotations = new AnnotationsBuilder(leftMargin);
 		processLinkJoinAnnotation(annotations, link, null );
-		return annotations.getAnnotations();
+		return annotations.getMultiLineAnnotations();
 	}
 	
 	private String buildCardinalityAnnotation( LinkInContext link ) {
@@ -704,7 +704,7 @@ public class JpaInContext {
 	private void processLinkCardinalityAnnotation(AnnotationsBuilder annotations, LinkInContext link) {
 		String annotation = buildCardinalityAnnotation(link);
 		if ( ! StrUtil.nullOrVoid(annotation) ) {
-			annotations.addLine(annotation);
+			annotations.addAnnotation(annotation);
 		}
 	}
 	
@@ -740,7 +740,7 @@ public class JpaInContext {
 			// Single Join Column
 			// Example :
 			//   @JoinColumn(name="MGR_COUNTRY", referencedColumnName="COUNTRY") 
-			annotations.addLine( jc.get(0) );
+			annotations.addAnnotation( jc.get(0) );
 		}
 		else if ( jc.size() > 1) {
 			// Multiple Join Columns
@@ -748,14 +748,14 @@ public class JpaInContext {
 			// @JoinColumns( {
 			//   @JoinColumn(name="MGR_COUNTRY", referencedColumnName="COUNTRY") ,
 			//   @JoinColumn(name="MGR_ID", referencedColumnName="EMP_ID") } )			
-			annotations.addLine("@JoinColumns( { " );
+			annotations.addAnnotation("@JoinColumns( { " );
 			int i = 0 ;
 			for ( String s : jc ) {
 				String jcEnd = ",";
 				if ( i == jc.size() - 1) {
 					jcEnd = "} )" ;
 				}
-				annotations.addLine("    " + s + jcEnd );
+				annotations.addAnnotation("    " + s + jcEnd );
 				i++;
 			}
 		}
@@ -780,12 +780,12 @@ public class JpaInContext {
 		// Get the FK referencing the "inverse side" : the other entity (in the collection)
 		ForeignKeyInContext fkInverseSide = getForeignKey(joinEntity, link.getTargetEntityName()) ;
 
-		annotations.addLine("@JoinTable( name=\"" + joinEntity.getSqlTableName() + "\", " );
+		annotations.addAnnotation("@JoinTable( name=\"" + joinEntity.getSqlTableName() + "\", " );
 		// Example for entity "Employee" having a link for a collection of "Skill" : "private List<Skill> skills" 
 		// Example : joinColumns = @JoinColumn( name="emp_id", referencedColumnName="id"),
-		annotations.addLine( processJoinTableColumns("  joinColumns",        fkOwningSide, "," ) ) ; 
+		annotations.addAnnotation( processJoinTableColumns("  joinColumns",        fkOwningSide, "," ) ) ; 
 		// Example :  inverseJoinColumns = @JoinColumn( name="skill_id", referencedColumnName="id") )
-		annotations.addLine( processJoinTableColumns("  inverseJoinColumns", fkInverseSide, " )" ) );  
+		annotations.addAnnotation( processJoinTableColumns("  inverseJoinColumns", fkInverseSide, " )" ) );  
 	}
 
 	private ForeignKeyInContext getForeignKey(EntityInContext joinEntity, String referencedEntityName) {
