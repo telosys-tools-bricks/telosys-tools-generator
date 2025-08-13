@@ -31,7 +31,10 @@ import org.telosys.tools.generic.model.types.NeutralType;
  */
 public class LiteralValuesProviderForCPlusPlus extends LiteralValuesProvider {
 	
-	private static final String NULL_LITERAL  = "NULL" ;  
+	// nullptr is a keyword representing a null pointer with its own type (std::nullptr_t)
+	// preferred in modern C++ ( eg int* ptr = nullptr; )
+	private static final String NULL_LITERAL  = "nullptr" ;  // Better than "NULL" that is just an integer 0
+	
 	private static final String TRUE_LITERAL  = "true" ;  
 	private static final String FALSE_LITERAL = "false" ; 
 
@@ -67,7 +70,13 @@ public class LiteralValuesProviderForCPlusPlus extends LiteralValuesProvider {
 				|| NeutralType.INTEGER.equals(neutralType) 
 				|| NeutralType.LONG.equals(neutralType) ) {
 			Long value = buildIntegerValue(neutralType, step);  
-			return new LiteralValue(value.toString(), value) ; // eg : 123
+			if ( NeutralType.LONG.equals(neutralType) ) {
+				// using the "L" suffix for long integer literals is generally recommended in C++, though it’s not strictly required
+				return new LiteralValue(value.toString()+"L", value) ; // eg :  123L
+			}
+			else {
+				return new LiteralValue(value.toString(), value) ; // eg : 123
+			}
 		}
 		
 		//--- NUMBER (NOT INTEGER)
@@ -75,13 +84,26 @@ public class LiteralValuesProviderForCPlusPlus extends LiteralValuesProvider {
 				|| NeutralType.DOUBLE.equals(neutralType) 
 				|| NeutralType.DECIMAL.equals(neutralType) ) {
 			BigDecimal value = buildDecimalValue(neutralType, step);
-			return new LiteralValue(value.toString(), value) ; // eg :  123.77
+			if ( NeutralType.FLOAT.equals(neutralType) ) {
+				// "f" suffix is recommended for "float" to avoid implicit conversion warnings in some compilers with strict flags (-Wconversion in GCC/Clang).
+				return new LiteralValue(value.toString()+"f", value) ; // eg :  123.77
+			}
+			else {
+				return new LiteralValue(value.toString(), value) ; // eg :  123.77
+			}
 		}
 
 		//--- BOOLEAN
 		else if ( NeutralType.BOOLEAN.equals(neutralType)  ) {
 			boolean value = buildBooleanValue(step);
 			return new LiteralValue(value ? TRUE_LITERAL : FALSE_LITERAL, Boolean.valueOf(value)) ;
+		}
+		
+		//--- UUID (type is string, "std::string" ) 
+		else if ( NeutralType.UUID.equals(neutralType)  ) {
+			String value = buildUUID() ;
+			// Add double quotes for string literals 
+			return new LiteralValue("\"" + value + "\"", value );
 		}
 
 		// Other literal values are not provided
@@ -107,25 +129,17 @@ public class LiteralValuesProviderForCPlusPlus extends LiteralValuesProvider {
 		notNullInitValues.put(NeutralType.BOOLEAN, FALSE_LITERAL);  
 		notNullInitValues.put(NeutralType.BYTE,    "'\0'");  // char or unsigned char
 		notNullInitValues.put(NeutralType.SHORT,   "0");  
-		notNullInitValues.put(NeutralType.INTEGER, "0");  
-		notNullInitValues.put(NeutralType.LONG,    "0");  
-		notNullInitValues.put(NeutralType.FLOAT,   "0");  
-		notNullInitValues.put(NeutralType.DOUBLE,  "0");  
-		notNullInitValues.put(NeutralType.DECIMAL, "0");  
+		notNullInitValues.put(NeutralType.INTEGER, "0");    // "0"  => Type: int
+		notNullInitValues.put(NeutralType.LONG,    "0L");   // "0L" => Type: long
+		notNullInitValues.put(NeutralType.FLOAT,   "0.0f");  // "0.0f" => Type: float
+		notNullInitValues.put(NeutralType.DOUBLE,  "0.0");   // "0.0" => Type: double
+		notNullInitValues.put(NeutralType.DECIMAL, "0.0");   // "0.0" => Type: double
 		// nothing for "array", in C++ a size is required when declaring an array => cannot use "void array" for all init
 		// nothing for "vector", in C++ a vector is empty by default
 	}
 	
 	@Override
 	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
-//		if (attribute.isNotNull()) {
-//			// not null attribute
-//			String defaultValue = notNullInitValues.get(languageType.getNeutralType());
-//			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
-//		} else {
-//			// nullable attribute
-//			return NULL_LITERAL;
-//		}
 		return getInitValue(languageType.getNeutralType(), attribute.isNotNull());
 	}
 

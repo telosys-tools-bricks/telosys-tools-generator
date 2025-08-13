@@ -198,7 +198,7 @@ public class TypeConverterForCPlusPlusTest extends AbstractTypeTest {
 		checkPrimitiveType( getType( NeutralType.TIMETZ, NONE ), EXPECTED_TYPE_FOR_TIME); // No Time with TZ in CPP => like Time
 	}
 	
-	private static final String  EXPECTED_TYPE_FOR_UUID = "std::array<std::uint8_t, 16>";
+	private static final String  EXPECTED_TYPE_FOR_UUID = STD_STRING; // UUID is stored as a string
 	@Test
 	public void testUUID() {
 		println("--- ");

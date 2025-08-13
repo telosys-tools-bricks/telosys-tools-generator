@@ -51,12 +51,15 @@ public class TypeConverterForCPlusPlus extends TypeConverter {
 
 	//--- Other types (with namespace prefix) :
 	private static final String CPP_STRING = "std::string" ;
-	private static final String CPP_YEAR_MONTH_DAY = "std::chrono::year_month_day" ; // Just the date, no time or time zone
-	private static final String CPP_HH_MM_SS       = "std::chrono::hh_mm_ss" ;       // Just the time-of-day, no date or time zone
-	private static final String CPP_LOCAL_TIME     = "std::chrono::local_time" ;     // Naive date-time, no time zone
-	private static final String CPP_ZONED_TIME     = "std::chrono::zoned_time" ;     // Date-time with time zone
+	//--- Temporal types usable since C++20 ("#include <chrono>" required)
+	private static final String CPP20_YEAR_MONTH_DAY = "std::chrono::year_month_day" ; // Just the date, no time or time zone  (since C++20)
+	private static final String CPP20_HH_MM_SS       = "std::chrono::hh_mm_ss" ;       // Just the time-of-day, no date or time zone (since C++20)
+	private static final String CPP20_LOCAL_TIME     = "std::chrono::local_time" ;     // Naive date-time, no time zone (since C++20)
+	private static final String CPP20_ZONED_TIME     = "std::chrono::zoned_time" ;     // Date-time with time zone (since C++20)
+	//--- calendar date and time broken down into its components (YYYY,MM,DD,HH,mm,SS) (#include <ctime>)
+	// private static final String CPP_DATE_AND_TIME    = "std::tm" ;      // Date-time 
 	
-	private static final String CPP_ARRAY_UINT8_T_16 = "std::array<std::uint8_t, 16>"; // '#include <array>'  for 'std::array'  and '#include <cstdint>' for 'std::uint8_t'
+	// private static final String CPP_ARRAY_UINT8_T_16 = "std::array<std::uint8_t, 16>"; // '#include <array>'  for 'std::array'  and '#include <cstdint>' for 'std::uint8_t'
 	private static final String CPP_VECTOR_BYTE      = "std::vector<std::byte>";       // '#include <vector>' for 'std::vector' and '#include <cstddef>' for 'std::byte'
 	
 	public TypeConverterForCPlusPlus() {
@@ -88,19 +91,20 @@ public class TypeConverterForCPlusPlus extends TypeConverter {
 		//declarePrimitiveType( buildPrimitiveType(NeutralType.TIME,      "std::time_t", "std::time_t" ) ); // Time        => #include <chrono> 
 		//declarePrimitiveType( buildPrimitiveType(NeutralType.TIMESTAMP, "std::tm",     "std::tm"     ) ); // Date + Hour => #include <chrono> 
 		//--- Temporal types (for C++ 20 with "#include <chrono>" for "std::chrono::TYPE" ) 
-		declarePrimitiveType( buildPrimitiveType(NeutralType.DATE,       CPP_YEAR_MONTH_DAY, CPP_YEAR_MONTH_DAY ) ); // Just the date, no time or time zone
-		declarePrimitiveType( buildPrimitiveType(NeutralType.TIME,       CPP_HH_MM_SS,       CPP_HH_MM_SS       ) ); // Just the time-of-day, no date or time zone
-		declarePrimitiveType( buildPrimitiveType(NeutralType.TIMESTAMP,  CPP_LOCAL_TIME,     CPP_LOCAL_TIME     ) ); // Naive date-time, no time zone
-		// v 4.3.0 new types
-		declarePrimitiveType( buildPrimitiveType(NeutralType.DATETIME,   CPP_LOCAL_TIME,     CPP_LOCAL_TIME     ) ); // Naive date-time, no time zone
-		declarePrimitiveType( buildPrimitiveType(NeutralType.DATETIMETZ, CPP_ZONED_TIME,     CPP_ZONED_TIME     ) ); // Date-time with time zone
-		declarePrimitiveType( buildPrimitiveType(NeutralType.TIMETZ,     CPP_HH_MM_SS,       CPP_HH_MM_SS       ) ); // No Time with TZ in C++ => like "time"
+		declarePrimitiveType( buildPrimitiveType(NeutralType.DATE,       CPP20_YEAR_MONTH_DAY, CPP20_YEAR_MONTH_DAY ) ); // Just the date, no time or time zone
+		declarePrimitiveType( buildPrimitiveType(NeutralType.TIME,       CPP20_HH_MM_SS,       CPP20_HH_MM_SS       ) ); // Just the time-of-day, no date or time zone
+		declarePrimitiveType( buildPrimitiveType(NeutralType.TIMESTAMP,  CPP20_LOCAL_TIME,     CPP20_LOCAL_TIME     ) ); // Naive date-time, no time zone
+		declarePrimitiveType( buildPrimitiveType(NeutralType.DATETIME,   CPP20_LOCAL_TIME,     CPP20_LOCAL_TIME     ) ); // Naive date-time, no time zone
+		declarePrimitiveType( buildPrimitiveType(NeutralType.DATETIMETZ, CPP20_ZONED_TIME,     CPP20_ZONED_TIME     ) ); // Date-time with time zone
+		declarePrimitiveType( buildPrimitiveType(NeutralType.TIMETZ,     CPP20_HH_MM_SS,       CPP20_HH_MM_SS       ) ); // No Time with TZ in C++ => like "time"
 
 		//--- UUID (v 4.3.0 )
 		// Option 1 : array of 16 bytes "std::array<uint8_t, 16>"  ( '#include <array>'  for 'std::array' and '#include <cstdint>' for 'std::uint8_t' )
 		// Some compilers also define the C versions (::uint8_t) in the global namespace as an extension, but the standard says to use std::uint8_t in C++.
-		declarePrimitiveType( buildPrimitiveType(NeutralType.UUID,     CPP_ARRAY_UINT8_T_16,  CPP_ARRAY_UINT8_T_16  ) ); 		
-		// Option 2 : string of 32 characters : "std::string"
+		// error: 'uint8_t' is not a member of 'std'
+		// declarePrimitiveType( buildPrimitiveType(NeutralType.UUID,     CPP_ARRAY_UINT8_T_16,  CPP_ARRAY_UINT8_T_16  ) ); 		
+		// Option 2 : string of 32 characters : "std::string" => SIMPLEST OPTION 
+		declarePrimitiveType( buildPrimitiveType(NeutralType.UUID,     CPP_STRING,  CPP_STRING ) ); 		
 		// Option 3 : library (GitHub project: mariusbancila/stduuid  or  Boost.UUID)
 		
 		//--- Byte array -> 2 options:
