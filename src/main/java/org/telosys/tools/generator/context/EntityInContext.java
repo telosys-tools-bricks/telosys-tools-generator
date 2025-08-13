@@ -619,10 +619,10 @@ public class EntityInContext
 	}
 
 	private void checkCriterion ( int criterion ) {
-		if ( criterion == Const.KEY || criterion == Const.NOT_KEY ) return ;
-		if ( criterion == Const.TEXT || criterion == Const.NOT_TEXT ) return ;
-		if ( criterion == Const.IN_LINKS || criterion == Const.NOT_IN_LINKS ) return ;
-		if ( criterion == Const.IN_SELECTED_LINKS || criterion == Const.NOT_IN_SELECTED_LINKS ) return ;
+		if ( criterion == ConstInContext.KEY || criterion == ConstInContext.NOT_KEY ) return ;
+		if ( criterion == ConstInContext.TEXT || criterion == ConstInContext.NOT_TEXT ) return ;
+		if ( criterion == ConstInContext.IN_LINKS || criterion == ConstInContext.NOT_IN_LINKS ) return ;
+		if ( criterion == ConstInContext.IN_SELECTED_LINKS || criterion == ConstInContext.NOT_IN_SELECTED_LINKS ) return ;
 		// else : invalid criterion
 		throw new GeneratorContextException("Invalid criterion in getAttributesByCriteria argument(s)");
 	}
@@ -691,34 +691,34 @@ public class EntityInContext
 			Boolean selectedBySelectedLink = null ;
 			
 			//--- IS KEY ?
-			if ( ( criteria & Const.KEY ) != 0 ) {
+			if ( ( criteria & ConstInContext.KEY ) != 0 ) {
 				selectedByKey = attribute.isKeyElement();
 			}
-			if ( ( criteria & Const.NOT_KEY ) != 0 ) {
+			if ( ( criteria & ConstInContext.NOT_KEY ) != 0 ) {
 				selectedByKey = ! attribute.isKeyElement();
 			}
 
 			//--- IS TEXT ?
-			if ( ( criteria & Const.TEXT ) != 0 ) {
+			if ( ( criteria & ConstInContext.TEXT ) != 0 ) {
 				selectedByText = attribute.isLongText();
 			}
-			if ( ( criteria & Const.NOT_TEXT ) != 0 ) {
+			if ( ( criteria & ConstInContext.NOT_TEXT ) != 0 ) {
 				selectedByText = ! attribute.isLongText();
 			}
 			
 			//--- IS IN LINK ?
-			if ( ( criteria & Const.IN_LINKS ) != 0 ) {
+			if ( ( criteria & ConstInContext.IN_LINKS ) != 0 ) {
 				selectedByLink = attribute.isUsedInLinks();
 			}
-			if ( ( criteria & Const.NOT_IN_LINKS ) != 0 ) {
+			if ( ( criteria & ConstInContext.NOT_IN_LINKS ) != 0 ) {
 				selectedByLink = ! attribute.isUsedInLinks();
 			}
 			
 			//--- IS IN SELECTED LINK ?
-			if ( ( criteria & Const.IN_SELECTED_LINKS ) != 0 ) {
+			if ( ( criteria & ConstInContext.IN_SELECTED_LINKS ) != 0 ) {
 				selectedBySelectedLink = attribute.isUsedInSelectedLinks() ;
 			}			
-			if ( ( criteria & Const.NOT_IN_SELECTED_LINKS ) != 0 ) {
+			if ( ( criteria & ConstInContext.NOT_IN_SELECTED_LINKS ) != 0 ) {
 				selectedBySelectedLink = ! attribute.isUsedInSelectedLinks() ;
 			}
 			

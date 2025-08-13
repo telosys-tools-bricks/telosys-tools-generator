@@ -43,7 +43,7 @@ import org.telosys.tools.generic.model.Model;
 		since = "2.0.3"
  )
 //-------------------------------------------------------------------------------------
-public class EmbeddedGenerator {
+public class GeneratorInContext {
 
 	private final Model              model ;
 	private final TelosysToolsCfg    telosysToolsCfg ; // v 3.0.0
@@ -57,7 +57,7 @@ public class EmbeddedGenerator {
 	/**
 	 * Constructor for limited embedded generator without generation capabilities
 	 */
-	public EmbeddedGenerator() {
+	public GeneratorInContext() {
 		super();
 		this.model = null ;
 		this.telosysToolsCfg = null ; // v 3.0.0
@@ -77,7 +77,7 @@ public class EmbeddedGenerator {
 	 * @param selectedEntitiesNames
 	 * @param generatedTargets
 	 */
-	public EmbeddedGenerator(	
+	public GeneratorInContext(	
 			TelosysToolsCfg telosysToolsCfg, // v 3.0.0
 			String bundleName, // v 3.0.0
 			TelosysToolsLogger logger, 

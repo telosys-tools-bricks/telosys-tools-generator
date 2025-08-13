@@ -34,7 +34,7 @@ import org.telosys.tools.generator.context.tools.LinesBuilder;
 	since = "2.0.7"
  )
 //-------------------------------------------------------------------------------------
-public class Java {
+public class JavaInContext {
 
 	private static final List<String> VOID_STRINGS_LIST = new LinkedList<>();
 
@@ -120,7 +120,7 @@ public class Java {
 						lb.append(indent, "if ( " + attributeName + " != other." + attributeName + " ) return false ; ");
 					}
 				}
-				else if ( isArray(attribute) ) {
+				else if ( isJavaArrayType(attribute) ) {
 					// char[], byte[], String[], ...
 					lb.append(indent, "if ( ! Arrays.equals(" + attributeName + ", other." + attributeName + ") ) return false ; ");
 				}
@@ -223,7 +223,7 @@ public class Java {
 							lb.append(indent, "result = prime * result + " + attributeName + ";");
 						}
 					}
-					else if ( isArray(attribute) ) { 
+					else if ( isJavaArrayType(attribute) ) { 
 						// char[], byte[], String[], ...
 						lb.append(indent, "result = prime * result + Arrays.hashCode(" + attributeName + ");");
 					}
@@ -349,7 +349,7 @@ public class Java {
 			"Indentation with SPACES (1 'indentationString' for each indentation level)"
 			},
 		example={ 
-			"$csharp.toStringMethod( $entity, 2, '  ' )" },
+			"$java.toStringMethod( $entity, 2, '  ' )" },
 		parameters = { 
 			"entity : the entity for which to generate the 'toString' method",
 			"indentationLevel : initial indentation level",
@@ -369,7 +369,7 @@ public class Java {
 			"Indent with TABS (1 tab for each indentation level)"
 			},
 		example={ 
-			"$csharp.toStringMethod( $entity, $attributes, 2 )" },
+			"$java.toStringMethod( $entity, $attributes, 2 )" },
 		parameters = { 
 			"entity : the entity for which to generate the 'toString' method",
 			"attributes : list of attributes to be used in the 'toString' method",
@@ -389,7 +389,7 @@ public class Java {
 			"Indentation with spaces (1 'indentationString' for each indentation level)"
 			},
 		example={ 
-			"$csharp.toStringMethod( $entity, $attributes, 2, '  ' )" },
+			"$java.toStringMethod( $entity, $attributes, 2, '  ' )" },
 		parameters = { 
 			"entity : the entity for which to generate the 'toString' method",
 			"attributes : list of attributes to be used in the 'toString' method",
@@ -402,16 +402,26 @@ public class Java {
 	}
 
     /**
+     * Returns true if Java array type: char[], byte[], String[], ...
      * @param attribute
      * @return
      * @since v 3.0.0
      */
-    private boolean isArray( AttributeInContext attribute ) {
+    private boolean isJavaArrayType( AttributeInContext attribute ) {
     	String type = attribute.getSimpleType();
-		if ( type != null && type.trim().endsWith("]")) {
-				return true ;
-		}
-		return false ;    	
+		return ( type != null && type.trim().endsWith("]") );    	
+    }
+    private boolean isJavaSpecialType( AttributeInContext attribute ) {
+    	String type = attribute.getType();
+    	if ( type != null ) {
+        	String s = type.trim() ;
+        	// java.sql.Blob
+        	// java.sql.Clob
+        	// java.sql.NClob
+        	// java.sql.Array
+        	return ( s.endsWith("Blob") || s.endsWith("Clob") || s.endsWith("Array") ) ;
+    	}
+    	return false ;    	
     }
 
 	//-------------------------------------------------------------------------------------
@@ -462,7 +472,7 @@ public class Java {
 		lb.append(indentationLevel, "StringBuilder sb = new StringBuilder();"); 
 		lb.append(indentationLevel, "sb.append(\"" + entity.getName() + "[\");");  // append the class name, example : sb.append("Employee[")
     	for ( AttributeInContext attribute : attributes ) {
-    		if ( usableInToString( attribute ) ) {
+    		if ( isUsableInToString( attribute ) ) {
     			String startOfLine = "";
                 if ( count > 0 ) {
                 	startOfLine = "sb.append(separator)" ; // not the first one => append separator before
@@ -488,18 +498,15 @@ public class Java {
      * @param attribute
      * @return
      */
-    private boolean usableInToString( AttributeInContext attribute ) {
-    	if ( attribute.isBinaryType() ) return false ;
-    	if ( isArray(attribute) ) return false ;
-    	if ( attribute.isLongText() ) return false ;
-    	
-    	String sType = attribute.getType();
-    	if ( null == sType ) return false ;
-    	String s = sType.trim() ;
-    	if ( s.endsWith("Blob") || s.endsWith("Clob") ) return false ; 
-    	return true ;
+    private boolean isUsableInToString( AttributeInContext attribute ) {
+    	return ! (   
+    		   attribute.isBinaryType()   // neutral type is 'binary' => Java 'byte[]'
+    		|| attribute.isLongText()     // neutral type is 'string' + @LongText => Java 'String' but 'long string'
+    		//--- check other special types (not supposed to happen)
+    		|| isJavaArrayType(attribute) 
+    		|| isJavaSpecialType(attribute) 
+    		) ;
     }
-    
 	
 	@VelocityMethod(
 		text={	

@@ -45,7 +45,7 @@ import org.telosys.tools.generator.context.names.ContextName;
 		since = "2.0.3"
  )
 //-------------------------------------------------------------------------------------
-public class Loader {
+public class LoaderInContext {
 	
     private final SpecificClassLoader    specificClassLoader ; // Specific Class Loader instance
 
@@ -58,7 +58,7 @@ public class Loader {
 	 * @param templatesFolderFullPath
 	 * @param velocityContext
 	 */
-	public Loader(String templatesFolderFullPath) {
+	public LoaderInContext(String templatesFolderFullPath) {
 		super();
 		this.templatesFolderFullPath = templatesFolderFullPath;
 		this.classesFolder = new File ( FileUtil.buildFilePath(this.templatesFolderFullPath, "classes" ) );

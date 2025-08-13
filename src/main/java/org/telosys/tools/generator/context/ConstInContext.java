@@ -33,7 +33,7 @@ import org.telosys.tools.generic.model.enums.DateType;
 		since = "2.0.3"
  )
 //-------------------------------------------------------------------------------------
-public class Const {
+public class ConstInContext {
 
 	//--- Attributes filter criteria
 	public static final int KEY      = 1 ;

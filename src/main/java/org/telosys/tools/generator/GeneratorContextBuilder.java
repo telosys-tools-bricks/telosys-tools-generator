@@ -23,19 +23,19 @@ import org.telosys.tools.commons.TelosysToolsLogger;
 import org.telosys.tools.commons.cfg.TelosysToolsCfg;
 import org.telosys.tools.generator.context.BeanValidation;
 import org.telosys.tools.generator.context.BundleInContext;
-import org.telosys.tools.generator.context.Const;
+import org.telosys.tools.generator.context.ConstInContext;
 import org.telosys.tools.generator.context.CsharpInContext;
-import org.telosys.tools.generator.context.EmbeddedGenerator;
+import org.telosys.tools.generator.context.GeneratorInContext;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generator.context.FactoryInContext;
 import org.telosys.tools.generator.context.FnInContext;
 import org.telosys.tools.generator.context.H2InContext;
 import org.telosys.tools.generator.context.HtmlInContext;
-import org.telosys.tools.generator.context.Java;
+import org.telosys.tools.generator.context.JavaInContext;
 import org.telosys.tools.generator.context.JdbcFactoryInContext;
 import org.telosys.tools.generator.context.JpaInContext;
-import org.telosys.tools.generator.context.Loader;
+import org.telosys.tools.generator.context.LoaderInContext;
 import org.telosys.tools.generator.context.ModelInContext;
 import org.telosys.tools.generator.context.NowInContext;
 import org.telosys.tools.generator.context.PhpInContext;
@@ -122,25 +122,27 @@ public class GeneratorContextBuilder {
 		EnvInContext env = new EnvInContext(projectVariables) ;
 		generatorContext.put(ContextName.ENV, env);  
 
+		//--- Deprecated object (just kept for backward compatibility)
+		generatorContext.put(ContextName.TODAY,           new Today()); // DEPRECATED 
+		generatorContext.put(ContextName.JDBC_FACTORY,    new JdbcFactoryInContext());  // DEPRECATED
+		generatorContext.put(ContextName.BEAN_VALIDATION, new BeanValidation()); // DEPRECATED (since 4.3.0)
+		
 		//--- Set the standard Velocity variables in the context
-		generatorContext.put(ContextName.GENERATOR,       new EmbeddedGenerator());  // Limited generator without generation capability 
-		generatorContext.put(ContextName.TODAY,           new Today()); // Current date and time 
+		generatorContext.put(ContextName.GENERATOR,       new GeneratorInContext());  // Default generator (without generation capability) 
 		generatorContext.put(ContextName.NOW,             new NowInContext()); // Current date and time ( ver 3.3.0 )
-		generatorContext.put(ContextName.CONST,           new Const()); // Constants (static values)
+		generatorContext.put(ContextName.CONST,           new ConstInContext()); // Constants (static values)
 		generatorContext.put(ContextName.FN,              new FnInContext(generatorContext, env)); // Utility functions
 		generatorContext.put(ContextName.H2,              new H2InContext());  // JDBC factory ( ver 2.1.1 )
 		
-		generatorContext.put(ContextName.JAVA,            new Java());  // Java utility functions
+		generatorContext.put(ContextName.JAVA,            new JavaInContext());  // Java utility functions
 		generatorContext.put(ContextName.JPA,             new JpaInContext());   // JPA utility functions
-		generatorContext.put(ContextName.JDBC_FACTORY,    new JdbcFactoryInContext());  // JDBC factory ( ver 2.1.1 )
-		generatorContext.put(ContextName.BEAN_VALIDATION, new BeanValidation()); // Bean Validation utility functions
 		generatorContext.put(ContextName.HTML,            new HtmlInContext());  // HTML utilities ( ver 3.0.0 )
 		generatorContext.put(ContextName.PHP,             new PhpInContext());  // PHP utilities ( ver 4.1.0 )
 		generatorContext.put(ContextName.CSHARP,          new CsharpInContext());  // C# utilities ( ver 4.1.0 )
 		
 
 		//--- Set the dynamic class loader 
-		Loader loader = new Loader( telosysToolsCfg.getTemplatesFolderAbsolutePath(bundleName) ); 
+		LoaderInContext loader = new LoaderInContext( telosysToolsCfg.getTemplatesFolderAbsolutePath(bundleName) ); 
 		generatorContext.put(ContextName.LOADER, loader);
 		
 		//--- Set the "$project" variable in the context
@@ -223,7 +225,7 @@ public class GeneratorContextBuilder {
 	//-------------------------------------------------------------------------------------------------------
 	private void setEmbeddedGenerator(GeneratorContext generatorContext, List<String> selectedEntitiesNames, String bundleName, List<Target> generatedTargets) {
 		//--- Set the "$generator"  in the context ( "real" embedded generator )
-		EmbeddedGenerator embeddedGenerator = new EmbeddedGenerator( telosysToolsCfg, bundleName, logger,
+		GeneratorInContext embeddedGenerator = new GeneratorInContext( telosysToolsCfg, bundleName, logger,
 				this.model, selectedEntitiesNames, generatedTargets );
 		generatorContext.put(ContextName.GENERATOR, embeddedGenerator );
 	}		

@@ -28,7 +28,7 @@ import org.telosys.tools.generator.context.tools.JavaValidationAnnotations;
 		text = { 
 				"Object providing a set of utility functions for Java Bean Validation (JSR-303) annotations",
 				"",
-				"DEPRECATED: use $java object instead"
+				"(!) DEPRECATED - use $java object instead"
 		},
 		since = "2.0.7",
 		deprecated = true

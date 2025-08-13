@@ -4,61 +4,64 @@ import java.util.List;
 
 import org.junit.Test;
 import org.telosys.tools.generator.context.BeanValidation;
-import org.telosys.tools.generator.context.Const;
+import org.telosys.tools.generator.context.ConstInContext;
+import org.telosys.tools.generator.context.CsharpInContext;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.FnInContext;
-import org.telosys.tools.generator.context.Java;
+import org.telosys.tools.generator.context.GeneratorInContext;
+import org.telosys.tools.generator.context.JavaInContext;
 import org.telosys.tools.generator.context.JpaInContext;
+import org.telosys.tools.generator.context.LoaderInContext;
+import org.telosys.tools.generator.context.PhpInContext;
 import org.telosys.tools.generator.context.Today;
 import org.telosys.tools.generator.context.names.ContextName;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DocBuilderTest {
 
+	private void println(String s) {
+		System.out.println(s);
+	}
 	private void print(ClassInfo classInfo) {
-		System.out.println(classInfo);
-		System.out.println("-----");
+		println(classInfo.toString());
+		println("-----");
 		
 		List<MethodInfo> methodsInfo = classInfo.getMethodsInfo() ;
 		for ( MethodInfo methodInfo : methodsInfo ) {
-//			System.out.println(" . Method : " + methodInfo.getJavaName() + " --> " + methodInfo.getVelocityName() );
-//			System.out.println("     return      : " + methodInfo.getReturnType());
-//			System.out.println("     param types : " + Arrays.toString( methodInfo.getParamTypes() ) );
-			System.out.println("     " + methodInfo.getSimpleDescription() );
-			System.out.println("     doc : "  );
+			println("  " + methodInfo.getSimpleDescription() );
+			println("     doc : "  );
 			String docText[] = methodInfo.getDocText() ;
 			for ( String s : docText ) {
 				
-				System.out.println("      " + s );
+				println("      " + s );
 			}
-			System.out.println("     parameters : "  );
+			println("     parameters : "  );
 			for ( MethodParameter p : methodInfo.getParameters() ) {
-				System.out.println("      " + p.getName() + " : " + p.getDescription() );
+				println("      " + p.getName() + " : " + p.getDescription() );
 			}
-			System.out.println("     example : "  );
+			println("     example : "  );
 			String example[] = methodInfo.getExampleText() ;
 			for ( String s : example ) {
 				
-				System.out.println("      " + s );
+				println("      " + s );
 			}
-			System.out.println("     deprecated  : " + methodInfo.isDeprecated() );
-			System.out.println("     since       : " + methodInfo.getSince());
-			System.out.println("     signature   : " + methodInfo.getSignature() );
-			System.out.println("-----");
+			println("     deprecated  : " + methodInfo.isDeprecated() );
+			println("     since       : " + methodInfo.getSince());
+			println("     signature   : " + methodInfo.getSignature() );
+			println("-----");
 		}
 	}
 	
 	@Test
 	public void testClassConst() {
 		DocBuilder docBuilder = new DocBuilder();
-		ClassInfo classInfo = docBuilder.getClassInfo(Const.class);
+		ClassInfo classInfo = docBuilder.getClassInfo(ConstInContext.class);
 		print(classInfo);
-
-		assertTrue ( "Const".equals( classInfo.getJavaClassName() ) );
-		assertTrue ( "const".equals( classInfo.getContextName() ) );
-		assertTrue ( classInfo.getMethodsCount() == 12 );
+		assertEquals("ConstInContext",  classInfo.getJavaClassName() );
+		assertEquals(ContextName.CONST, classInfo.getContextName() );
+		assertEquals(12, classInfo.getMethodsCount() );
 	}
 
 	@Test
@@ -66,23 +69,67 @@ public class DocBuilderTest {
 		DocBuilder docBuilder = new DocBuilder();
 		ClassInfo classInfo = docBuilder.getClassInfo(FnInContext.class);
 		print(classInfo);
-
-		assertTrue ( "FnInContext".equals( classInfo.getJavaClassName() ) );
-		assertTrue ( ContextName.FN.equals( classInfo.getContextName() ) );
-		//assertTrue ( classInfo.getMethodsCount() == 12 );
+		assertEquals("FnInContext",  classInfo.getJavaClassName() );
+		assertEquals(ContextName.FN, classInfo.getContextName() );
+		assertEquals(37, classInfo.getMethodsCount() );
 	}
+
+	@Test
+	public void testClassGenerator() {
+		DocBuilder docBuilder = new DocBuilder();
+		ClassInfo classInfo = docBuilder.getClassInfo(GeneratorInContext.class);
+		print(classInfo);
+		assertEquals("GeneratorInContext",  classInfo.getJavaClassName() );
+		assertEquals(ContextName.GENERATOR, classInfo.getContextName() );
+		assertEquals(3, classInfo.getMethodsCount() );
+	}
+
+	@Test
+	public void testClassToday() { // (!) DEPRECATED
+		DocBuilder docBuilder = new DocBuilder();
+		ClassInfo classInfo = docBuilder.getClassInfo(Today.class);
+		print(classInfo);
+
+		assertTrue ( "Today".equals( classInfo.getJavaClassName() ) );
+		assertTrue ( ContextName.TODAY.equals( classInfo.getContextName() ) );
+		assertTrue ( classInfo.getMethodsCount() == 4 );
+		assertTrue ( classInfo.isDeprecated() );
+	}
+
+	@Test
+	public void testClassEntity() {
+		DocBuilder docBuilder = new DocBuilder();
+		ClassInfo classInfo = docBuilder.getClassInfo(EntityInContext.class);
+		print(classInfo);
+
+		assertEquals ( "EntityInContext",  classInfo.getJavaClassName() );
+		assertEquals ( ContextName.ENTITY, classInfo.getContextName() );
+		assertTrue ( classInfo.getMethodsCount() >= 75 );
+	}
+
+	@Test
+	public void testClassLoader() {
+		DocBuilder docBuilder = new DocBuilder();
+		ClassInfo classInfo = docBuilder.getClassInfo(LoaderInContext.class);
+		print(classInfo);
+
+		assertEquals( "LoaderInContext",  classInfo.getJavaClassName() );
+		assertEquals( ContextName.LOADER, classInfo.getContextName() );
+		assertEquals( 5, classInfo.getMethodsCount() );
+	}
+
+	//----------------------------------------------------------------------------
 
 	@Test
 	public void testClassJava() {
 		DocBuilder docBuilder = new DocBuilder();
-		ClassInfo classInfo = docBuilder.getClassInfo(Java.class);
+		ClassInfo classInfo = docBuilder.getClassInfo(JavaInContext.class);
 		print(classInfo);
 
-		assertTrue ( "Java".equals( classInfo.getJavaClassName() ) );
-		assertTrue ( ContextName.JAVA.equals( classInfo.getContextName() ) );
+		assertEquals ( "JavaInContext",  classInfo.getJavaClassName() );
+		assertEquals ( ContextName.JAVA, classInfo.getContextName() );
 		assertTrue ( classInfo.getMethodsCount() >= 4 );
 	}
-
 	@Test
 	public void testClassJpa() {
 		DocBuilder docBuilder = new DocBuilder();
@@ -91,42 +138,38 @@ public class DocBuilderTest {
 
 		assertEquals("JpaInContext", classInfo.getJavaClassName() );
 		assertEquals( ContextName.JPA, classInfo.getContextName() );
-		//assertTrue ( classInfo.getMethodsCount() == 0 );
 	}
 
 	@Test
-	public void testClassBeanValidation() {
+	public void testClassBeanValidation() {  // (!) DEPRECATED
 		DocBuilder docBuilder = new DocBuilder();
 		ClassInfo classInfo = docBuilder.getClassInfo(BeanValidation.class);
 		print(classInfo);
 
 		assertTrue ( "BeanValidation".equals( classInfo.getJavaClassName() ) );
 		assertTrue ( ContextName.BEAN_VALIDATION.equals( classInfo.getContextName() ) );
-		//assertTrue ( classInfo.getMethodsCount() == 0 );
+		assertTrue ( classInfo.isDeprecated() );
 	}
 
 	@Test
-	public void testClassToday() {
+	public void testClassCsharp() {
 		DocBuilder docBuilder = new DocBuilder();
-		ClassInfo classInfo = docBuilder.getClassInfo(Today.class);
+		ClassInfo classInfo = docBuilder.getClassInfo(CsharpInContext.class);
 		print(classInfo);
 
-		assertTrue ( "Today".equals( classInfo.getJavaClassName() ) );
-		assertTrue ( ContextName.TODAY.equals( classInfo.getContextName() ) );
-		assertTrue ( classInfo.getMethodsCount() == 4 );
+		assertEquals ( "CsharpInContext",  classInfo.getJavaClassName() );
+		assertEquals ( ContextName.CSHARP, classInfo.getContextName() );
+		assertTrue ( classInfo.getMethodsCount() >= 4 );
 	}
 
 	@Test
-	public void testClassJavaBeanClass() {
+	public void testClassPhp() {
 		DocBuilder docBuilder = new DocBuilder();
-		//ClassInfo classInfo = docBuilder.getClassInfo(JavaBeanClass.class);
-		ClassInfo classInfo = docBuilder.getClassInfo(EntityInContext.class);
+		ClassInfo classInfo = docBuilder.getClassInfo(PhpInContext.class);
 		print(classInfo);
 
-		assertTrue ( "EntityInContext".equals( classInfo.getJavaClassName() ) );
-		assertTrue ( ContextName.ENTITY.equals( classInfo.getContextName() ) );
-		System.out.println("Methods count = " + classInfo.getMethodsCount() );
-		//assertTrue ( classInfo.getMethodsCount() == 35 );
-		//assertTrue ( classInfo.getMethodsCount() == 40 );
+		assertEquals ( "PhpInContext",  classInfo.getJavaClassName() );
+		assertEquals ( ContextName.PHP, classInfo.getContextName() );
+		assertTrue ( classInfo.getMethodsCount() >= 4 );
 	}
 }

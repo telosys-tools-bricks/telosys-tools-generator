@@ -18,9 +18,9 @@ package org.telosys.tools.generator.context.doc.tooling;
 import org.telosys.tools.generator.context.AttributeInContext;
 import org.telosys.tools.generator.context.BeanValidation;
 import org.telosys.tools.generator.context.BundleInContext;
-import org.telosys.tools.generator.context.Const;
+import org.telosys.tools.generator.context.ConstInContext;
 import org.telosys.tools.generator.context.CsharpInContext;
-import org.telosys.tools.generator.context.EmbeddedGenerator;
+import org.telosys.tools.generator.context.GeneratorInContext;
 import org.telosys.tools.generator.context.EntityInContext;
 import org.telosys.tools.generator.context.EnvInContext;
 import org.telosys.tools.generator.context.FactoryInContext;
@@ -31,13 +31,13 @@ import org.telosys.tools.generator.context.ForeignKeyInContext;
 import org.telosys.tools.generator.context.ForeignKeyPartInContext;
 import org.telosys.tools.generator.context.H2InContext;
 import org.telosys.tools.generator.context.HtmlInContext;
-import org.telosys.tools.generator.context.Java;
+import org.telosys.tools.generator.context.JavaInContext;
 import org.telosys.tools.generator.context.JdbcFactoryInContext;
 import org.telosys.tools.generator.context.JdbcInContext;
 import org.telosys.tools.generator.context.JpaInContext;
 import org.telosys.tools.generator.context.LinkAttributeInContext;
 import org.telosys.tools.generator.context.LinkInContext;
-import org.telosys.tools.generator.context.Loader;
+import org.telosys.tools.generator.context.LoaderInContext;
 import org.telosys.tools.generator.context.ModelInContext;
 import org.telosys.tools.generator.context.NowInContext;
 import org.telosys.tools.generator.context.PhpInContext;
@@ -62,15 +62,15 @@ public class ObjectsList {
 	private ObjectsList() {}
 
 	private static final Class<?>[] templatesObjectsClasses = new Class<?>[] {
-		Const.class,
-		EmbeddedGenerator.class,
+		ConstInContext.class,
+		GeneratorInContext.class,
 		FnInContext.class,
-		// GenerationInContext.class, // ver 2.1.0 // removed in v 3.0.0
-		Java.class, // ver 2.0.7
-		JpaInContext.class, // ver 2.0.7
-		BeanValidation.class, // ver 2.0.7
+		// GenerationInContext.class, // removed in v 3.0.0
+		JavaInContext.class,
+		JpaInContext.class,
+		BeanValidation.class, // DEPRECATED (to be removed in the future)
 
-		EntityInContext.class, // replaces JavaBeanClass.class ( ver 2.1.0 )
+		EntityInContext.class,
 
 		// Attribute + attribute FK parts
 		AttributeInContext.class,
@@ -79,19 +79,13 @@ public class ObjectsList {
 		// FK + FK attributes
 		ForeignKeyInContext.class, // ver 2.0.7
 		ForeignKeyAttributeInContext.class, // v 3.4.0 - forgetting => added in v 4.0.1
-		//ForeignKeyColumnInContext.class, // ver 2.0.7 // removed in  v 3.4.0
-		// JoinColumnInContext.class, // ver 2.1.0 // removed in  v 3.4.0
-		//JoinTableInContext.class, // ver 2.1.0  (added to list in v 3.3.0) // removed in  v 3.4.0
 		
 		// Link + Link attributes
 		LinkInContext.class,
 		LinkAttributeInContext.class, // forgetting => added in v 4.0.1
-		// LinkAttributesPairInContext.class, // ver 2.1.0 // removed in  v 3.4.0
 		
-		Loader.class,
+		LoaderInContext.class,
 		ModelInContext.class, // ver 2.1.0
-//		DatabasesInContext.class, // removed in v 3.4.0
-//		DatabaseInContext.class, // removed in v 3.4.0
 		ProjectInContext.class, // ver 2.1.0
 		Target.class,
 		Today.class,

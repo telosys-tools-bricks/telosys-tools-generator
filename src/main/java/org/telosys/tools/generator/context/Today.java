@@ -33,9 +33,10 @@ import org.telosys.tools.generator.context.names.ContextName;
 		contextName= ContextName.TODAY ,
 		text = {
 			"Object providing the current system date and time ",
-			"(!) DEPRECATED : use '$now' instead "
+			"(!) DEPRECATED - use '$now' instead "
 		},
-		since = ""
+		since = "",
+		deprecated = true
  )
 //-------------------------------------------------------------------------------------
 public class Today
@@ -47,7 +48,8 @@ public class Today
 	@VelocityMethod(
 		text={	
 			"Returns the current date with the default format (ISO date format)"
-			}
+			},
+		deprecated = true
 	)
     public String getDate()
     {
@@ -61,7 +63,8 @@ public class Today
 			},
 		parameters={
 			"format : the Java date format (cf 'SimpleDateFormat' JavaDoc) "
-		}
+		},
+		deprecated = true
 	)
     public String date( String sFormat )
     {
@@ -72,7 +75,8 @@ public class Today
 	@VelocityMethod(
 		text={	
 			"Returns the current time with the default format (ISO time format)"
-			}
+			},
+		deprecated = true
 	)
     public String getTime()
     {
@@ -86,7 +90,8 @@ public class Today
 			},
 		parameters={
 			"format : the Java date format (cf 'SimpleDateFormat' JavaDoc) "
-		}
+		},
+		deprecated = true
 	)
     public String time( String sFormat )
     {
