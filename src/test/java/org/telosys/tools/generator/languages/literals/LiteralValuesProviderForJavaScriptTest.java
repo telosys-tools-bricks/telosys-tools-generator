@@ -1,10 +1,12 @@
 package org.telosys.tools.generator.languages.literals;
 
 import org.junit.Test;
+import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class LiteralValuesProviderForJavaScriptTest extends AbstractLiteralsTest {
 	
@@ -84,7 +86,38 @@ public class LiteralValuesProviderForJavaScriptTest extends AbstractLiteralsTest
 		assertEquals("10000.77", getLiteralValuesProvider().generateLiteralValue(lt, 0, 1).getCurrentLanguageValue() );
 		assertEquals("20000.77", getLiteralValuesProvider().generateLiteralValue(lt, 0, 2).getCurrentLanguageValue() );
 	}
-
+	
+	@Test
+	public void testLiteralValuesForDATETIME() {
+		LanguageType lt = getLanguageType(NeutralType.DATETIME );
+		assertEquals("Temporal.PlainDateTime.from('2000-05-21T00:47:53')", getLiteralValuesProvider().generateLiteralValue(lt, 0,  0).getCurrentLanguageValue() );
+		assertEquals("Temporal.PlainDateTime.from('2001-05-21T01:47:53')", getLiteralValuesProvider().generateLiteralValue(lt, 0,  1).getCurrentLanguageValue() );
+		assertEquals("Temporal.PlainDateTime.from('2002-05-21T02:47:53')", getLiteralValuesProvider().generateLiteralValue(lt, 0,  2).getCurrentLanguageValue() );
+		lt = getLanguageTypeNotNull(NeutralType.DATETIME );
+		assertEquals("Temporal.PlainDateTime.from('2000-05-21T00:47:53')", getLiteralValuesProvider().generateLiteralValue(lt, 0,  0).getCurrentLanguageValue() );
+		assertEquals("Temporal.PlainDateTime.from('2001-05-21T01:47:53')", getLiteralValuesProvider().generateLiteralValue(lt, 0,  1).getCurrentLanguageValue() );
+	}
+	@Test
+	public void testLiteralValuesForDATETIMETZ() { // No TZ in 'Date' object => same result as "datetime" type
+		LanguageType lt = getLanguageType(NeutralType.DATETIMETZ );
+		assertEquals("Temporal.ZonedDateTime.from('2000-05-21T00:47:53+00:00')", getLiteralValuesProvider().generateLiteralValue(lt, 0,  0).getCurrentLanguageValue() );
+		assertEquals("Temporal.ZonedDateTime.from('2001-05-21T01:47:53+01:00')", getLiteralValuesProvider().generateLiteralValue(lt, 0,  1).getCurrentLanguageValue() );
+		assertEquals("Temporal.ZonedDateTime.from('2002-05-21T02:47:53+02:00')", getLiteralValuesProvider().generateLiteralValue(lt, 0,  2).getCurrentLanguageValue() );
+		lt = getLanguageTypeNotNull(NeutralType.DATETIMETZ );
+		assertEquals("Temporal.ZonedDateTime.from('2000-05-21T00:47:53+00:00')", getLiteralValuesProvider().generateLiteralValue(lt, 0,  0).getCurrentLanguageValue() );
+		assertEquals("Temporal.ZonedDateTime.from('2001-05-21T01:47:53+01:00')", getLiteralValuesProvider().generateLiteralValue(lt, 0,  1).getCurrentLanguageValue() );
+	}
+	
+	@Test
+	public void testLiteralValuesForUUID() {
+		LanguageType lt = getLanguageType(NeutralType.UUID );
+		String v = getLiteralValuesProvider().generateLiteralValue(lt, 0,  0).getCurrentLanguageValue();
+		assertEquals(38, v.length() ); // 36 + 2 single quotes
+		assertTrue(v.startsWith( "'" ) );
+		assertTrue(v.endsWith(   "'" ) );
+		assertEquals(4, StrUtil.countChar(v, '-'));
+	}
+	
 	@Test
 	public void testEqualsStatement() {
 		assertEquals(" == foo", getLiteralValuesProvider().getEqualsStatement("foo", getLanguageType(NeutralType.STRING )) );

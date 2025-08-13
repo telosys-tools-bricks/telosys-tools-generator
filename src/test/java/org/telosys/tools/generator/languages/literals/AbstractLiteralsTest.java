@@ -1,5 +1,6 @@
 package org.telosys.tools.generator.languages.literals;
 
+import org.junit.Test;
 import org.telosys.tools.commons.exception.TelosysRuntimeException;
 import org.telosys.tools.generator.GeneratorException;
 import org.telosys.tools.generator.context.EnvInContext;
@@ -7,6 +8,7 @@ import org.telosys.tools.generator.languages.types.AttributeTypeConst;
 import org.telosys.tools.generator.languages.types.AttributeTypeInfo;
 import org.telosys.tools.generator.languages.types.AttributeTypeInfoForTest;
 import org.telosys.tools.generator.languages.types.LanguageType;
+import org.telosys.tools.generic.model.types.NeutralType;
 
 public abstract class AbstractLiteralsTest {
 
@@ -60,7 +62,13 @@ public abstract class AbstractLiteralsTest {
 	 */
 	protected LanguageType getLanguageType(AttributeTypeInfo attributeTypeInfo) {
 		println( attributeTypeInfo + " --> " + attributeTypeInfo );
-		return getEnv().getTypeConverter().getType(attributeTypeInfo);
+		LanguageType lt = getEnv().getTypeConverter().getType(attributeTypeInfo);
+		if ( lt != null ) {
+			return lt;
+		}
+		else {
+			throw new TelosysRuntimeException("Cannot get type for AttributeTypeInfo : " + attributeTypeInfo);
+		}
 	}
 	
 	/**
@@ -92,6 +100,25 @@ public abstract class AbstractLiteralsTest {
 	protected LanguageType getLanguageTypeNotNull(String neutralType) {
 		AttributeTypeInfo attributeTypeInfo = new AttributeTypeInfoForTest(neutralType, AttributeTypeConst.NOT_NULL);
 		return getLanguageType(attributeTypeInfo);
+	}
+	
+	/**
+	 * Test all neutral types for the current target language 
+	 */
+	@Test
+	public void testAllTypes() {
+		for ( String neutralType : NeutralType.getAllNeutralTypes() ) {
+			// Check if this neutral type is known by the current target language
+			LanguageType languageType = getLanguageType(neutralType);
+			if ( languageType == null ) {
+				throw new TelosysRuntimeException("Cannot get LanguageType for neutral type '" + neutralType + "'");
+			}
+			// Check if it's possible to get a  neutral type is known by the current target language
+			LiteralValue literalValue = getLiteralValuesProvider().generateLiteralValue(languageType, 0, 1);
+			if ( literalValue == null ) {
+				throw new TelosysRuntimeException("Cannot get LiteralValue for LanguageType '" + languageType + "'");
+			}
+		}
 	}
 
 }

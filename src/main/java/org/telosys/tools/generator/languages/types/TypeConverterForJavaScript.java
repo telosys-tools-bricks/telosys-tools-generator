@@ -45,6 +45,7 @@ public class TypeConverterForJavaScript extends TypeConverter {
 		declarePrimitiveType( buildType(NeutralType.DATE ) );
 		declarePrimitiveType( buildType(NeutralType.TIME ) );
 		declarePrimitiveType( buildType(NeutralType.TIMESTAMP ) );
+		declarePrimitiveType( buildType(NeutralType.DATETIME ) ); // ver 4.3.0
 		declarePrimitiveType( buildType(NeutralType.DATETIMETZ ) ); // ver 4.3.0
 		declarePrimitiveType( buildType(NeutralType.TIMETZ ) ); // ver 4.3.0
 		

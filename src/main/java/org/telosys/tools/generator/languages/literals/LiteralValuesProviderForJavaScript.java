@@ -148,7 +148,7 @@ public class LiteralValuesProviderForJavaScript extends LiteralValuesProvider {
 		notNullInitValues.put(NeutralType.DATETIME,   "Temporal.PlainDateTime.from('0000-01-01T00:00:00')" ); 
 		notNullInitValues.put(NeutralType.DATETIMETZ, "Temporal.ZonedDateTime.from('0000-01-01T00:00:00+00:00[UTC]')" ); 
 		
-		notNullInitValues.put(NeutralType.UUID,  EMPTY_STRING_LITERAL);
+		notNullInitValues.put(NeutralType.UUID,    "'" + UUID_ZERO_VALUE_STRING + "'");
 		
 		notNullInitValues.put(NeutralType.BINARY,  "new Uint8Array(0)"); // Uint8Array is a typed array with a fixed length.
 	}
