@@ -1,6 +1,7 @@
 package org.telosys.tools.generator.languages.literals;
 
 import org.junit.Test;
+import org.telosys.tools.generator.languages.types.AttributeTypeInfo;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 
@@ -92,5 +93,98 @@ public class LiteralValuesProviderForCSharpTest extends AbstractLiteralsTest {
 		assertEquals(" == foo", getLiteralValuesProvider().getEqualsStatement("foo", getLanguageType(NeutralType.INTEGER )) );
 		assertEquals(" == foo", getLiteralValuesProvider().getEqualsStatement("foo", getLanguageType(NeutralType.FLOAT )) );
 	}
+	
+	
+	private String getInitValue(AttributeTypeInfo attributeTypeInfo) {
+		LanguageType languageType = getTypeConverter().getType(attributeTypeInfo);
+		System.out.println("LanguageType: " + languageType);
+		return getLiteralValuesProvider().getInitValue(attributeTypeInfo, languageType );
+	}
+	@Test
+	public void testInitValue() {
+		String literalNull = getLiteralValuesProvider().getLiteralNull();
+		
+		assertEquals(literalNull, getInitValue( new FakeAttributeTypeInfo(NeutralType.STRING) ) );
+		assertEquals(literalNull, getInitValue( new FakeAttributeTypeInfo(NeutralType.STRING).primitiveTypeExpected() ) );
+		assertEquals(literalNull, getInitValue( new FakeAttributeTypeInfo(NeutralType.STRING).objectTypeExpected() ) );
+		assertEquals("\"\"",      getInitValue( new FakeAttributeTypeInfo(NeutralType.STRING).notNull() ) );
+		assertEquals("\"\"",      getInitValue( new FakeAttributeTypeInfo(NeutralType.STRING).notNull().objectTypeExpected() ) );
+		
+		assertEquals(literalNull, getInitValue( new FakeAttributeTypeInfo(NeutralType.BOOLEAN) ) );
+		assertEquals(literalNull, getInitValue( new FakeAttributeTypeInfo(NeutralType.BOOLEAN).unsignedTypeExpected() ) );
+		assertEquals(literalNull, getInitValue( new FakeAttributeTypeInfo(NeutralType.BOOLEAN).objectTypeExpected() ) );
+		assertEquals("false",     getInitValue( new FakeAttributeTypeInfo(NeutralType.BOOLEAN).notNull() ) );
+		assertEquals("false",     getInitValue( new FakeAttributeTypeInfo(NeutralType.BOOLEAN).notNull().objectTypeExpected()  ) );
+		
+		assertEquals(literalNull,  getInitValue( new FakeAttributeTypeInfo(NeutralType.BYTE) ) );
+		assertEquals(literalNull,  getInitValue( new FakeAttributeTypeInfo(NeutralType.BYTE).unsignedTypeExpected() ) );
+		assertEquals("0",          getInitValue( new FakeAttributeTypeInfo(NeutralType.BYTE).notNull() ) );
+		assertEquals("0",          getInitValue( new FakeAttributeTypeInfo(NeutralType.BYTE).notNull().unsignedTypeExpected() ) );
 
+		assertEquals(literalNull,  getInitValue( new FakeAttributeTypeInfo(NeutralType.SHORT) ) );
+		assertEquals(literalNull,  getInitValue( new FakeAttributeTypeInfo(NeutralType.SHORT).unsignedTypeExpected() ) );
+		assertEquals("0",          getInitValue( new FakeAttributeTypeInfo(NeutralType.SHORT).notNull() ) );
+		assertEquals("0",          getInitValue( new FakeAttributeTypeInfo(NeutralType.SHORT).notNull().unsignedTypeExpected() ) );
+
+		assertEquals(literalNull,  getInitValue( new FakeAttributeTypeInfo(NeutralType.INTEGER) ) );
+		assertEquals(literalNull,  getInitValue( new FakeAttributeTypeInfo(NeutralType.INTEGER).unsignedTypeExpected() ) );
+		assertEquals("0",          getInitValue( new FakeAttributeTypeInfo(NeutralType.INTEGER).notNull() ) );
+		assertEquals("0",          getInitValue( new FakeAttributeTypeInfo(NeutralType.INTEGER).notNull().unsignedTypeExpected() ) );
+
+		assertEquals(literalNull,  getInitValue( new FakeAttributeTypeInfo(NeutralType.LONG) ) );
+		assertEquals(literalNull,  getInitValue( new FakeAttributeTypeInfo(NeutralType.LONG).unsignedTypeExpected() ) );
+		assertEquals("0L",         getInitValue( new FakeAttributeTypeInfo(NeutralType.LONG).notNull() ) );
+		assertEquals("0L",         getInitValue( new FakeAttributeTypeInfo(NeutralType.LONG).notNull().unsignedTypeExpected() ) );
+
+		assertEquals(literalNull,  getInitValue( new FakeAttributeTypeInfo(NeutralType.FLOAT) ) );
+		assertEquals(literalNull,  getInitValue( new FakeAttributeTypeInfo(NeutralType.FLOAT).unsignedTypeExpected() ) );
+		assertEquals("0.0f",       getInitValue( new FakeAttributeTypeInfo(NeutralType.FLOAT).notNull() ) );
+		assertEquals("0.0f",       getInitValue( new FakeAttributeTypeInfo(NeutralType.FLOAT).notNull().unsignedTypeExpected() ) );
+
+		assertEquals(literalNull,  getInitValue( new FakeAttributeTypeInfo(NeutralType.DOUBLE) ) );
+		assertEquals(literalNull,  getInitValue( new FakeAttributeTypeInfo(NeutralType.DOUBLE).unsignedTypeExpected() ) );
+		assertEquals("0.0",        getInitValue( new FakeAttributeTypeInfo(NeutralType.DOUBLE).notNull() ) );
+		assertEquals("0.0",        getInitValue( new FakeAttributeTypeInfo(NeutralType.DOUBLE).notNull().unsignedTypeExpected() ) );
+
+		assertEquals(literalNull,  getInitValue( new FakeAttributeTypeInfo(NeutralType.DECIMAL) ) );
+		assertEquals(literalNull,  getInitValue( new FakeAttributeTypeInfo(NeutralType.DECIMAL).unsignedTypeExpected() ) );
+		assertEquals("0.0m",       getInitValue( new FakeAttributeTypeInfo(NeutralType.DECIMAL).notNull() ) );
+		assertEquals("0.0m",       getInitValue( new FakeAttributeTypeInfo(NeutralType.DECIMAL).notNull().unsignedTypeExpected() ) );
+
+		assertEquals(literalNull,         getInitValue( new FakeAttributeTypeInfo(NeutralType.DATE) ) );
+		assertEquals(literalNull,         getInitValue( new FakeAttributeTypeInfo(NeutralType.DATE).primitiveTypeExpected() ) );
+		assertEquals("DateOnly.MinValue", getInitValue( new FakeAttributeTypeInfo(NeutralType.DATE).notNull() ) );
+		assertEquals("DateOnly.MinValue", getInitValue( new FakeAttributeTypeInfo(NeutralType.DATE).notNull().objectTypeExpected() ) );
+
+		assertEquals(literalNull,         getInitValue( new FakeAttributeTypeInfo(NeutralType.TIME) ) );
+		assertEquals(literalNull,         getInitValue( new FakeAttributeTypeInfo(NeutralType.TIME).primitiveTypeExpected() ) );
+		assertEquals("TimeOnly.MinValue", getInitValue( new FakeAttributeTypeInfo(NeutralType.TIME).notNull() ) );
+		assertEquals("TimeOnly.MinValue", getInitValue( new FakeAttributeTypeInfo(NeutralType.TIME).notNull().objectTypeExpected() ) );
+
+		assertEquals(literalNull,         getInitValue( new FakeAttributeTypeInfo(NeutralType.DATETIME) ) );
+		assertEquals(literalNull,         getInitValue( new FakeAttributeTypeInfo(NeutralType.DATETIME).primitiveTypeExpected() ) );
+		assertEquals("DateTime.MinValue", getInitValue( new FakeAttributeTypeInfo(NeutralType.DATETIME).notNull() ) );
+		assertEquals("DateTime.MinValue", getInitValue( new FakeAttributeTypeInfo(NeutralType.DATETIME).notNull().objectTypeExpected() ) );
+
+		assertEquals(literalNull,               getInitValue( new FakeAttributeTypeInfo(NeutralType.DATETIMETZ) ) );
+		assertEquals(literalNull,               getInitValue( new FakeAttributeTypeInfo(NeutralType.DATETIMETZ).primitiveTypeExpected() ) );
+		assertEquals("DateTimeOffset.MinValue", getInitValue( new FakeAttributeTypeInfo(NeutralType.DATETIMETZ).notNull() ) );
+		assertEquals("DateTimeOffset.MinValue", getInitValue( new FakeAttributeTypeInfo(NeutralType.DATETIMETZ).notNull().objectTypeExpected() ) );
+
+		assertEquals(literalNull,         getInitValue( new FakeAttributeTypeInfo(NeutralType.TIMETZ) ) );
+		assertEquals(literalNull,         getInitValue( new FakeAttributeTypeInfo(NeutralType.TIMETZ).primitiveTypeExpected() ) );
+		assertEquals("TimeOnly.MinValue", getInitValue( new FakeAttributeTypeInfo(NeutralType.TIMETZ).notNull() ) );
+		assertEquals("TimeOnly.MinValue", getInitValue( new FakeAttributeTypeInfo(NeutralType.TIMETZ).notNull().objectTypeExpected() ) );
+
+		assertEquals(literalNull,    getInitValue( new FakeAttributeTypeInfo(NeutralType.UUID) ) );
+		assertEquals(literalNull,    getInitValue( new FakeAttributeTypeInfo(NeutralType.UUID).primitiveTypeExpected() ) );
+		assertEquals("Guid.Empty",   getInitValue( new FakeAttributeTypeInfo(NeutralType.UUID).notNull() ) );
+		assertEquals("Guid.Empty",   getInitValue( new FakeAttributeTypeInfo(NeutralType.UUID).notNull().objectTypeExpected() ) );
+
+		assertEquals(literalNull,    getInitValue( new FakeAttributeTypeInfo(NeutralType.BINARY) ) );
+		assertEquals(literalNull,    getInitValue( new FakeAttributeTypeInfo(NeutralType.BINARY).primitiveTypeExpected() ) );
+		assertEquals("new byte[0]",  getInitValue( new FakeAttributeTypeInfo(NeutralType.BINARY).notNull() ) );
+		assertEquals("new byte[0]",  getInitValue( new FakeAttributeTypeInfo(NeutralType.BINARY).notNull().objectTypeExpected() ) );
+
+	}
 }
