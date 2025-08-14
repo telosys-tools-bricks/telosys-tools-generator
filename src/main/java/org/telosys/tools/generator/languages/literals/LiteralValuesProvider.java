@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import org.telosys.tools.generator.context.AttributeInContext;
+import org.telosys.tools.generator.languages.types.AttributeTypeInfo;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 
@@ -257,14 +258,18 @@ public abstract class LiteralValuesProvider {
 	 * @param languageType
 	 * @return
 	 */
-	public abstract String getInitValue(AttributeInContext attribute, LanguageType languageType);
+	public final String getInitValue(AttributeInContext attribute, LanguageType languageType) {
+		return getInitValue(attribute.getAttributeTypeInfo(), languageType);
+	}
 	
-	/**
-	 * Returns the default init value for the given neutral type  
-	 * @param neutralType
-	 * @param notNull 
-	 * @return
-	 */
-	public abstract String getInitValue(String neutralType, boolean notNull) ;
+//	/**
+//	 * Returns the default init value for the given neutral type  
+//	 * @param neutralType
+//	 * @param notNull 
+//	 * @return
+//	 */
+//	protected abstract String getInitValue(String neutralType, boolean notNull) ;
 
+//	protected abstract String getInitValue(String neutralType, boolean notNull) ;
+	protected abstract String getInitValue(AttributeTypeInfo attributeTypeInfo, LanguageType languageType);
 }

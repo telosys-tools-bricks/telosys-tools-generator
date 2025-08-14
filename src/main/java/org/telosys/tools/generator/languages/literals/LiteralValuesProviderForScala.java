@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.telosys.tools.generator.context.AttributeInContext;
+import org.telosys.tools.generator.languages.types.AttributeTypeInfo;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 
@@ -207,34 +208,36 @@ public class LiteralValuesProviderForScala extends LiteralValuesProvider {
 	private static final Set<String> notNullableScalaTypes = new HashSet<>();
 	static {
 		// Scala types derived from “AnyVal” are NOT NULLABLE
-		notNullableScalaTypes.add(NeutralType.BOOLEAN);
-		notNullableScalaTypes.add(NeutralType.BYTE);
-		notNullableScalaTypes.add(NeutralType.SHORT);
-		notNullableScalaTypes.add(NeutralType.INTEGER);
-		notNullableScalaTypes.add(NeutralType.LONG);
-		notNullableScalaTypes.add(NeutralType.FLOAT);
-		notNullableScalaTypes.add(NeutralType.DOUBLE);
+		notNullableScalaTypes.add("Boolean");
+		notNullableScalaTypes.add("Byte");
+		notNullableScalaTypes.add("Short");
+		notNullableScalaTypes.add("Int");
+		notNullableScalaTypes.add("Long");
+		notNullableScalaTypes.add("Float");
+		notNullableScalaTypes.add("Double");
 	}
 	private boolean isNotNullable(LanguageType languageType) {
-		return notNullableScalaTypes.contains(languageType.getNeutralType());
+		return notNullableScalaTypes.contains(languageType.getSimpleType());
 	}
 	
+//	@Override
+//	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
+//		return getInitValue(attribute.getAttributeTypeInfo(), languageType);
+//	}
+
 	// in Scala "_" initialises means "default value" when used in variable initialization
-	@Override
-	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
-		return getInitValue(languageType.getNeutralType(), attribute.isNotNull() || isNotNullable(languageType) );
-	}
-	
 	private static final String SCALA_DEFAULT_VALUE = "_"; 
+
 	@Override
-	public String getInitValue(String neutralType, boolean notNull) {
-		if (notNull) {
+	protected String getInitValue(AttributeTypeInfo attributeTypeInfo, LanguageType languageType) {
+		if ( attributeTypeInfo.isNotNull() || isNotNullable(languageType) ) {
 			// not null attribute
-			String defaultValue = notNullInitValues.get(neutralType);
+			String defaultValue = notNullInitValues.get(attributeTypeInfo.getNeutralType());
 			return defaultValue != null ? defaultValue : SCALA_DEFAULT_VALUE ; 
 		} else {
 			// nullable attribute
 			return NULL_LITERAL;
 		}
 	}
+	
 }

@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.telosys.tools.generator.context.AttributeInContext;
+import org.telosys.tools.generator.languages.types.AttributeTypeInfo;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generator.languages.types.TypeConverterForKotlin;
 import org.telosys.tools.generic.model.types.NeutralType;
@@ -81,13 +82,24 @@ public class LiteralValuesProviderForKotlin extends LiteralValuesProvider {
 		//--- STANDARD INTEGERS ( signed integer nullable or not : Short, Short?, Long, Long? )=> NO SUFIX
 		else if ( SIGNED_TYPES.contains(simpleType) ) {
 			Long value = buildIntegerValue(neutralType, step);  
-			return new LiteralValue(value.toString(), value) ; // eg : 123
+			if ( simpleType.startsWith(TypeConverterForKotlin.KOTLIN_LONG) ) {
+				// "Long" or "Long?"
+				return new LiteralValue(value.toString() + "L", value) ; // eg : 123L
+			}
+			else {
+				return new LiteralValue(value.toString(), value) ; // eg : 123
+			}
 		}
-		
 		//--- UNSIGNED INTEGERS ( unsigned integer nullable or not : UShort, UShort?, ULong, ULong?  ) => WITH "u" SUFIX		
 		else if ( UNSIGNED_TYPES.contains(simpleType) ) {
 			Long value = buildIntegerValue(neutralType, step);  
-			return new LiteralValue(value.toString() + "u", value) ; // eg : 123u
+			if ( simpleType.startsWith(TypeConverterForKotlin.KOTLIN_ULONG) ) {
+				// "ULong" or "ULong?"
+				return new LiteralValue(value.toString() + "uL", value) ; // eg : 123uL
+			}
+			else {
+				return new LiteralValue(value.toString() + "u", value) ; // eg : 123u
+			}
 		}
 
 		//--- NUMBER (NOT INTEGER)
@@ -153,51 +165,77 @@ public class LiteralValuesProviderForKotlin extends LiteralValuesProvider {
 	}
 	
 	private static final Map<String,String> notNullInitValues = new HashMap<>();	
+//	static {
+//		notNullInitValues.put(NeutralType.STRING,  EMPTY_STRING_LITERAL);  
+//		notNullInitValues.put(NeutralType.BOOLEAN, FALSE_LITERAL); 
+//		notNullInitValues.put(NeutralType.BYTE,    "0" );  
+//		notNullInitValues.put(NeutralType.SHORT,   "0" );  
+//		notNullInitValues.put(NeutralType.INTEGER, "0" );  
+//		notNullInitValues.put(NeutralType.LONG,    "0L" );  // 'L' suffix for Long
+//		notNullInitValues.put(NeutralType.FLOAT,   "0.0F" );  // 'F' or 'f' suffix
+//		notNullInitValues.put(NeutralType.DOUBLE,  "0.0"  );  // no suffix 
+//		notNullInitValues.put(NeutralType.DECIMAL, "BigDecimal.ZERO" );  // BigDecimal (java.math.BigDecimal)
+//
+//		notNullInitValues.put(NeutralType.DATE,       "LocalDate.now()"); 
+//		notNullInitValues.put(NeutralType.TIME,       "LocalTime.now()"); 
+//		notNullInitValues.put(NeutralType.TIMESTAMP,  "LocalDateTime.now()"); 
+//		notNullInitValues.put(NeutralType.DATETIME,   "LocalDateTime.now()");  // v 4.3.0
+//		notNullInitValues.put(NeutralType.DATETIMETZ, "OffsetDateTime.now()"); // v 4.3.0
+//		notNullInitValues.put(NeutralType.TIMETZ,     "OffsetTime.now()");     // v 4.3.0
+//
+//		notNullInitValues.put(NeutralType.UUID, 	 "UUID(0L,0L)"); // v 4.3.0  (Kotlin syntax != Java syntax, no "new" keyword)
+//		
+//		notNullInitValues.put(NeutralType.BINARY,    "ByteArray(0)"); // ByteArray (Kotlin syntax != Java syntax)
+//	}
 	static {
-		notNullInitValues.put(NeutralType.STRING,  EMPTY_STRING_LITERAL);  
-		notNullInitValues.put(NeutralType.BOOLEAN, FALSE_LITERAL); 
-		notNullInitValues.put(NeutralType.BYTE,    "0" );  
-		notNullInitValues.put(NeutralType.SHORT,   "0" );  
-		notNullInitValues.put(NeutralType.INTEGER, "0" );  
-		notNullInitValues.put(NeutralType.LONG,    "0L" );  // 'L' suffix for Long
-		notNullInitValues.put(NeutralType.FLOAT,   "0.0F" );  // 'F' or 'f' suffix
-		notNullInitValues.put(NeutralType.DOUBLE,  "0.0"  );  // no suffix 
-		notNullInitValues.put(NeutralType.DECIMAL, "BigDecimal.ZERO" );  // BigDecimal (java.math.BigDecimal)
-
-		notNullInitValues.put(NeutralType.DATE,       "LocalDate.now()"); 
-		notNullInitValues.put(NeutralType.TIME,       "LocalTime.now()"); 
-		notNullInitValues.put(NeutralType.TIMESTAMP,  "LocalDateTime.now()"); 
-		notNullInitValues.put(NeutralType.DATETIME,   "LocalDateTime.now()");  // v 4.3.0
-		notNullInitValues.put(NeutralType.DATETIMETZ, "OffsetDateTime.now()"); // v 4.3.0
-		notNullInitValues.put(NeutralType.TIMETZ,     "OffsetTime.now()");     // v 4.3.0
-
-		notNullInitValues.put(NeutralType.UUID, 	 "UUID(0L,0L)"); // v 4.3.0  (Kotlin syntax != Java syntax, no "new" keyword)
+		// In Kotlin all types with "?" suffix are not null
+		notNullInitValues.put("String",     EMPTY_STRING_LITERAL);  
+		notNullInitValues.put("Boolean",    FALSE_LITERAL);
 		
-		notNullInitValues.put(NeutralType.BINARY,    "ByteArray(0)"); // ByteArray (Kotlin syntax != Java syntax)
+		notNullInitValues.put("Byte",       "0" );  
+		notNullInitValues.put("UByte",      "0u" );  // Unsigned
+		notNullInitValues.put("Short",      "0" );  
+		notNullInitValues.put("UShort",     "0u" );  // Unsigned
+		notNullInitValues.put("Int",        "0" );  
+		notNullInitValues.put("UInt",       "0u" );  // Unsigned
+		notNullInitValues.put("Long",       "0L" );    // 'L' suffix for Long
+		notNullInitValues.put("ULong",      "0uL" );   // Unsigned => 'uL' suffix for Long
+		
+		notNullInitValues.put("Float",      "0.0F" );  // 'F' or 'f' suffix
+		notNullInitValues.put("Double",     "0.0"  );  // no suffix 
+		
+		notNullInitValues.put("BigDecimal", "BigDecimal.ZERO" );  // BigDecimal (java.math.BigDecimal)
+
+		notNullInitValues.put("LocalDate",       "LocalDate.now()"); 
+		notNullInitValues.put("LocalTime",       "LocalTime.now()"); 
+		notNullInitValues.put("LocalDateTime",   "LocalDateTime.now()");  // v 4.3.0
+		notNullInitValues.put("OffsetDateTime",  "OffsetDateTime.now()"); // v 4.3.0
+		notNullInitValues.put("OffsetTime",      "OffsetTime.now()");     // v 4.3.0
+
+		notNullInitValues.put("UUID",       "UUID(0L,0L)"); // v 4.3.0  (Kotlin syntax != Java syntax, no "new" keyword)
+		
+		notNullInitValues.put("ByteArray",  "ByteArray(0)"); // ByteArray (Kotlin syntax != Java syntax)
 	}
+	
+//	@Override
+//	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
+////		// In Kotlin, primitive types cannot be null by default
+////		return getInitValue(languageType.getNeutralType(), attribute.isNotNull() || languageType.isPrimitiveType() );
+//		return getInitValue(attribute.getAttributeTypeInfo(), languageType);
+//	}
+	
 	@Override
-	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
-//		if ( attribute.isNotNull() ) {
-//			// not null attribute 
-//			String initValue = notNullInitValues.get(languageType.getNeutralType());
-//			return initValue != null ? initValue : NULL_LITERAL ; 
-//		} else {
-//			// nullable attribute
-//			return NULL_LITERAL;
-//		}
-		// In Kotlin, primitive types cannot be null by default
-		return getInitValue(languageType.getNeutralType(), attribute.isNotNull() || languageType.isPrimitiveType() );
-	}
-	@Override
-	public String getInitValue(String neutralType, boolean notNull) {
-		if (notNull) {
+	protected String getInitValue(AttributeTypeInfo attributeTypeInfo, LanguageType languageType) {
+		if ( attributeTypeInfo.isNotNull() || isNotNullable(languageType) ) {
 			// not null attribute
-			String defaultValue = notNullInitValues.get(neutralType);
+			String defaultValue = notNullInitValues.get(languageType.getSimpleType());
 			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
 		} else {
 			// nullable attribute
 			return NULL_LITERAL;
 		}
 	}
-
+	private boolean isNotNullable(LanguageType languageType) {
+		return ! languageType.getSimpleType().endsWith("?");
+	}
 }

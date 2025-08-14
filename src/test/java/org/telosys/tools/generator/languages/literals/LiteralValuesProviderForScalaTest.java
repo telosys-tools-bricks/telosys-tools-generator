@@ -1,7 +1,9 @@
 package org.telosys.tools.generator.languages.literals;
 
 import org.junit.Test;
+import org.telosys.tools.generator.languages.types.AttributeTypeInfo;
 import org.telosys.tools.generator.languages.types.LanguageType;
+import org.telosys.tools.generator.languages.types.TypeConverterForScala;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
@@ -129,19 +131,107 @@ public class LiteralValuesProviderForScalaTest extends AbstractLiteralsTest {
 	protected static final boolean NULLABLE = false ;
 	protected static final boolean NOT_NULL = true ;
 	
+	
+	private String getInitValue(AttributeTypeInfo attributeTypeInfo) {
+		LanguageType languageType = getTypeConverter().getType(attributeTypeInfo);
+		return getLiteralValuesProvider().getInitValue(attributeTypeInfo, languageType );
+	}
+	
 	@Test
 	public void testInitValue() {
 		String literalNull = getLiteralValuesProvider().getLiteralNull();
-		assertEquals(literalNull, getLiteralValuesProvider().getInitValue(NeutralType.STRING, NULLABLE) );
-		assertEquals("\"\"",      getLiteralValuesProvider().getInitValue(NeutralType.STRING, NOT_NULL) );
+//		TypeConverterForScala typeConverter = new TypeConverterForScala();
+		
+//		EnvInContext envInContext = new EnvInContext();
+//		envInContext.setLanguage(getLanguageName());
+//		AttributeInContext attribute = FakeAttributeBuilder.buildAttribute("Car", "foo", NeutralType.STRING, envInContext);
+//		LanguageType languageType = getLanguageType(attribute.getNeutralType(), typeInfo);
+		
+//		AttributeTypeInfo attributeTypeInfo = new FakeAttributeTypeInfo_BAK.Builder()
+//		        .neutralType(NeutralType.STRING)
+//		        .notNull()
+//		        .primitiveTypeExpected()
+//		        .objectTypeExpected()
+//		        .unsignedTypeExpected()
+//		        .build();
+//		AttributeTypeInfo attributeTypeInfo = new FakeAttributeTypeInfo(NeutralType.STRING).notNull() ;
+//		
+//		assertEquals(literalNull, getLiteralValuesProvider().getInitValue(attributeTypeInfo, typeConverter.getType(attributeTypeInfo) ) );
+//		assertEquals(literalNull, getInitValue( new FakeAttributeTypeInfo(NeutralType.STRING).notNull() ) );
+		
+//		assertEquals(literalNull, getLiteralValuesProvider().getInitValue(NeutralType.STRING, NULLABLE) );
+		assertEquals(literalNull, getInitValue( new FakeAttributeTypeInfo(NeutralType.STRING) ) );
+		assertEquals(literalNull, getInitValue( new FakeAttributeTypeInfo(NeutralType.STRING).nullable() ) );
+//		assertEquals("\"\"",      getLiteralValuesProvider().getInitValue(NeutralType.STRING, NOT_NULL) );
+		assertEquals("\"\"",      getInitValue( new FakeAttributeTypeInfo(NeutralType.STRING).notNull() ) );
 
-		assertEquals(literalNull, getLiteralValuesProvider().getInitValue(NeutralType.BOOLEAN, NULLABLE) );
-		assertEquals("false",     getLiteralValuesProvider().getInitValue(NeutralType.BOOLEAN, NOT_NULL) );
+		//--- "AnyVal" Scala types are considered as "primitive types" => NOT NULLABLE
+		//    Boolean, Byte, Short, Int, Long, Float, Double
+		assertEquals("false",     getInitValue( new FakeAttributeTypeInfo(NeutralType.BOOLEAN) ) );
+		assertEquals("false",     getInitValue( new FakeAttributeTypeInfo(NeutralType.BOOLEAN).notNull() ) );
+		assertEquals("false",     getInitValue( new FakeAttributeTypeInfo(NeutralType.BOOLEAN).unsignedTypeExpected() ) );
+		assertEquals("false",     getInitValue( new FakeAttributeTypeInfo(NeutralType.BOOLEAN).objectTypeExpected() ) );
 
-		assertEquals(literalNull, getLiteralValuesProvider().getInitValue(NeutralType.BYTE, NULLABLE) );
-		assertEquals("0",         getLiteralValuesProvider().getInitValue(NeutralType.BYTE, NOT_NULL) );
-		assertEquals(literalNull, getLiteralValuesProvider().getInitValue(NeutralType.SHORT, NULLABLE) );
-		assertEquals("0",         getLiteralValuesProvider().getInitValue(NeutralType.SHORT, NOT_NULL) );
+		assertEquals("0",  getInitValue( new FakeAttributeTypeInfo(NeutralType.BYTE) ) );
+		assertEquals("0",  getInitValue( new FakeAttributeTypeInfo(NeutralType.BYTE).notNull() ) );
+		assertEquals("0",  getInitValue( new FakeAttributeTypeInfo(NeutralType.BYTE).unsignedTypeExpected() ) );
+		assertEquals("0",  getInitValue( new FakeAttributeTypeInfo(NeutralType.BYTE).objectTypeExpected() ) );
+		
+		assertEquals("0",  getInitValue( new FakeAttributeTypeInfo(NeutralType.SHORT) ) );
+		assertEquals("0",  getInitValue( new FakeAttributeTypeInfo(NeutralType.SHORT).notNull() ) );
+		assertEquals("0",  getInitValue( new FakeAttributeTypeInfo(NeutralType.SHORT).unsignedTypeExpected() ) );
+		assertEquals("0",  getInitValue( new FakeAttributeTypeInfo(NeutralType.SHORT).objectTypeExpected() ) );
+		assertEquals("0",  getInitValue( new FakeAttributeTypeInfo(NeutralType.SHORT).primitiveTypeExpected() ) );
+
+		assertEquals("0", getInitValue( new FakeAttributeTypeInfo(NeutralType.INTEGER)  ) );
+		assertEquals("0", getInitValue( new FakeAttributeTypeInfo(NeutralType.INTEGER).notNull() ) );
+		assertEquals("0", getInitValue( new FakeAttributeTypeInfo(NeutralType.INTEGER).unsignedTypeExpected() ) );
+		assertEquals("0", getInitValue( new FakeAttributeTypeInfo(NeutralType.INTEGER).objectTypeExpected() ) );
+		assertEquals("0", getInitValue( new FakeAttributeTypeInfo(NeutralType.INTEGER).primitiveTypeExpected() ) );
+
+		assertEquals("0L", getInitValue( new FakeAttributeTypeInfo(NeutralType.LONG)  ) );
+		assertEquals("0L", getInitValue( new FakeAttributeTypeInfo(NeutralType.LONG).notNull() ) );
+		
+		assertEquals("0.0F", getInitValue( new FakeAttributeTypeInfo(NeutralType.FLOAT)  ) );
+		assertEquals("0.0F", getInitValue( new FakeAttributeTypeInfo(NeutralType.FLOAT).notNull() ) );
+
+		assertEquals("0.0D", getInitValue( new FakeAttributeTypeInfo(NeutralType.DOUBLE)  ) );
+		assertEquals("0.0D", getInitValue( new FakeAttributeTypeInfo(NeutralType.DOUBLE).notNull() ) );
+		
+		//--- Decimal is nullable
+		assertEquals(literalNull,       getInitValue( new FakeAttributeTypeInfo(NeutralType.DECIMAL)  ) );
+		assertEquals(literalNull,       getInitValue( new FakeAttributeTypeInfo(NeutralType.DECIMAL).unsignedTypeExpected() ) );
+		assertEquals("BigDecimal(0.0)", getInitValue( new FakeAttributeTypeInfo(NeutralType.DECIMAL).notNull() ) );
+		assertEquals("BigDecimal(0.0)", getInitValue( new FakeAttributeTypeInfo(NeutralType.DECIMAL).notNull().unsignedTypeExpected() ) );
+		
+		//--- Temporal types
+		assertEquals(literalNull,       getInitValue( new FakeAttributeTypeInfo(NeutralType.DATE)  ) );
+		assertEquals("LocalDate.now()", getInitValue( new FakeAttributeTypeInfo(NeutralType.DATE).notNull() ) );
+		
+		assertEquals(literalNull,       getInitValue( new FakeAttributeTypeInfo(NeutralType.TIME)  ) );
+		assertEquals("LocalTime.now()", getInitValue( new FakeAttributeTypeInfo(NeutralType.TIME).notNull() ) );
+
+		assertEquals(literalNull,           getInitValue( new FakeAttributeTypeInfo(NeutralType.TIMESTAMP)  ) );
+		assertEquals("LocalDateTime.now()", getInitValue( new FakeAttributeTypeInfo(NeutralType.TIMESTAMP).notNull() ) );
+		
+		assertEquals(literalNull,           getInitValue( new FakeAttributeTypeInfo(NeutralType.DATETIME)  ) ); // v 4.3
+		assertEquals("LocalDateTime.now()", getInitValue( new FakeAttributeTypeInfo(NeutralType.DATETIME).notNull() ) ); // v 4.3
+		
+		assertEquals(literalNull,            getInitValue( new FakeAttributeTypeInfo(NeutralType.DATETIMETZ)  ) ); // v 4.3
+		assertEquals("OffsetDateTime.now()", getInitValue( new FakeAttributeTypeInfo(NeutralType.DATETIMETZ).notNull() ) ); // v 4.3
+
+		assertEquals(literalNull,         getInitValue( new FakeAttributeTypeInfo(NeutralType.TIMETZ)  ) ); // v 4.3
+		assertEquals("OffsetTime.now()",  getInitValue( new FakeAttributeTypeInfo(NeutralType.TIMETZ).notNull() ) ); // v 4.3
+
+		//---
+		assertEquals(literalNull,        getInitValue( new FakeAttributeTypeInfo(NeutralType.UUID)  ) ); // v 4.3
+		assertEquals("new UUID(0L,0L)",  getInitValue( new FakeAttributeTypeInfo(NeutralType.UUID).notNull() ) ); // v 4.3
+
+		assertEquals(literalNull,          getInitValue( new FakeAttributeTypeInfo(NeutralType.BINARY)  ) ); // v 4.3
+		assertEquals("Array.empty[Byte]",  getInitValue( new FakeAttributeTypeInfo(NeutralType.BINARY).notNull() ) ); // v 4.3
+		
+/**
+		
 		assertEquals(literalNull, getLiteralValuesProvider().getInitValue(NeutralType.INTEGER, NULLABLE) );
 		assertEquals("0",         getLiteralValuesProvider().getInitValue(NeutralType.INTEGER, NOT_NULL) );
 		assertEquals(literalNull, getLiteralValuesProvider().getInitValue(NeutralType.LONG, NULLABLE) );
@@ -172,6 +262,7 @@ public class LiteralValuesProviderForScalaTest extends AbstractLiteralsTest {
 		
 		assertEquals(literalNull,         getLiteralValuesProvider().getInitValue(NeutralType.BINARY, NULLABLE) ); 
 		assertEquals("Array.empty[Byte]", getLiteralValuesProvider().getInitValue(NeutralType.BINARY, NOT_NULL) ); 
+**/
 	}
 
 }

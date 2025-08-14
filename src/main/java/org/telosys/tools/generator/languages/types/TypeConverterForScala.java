@@ -39,7 +39,7 @@ public class TypeConverterForScala extends TypeConverter {
 		declarePrimitiveType( buildPrimitiveType(NeutralType.LONG,     "Long"    ) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.FLOAT,    "Float"   ) );
 		declarePrimitiveType( buildPrimitiveType(NeutralType.DOUBLE,   "Double"  ) );		
-		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY,   "Array[Byte]" )  ); 
+		declarePrimitiveType( buildPrimitiveType(NeutralType.BINARY,   "Array[Byte]" )  ); // in Scala, Array[Byte] is a reference type on the JVM, so it can be null.
 		// No primitive type for STRING, DECIMAL, DATE, TIME, TIMESTAMP
 		
 		//--- No unsigned primitive types : 

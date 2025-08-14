@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.telosys.tools.generator.context.AttributeInContext;
+import org.telosys.tools.generator.languages.types.AttributeTypeInfo;
 import org.telosys.tools.generator.languages.types.LanguageType;
 import org.telosys.tools.generic.model.types.NeutralType;
 
@@ -168,15 +169,27 @@ public class LiteralValuesProviderForPHP extends LiteralValuesProvider {
 
 		notNullInitValues.put(NeutralType.BINARY,     EMPTY_STRING_LITERAL ); // v 4.3.0  
 	}
+//	@Override
+//	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
+//		return getInitValue(languageType.getNeutralType(), attribute.isNotNull() );
+//	}
+////	@Override
+//	private String getInitValue(String neutralType, boolean notNull) {
+//		if (notNull) {
+//			// not null attribute
+//			String defaultValue = notNullInitValues.get(neutralType);
+//			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
+//		} else {
+//			// nullable attribute
+//			return NULL_LITERAL;
+//		}
+//	}
+
 	@Override
-	public String getInitValue(AttributeInContext attribute, LanguageType languageType) {
-		return getInitValue(languageType.getNeutralType(), attribute.isNotNull() );
-	}
-	@Override
-	public String getInitValue(String neutralType, boolean notNull) {
-		if (notNull) {
+	protected String getInitValue(AttributeTypeInfo attributeTypeInfo, LanguageType languageType) {
+		if ( attributeTypeInfo.isNotNull() ) {
 			// not null attribute
-			String defaultValue = notNullInitValues.get(neutralType);
+			String defaultValue = notNullInitValues.get(languageType.getNeutralType());
 			return defaultValue != null ? defaultValue : NULL_LITERAL ; 
 		} else {
 			// nullable attribute

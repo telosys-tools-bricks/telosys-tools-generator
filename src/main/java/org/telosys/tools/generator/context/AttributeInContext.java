@@ -255,6 +255,10 @@ public class AttributeInContext {
 
 	}
 
+	public final AttributeTypeInfo getAttributeTypeInfo() {
+		return this.attributeTypeInfo;
+	}
+	
 	protected final LanguageType getLanguageType() {
 		TypeConverter typeConverter = envInContext.getTypeConverter();
 		LanguageType languageType = typeConverter.getType(this.attributeTypeInfo);

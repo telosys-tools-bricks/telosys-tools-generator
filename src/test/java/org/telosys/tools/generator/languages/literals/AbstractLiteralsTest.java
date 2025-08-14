@@ -8,6 +8,7 @@ import org.telosys.tools.generator.languages.types.AttributeTypeConst;
 import org.telosys.tools.generator.languages.types.AttributeTypeInfo;
 import org.telosys.tools.generator.languages.types.AttributeTypeInfoForTest;
 import org.telosys.tools.generator.languages.types.LanguageType;
+import org.telosys.tools.generator.languages.types.TypeConverter;
 import org.telosys.tools.generic.model.types.NeutralType;
 
 public abstract class AbstractLiteralsTest {
@@ -40,13 +41,21 @@ public abstract class AbstractLiteralsTest {
 	protected EnvInContext getEnv() {
 		EnvInContext env = new EnvInContext();
 		try {
-			env.setLanguage(getLanguageName());
+			env.setLanguage(getLanguageName()); // Init "env" with target language defined in the subclass
 		} catch (GeneratorException e) {
 			throw new TelosysRuntimeException("Invalid language name", e);
 		}
 		return env ;
 	}
-
+	
+	/**
+	 * Returns the TypeConverter for the current language defined in $env
+	 * @return
+	 */
+	protected TypeConverter getTypeConverter() {
+		return getEnv().getTypeConverter();
+	}
+	
 	/**
 	 * Returns the LiteralValuesProvider for the current language defined in $env
 	 * @return
@@ -99,6 +108,16 @@ public abstract class AbstractLiteralsTest {
 	 */
 	protected LanguageType getLanguageTypeNotNull(String neutralType) {
 		AttributeTypeInfo attributeTypeInfo = new AttributeTypeInfoForTest(neutralType, AttributeTypeConst.NOT_NULL);
+		return getLanguageType(attributeTypeInfo);
+	}
+
+	/**
+	 * Returns the target language type for the given neutral type with 'UNSIGNED' info
+	 * @param neutralType
+	 * @return
+	 */
+	protected LanguageType getLanguageTypeUnsigned(String neutralType) {
+		AttributeTypeInfo attributeTypeInfo = new AttributeTypeInfoForTest(neutralType, AttributeTypeConst.UNSIGNED_TYPE );
 		return getLanguageType(attributeTypeInfo);
 	}
 	

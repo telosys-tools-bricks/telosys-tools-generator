@@ -164,15 +164,15 @@ public abstract class TypeConverter {
 	 */
 	public abstract LanguageType getType(AttributeTypeInfo attributeTypeInfo) ;
 	
-	/**
-	 * Returns the LanguageType that suits as well as possible with the given attribute's characteristics
-	 * @param attribute
-	 * @return
-	 */
-	public final LanguageType getType(Attribute attribute) {		
-		AttributeTypeInfo attributeTypeInfo = new AttributeTypeInfoImpl(attribute);
-		return getType(attributeTypeInfo);
-	}
+//	/**
+//	 * Returns the LanguageType that suits as well as possible with the given attribute's characteristics
+//	 * @param attribute
+//	 * @return
+//	 */
+//	public final LanguageType getType(Attribute attribute) {		
+//		AttributeTypeInfo attributeTypeInfo = new AttributeTypeInfoImpl(attribute);
+//		return getType(attributeTypeInfo);
+//	}
 	
 	//--------------------------------------------------------------------------------------------
 	// Collection type ( since v 3.3.0 )
