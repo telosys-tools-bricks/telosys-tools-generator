@@ -1213,21 +1213,58 @@ public class AttributeInContext {
 	public boolean isTimestampType() {
 		return NeutralType.TIMESTAMP.equals(this.neutralType ) ; 
 	}
+	//------------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+			"Returns TRUE if the attribute's neutral type is 'datetime' "
+		},
+	since="4.3.0"
+	)
+	public boolean isDatetimeType() {
+		return NeutralType.DATETIME.equals(this.neutralType ) ; 
+	}
+	//------------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+			"Returns TRUE if the attribute's neutral type is 'datetimetz' "
+		},
+	since="4.3.0"
+	)
+	public boolean isDatetimetzType() {
+		return NeutralType.DATETIMETZ.equals(this.neutralType ) ; 
+	}
+	//------------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+			"Returns TRUE if the attribute's neutral type is 'timetz' "
+		},
+	since="4.3.0"
+	)
+	public boolean isTimetzType() {
+		return NeutralType.TIMETZ.equals(this.neutralType ) ; 
+	}
+	//------------------------------------------------------------------------------------------
+	@VelocityMethod(
+	text={	
+			"Returns TRUE if the attribute's neutral type is 'uuid' "
+		},
+	since="4.3.0"
+	)
+	public boolean isUuidType() {
+		return NeutralType.UUID.equals(this.neutralType ) ; 
+	}
+	
 	
 	//------------------------------------------------------------------------------------------
 	@VelocityMethod(
 	text={	
 		"Returns TRUE if the attribute's neutral type is a temporal type",
-		"( date, time, timestamp )"
+		"( date, time, timestamp, datetime, datetimetz, timetz )"
 		},
 	since="2.0.7"
 	)
 	public boolean isTemporalType() {
-		/***
-    	if ( isDateType() || isTimeType() || isTimestampType() ) return true ;
-    	return false ;
-    	***/
-		return isDateType() || isTimeType() || isTimestampType() ;
+		return isDateType() || isTimeType() || isTimestampType() || isDatetimeType() || isDatetimetzType() || isTimetzType() ;
 	}
 
 	//------------------------------------------------------------------------------------------

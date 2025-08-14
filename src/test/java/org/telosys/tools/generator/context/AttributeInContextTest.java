@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import org.junit.Test;
 import org.telosys.tools.dsl.model.DslModelAttribute;
+import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -19,6 +20,7 @@ public class AttributeInContextTest {
 	private static final String FLOAT = "float";
 	private static final String DOUBLE = "double";
 	private static final String DECIMAL = "decimal";
+	
 	
 	@Test
 	public void testIsNumberType() {
@@ -36,6 +38,34 @@ public class AttributeInContextTest {
 		assertTrue( buildAttribute("a", FLOAT).isNumberType() );
 		assertTrue( buildAttribute("a", DOUBLE).isNumberType() );
 		assertTrue( buildAttribute("a", DECIMAL).isNumberType() );
+	}
+
+	@Test
+	public void testIsTemporalType() {
+		assertFalse( buildAttribute("a", NeutralType.BOOLEAN).isTemporalType() );
+		assertFalse( buildAttribute("a", NeutralType.STRING).isTemporalType() );
+
+		assertTrue( buildAttribute("a", NeutralType.DATE).isTemporalType() );
+		assertTrue( buildAttribute("a", NeutralType.TIME).isTemporalType() );
+		assertTrue( buildAttribute("a", NeutralType.DATETIME).isTemporalType() );
+		assertTrue( buildAttribute("a", NeutralType.TIMESTAMP).isTemporalType() );
+		assertTrue( buildAttribute("a", NeutralType.DATETIMETZ).isTemporalType() );
+		assertTrue( buildAttribute("a", NeutralType.TIMETZ).isTemporalType() );
+
+		assertTrue( buildAttribute("a", NeutralType.DATE).isDateType() );
+		assertTrue( buildAttribute("a", NeutralType.TIME).isTimeType() );
+		assertTrue( buildAttribute("a", NeutralType.DATETIME).isDatetimeType() );
+		assertTrue( buildAttribute("a", NeutralType.TIMESTAMP).isTimestampType() );
+		assertTrue( buildAttribute("a", NeutralType.DATETIMETZ).isDatetimetzType() );
+		assertTrue( buildAttribute("a", NeutralType.TIMETZ).isTimetzType() );
+	}
+	
+	@Test
+	public void testIsUuidType() {
+		assertFalse( buildAttribute("a", NeutralType.BOOLEAN).isUuidType() );
+		assertFalse( buildAttribute("a", NeutralType.STRING).isUuidType() );
+
+		assertTrue( buildAttribute("a", NeutralType.UUID).isUuidType() );
 	}
 	
 	@Test
