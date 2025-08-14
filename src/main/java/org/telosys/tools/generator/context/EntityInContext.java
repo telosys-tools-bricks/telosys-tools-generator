@@ -1292,6 +1292,72 @@ public class EntityInContext
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
+			"Returns TRUE if this entity has at least one attribute with type 'uuid' "
+		},
+		example= {
+			"#if ( $entity.hasUuidAttribute() )",
+			"...",
+			"#end"
+		},
+		since="4.3.0"
+	)
+	public boolean hasUuidAttribute() {
+    	if ( attributes != null ) {
+        	for ( AttributeInContext attribute : attributes ) {
+                if ( attribute.isUuidType() ) {
+                	return true ;
+                }
+        	}
+    	}
+    	return false ;
+	}
+
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns TRUE if this entity has at least one attribute with type 'binary' "
+		},
+		example= {
+			"#if ( $entity.hasBinaryAttribute() )",
+			"...",
+			"#end"
+		},
+		since="4.3.0"
+	)
+	public boolean hasBinaryAttribute() {
+    	if ( attributes != null ) {
+        	for ( AttributeInContext attribute : attributes ) {
+                if ( attribute.isBinaryType() ) {
+                	return true ;
+                }
+        	}
+    	}
+    	return false ;
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
+			"Returns TRUE if this entity has at least one attribute with a temporal type ('date', 'datetime', etc) "
+		},
+		example= {
+			"#if ( $entity.hasTemporalAttribute() )",
+			"...",
+			"#end"
+		},
+		since="4.3.0"
+	)
+	public boolean hasTemporalAttribute() {
+    	if ( attributes != null ) {
+        	for ( AttributeInContext attribute : attributes ) {
+                if ( attribute.isTemporalType() ) {
+                	return true ;
+                }
+        	}
+    	}
+    	return false ;
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
 			"Returns TRUE if this entity has a composite primary key ",
 			"( a primary key composed of 2 or more attributes )"
 		},
