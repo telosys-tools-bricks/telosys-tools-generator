@@ -786,6 +786,29 @@ public class FnInContext {
 		return sb.toString();
 	}
 	
+	public String joinWithTransformation(Collection<String> collection, String separator, String template, String variable) {
+		StringBuilder sb = new StringBuilder();
+		int i = 0;
+		if ( collection != null ) {
+			for ( String s : collection ) {
+				if ( s != null ) {
+					i++;
+					if ( separator != null && i > 1) {
+						sb.append(separator);
+					}
+					if ( template != null && variable != null && ! template.isEmpty() && ! variable.trim().isEmpty() ) {
+						// Replace
+						sb.append(template.replace(variable, s));
+					}
+					else {
+						// Nothing to replace
+						sb.append(s);
+					}
+				}
+			}
+		}
+		return sb.toString();
+	}
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(text={	
 			"Replaces all occurrences of an element with another in the given list"

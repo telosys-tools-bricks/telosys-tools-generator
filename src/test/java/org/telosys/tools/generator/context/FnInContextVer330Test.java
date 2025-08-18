@@ -53,6 +53,32 @@ public class FnInContextVer330Test {
 	}
 
 	@Test
+	public void testJoinWithTransformation() {
+		FnInContext fn = new FnInContext(null, null);
+		List<String> items = Arrays.asList("aa", "bb", "cc");
+
+		Assert.assertEquals("aa=foo.aa,bb=foo.bb,cc=foo.cc",   fn.joinWithTransformation(items, ",",  "$x=foo.$x", "$x") );
+		Assert.assertEquals("aa=foo.aa, bb=foo.bb, cc=foo.cc", fn.joinWithTransformation(items, ", ", "$x=foo.$x", "$x") );
+		Assert.assertEquals("aa=foo.aa, bb=foo.bb, cc=foo.cc", fn.joinWithTransformation(items, ", ", "%=foo.%",   "%") );
+		Assert.assertEquals("foo, foo, foo",                   fn.joinWithTransformation(items, ", ", "foo",       "$x") );
+		Assert.assertEquals("foo.aa, foo.bb, foo.cc",          fn.joinWithTransformation(items, ", ", "foo.$x",    "$x") );
+		Assert.assertEquals("foo.aa, foo.bb, foo.cc",          fn.joinWithTransformation(items, ", ", "foo.${x}",  "${x}") );
+		Assert.assertEquals("foo.aaZ, foo.bbZ, foo.ccZ",       fn.joinWithTransformation(items, ", ", "foo.${x}Z", "${x}") );
+		Assert.assertEquals("foo.aaZ, foo.bbZ, foo.ccZ",       fn.joinWithTransformation(items, ", ", "foo.%Z",    "%") );
+		// Test with bad template or bad variable name
+		Assert.assertEquals("aa, bb, cc",                      fn.joinWithTransformation(items, ", ",  null,    "$x"  ) );
+		Assert.assertEquals("aa, bb, cc",                      fn.joinWithTransformation(items, ", ",  "",      "$x"  ) );
+		Assert.assertEquals("aa, bb, cc",                      fn.joinWithTransformation(items, ", ", "foo.$x", null  ) );
+		Assert.assertEquals("aa, bb, cc",                      fn.joinWithTransformation(items, ", ", "foo.$x", ""  ) );
+		Assert.assertEquals("aa, bb, cc",                      fn.joinWithTransformation(items, ", ", "foo.$x", " "  ) );
+		Assert.assertEquals("foo.$x, foo.$x, foo.$x",          fn.joinWithTransformation(items, ", ", "foo.$x", "$z") );
+		Assert.assertEquals("aa, bb, cc",                      fn.joinWithTransformation(items, ", ",  null,    null ) );
+
+		items = Arrays.asList("aa", "", "cc", null, "eee");
+		Assert.assertEquals("aa=foo.aa, =foo., cc=foo.cc, eee=foo.eee", fn.joinWithTransformation(items, ", ", "$x=foo.$x", "$x") );
+	}
+
+	@Test
 	public void testJoinWithPrefixSuffixIntegerList() {
 		FnInContext fn = new FnInContext(null, null);
 		Integer[] array = { 1, 2, 3 };
