@@ -71,7 +71,7 @@ public class DocBuilderTest {
 		print(classInfo);
 		assertEquals("FnInContext",  classInfo.getJavaClassName() );
 		assertEquals(ContextName.FN, classInfo.getContextName() );
-		assertEquals(38, classInfo.getMethodsCount() );
+		assertEquals(40, classInfo.getMethodsCount() );
 	}
 
 	@Test

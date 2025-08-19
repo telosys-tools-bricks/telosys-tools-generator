@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class FnInContextVer330Test {
+public class FnInContextPart2Test {
 	
 	@Test
 	public void testToList() {
@@ -58,6 +58,7 @@ public class FnInContextVer330Test {
 		List<String> items = Arrays.asList("aa", "bb", "cc");
 
 		Assert.assertEquals("aa=foo.aa,bb=foo.bb,cc=foo.cc",   fn.joinWithTransformation(items, ",",  "$x=foo.$x", "$x") );
+		Assert.assertEquals("aa=foo.aabb=foo.bbcc=foo.cc",     fn.joinWithTransformation(items, "",   "$x=foo.$x", "$x") );
 		Assert.assertEquals("aa=foo.aa, bb=foo.bb, cc=foo.cc", fn.joinWithTransformation(items, ", ", "$x=foo.$x", "$x") );
 		Assert.assertEquals("aa=foo.aa, bb=foo.bb, cc=foo.cc", fn.joinWithTransformation(items, ", ", "%=foo.%",   "%") );
 		Assert.assertEquals("foo, foo, foo",                   fn.joinWithTransformation(items, ", ", "foo",       "$x") );
@@ -65,6 +66,7 @@ public class FnInContextVer330Test {
 		Assert.assertEquals("foo.aa, foo.bb, foo.cc",          fn.joinWithTransformation(items, ", ", "foo.${x}",  "${x}") );
 		Assert.assertEquals("foo.aaZ, foo.bbZ, foo.ccZ",       fn.joinWithTransformation(items, ", ", "foo.${x}Z", "${x}") );
 		Assert.assertEquals("foo.aaZ, foo.bbZ, foo.ccZ",       fn.joinWithTransformation(items, ", ", "foo.%Z",    "%") );
+		Assert.assertEquals("fooaabar, foobbbar, fooccbar",    fn.joinWithTransformation(items, ", ", "foo%bar",   "%") );
 		// Test with bad template or bad variable name
 		Assert.assertEquals("aa, bb, cc",                      fn.joinWithTransformation(items, ", ",  null,    "$x"  ) );
 		Assert.assertEquals("aa, bb, cc",                      fn.joinWithTransformation(items, ", ",  "",      "$x"  ) );
@@ -73,9 +75,20 @@ public class FnInContextVer330Test {
 		Assert.assertEquals("aa, bb, cc",                      fn.joinWithTransformation(items, ", ", "foo.$x", " "  ) );
 		Assert.assertEquals("foo.$x, foo.$x, foo.$x",          fn.joinWithTransformation(items, ", ", "foo.$x", "$z") );
 		Assert.assertEquals("aa, bb, cc",                      fn.joinWithTransformation(items, ", ",  null,    null ) );
+		Assert.assertEquals("aabbcc",                          fn.joinWithTransformation(items, "",    null,    null ) );
+		Assert.assertEquals("aabbcc",                          fn.joinWithTransformation(items, null,  null,    null ) );
 
+		// Examples for doc
 		items = Arrays.asList("aa", "", "cc", null, "eee");
-		Assert.assertEquals("aa=foo.aa, =foo., cc=foo.cc, eee=foo.eee", fn.joinWithTransformation(items, ", ", "$x=foo.$x", "$x") );
+		Assert.assertEquals("foo.aa, foo., foo.cc, foo.eee",            fn.joinWithTransformation(items, ", ", "foo.$name",    "$name") );
+		Assert.assertEquals("aa=foo.aa, =foo., cc=foo.cc, eee=foo.eee", fn.joinWithTransformation(items, ", ", "${x}=foo.${x}", "${x}") );
+		
+		
+		// Test with fixed variable name
+		items = Arrays.asList("aa", "bb", "cc");
+		Assert.assertEquals("aa=foo.aa,bb=foo.bb,cc=foo.cc",   fn.joinWithTransformation(items, ",",  "%=foo.%" ) );
+		Assert.assertEquals("aa=foo.aabb=foo.bbcc=foo.cc",     fn.joinWithTransformation(items, "",   "%=foo.%" ) );
+		Assert.assertEquals("foo(aa),foo(bb),foo(cc)",         fn.joinWithTransformation(items, ",",  "foo(%)" ) );
 	}
 
 	@Test

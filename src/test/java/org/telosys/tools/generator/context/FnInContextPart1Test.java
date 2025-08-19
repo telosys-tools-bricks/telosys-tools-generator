@@ -12,7 +12,7 @@ import org.telosys.tools.generic.model.Attribute;
 
 import junit.env.telosys.tools.generator.context.Builder;
 
-public class FnInContextForJavaTest {
+public class FnInContextPart1Test {
 	
 	private static final List<AttributeInContext> ATTRIBUTES_VOID_LIST = new LinkedList<>();
 	
@@ -40,6 +40,8 @@ public class FnInContextForJavaTest {
 		Assert.assertEquals("A", fn.firstCharToUpperCase("A") );
 		Assert.assertEquals("Abcd", fn.firstCharToUpperCase("abcd") );
 		Assert.assertEquals("Abcd", fn.firstCharToUpperCase("ABCD") ); 
+		Assert.assertEquals(" abc", fn.capitalize(" abc") ); 
+		Assert.assertEquals("Abc ", fn.capitalize("abc ") );
 	}
 
 	@Test
@@ -309,4 +311,17 @@ public class FnInContextForJavaTest {
 		Assert.assertEquals("", fn.argumentsListWithWrapperType(null) );
 		Assert.assertEquals("", fn.argumentsListWithWrapperType(ATTRIBUTES_VOID_LIST) );
 	}
+	
+	@Test
+	public void testAttributeNames() {
+		FnInContext fn = new FnInContext(null, null);
+		List<AttributeInContext> attributes = buildAttributes(new EnvInContext());
+		List<String> names = fn.attributeNames(attributes);
+		Assert.assertEquals(3, names.size() );
+		int i = 0;
+		Assert.assertEquals("id", names.get(i++) );
+		Assert.assertEquals("name", names.get(i++) );
+		Assert.assertEquals("flag", names.get(i) );
+	}
+
 }
