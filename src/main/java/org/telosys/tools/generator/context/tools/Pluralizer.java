@@ -109,6 +109,8 @@ public final class Pluralizer {
         	// echo  -> echoes
             return noun + "es";
         } 
+        // TODO : Replace the ‘f’ or ‘fe’ ending with ‘ves’ (https://www.bbc.co.uk/bitesize/articles/zfqh92p#zjd7qfr)
+        // NB: exceptions (eg "roof")
         else {
         	// default : just add "s"
             return noun + "s";
