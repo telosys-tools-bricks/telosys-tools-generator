@@ -9,7 +9,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.telosys.tools.dsl.model.DslModelAttribute;
 import org.telosys.tools.generic.model.Attribute;
-import org.telosys.tools.generic.model.enums.DateType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -299,7 +298,6 @@ public class ValuesInContextForJavaTest {
 		attributes.add( buildAttributeInContext("time1",     "time"      ) );
 		
 		DslModelAttribute attrib = new DslModelAttribute("time3", "time");
-		attrib.setDateType(DateType.TIME_ONLY);
 		attributes.add( buildAttributeInContext(attrib) );
 		
 		ValuesInContext values = new ValuesInContext( attributes, 2, env );

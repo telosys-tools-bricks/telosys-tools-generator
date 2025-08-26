@@ -61,7 +61,7 @@ public class DocBuilderTest {
 		print(classInfo);
 		assertEquals("ConstInContext",  classInfo.getJavaClassName() );
 		assertEquals(ContextName.CONST, classInfo.getContextName() );
-		assertEquals(12, classInfo.getMethodsCount() );
+		assertEquals(8, classInfo.getMethodsCount() );
 	}
 
 	@Test

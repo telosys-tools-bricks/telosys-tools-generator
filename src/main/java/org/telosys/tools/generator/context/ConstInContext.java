@@ -18,7 +18,6 @@ package org.telosys.tools.generator.context;
 import org.telosys.tools.generator.context.doc.VelocityConstant;
 import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
-import org.telosys.tools.generic.model.enums.DateType;
 
 /**
  * Constants usable in a Velocity template
@@ -84,22 +83,4 @@ public class ConstInContext {
 		return    NOT_IN_SELECTED_LINKS ;
 	}
 	
-	
-	@VelocityConstant
-	public int getNO_DATE_TYPE() {
-		return DateType.UNDEFINED.getValue() ; // v 3.0.0
-	}
-	@VelocityConstant
-	public int getDATE_ONLY() {
-		return DateType.DATE_ONLY.getValue() ; // v 3.0.0
-	}
-	@VelocityConstant
-	public int getTIME_ONLY() {
-		return DateType.TIME_ONLY.getValue() ; // v 3.0.0
-	}
-	@VelocityConstant
-	public int getDATE_AND_TIME() {
-		return DateType.DATE_AND_TIME.getValue() ; // v 3.0.0
-	}
-
 }
