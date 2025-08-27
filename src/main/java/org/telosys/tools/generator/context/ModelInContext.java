@@ -28,7 +28,6 @@ import org.telosys.tools.generator.context.doc.VelocityObject;
 import org.telosys.tools.generator.context.names.ContextName;
 import org.telosys.tools.generic.model.Entity;
 import org.telosys.tools.generic.model.Model;
-import org.telosys.tools.generic.model.enums.ModelType;
 
 /**
  * This class gives access to the entire model
@@ -48,9 +47,9 @@ public class ModelInContext
 	private static final NamingStyleConverter converter = new NamingStyleConverter(); // v 4.1.0 (from old class SqlTableNameProvider)
 	
 	private final String    modelName ;
-	private final String    modelFolderName ;
+//	private final String    modelFolderName ; // Removed in v 4.3.0
 	private final String    modelVersion ;
-	private final ModelType modelType ;
+//	private final ModelType modelType ; // Removed in v 4.3.0
 	
 	private final String   modelTitle ;
 	private final String   modelDescription ;
@@ -59,7 +58,7 @@ public class ModelInContext
 	private final String   databaseName ; // v 3.4.0 (replaces productName )
 	private final String   databaseType ; // v 3.4.0
 	
-	private final List<EntityInContext>       allEntities ;
+	private final List<EntityInContext>       entities ;
 	private final Map<String,EntityInContext> entitiesByTableName ; // Key = table name in upper case
 	private final Map<String,EntityInContext> entitiesByClassName ; // Key = entity name as is
 
@@ -68,53 +67,50 @@ public class ModelInContext
 	}
 
 	//-------------------------------------------------------------------------------------
-//	/**
-//	 * Constructor
-//	 * @param model
-//	 * @param telosysToolsCfg
-//	 * @param env
-//	 */
-//	public ModelInContext( Model model, TelosysToolsCfg telosysToolsCfg, EnvInContext env ) { // v 3.3.0
-	public ModelInContext( Model model, String defaultEntityPackage, EnvInContext env ) { // v 4.2.0
+	/**
+	 * Constructor
+	 * @param model
+	 * @param defaultEntityPackage
+	 * @param env
+	 */
+	public ModelInContext( Model model, String defaultEntityPackage, EnvInContext env ) {
 		super();
 		if ( model == null ) throw new IllegalArgumentException("Model is null");
 		if ( defaultEntityPackage == null ) throw new IllegalArgumentException("defaultEntityPackage is null");
 		if ( env == null ) throw new IllegalArgumentException("EnvInContext is null");
 		
 		this.modelName = model.getName();  // MANDATORY
-		this.modelFolderName = model.getFolderName();  // MANDATORY
+//		this.modelFolderName = model.getFolderName();  // Removed in v 4.3.0
 		this.modelVersion = model.getVersion(); // MANDATORY
-		this.modelType = model.getType(); // MANDATORY
+//		this.modelType = model.getType(); // Removed in v 4.3.0
 		// check validity 
 		if ( this.modelName == null ) throw new IllegalArgumentException("Model name is null");
-		if ( this.modelFolderName == null ) throw new IllegalArgumentException("Model folder name is null");
+//		if ( this.modelFolderName == null ) throw new IllegalArgumentException("Model folder name is null"); // Removed in v 4.3.0
 		if ( this.modelVersion == null ) throw new IllegalArgumentException("Model version is null");
-		if ( this.modelType == null ) throw new IllegalArgumentException("Model type is null");
+//		if ( this.modelType == null ) throw new IllegalArgumentException("Model type is null"); // Removed in v 4.3.0
 		
 		this.modelTitle = model.getTitle() != null ? model.getTitle() : "" ;
 		this.modelDescription = model.getDescription() != null ? model.getDescription() : "" ;
 		
 		//--- All the entities (the original model order is kept)
-		this.allEntities = new LinkedList<>(); // v 3.0.0
+		this.entities = new LinkedList<>(); // v 3.0.0
 		for ( Entity entity : model.getEntities() ) { // v 3.0.0
-			//_allEntities.add( new EntityInContext(entity, entitiesPackage, this, env) );// v 3.0.0
-			this.allEntities.add( 
+			this.entities.add( 
 					new EntityInContext(entity, 
-//							telosysToolsCfg.getEntityPackage(),  // v 3.3.0
 							defaultEntityPackage,  // v 4.2.0
 							this, env) );
 		}
 		
 		//--- Entities by TABLE NAME
 		this.entitiesByTableName = new HashMap<>();
-		for ( EntityInContext entity : this.allEntities ) {
+		for ( EntityInContext entity : this.entities ) {
 			// The table name is unique 
 			this.entitiesByTableName.put(getTableNameUpperCase(entity), entity); // v 4.1.0
 		}
 		
 		//--- Entities by CLASS NAME
 		this.entitiesByClassName = new HashMap<>();
-		for ( EntityInContext entity : this.allEntities ) {
+		for ( EntityInContext entity : this.entities ) {
 			// The class name is supposed to be unique 
 			this.entitiesByClassName.put(entity.getName(), entity);
 		}
@@ -157,13 +153,15 @@ public class ModelInContext
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the name of the folder where entities are located "
-			},
+			"Returns the name of the folder where entities are located ",
+			"",
+			"(!) DEPRECATED : useless, always returns the model name"
+		},
+		deprecated=true,
 		since="3.3.0"
 	)
-    public String getFolderName()
-    {
-        return modelFolderName ;
+    public String getFolderName() {
+        return getName() ;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -181,20 +179,15 @@ public class ModelInContext
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns the Telosys model type (DSL-MODEL, DB-MODEL, etc) "
-			},
+			"Returns the Telosys model type ",
+			"",
+			"(!) DEPRECATED : useless, always returns 'DSL-MODEL' "
+		},
+		deprecated=true,
 		since="3.3.0"
 	)
-    public String getType()
-    {
-        switch ( modelType ) {
-        case DOMAIN_SPECIFIC_LANGUAGE : 
-        	return "DSL-MODEL" ;
-        case DATABASE_SCHEMA : 
-        	return "DB-MODEL" ;
-        default:
-            return "UNKNOWN";
-        }
+    public String getType() {
+		return "DSL-MODEL" ; 
     }
 
 	//-------------------------------------------------------------------------------------
@@ -229,7 +222,7 @@ public class ModelInContext
 	)
     public int getNumberOfEntities()
     {
-        return allEntities.size() ;
+        return entities.size() ;
     }
 
 	//-------------------------------------------------------------------------------------
@@ -242,7 +235,7 @@ public class ModelInContext
 			}
 	)
     public List<EntityInContext> getAllEntites() { // NB : typo in method name
-		return getAllEntities() ;
+		return getEntities() ;
     }
 	
 	//-------------------------------------------------------------------------------------
@@ -258,9 +251,25 @@ public class ModelInContext
 		}		
 	)
     public List<EntityInContext> getAllEntities() {
-		return allEntities ;
+		return getEntities() ;
     }
 	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a list containing all the entities defined in the model",
+		},
+		example = {
+			"#foreach ( $entity in $model.entities )",
+			"...",
+			"#end",
+			""
+		}		
+	)
+    public List<EntityInContext> getEntities() {
+		return entities ;
+    }
+
 	//---------------------------------------------------------------------------------------------------
 	/**
 	 * Returns a list of entities for the given entities names
