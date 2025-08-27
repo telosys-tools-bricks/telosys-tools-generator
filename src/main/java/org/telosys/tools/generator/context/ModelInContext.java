@@ -160,6 +160,7 @@ public class ModelInContext
 		deprecated=true,
 		since="3.3.0"
 	)
+	@Deprecated
     public String getFolderName() {
         return getName() ;
     }
@@ -186,6 +187,7 @@ public class ModelInContext
 		deprecated=true,
 		since="3.3.0"
 	)
+	@Deprecated
     public String getType() {
 		return "DSL-MODEL" ; 
     }
@@ -234,6 +236,7 @@ public class ModelInContext
 			"(!) DEPRECATED : do not use (will be removed)"			
 			}
 	)
+	@Deprecated
     public List<EntityInContext> getAllEntites() { // NB : typo in method name
 		return getEntities() ;
     }
