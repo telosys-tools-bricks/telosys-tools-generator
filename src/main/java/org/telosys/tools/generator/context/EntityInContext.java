@@ -595,27 +595,31 @@ public class EntityInContext
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
-			"Returns a list of all the links selected in the model for the current entity"
+			"Returns a list of all the links in the model for the current entity",
+			"(!) DEPRECATED - use '$entity.links' instead"
 		},
 		example={	
 			"#foreach( $link in $entity.selectedLinks )",
 			"...",
 			"#end" 
-		}
+		},
+		deprecated=true
 	)
 	@VelocityReturnType("List of 'link' objects")
+	@Deprecated
 	public List<LinkInContext> getSelectedLinks() {
-		if ( links != null && ! links.isEmpty() )
-		{
-			LinkedList<LinkInContext> selectedLinks = new LinkedList<>();
-			for ( LinkInContext link : links ) {
-				if ( link.isSelected() ) {
-					selectedLinks.add(link) ;
-				}
-			}
-			return selectedLinks ;
-		}
-		return VOID_LINKS_LIST ;
+//		if ( links != null && ! links.isEmpty() )
+//		{
+//			LinkedList<LinkInContext> selectedLinks = new LinkedList<>();
+//			for ( LinkInContext link : links ) {
+//				if ( link.isSelected() ) {
+//					selectedLinks.add(link) ;
+//				}
+//			}
+//			return selectedLinks ;
+//		}
+//		return VOID_LINKS_LIST ;
+		return getLinks();
 	}
 
 	private void checkCriterion ( int criterion ) {

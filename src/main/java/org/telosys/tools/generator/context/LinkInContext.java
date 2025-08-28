@@ -64,22 +64,15 @@ public class LinkInContext {
 	private final ModelInContext   modelInContext ;  // v 3.0.0 (replaces EntitiesManager)
 	private final EnvInContext     envInContext ; // ver 3.3.0
 
-//	private final List<JoinColumnInContext> joinColumns ;  // removed in v 3.4.0
 	private final List<LinkAttributeInContext> linkAttributes ; // added in v 3.4.0  (replaces joinColumns)
 	
-//	private final JoinTableInContext        joinTable ;  // removed in v 3.4.0
-//	private final boolean isBasedOnJoinEntity; // added in v 4.1.0 // ununsed => removed
 	private final String  joinEntityName ;  // added in v 3.4.0  (replaces joinTable)
-//	private final EntityInContext joinEntity; // added in v 4.1.0
 
 	//--- Added in ver 3.0.0 (to replace reference / Link )
-//	private final String       id ; // removed in v 3.4.0
 	private final String       fieldName ;
-//	private final String       targetTableName ; // removed in v 3.4.0
 	private final String       targetEntityName ; // v 3.4.0
 	private final String       mappedBy ;
-	private final boolean      isSelected ;
-//	private final boolean      isOwningSide ; // removed in v 4.1.0
+//	private final boolean      isSelected ; // removed in v 4.3.0
 	
 	private final Cardinality    cardinality ;
 	private final FetchType      fetchType ;
@@ -121,15 +114,13 @@ public class LinkInContext {
 			}
 		}
 
-		//this.isBasedOnJoinEntity = link.isBasedOnJoinEntity() ; // added in v 4.1.0 // unused => removed
 		this.joinEntityName = link.getJoinEntityName(); // keep null if not defined  // added in v 3.4.0
 		
 		//--- Init link information (ver 3.0.0)
 		this.fieldName = link.getFieldName() ;
 		this.targetEntityName = link.getReferencedEntityName();  // added in v 3.4.0
-		this.isSelected = link.isSelected();
+//		this.isSelected = link.isSelected(); // removed in v 4.3.0
 		this.mappedBy = link.getMappedBy(); // keep null if not defined
-//		this.isOwningSide = link.isOwningSide(); // removed in v 4.1.0
 		
 		this.cardinality = link.getCardinality() != null ? link.getCardinality() : Cardinality.UNDEFINED ;
 		this.fetchType = link.getFetchType() != null ? link.getFetchType() : FetchType.DEFAULT ;
@@ -340,16 +331,17 @@ public class LinkInContext {
 		}
 		return false ; 
 	}
-	
-	//-------------------------------------------------------------------------------------
-	@VelocityMethod(
-		text={	
-			"Returns TRUE if the link is selected (checkbox checked in the GUI)"
-			}
-	)
-	public boolean isSelected() {
-		return isSelected ;
-	}
+
+// removed in v 4.3.0
+//	//-------------------------------------------------------------------------------------
+//	@VelocityMethod(
+//		text={	
+//			"Returns TRUE if the link is selected (checkbox checked in the GUI)"
+//			}
+//	)
+//	public boolean isSelected() {
+//		return isSelected ;
+//	}
 
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
