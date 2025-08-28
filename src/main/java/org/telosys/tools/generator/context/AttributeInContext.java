@@ -103,8 +103,8 @@ public class AttributeInContext {
     //--- Further info for DATE and TIME ---------------------------------
     private final boolean  isDateInThePast ;
     private final boolean  isDateInTheFuture ;
-    private final String   dateBeforeValue  ;
-    private final String   dateAfterValue   ;
+//    private final String   dateBeforeValue  ; // DEPRECATED // removed in ver 4.3.0
+//    private final String   dateAfterValue   ; // DEPRECATED // removed in ver 4.3.0
 
 	//--- Database info -------------------------------------------------
     private final boolean isKeyElement      ;  // True if primary key
@@ -198,8 +198,8 @@ public class AttributeInContext {
 		//--- Further info for DATE/TIME 
 	    this.isDateInThePast   = attribute.isDatePast();
 	    this.isDateInTheFuture = attribute.isDateFuture();
-	    this.dateBeforeValue = StrUtil.notNull( attribute.getDateBeforeValue() );
-	    this.dateAfterValue  = StrUtil.notNull( attribute.getDateAfterValue() );
+//	    this.dateBeforeValue = StrUtil.notNull( attribute.getDateBeforeValue() ); // removed in ver 4.3.0
+//	    this.dateAfterValue  = StrUtil.notNull( attribute.getDateAfterValue() ); // removed in ver 4.3.0
         
 		//--- Database info
 		this.databaseName     = StrUtil.notNull( attribute.getDatabaseName() ) ;
@@ -703,7 +703,8 @@ public class AttributeInContext {
 		}
 	)
     public boolean isDatabaseNotNull() {
-        return isNotNull;
+//        return isNotNull;
+        return isNotNull();
     }
     
 	//----------------------------------------------------------------------
@@ -958,41 +959,55 @@ public class AttributeInContext {
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns TRUE if the attribute must be validated as a date BEFORE a given date value"
-			}
+			"Returns TRUE if the attribute must be validated as a date BEFORE a given date value",
+			"(!) DEPRECATED - do not use"
+		},
+		deprecated=true
 	)
+	@Deprecated
 	public boolean hasDateBeforeValidation() {
-		return ! StrUtil.nullOrVoid(dateBeforeValue); // v 3.3.0
+//		return ! StrUtil.nullOrVoid(dateBeforeValue); // removed in v 4.3.0
+		return false; // v 4.3.0 (deprecated)
 	}
 	
 	@VelocityMethod(
 		text={	
-			"Returns the 'date before' value (for date validation)",
-			"(returns a void string if none)"
-		}
+			"Returns the 'date before' value (for date validation) or a void string if none",
+			"(!) DEPRECATED - do not use"
+		},
+		deprecated=true
 	)
+	@Deprecated
 	public String getDateBeforeValue() {
-		return voidIfNull(dateBeforeValue) ;
+//		return voidIfNull(dateBeforeValue) ; // removed in v 4.3.0
+		return VOID_STRING; // v 4.3.0 (deprecated)
 	}
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
-			"Returns TRUE if the attribute must be validated as a date AFTER a given date value"
-			}
+			"Returns TRUE if the attribute must be validated as a date AFTER a given date value",
+			"(!) DEPRECATED - do not use"
+			},
+		deprecated=true
 	)
+	@Deprecated
 	public boolean hasDateAfterValidation() {
-		return ! StrUtil.nullOrVoid(dateAfterValue); // v 3.3.0
+//		return ! StrUtil.nullOrVoid(dateAfterValue); // removed in v 4.3.0
+		return false; // v 4.3.0 (deprecated)
 	}
 	
 	@VelocityMethod(
 		text={	
-			"Returns the 'date after' value (for date validation)",
-			"(returns a void string if none)"
-		}
+			"Returns the 'date after' value (for date validation) or a void string if none",
+			"(!) DEPRECATED - do not use"
+			},
+		deprecated=true
 	)
+	@Deprecated
 	public String getDateAfterValue() {
-		return voidIfNull(dateAfterValue) ;
+//		return voidIfNull(dateAfterValue) ; // removed in v 4.3.0
+		return VOID_STRING; // v 4.3.0 (deprecated)
 	}
 
 	//-----------------------------------------------------------------------------
