@@ -80,8 +80,12 @@ public class TypeConverterForPython extends TypeConverter {
 		
 		declarePrimitiveType( buildObjectType(NeutralType.UUID,       "UUID",   "from uuid import UUID" ) ); // v 4.3.0
 		
-		// 'bytearray' is a built-in type in Python, it does not require an import
-		declarePrimitiveType( buildPseudoPrimitiveType(NeutralType.BINARY, "bytearray" ) );  
+		// 2 options 'bytes' and 'bytearray' 
+		//  - Use bytes for most cases: network I/O, file I/O, database fields, cryptographic data.
+		//  - Use bytearray only if you need to mutate the binary data in place
+		// When working with a DB like PostgreSQL the natural mapping is bytes, not bytearray.
+		// 'bytes' and 'bytearray' are built-in types in Python => no import required
+		declarePrimitiveType( buildPseudoPrimitiveType(NeutralType.BINARY, "bytes" ) );   // switch from 'bytearray' to 'bytes' in v 4.3.0
 		
 	}
 

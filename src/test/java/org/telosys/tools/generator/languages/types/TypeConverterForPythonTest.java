@@ -123,7 +123,7 @@ public class TypeConverterForPythonTest extends AbstractTypeTest {
 	}
 	@Test
 	public void testBinary() {
-		genericPrimitiveTypeTest(NeutralType.BINARY, "bytearray");
+		genericPrimitiveTypeTest(NeutralType.BINARY, "bytes");
 	}
 
 	@Test
