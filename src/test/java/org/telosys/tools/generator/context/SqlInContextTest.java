@@ -338,8 +338,8 @@ public class SqlInContextTest {
 		assertEquals("DATE",  sql.getConfigType("date", true) );
 		assertEquals("DATE",  sql.getConfigType("date", false) );
 
-		assertEquals("CHAR(1)",  sql.getConfigType("boolean", true) );
-		assertEquals("CHAR(1)",  sql.getConfigType("boolean", false) );
+		assertEquals("NUMBER(1)",  sql.getConfigType("boolean", true) );
+		assertEquals("NUMBER(1)",  sql.getConfigType("boolean", false) );
 		
 		assertEquals("TIMESTAMP",  sql.getConfigType("time", true) );
 		assertEquals("TIMESTAMP",  sql.getConfigType("time", false) );
