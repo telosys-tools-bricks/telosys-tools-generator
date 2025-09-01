@@ -18,6 +18,7 @@ package org.telosys.tools.generator.context;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.telosys.tools.commons.StrUtil;
 import org.telosys.tools.generator.context.tools.JavaTypeUtil;
 
 /**
@@ -34,7 +35,7 @@ public class JavaImportsList {
 	/**
 	 * Constructor
 	 */
-	public JavaImportsList() {
+	protected JavaImportsList() {
 		super();
 	}
 	
@@ -42,7 +43,10 @@ public class JavaImportsList {
 	 * Declare the given type : stored only if needed ( requires import and not yet stored )
 	 * @param fullTypeName 
 	 */
-	public void declareType(String fullTypeName ) {
+	protected void declareType(String fullTypeName ) {
+		if ( StrUtil.nullOrVoid(fullTypeName) ) {
+			return;
+		}
 		if ( JavaTypeUtil.needsImport(fullTypeName) && ( ! imports.contains(fullTypeName) ) ) {
 			imports.add(fullTypeName);
 		}
@@ -66,7 +70,7 @@ public class JavaImportsList {
 	 * ( sorted and without collided types )
 	 * @return
 	 */
-	public List<String> getFinalImportsList() {
+	protected List<String> getFinalImportsList() {
 		removeCollidedTypes();
 		java.util.Collections.sort(imports);
 		return imports ;		
@@ -97,8 +101,12 @@ public class JavaImportsList {
 			java.util.TreeMap.class
 			};
 	
-	private void declareLinkType(String inputType) {
-		String type = inputType.trim();
+	protected void declareLinkType(String linkType) {
+		if ( StrUtil.nullOrVoid(linkType) ) {
+			return;
+		}
+		// The link type should be a collection type 
+		String type = linkType.trim();
 		if ( type.contains("<") && type.endsWith(">") ) {
 			for ( Class<?> clazz : COLLECTIONS ) {
 				// "Collection<Type>", "List<Type>", "Set<Type>"
@@ -109,13 +117,13 @@ public class JavaImportsList {
 		}
 	}
 	
-	public void buildImports( List<String> basicAttributeTypes, List<String> linkAttributeTypes) {
-		for ( String type : basicAttributeTypes ) {
-			declareType(type); 
-		}
-		for ( String type : linkAttributeTypes ) {
-			declareLinkType(type); 
-		}
-	}
+//	public void buildImports( List<String> basicAttributeTypes, List<String> linkAttributeTypes) {
+//		for ( String type : basicAttributeTypes ) {
+//			declareType(type); 
+//		}
+//		for ( String type : linkAttributeTypes ) {
+//			declareLinkType(type); 
+//		}
+//	}
 	
 }

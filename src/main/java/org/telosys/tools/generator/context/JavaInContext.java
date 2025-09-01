@@ -46,29 +46,33 @@ public class JavaInContext {
 		return spaces.toString();
 	}
 	
-	//-------------------------------------------------------------------------------------
+	//=====================================================================================
+	// "equals" METHOD GENERATION
+	//=====================================================================================
 	@VelocityMethod(
 		text={	
 			"Returns a string containing all the code for a Java 'equals' method",
-			"Tabulations are used for code indentation"
+			"Tabulations are used for code indentation",
+			"(!) DEPRECATED - do not use"
 			},
 		example={ 
 			"$java.equalsMethod( $entity.name, $entity.attributes )" },
 		parameters = { 
 			"className : the Java class name (simple name or full name)",
 			"attributes : list of attributes to be used in the equals method"},
-		since = "2.0.7"
+		since = "2.0.7",
+		deprecated=true
 			)
+	@Deprecated
 	public String equalsMethod( String className, List<AttributeInContext> attributes ) {
-		
-		return equalsMethod( className , attributes, new LinesBuilder() ); 
+		return buildEqualsMethod( className , attributes, 1, new LinesBuilder() ); 
 	}
-	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Returns a string containing all the code for a Java 'equals' method",
-			"Spaces are used for code indentation"
+			"Spaces are used for code indentation",
+			"(!) DEPRECATED - do not use"
 			},
 		example={ 
 			"$java.equalsMethod( $entity.name, $entity.attributes, 4 )" },
@@ -76,17 +80,63 @@ public class JavaInContext {
 			"className : the Java class name (simple name or full name)",
 			"attributes : list of attributes to be used in the equals method",
 			"indentSpaces : number of spaces to be used for each indentation level"},
-		since = "2.0.7"
+		since = "2.0.7",
+		deprecated=true
 			)
+	@Deprecated
 	public String equalsMethod( String className, List<AttributeInContext> attributes, int indentSpaces ) {
-		
-		return equalsMethod( className , attributes, new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) ); 
+		return buildEqualsMethod( className , attributes, 1, new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) ); 
 	}
-	
 	//-------------------------------------------------------------------------------------
-	private String equalsMethod( String className, List<AttributeInContext> fieldsList, LinesBuilder lb ) {
+	// "equalsMethod" with standard arguments (since v 4.3.0)
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing all the code for a Java 'equals' method",
+			"Generates the method using all the attributes of the given entity",
+			"Indentation with TABS (1 tab for each indentation level)"
+			},
+		example={ 
+			"$java.equalsMethod( $entity, 1 )" },
+		parameters = { 
+			"entity : the entity for which to generate the 'equals' method",
+			"indentationLevel : initial indentation level" },
+		since = "4.3.0"
+		)
+	public String equalsMethod(EntityInContext entity, int indentationLevel) {
+		return buildEqualsMethod(entity, indentationLevel, new LinesBuilder()); 
+	}
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing all the code for a Java 'equals' method",
+			"Generates the method using all the attributes of the given entity",
+			"Indentation with SPACES (1 'indentationString' for each indentation level)"
+			},
+		example={ 
+			"$java.equalsMethod( $entity, 1, '   ' )" },
+		parameters = { 
+			"entity : the entity for which to generate the 'equals' method",
+			"indentationLevel : initial indentation level",
+			"indentationString : string to use for each indentation (usually N spaces)"},
+		since = "4.3.0"
+		)
+	public String equalsMethod(EntityInContext entity, int indentationLevel, String indentationString) {
+		return buildEqualsMethod(entity, indentationLevel, new LinesBuilder(indentationString) ); 
+	}
+	//-------------------------------------------------------------------------------------
+	// No 'attributes' paramater for 'equals' (must use all the attributes) 
+	//-------------------------------------------------------------------------------------
+	private String buildEqualsMethod(EntityInContext entity, int indentationLevel, LinesBuilder linesBuilder) {
+    	if ( entity == null ) {
+    		throw new IllegalArgumentException("$java.equalsMethod(..) : entity arg is null");
+    	}
+		return buildEqualsMethod(entity.getName(), entity.getAttributes(), indentationLevel, linesBuilder ); 
+	}
+	//-------------------------------------------------------------------------------------
+	private String buildEqualsMethod( String className, List<AttributeInContext> attributes, int indent, LinesBuilder lb ) {
 
-		int indent = 1 ;
+		// int indent = 1 ; // now in parameters 
 		lb.append(indent, "public boolean equals(Object obj) { ");
 		
 		indent++;
@@ -97,8 +147,8 @@ public class JavaInContext {
 		// Cast obj to the given className 
 		lb.append( indent, className + " other = (" + className + ") obj; ");
 		
-		if ( fieldsList != null ) {
-			for ( AttributeInContext attribute : fieldsList ) {
+		if ( attributes != null ) {
+			for ( AttributeInContext attribute : attributes ) {
 				
 				String attributeName = attribute.getName() ;
 				lb.append(indent, "//--- Attribute " + attributeName );
@@ -122,7 +172,8 @@ public class JavaInContext {
 				}
 				else if ( isJavaArrayType(attribute) ) {
 					// char[], byte[], String[], ...
-					lb.append(indent, "if ( ! Arrays.equals(" + attributeName + ", other." + attributeName + ") ) return false ; ");
+					// "java.util" prefix is used to avoid the import 
+					lb.append(indent, "if ( ! java.util.Arrays.equals(" + attributeName + ", other." + attributeName + ") ) return false ; ");
 				}
 				else {
 					lb.append(indent, "if ( " + attributeName + " == null ) { ");
@@ -142,107 +193,167 @@ public class JavaInContext {
 		return lb.toString();
 	}
 
-	//-------------------------------------------------------------------------------------
+	//=====================================================================================
+	// "hashCode" METHOD GENERATION
+	//=====================================================================================
 	@VelocityMethod(
-			text={	
-				"Returns a string containing all the code for a Java 'hashCode' method",
-				"Tabulations are used for code indentation"
-				},
-			example={ 
-				"$java.hashCode( $entity.name, $entity.attributes )" },
-			parameters = { 
-				"className  : the Java class name (simple name or full name)",
-				"attributes : list of attributes to be used in the equals method"},
-			since = "2.0.7"
-				)
+		text={	
+			"Returns a string containing all the code for a Java 'hashCode' method",
+			"Tabulations are used for code indentation",
+			"(!) DEPRECATED - do not use"
+			},
+		example={ 
+			"$java.hashCodeMethod( $entity.name, $entity.attributes )" },
+		parameters = { 
+			"className  : the Java class name (simple name or full name)",
+			"attributes : list of attributes to be used in the equals method"},
+		since = "2.0.7",
+		deprecated=true
+			)
+	@Deprecated
 	public String hashCodeMethod( String className, List<AttributeInContext> attributes ) {
-		return hashCodeMethod(attributes, new LinesBuilder() ); 
+		return buildHashCodeMethod(attributes, 1, new LinesBuilder() ); 
 	}
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
-			text={	
-				"Returns a string containing all the code for a Java 'hashCode' method",
-				"Spaces are used for code indentation"
-				},
-			example={ 
-				"$java.hashCode( $entity.name, $entity.attributes, 4 )" },
-			parameters = { 
-				"className  : the Java class name (simple name or full name)",
-				"attributes : list of attributes to be used in the equals method",
-				"indentSpaces : number of spaces to be used for each indentation level"},
-			since = "2.0.7"
-				)
+		text={	
+			"Returns a string containing all the code for a Java 'hashCode' method",
+			"Spaces are used for code indentation",
+			"(!) DEPRECATED - do not use"
+			},
+		example={ 
+			"$java.hashCodeMethod( $entity.name, $entity.attributes, 4 )" },
+		parameters = { 
+			"className  : the Java class name (simple name or full name)",
+			"attributes : list of attributes to be used in the equals method",
+			"indentSpaces : number of spaces to be used for each indentation level"},
+		since = "2.0.7",
+		deprecated=true
+			)
+	@Deprecated
 	public String hashCodeMethod( String className, List<AttributeInContext> attributes, int indentSpaces ) {
-		return hashCodeMethod(attributes, new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) ); 
+		return buildHashCodeMethod(attributes, 1, new LinesBuilder(buildIndentationWithSpaces(indentSpaces)) ); 
+	}
+	//-------------------------------------------------------------------------------------
+	// "hashCodeMethod" with standard arguments (since v 4.3.0)
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing all the code for a Java 'hashCode' method",
+			"Generates the method using all the attributes of the given entity",
+			"Indentation with TABS (1 tab for each indentation level)"
+			},
+		example={ 
+			"$java.hashCodeMethod( $entity, 1 )" },
+		parameters = { 
+			"entity : the entity for which to generate the method",
+			"indentationLevel : initial indentation level (usually 1)" },
+		since = "4.3.0"
+		)
+	public String hashCodeMethod(EntityInContext entity, int indentationLevel) {
+		return buildHashCodeMethod(entity, indentationLevel, new LinesBuilder()); 
+	}
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod(
+		text={	
+			"Returns a string containing all the code for a Java 'hashCode' method",
+			"Generates the method using all the attributes of the given entity",
+			"Indentation with SPACES (1 'indentationString' for each indentation level)"
+			},
+		example={ 
+			"$java.hashCodeMethod( $entity, 1, '   ' )" },
+		parameters = { 
+			"entity : the entity for which to generate the method",
+			"indentationLevel : initial indentation level (usually 1)",
+			"indentationString : string to use for each indentation (usually N spaces)"},
+		since = "4.3.0"
+		)
+	public String hashCodeMethod(EntityInContext entity, int indentationLevel, String indentationString) {
+		return buildHashCodeMethod(entity, indentationLevel, new LinesBuilder(indentationString) ); 
 	}
 	
 	//-------------------------------------------------------------------------------------
-	private String hashCodeMethod(List<AttributeInContext> fieldsList, LinesBuilder lb ) {
-
-		int indent = 1 ;
+	// No 'attributes' paramater for 'hashCode' (must use all the attributes) 
+	//-------------------------------------------------------------------------------------
+	private String buildHashCodeMethod(EntityInContext entity, int indentationLevel, LinesBuilder linesBuilder) {
+    	if ( entity == null ) {
+    		throw new IllegalArgumentException("$java.hashCodeMethod(..) : entity arg is null");
+    	}
+		return buildHashCodeMethod(entity.getAttributes(), indentationLevel, linesBuilder ); 	
+	}
+	//-------------------------------------------------------------------------------------
+	private boolean atLeastOneDoubleAttribute(List<AttributeInContext> attributes) {
+		for ( AttributeInContext attribute : attributes ) {
+			if ( attribute.isPrimitiveType() && attribute.isDoubleType() ) {
+				// neutral type 'double' + 'primitive type' => Java 'double'
+				return true;
+			}
+		}
+		return false;
+	}
+	//-------------------------------------------------------------------------------------
+	private String buildHashCodeMethod(List<AttributeInContext> attributes, int indent, LinesBuilder lb ) {
 		lb.append(indent, "public int hashCode() { ");
-
-		boolean longtempVarDefined = false ;
 		indent++;
-			lb.append(indent, "final int prime = 31; ");
-			lb.append(indent, "int result = 1; ");
-			lb.append(indent, "");
-			
-			if ( fieldsList != null ) {
-				for ( AttributeInContext attribute : fieldsList ) {
-					
-					String attributeName = attribute.getName() ;
-					lb.append(indent, "//--- Attribute " + attributeName );
-					if ( attribute.isPrimitiveType() ) {
-						//--- Primitive types
-						if ( attribute.isBooleanType() ) {
-							// boolean
-							lb.append(indent, "result = prime * result + (" + attributeName + " ? 1231 : 1237 );");
-						}
-						else if ( attribute.isLongType() ) {
-							// long (must be converted to int)
-							lb.append(indent, "result = prime * result + (int) (" + attributeName 
-									+ " ^ (" + attributeName + " >>> 32));");
-						}
-						else if ( attribute.isFloatType() ) {
-							// float
-							lb.append(indent, "result = prime * result + Float.floatToIntBits(" + attributeName + ");");
-						}
-						else if ( attribute.isDoubleType() ) {
-							// double
-							if ( ! longtempVarDefined ) {
-								lb.append(indent, "long temp;");
-								longtempVarDefined = true ;
-							}
-							lb.append(indent, "temp = Double.doubleToLongBits(" + attributeName + ");");
-							lb.append(indent, "result = prime * result + (int) (temp ^ (temp >>> 32));");
-						}
-						else {
-							// char, byte, short, int 
-							lb.append(indent, "result = prime * result + " + attributeName + ";");
-						}
-					}
-					else if ( isJavaArrayType(attribute) ) { 
-						// char[], byte[], String[], ...
-						lb.append(indent, "result = prime * result + Arrays.hashCode(" + attributeName + ");");
-					}
-					else {
-						//--- Objects : just use the 'hashCode' method
-						lb.append(indent, "result = prime * result + ((" + attributeName + " == null) ? 0 : " 
-								+ attributeName + ".hashCode() ) ; ");
-					}
-				}
-			} 
-
-			lb.append(indent, "");
-			lb.append(indent, "return result; ");
+		lb.append(indent, "final int prime = 31; ");
+		lb.append(indent, "int result = 1; ");
+		// Declare a 'temp' variable if used for 'Double' 
+		if ( atLeastOneDoubleAttribute(attributes) ) {
+			lb.append(indent, "long temp;");
+		}
+		// Compute hash code for each attribute
+		if ( attributes != null ) {
+			for ( AttributeInContext attribute : attributes ) {
+				buildHashCodeMethodForAttribute(attribute, indent, lb );
+			}
+		} 
+		lb.append(indent, "return result; ");
 		indent--;
 		lb.append(indent, "} ");
-
 		return lb.toString();
 	}
+	private void buildHashCodeMethodForAttribute(AttributeInContext attribute, int indent, LinesBuilder lb ) {
+		String attributeName = attribute.getName() ;
+		if ( attribute.isPrimitiveType() ) {
+			//--- Primitive types
+			if ( attribute.isBooleanType() ) {
+				// Java 'boolean'
+				lb.append(indent, "result = prime * result + (" + attributeName + " ? 1231 : 1237 );");
+			}
+			else if ( attribute.isLongType() ) {
+				// Java 'long' (must be converted to int)
+				lb.append(indent, "result = prime * result + (int) (" + attributeName 
+						+ " ^ (" + attributeName + " >>> 32));");
+			}
+			else if ( attribute.isFloatType() ) {
+				// Java 'float'
+				lb.append(indent, "result = prime * result + Float.floatToIntBits(" + attributeName + ");");
+			}
+			else if ( attribute.isDoubleType() ) {
+				// Java 'double' ('temp' var is declared before)
+				lb.append(indent, "temp = Double.doubleToLongBits(" + attributeName + ");");
+				lb.append(indent, "result = prime * result + (int) (temp ^ (temp >>> 32));");
+			}
+			else {
+				// Other primitive types : char, byte, short, int 
+				lb.append(indent, "result = prime * result + " + attributeName + ";");
+			}
+		}
+		else if ( isJavaArrayType(attribute) ) { 
+			//--- Array type : char[], byte[], String[], ...
+			// "java.util" prefix is used to avoid the import 
+			lb.append(indent, "result = prime * result + java.util.Arrays.hashCode(" + attributeName + ");");
+		}
+		else {
+			//--- Other objects : just use the 'hashCode' method
+			lb.append(indent, "result = prime * result + ((" + attributeName + " == null) ? 0 : " 
+					+ attributeName + ".hashCode() ) ; ");
+		}
+	}
 
+	//-------------------------------------------------------------------------------------
+	// "imports"
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 			text={	
@@ -296,22 +407,23 @@ public class JavaInContext {
 			//--- All the links 
 			for ( LinkInContext link : entity.getLinks() ) {
 				if ( link.isCardinalityOneToMany() || link.isCardinalityManyToMany() ) {
-					String type = link.getFieldType();
-					if ( type.contains("Set<") && type.contains(">") ) {
-						imports.declareType("java.util.Set");
-					} 
-					else if ( type.contains("Collection<") && type.contains(">") ) {
-						imports.declareType("java.util.Collection");
-					} 
-					else {
-						// by default "List" 
-						imports.declareType("java.util.List");
-					}
+					//--- Collection type: List, Set, Map, etc
+					imports.declareLinkType(link.getFieldType()); // "List<Foo>", "Set<Foo>", etc // ver 4.3.0
+//					String type = link.getFieldType();
+//					if ( type.contains("Set<") && type.contains(">") ) {
+//						imports.declareType("java.util.Set");
+//					} 
+//					else if ( type.contains("Collection<") && type.contains(">") ) {
+//						imports.declareType("java.util.Collection");
+//					} 
+//					else {
+//						// by default "List" 
+//						imports.declareType("java.util.List");
+//					}
 				}
-				else {
-					// ManyToOne or OneToOne => bean ( "Book", "Person", ... )
-					// Supposed to be in the same package
-				}
+				// ELSE = other cardinalities (ManyToOne or OneToOne) 
+				// => just the referenced class name ( "Book", "Person", ... ) 
+				// => Supposed to be in the same package => no import 
 			}
 			//--- Resulting list of imports
 			return imports.getFinalImportsList();
@@ -320,7 +432,7 @@ public class JavaInContext {
 	}
 
 	//-------------------------------------------------------------------------------------
-	// toString METHOD GENERATION
+	// "toString" METHOD GENERATION
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
@@ -508,6 +620,9 @@ public class JavaInContext {
     		) ;
     }
 	
+	//-------------------------------------------------------------------------------------
+	// "validationAnnotations" METHOD GENERATION
+	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Returns the 'Bean Validation (JSR-303)' or 'Jakarta EE' annotations for the given attribute",
@@ -530,7 +645,7 @@ public class JavaInContext {
 		JavaValidationAnnotations annotations = new JavaValidationAnnotations(attribute);
 		return annotations.getValidationAnnotations(leftMargin );
     }
-
+	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Same as 'validationAnnotations' but with multiline result (one line for each annotation)"
@@ -547,7 +662,7 @@ public class JavaInContext {
 		JavaValidationAnnotations annotations = new JavaValidationAnnotations(attribute);
 		return annotations.getValidationAnnotationsMultiline(leftMargin );
     }
-
+	//-------------------------------------------------------------------------------------
 	@VelocityMethod(
 		text={	
 			"Returns TRUE if the attribute has at least one validation annotation ",
