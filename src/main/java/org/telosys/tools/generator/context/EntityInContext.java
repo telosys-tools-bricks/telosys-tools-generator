@@ -1340,6 +1340,28 @@ public class EntityInContext
 	
 	//-------------------------------------------------------------------------------------
 	@VelocityMethod ( text= { 
+			"Returns TRUE if this entity has at least one attribute with type 'decimal' "
+		},
+		example= {
+			"#if ( $entity.hasDecimalAttribute() )",
+			"...",
+			"#end"
+		},
+		since="4.3.0"
+	)
+	public boolean hasDecimalAttribute() {
+    	if ( attributes != null ) {
+        	for ( AttributeInContext attribute : attributes ) {
+                if ( attribute.isDecimalType() ) {
+                	return true ;
+                }
+        	}
+    	}
+    	return false ;
+	}
+	
+	//-------------------------------------------------------------------------------------
+	@VelocityMethod ( text= { 
 			"Returns TRUE if this entity has at least one attribute with a temporal type ('date', 'datetime', etc) "
 		},
 		example= {
