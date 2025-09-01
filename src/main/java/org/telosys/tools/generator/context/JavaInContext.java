@@ -135,23 +135,18 @@ public class JavaInContext {
 	}
 	//-------------------------------------------------------------------------------------
 	private String buildEqualsMethod( String className, List<AttributeInContext> attributes, int indent, LinesBuilder lb ) {
-
-		// int indent = 1 ; // now in parameters 
-		lb.append(indent, "public boolean equals(Object obj) { ");
+		lb.append(indent, "public boolean equals(Object obj) { ");	
 		
 		indent++;
 		lb.append(indent, "if ( this == obj ) return true ; ");
 		lb.append(indent, "if ( obj == null ) return false ;");
 		lb.append(indent, "if ( this.getClass() != obj.getClass() ) return false ; ");
-		
 		// Cast obj to the given className 
 		lb.append( indent, className + " other = (" + className + ") obj; ");
-		
 		if ( attributes != null ) {
 			for ( AttributeInContext attribute : attributes ) {
 				
 				String attributeName = attribute.getName() ;
-				lb.append(indent, "//--- Attribute " + attributeName );
 				if ( attribute.isPrimitiveType() ) {
 					if ( attribute.isFloatType() ) {
 						// float
@@ -409,19 +404,8 @@ public class JavaInContext {
 				if ( link.isCardinalityOneToMany() || link.isCardinalityManyToMany() ) {
 					//--- Collection type: List, Set, Map, etc
 					imports.declareLinkType(link.getFieldType()); // "List<Foo>", "Set<Foo>", etc // ver 4.3.0
-//					String type = link.getFieldType();
-//					if ( type.contains("Set<") && type.contains(">") ) {
-//						imports.declareType("java.util.Set");
-//					} 
-//					else if ( type.contains("Collection<") && type.contains(">") ) {
-//						imports.declareType("java.util.Collection");
-//					} 
-//					else {
-//						// by default "List" 
-//						imports.declareType("java.util.List");
-//					}
 				}
-				// ELSE = other cardinalities (ManyToOne or OneToOne) 
+				// ELSE = other cardinalities ('ManyToOne' or 'OneToOne') 
 				// => just the referenced class name ( "Book", "Person", ... ) 
 				// => Supposed to be in the same package => no import 
 			}
