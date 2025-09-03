@@ -797,8 +797,8 @@ public class AttributeInContext {
      */
 	@VelocityMethod(
 	text={	
-		"Returns TRUE if the attribute is 'auto-incremented' by the database",
-		"when a new entity is inserted in the database"
+		"Returns TRUE if the attribute has a 'generated value strategy' of type 'IDENTITY'. ",
+		"Relies on the database’s auto-increment feature (supported by PostgreSQL, MySQL, SQL Server, etc)."
 		}
 	)
     public boolean isAutoIncremented() {
