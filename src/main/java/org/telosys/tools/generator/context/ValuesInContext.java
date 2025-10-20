@@ -96,6 +96,30 @@ public class ValuesInContext {
 	
 	//----------------------------------------------------------------------------------------
 	@VelocityMethod(
+			text={	
+				"Returns true if the values contains the given value"
+			},
+			parameters = { 
+				"searchedValue : the value (string) to find "
+			},
+			example = {
+				"#if ( $values.contains('null') " 
+			},
+			since = "4.3.0"
+		)
+	public boolean contains(String searchedValue) {
+		if ( searchedValue != null ) {
+			for (LiteralValue literalValue : values.values()) {
+				if ( searchedValue.equals( literalValue.getCurrentLanguageValue() ) ) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	//----------------------------------------------------------------------------------------
+	@VelocityMethod(
 		text={	
 			"Returns the size of the values list (the number of values)"
 			},

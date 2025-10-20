@@ -240,6 +240,7 @@ public class ValuesInContextForJavaTest {
 		attributes.add( buildAttributeInContext("datetime",   NeutralType.DATETIME   ) );
 		attributes.add( buildAttributeInContext("datetimeTZ", NeutralType.DATETIMETZ ) );
 		attributes.add( buildAttributeInContext("time1",      NeutralType.TIME       ) );
+		attributes.add( buildAttributeInContext("bin",        NeutralType.BINARY     ) );
 		attributes.add( buildAttributeInContext(new DslModelAttribute("time3", NeutralType.TIME )) );
 		
 		ValuesInContext values = new ValuesInContext(attributes, 2, env );
@@ -249,6 +250,7 @@ public class ValuesInContextForJavaTest {
 		checkValue(values, "age",        "Short.valueOf((short)2)") ;
 		checkValue(values, "datetime",   "java.time.LocalDateTime.parse(\"2002-05-21T02:47:53\")") ;
 		checkValue(values, "datetimeTZ", "java.time.OffsetDateTime.parse(\"2002-05-21T02:47:53+02:00\")") ;
+		checkValue(values, "bin",        "null") ;
 
 		toJSON(values, attributes);
 		println("----------" );
@@ -257,6 +259,10 @@ public class ValuesInContextForJavaTest {
 		keyAttributes.add( buildAttributeInContext("id", NeutralType.INTEGER, true ) );
 		String keyValues = values.getValues(keyAttributes, ", ");
 		assertEquals("200", keyValues);
+		
+		assertTrue(values.contains("200"));
+		assertTrue(values.contains("Short.valueOf((short)2)"));
+		assertTrue(values.contains("null"));
 	}
 	
 	@Test
