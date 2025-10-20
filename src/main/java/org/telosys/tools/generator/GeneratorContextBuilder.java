@@ -106,8 +106,12 @@ public class GeneratorContextBuilder {
 		generatorContext.put(ContextName.LBRACE,  "{"  ); // left brace
 		generatorContext.put(ContextName.RBRACE,  "}"  ); // right brace
 		
-		generatorContext.put(ContextName.NEWLINE, "\n"  ); 
-		generatorContext.put(ContextName.TAB,     "\t"  ); 
+		generatorContext.put(ContextName.NEWLINE, "\n"  );
+		generatorContext.put(ContextName.TAB,     "\t"  );
+		for ( int i = 1 ; i <= 20 ; i++ ) { // $_, $__, $___, etc
+			String s = StrUtil.repeat('_', i);
+			generatorContext.put(s, "");
+		}
 	}
 	
 	/**

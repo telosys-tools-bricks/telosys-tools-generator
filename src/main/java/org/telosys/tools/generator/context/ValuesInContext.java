@@ -135,13 +135,12 @@ public class ValuesInContext {
 		text={	
 			"Returns a string containing all the literal values separated by a comma. ",
 			"e.g. for Java : ' \"AAAA\", (short)10, true '  ",
-			" ",
-			"Usage example in Velocity template :",
+		},
+		example = {			
 			" $values.allValues  ",
 			" or  ",
 			" $values.getAllValues()  ",
-			" "
-			},
+		},
 		since = "3.0.0"
 	)
 	public String getAllValues() {
@@ -150,6 +149,35 @@ public class ValuesInContext {
 		for ( String name : attributeNames ) {
 			if ( n > 0 ) {
 				sb.append(", ");
+			}
+			sb.append(getValue(name));
+			n++ ;
+		}
+		return sb.toString();
+	}
+
+	//----------------------------------------------------------------------------------------
+	@VelocityMethod(
+			text={	
+				"Returns a string containing the literal values for the given list of attributes. ",
+				"e.g. for Java : ' \"AAAA\", 10, true '  "
+			},
+			parameters = { 
+				"attributes : list of attributes to be put in the resulting string ",
+				"separator  : the separator to put between each value "
+			},
+			example = {
+				"$values.getValues($entity.keyAttributes, \", \" ) " 
+			},
+			since = "4.3.0"
+		)
+	public String getValues(List<AttributeInContext> attributes, String separator) {
+		StringBuilder sb = new StringBuilder();
+		int n = 0 ;
+		for ( AttributeInContext attribute : attributes ) {
+			String name = attribute.getName();
+			if ( n > 0 ) {
+				sb.append(separator);
 			}
 			sb.append(getValue(name));
 			n++ ;

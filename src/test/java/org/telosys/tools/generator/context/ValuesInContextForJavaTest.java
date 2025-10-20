@@ -1,6 +1,5 @@
 package org.telosys.tools.generator.context;
 
-import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.telosys.tools.dsl.model.DslModelAttribute;
 import org.telosys.tools.generic.model.Attribute;
+import org.telosys.tools.generic.model.types.NeutralType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,6 +27,10 @@ public class ValuesInContextForJavaTest {
 	private void setShortObj(Short v) { /* nothing */ } 
 	private void setIntObj(Integer v)     { /* nothing */ } 
 	private void setLongObj(Long v)   { /* nothing */ } 
+	
+	private void println(String msg) {
+		System.out.println(msg);
+	}
 
 	@Test
 	public void testLiteral() {
@@ -41,46 +45,45 @@ public class ValuesInContextForJavaTest {
 		setLongObj(12L);
 		
 		byte  b =  12;
-		System.out.println("b = " + b);
+		println("b = " + b);
 		Byte  b2 =  34;
-		System.out.println("b2 = " + b2);
+		println("b2 = " + b2);
 		
 		short sh = (short)12;
-		System.out.println("sh = " + sh);
+		println("sh = " + sh);
 		
 		float  f = 12345.60F ;
-		System.out.println("f = " + f);
+		println("f = " + f);
 		
 		double d = 456.89D ;
-		System.out.println("d = " + d);
+		println("d = " + d);
 
 		long   l = 12345L ;
-		System.out.println("l = " + l);
+		println("l = " + l);
 
 		
-		BigDecimal bigDecimal = (new BigDecimal(12345678.5));
-		System.out.println("bigDecimal = " + bigDecimal);
+		java.math.BigDecimal bigDecimal = (java.math.BigDecimal.valueOf(12345678.5));
+		println("bigDecimal = " + bigDecimal);
 
 		
 		java.util.Date utilDate = Calendar.getInstance().getTime() ;
-		System.out.println("utilDate = " + utilDate);
-		//(new SimpleDateFormat("yyyy-MM-dd")).parse("1901-01-01");
+		println("utilDate = " + utilDate);
 
 		java.sql.Date sqlDate = (new java.sql.Date(Calendar.getInstance().getTime().getTime()));
-		System.out.println("sqlDate = " + sqlDate);
+		println("sqlDate = " + sqlDate);
 
 		java.sql.Time sqlTime = (new java.sql.Time(Calendar.getInstance().getTime().getTime()));
-		System.out.println("sqlTime = " + sqlTime);
+		println("sqlTime = " + sqlTime);
 
 		java.sql.Timestamp sqlTimestamp = (new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
-		System.out.println("sqlTimestamp = " + sqlTimestamp);
+		println("sqlTimestamp = " + sqlTimestamp);
 	}
 
 	@Test
 	public void testCompare() {
 		
 		byte  b =  12;
-		System.out.println("b = " + b);
+		println("b = " + b);
 		Byte  b2 =  34;
 		Assert.assertTrue( b2 == 34 ) ;
 		
@@ -93,26 +96,13 @@ public class ValuesInContextForJavaTest {
 		Long   l = 12345L ;
 		Assert.assertTrue( l == 12345L ) ;
 
-		BigDecimal bigDecimal = (new BigDecimal(12345678.5));
-		Assert.assertTrue( bigDecimal.equals( (new BigDecimal(12345678.5)) ) ) ;
-		//System.out.println("bigDecimal = " + bigDecimal);
+		java.math.BigDecimal bigDecimal = (java.math.BigDecimal.valueOf(12345678.5));
+		Assert.assertTrue( bigDecimal.equals( (java.math.BigDecimal.valueOf(12345678.5)) ) ) ;
 
 		Boolean  bool1 = false ;
 		Assert.assertTrue( bool1 == false ) ;
 		Boolean  bool2 = true ;
 		Assert.assertTrue( bool2 == true ) ;
-//		
-//		java.util.Date utilDate = Calendar.getInstance().getTime() ;
-//		System.out.println("utilDate = " + utilDate);
-//
-//		java.sql.Date sqlDate = (new java.sql.Date(Calendar.getInstance().getTime().getTime()));
-//		System.out.println("sqlDate = " + sqlDate);
-//
-//		java.sql.Time sqlTime = (new java.sql.Time(Calendar.getInstance().getTime().getTime()));
-//		System.out.println("sqlTime = " + sqlTime);
-//
-//		java.sql.Timestamp sqlTimestamp = (new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
-//		System.out.println("sqlTimestamp = " + sqlTimestamp);
 	}
 	
 	private EnvInContext getEnvInContext() {
@@ -127,49 +117,20 @@ public class ValuesInContextForJavaTest {
 	
 	@Test
 	public void testValuesStep1() {
-		EnvInContext    env = getEnvInContext() ;
-		
-		
-		
-//		AttributeInContext attribFirstName =  new AttributeInContext("firstName", "java.lang.String", 10)) ;
-//		attributes.add(attribFirstName);		
-//		attributes.add( new AttributeInContext("age",       "java.lang.Short")) ) ;
-//		attributes.add( new AttributeInContext("num1",      "long")) ) ;
-//		attributes.add( new AttributeInContext("num2",      "java.lang.Double")) ) ;
-//		attributes.add( new AttributeInContext("date1",     "java.util.Date")) ) ;
-//		attributes.add( new AttributeInContext("date2",     "java.sql.Date")) ) ;
-//		attributes.add( new AttributeInContext("flag",      "boolean")) ) ;
-//		attributes.add( new AttributeInContext("flag2",     "boolean")) ) ;
-//		attributes.add( new AttributeInContext("time",     "java.sql.Time")) ) ;
-
-		// with neutral types
-//		AttributeInContext id        = new AttributeInContext("id",        "int"), modelInContext, env) ;
-//		AttributeInContext code      = new AttributeInContext("code",      "int", true), modelInContext, env) ; // NOT NULL
-//		AttributeInContext firstName = new AttributeInContext("firstName", "string", 10), modelInContext, env) ;
-//		AttributeInContext age       = new AttributeInContext("age",       "short"), modelInContext, env) ;
-//		AttributeInContext num1      = new AttributeInContext("num1",      "long"), modelInContext, env)  ;
-//		AttributeInContext num2      = new AttributeInContext("num2",      "double"), modelInContext, env)  ;
-//		AttributeInContext dec       = new AttributeInContext("dec",       "decimal"), modelInContext, env)  ;
-//		AttributeInContext date1     = new AttributeInContext("date1",     "date"), modelInContext, env)  ;
-//		AttributeInContext date2     = new AttributeInContext("date2",     "date"), modelInContext, env) ;
-//		AttributeInContext flag      = new AttributeInContext("flag",      "boolean"), modelInContext, env) ;
-//		AttributeInContext flag2     = new AttributeInContext("flag2",     "boolean", true), modelInContext, env) ;
-//		AttributeInContext time      = new AttributeInContext("time",      "time"), modelInContext, env) ;
-
-		AttributeInContext id        = buildAttributeInContext("id",        "int"      ) ;
-		AttributeInContext code      = buildAttributeInContext("code",      "int",    true) ; // NOT NULL
-		AttributeInContext firstName = buildAttributeInContext("firstName", "string", 10) ;
-		AttributeInContext age       = buildAttributeInContext("age",       "short"    ) ;
-		AttributeInContext num1      = buildAttributeInContext("num1",      "long"     ) ;
-		AttributeInContext num2      = buildAttributeInContext("num2",      "double"   ) ;
-		AttributeInContext dec       = buildAttributeInContext("dec",       "decimal"  ) ;
-		AttributeInContext date1     = buildAttributeInContext("date1",     "date"     ) ;
-		AttributeInContext date2     = buildAttributeInContext("date2",     "date"     ) ;
-		AttributeInContext flag      = buildAttributeInContext("flag",      "boolean"  ) ;
-		AttributeInContext flag2     = buildAttributeInContext("flag2",     "boolean", true) ;
-		AttributeInContext time      = buildAttributeInContext("time",      "time"     ) ;
+		AttributeInContext id          = buildAttributeInContext("id",          NeutralType.INTEGER  ) ;
+		AttributeInContext code        = buildAttributeInContext("code",        NeutralType.INTEGER, true) ; // NOT NULL
+		AttributeInContext firstName   = buildAttributeInContext("firstName",   NeutralType.STRING,  10) ;
+		AttributeInContext age         = buildAttributeInContext("age",         NeutralType.SHORT    ) ;
+		AttributeInContext num1        = buildAttributeInContext("num1",        NeutralType.LONG     ) ;
+		AttributeInContext num2        = buildAttributeInContext("num2",        NeutralType.DOUBLE   ) ;
+		AttributeInContext dec         = buildAttributeInContext("dec",         NeutralType.DECIMAL  ) ;
+		AttributeInContext date1       = buildAttributeInContext("date1",       NeutralType.DATE     ) ;
+		AttributeInContext date2       = buildAttributeInContext("date2",       NeutralType.DATE     ) ;
+		AttributeInContext flag        = buildAttributeInContext("flag",        NeutralType.BOOLEAN  ) ;
+		AttributeInContext flagNotNull = buildAttributeInContext("flagNotNull", NeutralType.BOOLEAN, true) ;
+		AttributeInContext time        = buildAttributeInContext("time",        NeutralType.TIME     ) ;
 				
-		List<AttributeInContext> attributes = new LinkedList<AttributeInContext>() ;
+		List<AttributeInContext> attributes = new LinkedList<>() ;
 		attributes.add( id );
 		attributes.add( code );
 		attributes.add( firstName );		
@@ -180,21 +141,23 @@ public class ValuesInContextForJavaTest {
 		attributes.add( date1 ) ;
 		attributes.add( date2 ) ;
 		attributes.add( flag ) ;
-		attributes.add( flag2 ) ;
+		attributes.add( flagNotNull ) ;
 		attributes.add( time ) ;
+
 		
+		EnvInContext    env = getEnvInContext() ;
 		ValuesInContext values = new ValuesInContext( attributes, 1, env );
 		String listOfValues = values.getAllValues();
-		System.out.println("List of values :");
-		System.out.println(listOfValues);
+		println("List of values :");
+		println(listOfValues);
 		
-		assertEquals("int", id.getNeutralType() );
+		assertEquals(NeutralType.INTEGER, id.getNeutralType() );
 		assertFalse( id.isPrimitiveType() ) ;
 		assertFalse( id.isNotNull() );
 		checkValue(values, "id",        "Integer.valueOf(100)") ;
 		checkCompareValue(values, "book", id,   "book.getId().equals(Integer.valueOf(100))");
 
-		assertEquals("int", code.getNeutralType() );
+		assertEquals(NeutralType.INTEGER, code.getNeutralType() );
 		assertTrue( code.isNotNull() );
 		checkValue(values, "code",        "100") ;
 		checkCompareValue(values, "book", code,        "book.getCode() == 100"); // NOT NULL => primitive type comparison
@@ -202,115 +165,98 @@ public class ValuesInContextForJavaTest {
 		checkValue(values, "firstName", buildString('A', 10)) ;
 		checkCompareValue(values, "book", firstName, "book.getFirstName().equals(" + buildString('A', 10) + ")");
 		
-		assertEquals("short", age.getNeutralType() );
+		assertEquals(NeutralType.SHORT, age.getNeutralType() );
 		assertFalse( age.isNotNull() );
 		assertFalse( id.isPrimitiveType() ) ;
 		checkValue(values, "age",       "Short.valueOf((short)1)") ;
 		checkCompareValue(values, "book", age,  "book.getAge().equals(Short.valueOf((short)1))"); 
 		
-		assertEquals("boolean", flag.getNeutralType() );
+		assertEquals(NeutralType.BOOLEAN, flag.getNeutralType() );
 		assertFalse( flag.isNotNull() );
 		assertFalse( id.isPrimitiveType() ) ;
 		checkValue(values, "flag",      "Boolean.valueOf(true)") ;
 		checkCompareValue(values, "book", flag,        "book.getFlag().equals(Boolean.valueOf(true))"); 
 		
-		assertEquals("boolean", flag2.getNeutralType() );
-		checkValue(values, "flag2",      "true") ;
-		assertTrue( flag2.isNotNull() );
-		checkCompareValue(values, "book", flag2,        "book.isFlag2() == true"); 
+		assertEquals(NeutralType.BOOLEAN, flagNotNull.getNeutralType() );
+		checkValue(values, "flagNotNull",      "true") ;
+		assertTrue( flagNotNull.isNotNull() );
+		checkCompareValue(values, "book", flagNotNull,  "book.isFlagNotNull() == true"); 
 		
 		//---- DATE
-		assertEquals("date", date1.getNeutralType() );
-		//assertEquals("java.util.Date", date1.getLanguageType().getFullType() );
+		assertEquals(NeutralType.DATE, date1.getNeutralType() );
 		assertEquals(LOCAL_DATE, date1.getLanguageType().getFullType() ); // v 3.4.0
 		
-		// checkValue(values, "date1",     "java.sql.Date.valueOf(\"2001-06-22\")") ;
 		checkValue(values, "date1",     "java.time.LocalDate.parse(\"2001-06-22\")" ); // v 3.4.0
 		checkCompareValue(values, "book", date1,        
 				"book.getDate1().equals(java.time.LocalDate.parse(\"2001-06-22\"))");  // v 3.4.0
 		
-		assertEquals("date", date2.getNeutralType() );
-		//assertEquals("java.util.Date", date2.getLanguageType().getFullType() );
+		assertEquals(NeutralType.DATE, date2.getNeutralType() );
 		assertEquals(LOCAL_DATE, date2.getLanguageType().getFullType() ); // v 3.4.0
-		//checkValue(values, "date2",     "java.sql.Date.valueOf(\"2001-06-22\")") ;
 		checkValue(values, "date2",     "java.time.LocalDate.parse(\"2001-06-22\")") ; // v 3.4.0
 		
 		//---- TIME
-		assertEquals("time", time.getNeutralType() );
-		//assertEquals("java.util.Date", time.getLanguageType().getFullType() );
+		assertEquals(NeutralType.TIME, time.getNeutralType() );
 		assertEquals(LOCAL_TIME, time.getLanguageType().getFullType() ); // v 3.4.0
-		// checkValue(values, "time",      "java.sql.Time.valueOf(\"01:46:52\")") ;
 		checkValue(values, "time",      "java.time.LocalTime.parse(\"01:46:52\")") ; // v 3.4.0
-		//checkCompareValue(values, "book", time,        "book.getTime().equals(java.sql.Time.valueOf(\"01:46:52\"))"); 
-		checkCompareValue(values, "book", time,
-				"book.getTime().equals(java.time.LocalTime.parse(\"01:46:52\"))");  // v 3.4.0
+		checkCompareValue(values, "book", time, "book.getTime().equals(java.time.LocalTime.parse(\"01:46:52\"))");  // v 3.4.0
 		
-		assertEquals("long", num1.getNeutralType() );
+		assertEquals(NeutralType.LONG, num1.getNeutralType() );
 		checkValue(values, "num1",      "Long.valueOf(1000L)") ;
 		checkCompareValue(values, "book", num1,        "book.getNum1().equals(Long.valueOf(1000L))"); 
 		
-		assertEquals("double", num2.getNeutralType() );
+		assertEquals(NeutralType.DOUBLE, num2.getNeutralType() );
 		checkValue(values, "num2",      "Double.valueOf(1000.66D)") ;
 		checkCompareValue(values, "book", num2,        "book.getNum2().equals(Double.valueOf(1000.66D))"); 
 		
-		assertEquals("decimal", dec.getNeutralType() );
+		assertEquals(NeutralType.DECIMAL, dec.getNeutralType() );
 		checkValue(values, "dec",      "java.math.BigDecimal.valueOf(10000.77)") ;
 		checkCompareValue(values, "book", dec,        "book.getDec().equals(java.math.BigDecimal.valueOf(10000.77))"); 
-		BigDecimal foo = new BigDecimal(2.3);
-		assertTrue ( foo.equals((new BigDecimal(2.3))) ) ;
+		java.math.BigDecimal foo = java.math.BigDecimal.valueOf(2.3);
+		assertTrue ( foo.equals((java.math.BigDecimal.valueOf(2.3))) ) ;
 		
 		checkValue(values, "inex",      "null") ;
 
-		System.out.println("---> values.toJSON() : \n" + values.toJSON());
-		System.out.println("---> values.toFormattedJSON() : \n" + values.toFormattedJSON());
-		System.out.println("---> values.toJSON(attributes) : \n" + values.toJSON(attributes));
-		System.out.println("---> values.toFormattedJSON(attributes) : \n" + values.toFormattedJSON(attributes));
-		System.out.println("---> values.toURI() : \n" + values.toURI());
-		System.out.println("---> values.toURI(attributes) : \n" + values.toURI(attributes));
-		System.out.println("----------" );
+		toJSON(values, attributes);
+		toURI(values, attributes);
+		println("----------" );
+
+		List<AttributeInContext> keyAttributes = new LinkedList<>() ;
+		keyAttributes.add( id );
+		keyAttributes.add( code );
+		String keyValues = values.getValues(keyAttributes, ", ");
+		assertEquals("Integer.valueOf(100), 100", keyValues);
 	}
 
 	@Test
 	public void testValuesStep2() {
 		EnvInContext env = getEnvInContext() ;
 
-		List<AttributeInContext> attributes = new LinkedList<AttributeInContext>() ;
+		List<AttributeInContext> attributes = new LinkedList<>() ;
+		attributes.add( buildAttributeInContext("id",         NeutralType.INTEGER, true ) ); // Not Null
+		attributes.add( buildAttributeInContext("firstName",  NeutralType.STRING, 3  ) );
+		attributes.add( buildAttributeInContext("age",        NeutralType.SHORT      ) );
+		attributes.add( buildAttributeInContext("date1",      NeutralType.DATE       ) );
+		attributes.add( buildAttributeInContext("date2",      NeutralType.DATE       ) );
+		attributes.add( buildAttributeInContext("datetime",   NeutralType.DATETIME   ) );
+		attributes.add( buildAttributeInContext("datetimeTZ", NeutralType.DATETIMETZ ) );
+		attributes.add( buildAttributeInContext("time1",      NeutralType.TIME       ) );
+		attributes.add( buildAttributeInContext(new DslModelAttribute("time3", NeutralType.TIME )) );
 		
-//		attributes.add( new AttributeInContext("id",        "int")) ) ;
-//		attributes.add( new AttributeInContext("firstName", "java.lang.String", 3)) ) ;
-//		attributes.add( new AttributeInContext("age",       "java.lang.Short")) ) ;
-//		attributes.add( new AttributeInContext("date1",     "java.util.Date")) ) ;
-//		attributes.add( new AttributeInContext("date2",     "java.sql.Date")) ) ;
+		ValuesInContext values = new ValuesInContext(attributes, 2, env );
+		
+		checkValue(values, "id",         "200") ;
+		checkValue(values, "firstName",  buildString('B', 3)) ;
+		checkValue(values, "age",        "Short.valueOf((short)2)") ;
+		checkValue(values, "datetime",   "java.time.LocalDateTime.parse(\"2002-05-21T02:47:53\")") ;
+		checkValue(values, "datetimeTZ", "java.time.OffsetDateTime.parse(\"2002-05-21T02:47:53+02:00\")") ;
 
-		// with neutral types
-//		attributes.add( new AttributeInContext("id",        "int"), modelInContext, env) ) ;
-//		attributes.add( new AttributeInContext("firstName", "string", 3), modelInContext, env) ) ;
-//		attributes.add( new AttributeInContext("age",       "short"), modelInContext, env) ) ;
-//		attributes.add( new AttributeInContext("date1",     "date"), modelInContext, env) ) ;
-//		attributes.add( new AttributeInContext("date2",     "date"),modelInContext,  env ) ) ;
-		
-		attributes.add( buildAttributeInContext("id",        "int"     ) );
-		attributes.add( buildAttributeInContext("firstName", "string", 3 ) );
-		attributes.add( buildAttributeInContext("age",       "short"     ) );
-		attributes.add( buildAttributeInContext("date1",     "date"      ) );
-		attributes.add( buildAttributeInContext("date2",     "date"      ) );
-		attributes.add( buildAttributeInContext("date2",     "date"      ) );
-		attributes.add( buildAttributeInContext("time1",     "time"      ) );
-		
-		DslModelAttribute attrib = new DslModelAttribute("time3", "time");
-		attributes.add( buildAttributeInContext(attrib) );
-		
-		ValuesInContext values = new ValuesInContext( attributes, 2, env );
-		
-		checkValue(values, "id",        "Integer.valueOf(200)") ;
-		checkValue(values, "firstName", buildString('B', 3)) ;
-		checkValue(values, "age",       "Short.valueOf((short)2)") ;
+		toJSON(values, attributes);
+		println("----------" );
 
-		System.out.println("---> values.toJSON() : \n" + values.toJSON());
-		System.out.println("---> values.toFormattedJSON() : \n" + values.toFormattedJSON());
-		System.out.println("---> values.toJSON(attributes) : \n" + values.toJSON(attributes));
-		System.out.println("---> values.toFormattedJSON(attributes) : \n" + values.toFormattedJSON(attributes));
-		System.out.println("----------" );
+		List<AttributeInContext> keyAttributes = new LinkedList<>() ;
+		keyAttributes.add( buildAttributeInContext("id", NeutralType.INTEGER, true ) );
+		String keyValues = values.getValues(keyAttributes, ", ");
+		assertEquals("200", keyValues);
 	}
 	
 	@Test
@@ -318,26 +264,12 @@ public class ValuesInContextForJavaTest {
 		
 		EnvInContext env = getEnvInContext() ;
 
-		List<AttributeInContext> attributes = new LinkedList<AttributeInContext>() ;
-		
-//		attributes.add( new AttributeInContext("id",        "short")) ) ;
-//		attributes.add( new AttributeInContext("firstName", "java.lang.String", 3)) ) ;
-//		attributes.add( new AttributeInContext("flag1",     "java.lang.Boolean")) ) ;
-//		attributes.add( new AttributeInContext("flag2",     "boolean")) ) ;
-//		attributes.add( new AttributeInContext("byteVal",   "byte")) ) ;
-
-		// with neutral types
-//		attributes.add( new AttributeInContext("id",        "short"), modelInContext, env) ) ;
-//		attributes.add( new AttributeInContext("firstName", "string", 3), modelInContext, env) ) ;
-//		attributes.add( new AttributeInContext("flag1",     "boolean"), modelInContext, env) ) ;
-//		attributes.add( new AttributeInContext("flag2",     "boolean"), modelInContext, env) ) ;
-//		attributes.add( new AttributeInContext("byteVal",   "byte"), modelInContext, env) ) ;
-		
-		attributes.add( buildAttributeInContext("id",        "short"    ) );
-		attributes.add( buildAttributeInContext("firstName", "string", 3) );
-		attributes.add( buildAttributeInContext("flag1",     "boolean"  ) );
-		attributes.add( buildAttributeInContext("flag2",     "boolean"  ) );
-		attributes.add( buildAttributeInContext("byteVal",   "byte"     ) );
+		List<AttributeInContext> attributes = new LinkedList<>() ;
+		attributes.add( buildAttributeInContext("id",        NeutralType.SHORT    ) );
+		attributes.add( buildAttributeInContext("firstName", NeutralType.STRING, 3) );
+		attributes.add( buildAttributeInContext("flag1",     NeutralType.BOOLEAN  ) );
+		attributes.add( buildAttributeInContext("flag2",     NeutralType.BOOLEAN  ) );
+		attributes.add( buildAttributeInContext("byteVal",   NeutralType.BYTE     ) );
 		
 		
 		ValuesInContext values = new ValuesInContext( attributes, 3, env );
@@ -348,25 +280,32 @@ public class ValuesInContextForJavaTest {
 		checkValue(values, "flag2",     "Boolean.valueOf(true)") ;
 		checkValue(values, "byteVal",   "Byte.valueOf((byte)3)") ;
 
-		System.out.println("---> values.toJSON() : \n" + values.toJSON());
-		System.out.println("---> values.toFormattedJSON() : \n" + values.toFormattedJSON());
-		System.out.println("---> values.toJSON(attributes) : \n" + values.toJSON(attributes));
-		System.out.println("---> values.toFormattedJSON(attributes) : \n" + values.toFormattedJSON(attributes));
-		System.out.println("----------" );
+		toJSON(values, attributes);
+		toURI(values, attributes);
+		println("----------" );
+	}
+	
+	private void toJSON(ValuesInContext values, List<AttributeInContext> attributes) {
+		println("---> values.toJSON() : \n" + values.toJSON());
+		println("---> values.toFormattedJSON() : \n" + values.toFormattedJSON());
+		println("---> values.toJSON(attributes) : \n" + values.toJSON(attributes));
+		println("---> values.toFormattedJSON(attributes) : \n" + values.toFormattedJSON(attributes));
+	}
+	private void toURI(ValuesInContext values, List<AttributeInContext> attributes) {
+		println("---> values.toURI() : \n" + values.toURI());
+		println("---> values.toURI(attributes) : \n" + values.toURI(attributes));
 	}
 	
 	private void checkValue(ValuesInContext values, String attributeName, String expectedValue) {
 		String v = values.getValue(attributeName);
-		System.out.println(". value for '" + attributeName + "' = '" + v + "' (expected : '" + expectedValue + "')");
-		//Assert.assertTrue(v.equals(expectedValue));
+		println(". value for '" + attributeName + "' = '" + v + "' (expected : '" + expectedValue + "')");
 		Assert.assertEquals(expectedValue, v);
 	}
 	
 	private void checkCompareValue(ValuesInContext values, String entityVariableName, AttributeInContext attribute, String expectedValue) {
 		String v = values.comparisonStatement(entityVariableName, attribute);
 		String v2 = v.trim();
-		System.out.println(". comparison : '" + v + "' (expected : '" + expectedValue + "')");
-		//Assert.assertTrue(v2.equals(expectedValue.trim()));
+		println(". comparison : '" + v + "' (expected : '" + expectedValue + "')");
 		Assert.assertEquals(expectedValue.trim(), v2);
 	}
 	
@@ -403,8 +342,6 @@ public class ValuesInContextForJavaTest {
 	//------------------------
 	private Attribute buildAttribute(String attributeName, String neutralType, int maxLength, boolean notNull) {
 		DslModelAttribute attribute = new DslModelAttribute(attributeName, neutralType );
-//		attribute.setName(attributeName);
-//		attribute.setFullType(javaType);
 		attribute.setMaxLength(maxLength);
 		attribute.setNotNull(notNull);
 		return attribute ;
