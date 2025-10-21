@@ -1,10 +1,7 @@
 package org.telosys.tools.generator.context;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.Properties;
 
 import org.junit.Test;
 import org.telosys.tools.dsl.model.DslModelAttribute;
@@ -104,7 +101,7 @@ public class SqlInContextTest {
 		assertEquals("varchar",     sql.replaceVar("varchar(%s)", null) );
 
 		assertEquals("NUMBER(2)",    sql.replaceVar("NUMBER(%p)", new BigDecimal("2")) );
-		assertEquals("NUMBER(10.2)", sql.replaceVar("NUMBER(%p)", new BigDecimal("10.2")) );
+		assertEquals("NUMBER(10,2)", sql.replaceVar("NUMBER(%p)", new BigDecimal("10.2")) );
 		assertEquals("NUMBER",       sql.replaceVar("NUMBER(%p)", null ) );
 		
 		//--- Primary Key :
@@ -130,13 +127,13 @@ public class SqlInContextTest {
 	}
 
 	//---- (%s) and (%S)
-	@Test(expected = GeneratorSqlException.class)
-	public void testPostgreSQLVarSizeMandatoryError1() {
-		getSql().replaceVar("varchar(%S)", null); // Mandatory
+	@Test 
+	public void testPostgreSQLVarSizeMandatoryIsNull() {
+		assertEquals("varchar(255)", getSql().replaceVar("varchar(%S)", null) ); // Mandatory
 	}
-	@Test(expected = GeneratorSqlException.class)
-	public void testPostgreSQLVarSizeMandatoryError2() {
-		getSql().replaceVar("varchar(%S)", new BigDecimal("0")); // Mandatory
+	@Test 
+	public void testPostgreSQLVarSizeMandatoryIsZero() {
+		assertEquals("varchar(255)", getSql().replaceVar("varchar(%S)", new BigDecimal("0")) ); // Mandatory
 	}
 	@Test(expected = GeneratorSqlException.class)
 	public void testPostgreSQLVarSizeValueError() {
@@ -149,17 +146,25 @@ public class SqlInContextTest {
 	}
 	
 	//---- (%P) and (%p)
-	@Test(expected = GeneratorSqlException.class)
-	public void testPostgreSQLVarPrecisionMandatoryError1() {
-		getSql().replaceVar("numeric(%P)", null); // Mandatory
+	@Test  
+	public void testPostgreSQLVarPrecisionMandatory() {
+		// Mandatory, no size => default value
+		assertEquals("numeric(16,4)", getSql().replaceVar("numeric(%P)", new BigDecimal("16.4")) );
 	}
-	@Test(expected = GeneratorSqlException.class)
-	public void testPostgreSQLVarPrecisionMandatoryError2() {
-		getSql().replaceVar("numeric(%P)", new BigDecimal("0")); // Mandatory
+	@Test  
+	public void testPostgreSQLVarPrecisionMandatoryIsNull() {
+		// Mandatory, no size => default value
+		assertEquals("numeric(10,2)", getSql().replaceVar("numeric(%P)", null) );
 	}
-	@Test(expected = GeneratorSqlException.class)
-	public void testPostgreSQLVarPrecisionMandatoryError3() {
-		getSql().replaceVar("numeric(%P)", new BigDecimal("0.4")); // Mandatory
+	@Test 
+	public void testPostgreSQLVarPrecisionMandatoryIsZero() {
+		// Mandatory, precision = 0 => default value
+		assertEquals("numeric(10,2)", getSql().replaceVar("numeric(%P)", new BigDecimal("0")) ); // Mandatory
+	}
+	@Test 
+	public void testPostgreSQLVarPrecisionMandatoryIsZeroWithScale() {
+		// Mandatory, precision = 0 => default value
+		assertEquals("numeric(10,2)", getSql().replaceVar("numeric(%P)", new BigDecimal("0.4")) ); // Mandatory
 	}
 	@Test(expected = GeneratorSqlException.class)
 	public void testPostgreSQLVarPrecisionValueError() {
@@ -188,18 +193,19 @@ public class SqlInContextTest {
 		assertEquals("TIME",  sql.getConfigType("time", true) );
 		assertEquals("TIME",  sql.getConfigType("time", false) );
 		// New types in ver 4.3.0
-		assertEquals("TIMESTAMP",        sql.getConfigType("datetime", true) );
-		assertEquals("TIMESTAMP",        sql.getConfigType("datetime", false) );
-		assertEquals("TIMESTAMP WITH TIME ZONE",   sql.getConfigType("datetimetz", true) );
-		assertEquals("TIMESTAMP WITH TIME ZONE",   sql.getConfigType("datetimetz", false) );
-		assertEquals("TIME WITH TIME ZONE",             sql.getConfigType("timetz", true) );
-		assertEquals("TIME WITH TIME ZONE",             sql.getConfigType("timetz", false) );
+		assertEquals("TIMESTAMP",                sql.getConfigType("datetime", true) );
+		assertEquals("TIMESTAMP",                sql.getConfigType("datetime", false) );
+		assertEquals("TIMESTAMP WITH TIME ZONE", sql.getConfigType("datetimetz", true) );
+		assertEquals("TIMESTAMP WITH TIME ZONE", sql.getConfigType("datetimetz", false) );
+		assertEquals("TIME WITH TIME ZONE",      sql.getConfigType("timetz", true) );
+		assertEquals("TIME WITH TIME ZONE",      sql.getConfigType("timetz", false) );
 		assertEquals("CHAR(36)", sql.getConfigType("uuid", true) );
 		assertEquals("CHAR(36)", sql.getConfigType("uuid", false) );
 	}
 	
 	@Test
 	public void testMySQL() {
+		AttributeInContext attribute ;
 		SqlInContext sql = new SqlInContext("MySQL") ;
 		// check current SQL language and config file
 		assertEquals("MySQL", sql.getDatabaseName());
@@ -214,8 +220,8 @@ public class SqlInContextTest {
 		assertEquals("BIGINT",                  sql.getConfigType("long", false) );
 		assertEquals("BIGINT AUTO_INCREMENT",   sql.getConfigType("long", true) );
 		
-		assertEquals("VARCHAR(%s)",   sql.getConfigType("string", false) );
-		assertEquals("VARCHAR(%s)",   sql.getConfigType("string", true) ); // OK : auto-incr ignored
+		assertEquals("VARCHAR(%S)",   sql.getConfigType("string", false) );
+		assertEquals("VARCHAR(%S)",   sql.getConfigType("string", true) ); // OK : auto-incr ignored
 		assertEquals("DATETIME",  sql.getConfigType("timestamp", true) );
 		assertEquals("DATETIME",  sql.getConfigType("timestamp", false) );
 		assertEquals("TIME",      sql.getConfigType("time", true) );
@@ -229,6 +235,22 @@ public class SqlInContextTest {
 		assertEquals("TIME",      sql.getConfigType("timetz", false) );
 		assertEquals("CHAR(36)",  sql.getConfigType("uuid", true) );
 		assertEquals("CHAR(36)",  sql.getConfigType("uuid", false) );
+		
+		// Test "VARCHAR(%S)" -> Size is mandatory 
+		attribute = buildAttributeWithMaxLength("firstName", NeutralType.STRING, null);
+		assertEquals("VARCHAR(255)", sql.columnType(attribute)); // no size => 255 as default value
+		attribute = buildAttributeWithMaxLength("firstName", NeutralType.STRING, 34);
+		assertEquals("VARCHAR(34)", sql.columnType(attribute)); // use MaxLength for size 
+		attribute = buildAttributeWithSize("firstName", NeutralType.STRING, "48");
+		assertEquals("VARCHAR(48)", sql.columnType(attribute)); // use Size 
+
+		// Test "NUMERIC(%p)" -> Precision is not mandatory 
+		attribute = buildAttributeWithSize("price", NeutralType.DECIMAL, null);
+		assertEquals("NUMERIC", sql.columnType(attribute)); // no size => no precision
+		attribute = buildAttributeWithSize("price", NeutralType.DECIMAL, "10");
+		assertEquals("NUMERIC(10)", sql.columnType(attribute)); // size => used for precision
+		attribute = buildAttributeWithSize("price", NeutralType.DECIMAL, "10,2");
+		assertEquals("NUMERIC(10,2)", sql.columnType(attribute)); // size => used for precision
 	}
 	
 	@Test
@@ -257,12 +279,12 @@ public class SqlInContextTest {
 		// Type conversion 
 		assertEquals("int",           sql.getConfigType("int", false) );
 		assertEquals("int identity",  sql.getConfigType("int", true) );
-		assertEquals("varchar(%s)",   sql.getConfigType("string", false) );
-		assertEquals("varchar(%s)",   sql.getConfigType("string", true) );
-		assertEquals("time",  sql.getConfigType("time", true) );
-		assertEquals("time",  sql.getConfigType("time", false) );
-		assertEquals("datetime2",  sql.getConfigType("timestamp", true) );
-		assertEquals("datetime2",  sql.getConfigType("timestamp", false) );
+		assertEquals("varchar(%S)",   sql.getConfigType("string", false) );
+		assertEquals("varchar(%S)",   sql.getConfigType("string", true) );
+		assertEquals("time",          sql.getConfigType("time", true) );
+		assertEquals("time",          sql.getConfigType("time", false) );
+		assertEquals("datetime2",     sql.getConfigType("timestamp", true) );
+		assertEquals("datetime2",     sql.getConfigType("timestamp", false) );
 		// New types in ver 4.3.0
 		assertEquals("datetime2",        sql.getConfigType("datetime", true) );
 		assertEquals("datetime2",        sql.getConfigType("datetime", false) );
@@ -272,10 +294,27 @@ public class SqlInContextTest {
 		assertEquals("time",             sql.getConfigType("timetz", false) );
 		assertEquals("uniqueidentifier", sql.getConfigType("uuid", true) );
 		assertEquals("uniqueidentifier", sql.getConfigType("uuid", false) );
+
+		// Test "VARCHAR(%S)" -> Size is mandatory 
+		attribute = buildAttributeWithMaxLength("firstName", NeutralType.STRING, null);
+		assertEquals("varchar(255)", sql.columnType(attribute)); // no size => 255 as default value
+		attribute = buildAttributeWithMaxLength("firstName", NeutralType.STRING, 34);
+		assertEquals("varchar(34)", sql.columnType(attribute)); // use MaxLength for size 
+		attribute = buildAttributeWithSize("firstName", NeutralType.STRING, "48");
+		assertEquals("varchar(48)", sql.columnType(attribute)); // use Size 
+
+		// Test "NUMERIC(%p)" -> Precision is not mandatory 
+		attribute = buildAttributeWithSize("price", NeutralType.DECIMAL, null);
+		assertEquals("numeric", sql.columnType(attribute)); // no size => no precision
+		attribute = buildAttributeWithSize("price", NeutralType.DECIMAL, "10");
+		assertEquals("numeric(10)", sql.columnType(attribute)); // size => used for precision
+		attribute = buildAttributeWithSize("price", NeutralType.DECIMAL, "10,2");
+		assertEquals("numeric(10,2)", sql.columnType(attribute)); // size => used for precision
 	}
 
 	static final String TEXT = "TEXT";
 	static final String REAL = "REAL";
+	static final String INTEGER = "INTEGER";
 	@Test
 	public void testSQLite() {
 		SqlInContext sql = new SqlInContext("SQLite") ;
@@ -283,14 +322,14 @@ public class SqlInContextTest {
 		assertEquals("SQLite", sql.getDatabaseName());
 		assertEquals("target-db/sqlite.properties", sql.getDatabaseConfigFile());
 		// check type conversion 
-		assertEquals("INTEGER",  sql.getConfigType("byte", false) );
-		assertEquals("INTEGER",  sql.getConfigType("byte", true) );
-		assertEquals("INTEGER",  sql.getConfigType("short", false) );
-		assertEquals("INTEGER",  sql.getConfigType("short", true) );
-		assertEquals("INTEGER",  sql.getConfigType("int", false) );
-		assertEquals("INTEGER",  sql.getConfigType("int", true) );
-		assertEquals("INTEGER",  sql.getConfigType("long", false) );
-		assertEquals("INTEGER",  sql.getConfigType("long", true) );
+		assertEquals(INTEGER,  sql.getConfigType("byte", false) );
+		assertEquals(INTEGER,  sql.getConfigType("byte", true) );
+		assertEquals(INTEGER,  sql.getConfigType("short", false) );
+		assertEquals(INTEGER,  sql.getConfigType("short", true) );
+		assertEquals(INTEGER,  sql.getConfigType("int", false) );
+		assertEquals(INTEGER,  sql.getConfigType("int", true) );
+		assertEquals(INTEGER,  sql.getConfigType("long", false) );
+		assertEquals(INTEGER,  sql.getConfigType("long", true) );
 
 		assertEquals(REAL,  sql.getConfigType("float", false) );
 		assertEquals(REAL,  sql.getConfigType("float", true) );
@@ -397,27 +436,21 @@ public class SqlInContextTest {
 		}
 		return new AttributeInContext(null, fakeAttribute, null, new EnvInContext() );
 	}
-
-/***
-	private ForeignKeyInContext buidForeignKey1(ModelInContext model) {
-		FakeForeignKey fakeFK = new FakeForeignKey("FK_DRIVER_CAR1", "GoodDriver", "SpecialCar");
-//		fakeFK.addColumn(new FakeForeignKeyColumn("carId", "id", 1));
-		fakeFK.addAttribute(new FakeForeignKeyAttribute(1, "carId", "id"));
-		return new ForeignKeyInContext(fakeFK, model, new EnvInContext());
-	}
-
-	private ForeignKeyInContext buidForeignKey2(ModelInContext model) {
-//		FakeForeignKey fakeFK = new FakeForeignKey("FK_DRIVER_CAR", "GOOD_DRIVER", "SPECIAL_CAR");
-		FakeForeignKey fakeFK = new FakeForeignKey("FK_DRIVER_CAR2", "GoodDriver", "SpecialCar");
-//		fakeFK.addColumn(new FakeForeignKeyColumn("carId1", "myId1", 1));
-		fakeFK.addAttribute(new FakeForeignKeyAttribute(1, "carId1", "myId1"));
-//		fakeFK.addColumn(new FakeForeignKeyColumn("carId2", "myId2", 2));
-		fakeFK.addAttribute(new FakeForeignKeyAttribute(2, "carId2", "myId2"));
-		return new ForeignKeyInContext(fakeFK, model, new EnvInContext());
+	
+	private AttributeInContext buildAttributeWithMaxLength(String attribName, String neutralType, Integer maxLength) {
+		DslModelAttribute fakeAttribute = new DslModelAttribute(attribName, neutralType);
+		if ( maxLength != null ) {
+			fakeAttribute.setMaxLength(maxLength);
+		}
+		return new AttributeInContext(null, fakeAttribute, null, new EnvInContext() );
 	}
 	
-	private ModelInContext buildModel() {
-		
+	private AttributeInContext buildAttributeWithSize(String attribName, String neutralType, String size) {
+		DslModelAttribute fakeAttribute = new DslModelAttribute(attribName, neutralType);
+		if ( size != null ) {
+			fakeAttribute.setSize(size);
+		}
+		return new AttributeInContext(null, fakeAttribute, null, new EnvInContext() );
 	}
-**/
+
 }

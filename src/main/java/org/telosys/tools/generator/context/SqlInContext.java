@@ -73,6 +73,8 @@ public class SqlInContext {
 	private static final String CONV_COLUMN_NAME = "conv.columnName";
 	private static final String CONV_PK_NAME     = "conv.pkName";
 	private static final String CONV_FK_NAME     = "conv.fkName";
+	private static final String DEFAULT_SIZE       = "255";  // default size for mandatory size (for example "VARCHAR(%S)")
+	private static final String DEFAULT_PRECISION  = "10,2"; // default precision (10 with scale 2) for mandatory precision (for example "NUMERIC(%P)")
 	
 	private final NamingStyleConverter converter = new NamingStyleConverter();
 
@@ -648,15 +650,16 @@ public class SqlInContext {
 				return null ; 
 			}
 			else {
-				// >= 1
-				return size.toString(); // OK : keep it
+				// >= 1 => OK : keep it
+				String strValue = size.toString(); // eg "10" or "10.4"
+				return strValue.replace('.', ','); // eg "10" or "10,4"
 			}
 		}
 		return null ;
 	}
 
 	/**
-	 * Replaces size parameter (%s) (%S) (%p) (%P) for SQL types like 'varchar(..)' or 'number(..)'
+	 * Replaces parameter (%s) (%S) (%p) (%P) for SQL types like 'varchar(..)' or 'number(..)'
 	 * @param sqlType
 	 * @param varMandatory variable string to replace : "%S" or "%P"
 	 * @param varOptional  variable string to replace : "%s" or "%p"
@@ -666,13 +669,14 @@ public class SqlInContext {
 	protected String replaceVarSize(String sqlType, String varMandatory, String varOptional, Number size) {
 		String sizeOK = getSizeToApply(size);
 		if ( sqlType.contains(varMandatory) ) {
-			// SIZE IS MANDATORY 
-			if ( sizeOK != null ) {
-				return StrUtil.replaceVar(sqlType, varMandatory, sizeOK);
+			// SIZE IS MANDATORY : if no size => use default size (since v 4.3.0)
+			if ( sizeOK == null ) {
+				if ( varMandatory.equals("%S") ) sizeOK = DEFAULT_SIZE;
+				else if ( varMandatory.equals("%P") ) sizeOK = DEFAULT_PRECISION;
+				else throw new GeneratorSqlException("SQL type '" + sqlType + "': internal error: invalid var '"+varMandatory+"' ");
 			}
-			else {
-				throw new GeneratorSqlException("SQL type '" + sqlType + "' : size is mandatory");
-			}
+			// Replace "%S" or "%P" by the value, example : "VARCHAR(%S)" -> "VARCHAR(72)" or "NUMERIC(%P)" -> "NUMERIC(10)"
+			return StrUtil.replaceVar(sqlType, varMandatory, sizeOK);
 		}
 		else if ( sqlType.contains(varOptional) ) {
 			// SIZE IS OPTIONAL  
@@ -680,11 +684,13 @@ public class SqlInContext {
 				return StrUtil.replaceVar(sqlType, varOptional, sizeOK);
 			}
 			else {
-				return StrUtil.replaceVar(sqlType, "("+varOptional+")", ""); // remove "(%s) or (%p)"
+				// Keep only the type name, remove "(%s) or (%p)" 
+				// example : "VARCHAR(%s)" -> "VARCHAR"
+				return StrUtil.replaceVar(sqlType, "("+varOptional+")", "");
 			}
 		}
 		else {
-			throw new GeneratorSqlException("SQL type '" + sqlType + "' : internal error (size var)");
+			throw new GeneratorSqlException("SQL type '" + sqlType + "': internal error: unknown var ");
 		}
 	}
 
