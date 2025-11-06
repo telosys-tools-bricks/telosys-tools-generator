@@ -47,9 +47,8 @@ public class ModelInContext
 	private static final NamingStyleConverter converter = new NamingStyleConverter(); // v 4.1.0 (from old class SqlTableNameProvider)
 	
 	private final String    modelName ;
-//	private final String    modelFolderName ; // Removed in v 4.3.0
 	private final String    modelVersion ;
-//	private final ModelType modelType ; // Removed in v 4.3.0
+	// modelFolderName & modelType -> removed in v 4.3.0
 	
 	private final String   modelTitle ;
 	private final String   modelDescription ;
@@ -80,21 +79,17 @@ public class ModelInContext
 		if ( env == null ) throw new IllegalArgumentException("EnvInContext is null");
 		
 		this.modelName = model.getName();  // MANDATORY
-//		this.modelFolderName = model.getFolderName();  // Removed in v 4.3.0
 		this.modelVersion = model.getVersion(); // MANDATORY
-//		this.modelType = model.getType(); // Removed in v 4.3.0
 		// check validity 
 		if ( this.modelName == null ) throw new IllegalArgumentException("Model name is null");
-//		if ( this.modelFolderName == null ) throw new IllegalArgumentException("Model folder name is null"); // Removed in v 4.3.0
 		if ( this.modelVersion == null ) throw new IllegalArgumentException("Model version is null");
-//		if ( this.modelType == null ) throw new IllegalArgumentException("Model type is null"); // Removed in v 4.3.0
 		
 		this.modelTitle = model.getTitle() != null ? model.getTitle() : "" ;
 		this.modelDescription = model.getDescription() != null ? model.getDescription() : "" ;
 		
 		//--- All the entities (the original model order is kept)
-		this.entities = new LinkedList<>(); // v 3.0.0
-		for ( Entity entity : model.getEntities() ) { // v 3.0.0
+		this.entities = new LinkedList<>();
+		for ( Entity entity : model.getEntities() ) {
 			this.entities.add( 
 					new EntityInContext(entity, 
 							defaultEntityPackage,  // v 4.2.0
@@ -155,10 +150,9 @@ public class ModelInContext
 		text={	
 			"Returns the name of the folder where entities are located ",
 			"",
-			"(!) DEPRECATED : useless, always returns the model name"
+			"(!) DEPRECATED since ver 4.3.0 : useless, always returns the model name"
 		},
-		deprecated=true,
-		since="3.3.0"
+		deprecated=true
 	)
 	@Deprecated
     public String getFolderName() {
@@ -182,10 +176,9 @@ public class ModelInContext
 		text={	
 			"Returns the Telosys model type ",
 			"",
-			"(!) DEPRECATED : useless, always returns 'DSL-MODEL' "
+			"(!) DEPRECATED since ver 4.3.0 : useless, always returns 'DSL-MODEL' "
 		},
-		deprecated=true,
-		since="3.3.0"
+		deprecated=true
 	)
 	@Deprecated
     public String getType() {
@@ -267,7 +260,8 @@ public class ModelInContext
 			"...",
 			"#end",
 			""
-		}		
+		},
+		since="4.3.0"
 	)
     public List<EntityInContext> getEntities() {
 		return entities ;

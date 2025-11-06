@@ -657,8 +657,7 @@ public class JavaInContext {
 			"$java.validationAnnotations(4, $attribute)",
 			"#end" },
 		parameters = { 
-			"leftMargin : the left margin size (number of blanks) ",
-			"attribute : the attribute to be annotated "
+			"attribute : the attribute to be checked "
 			},
 		since = "4.3.0"
 	)

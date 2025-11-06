@@ -103,7 +103,9 @@ public class ValuesInContext {
 				"searchedValue : the value (string) to find "
 			},
 			example = {
-				"#if ( $values.contains('null') " 
+				"#if ( $values.contains('null') )" ,
+				"import static org.junit.jupiter.api.Assertions.assertNull;" ,
+				"#end" 
 			},
 			since = "4.3.0"
 		)
